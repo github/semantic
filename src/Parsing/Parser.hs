@@ -19,8 +19,7 @@ module Parsing.Parser
 , jsxParserALaCarte
 , jsxParserPrecise
 , jsxParser
-, phpParser
-, markdownParser
+, phpParserPrecise
 , pythonParserALaCarte
 , pythonParserPrecise
 , pythonParser
@@ -68,7 +67,6 @@ import qualified Language.TypeScript.Assignment as TypeScriptALaCarte
 import           Language.TypeScript.Grammar
 import           Prelude hiding (fail)
 import qualified TreeSitter.Language as TS (Language, Symbol)
-import           TreeSitter.PHP
 import           TreeSitter.TSX
 
 -- | A parser from 'Source' onto some term type.
@@ -154,16 +152,8 @@ jsxParser modes = case jsxMode modes of
   ALaCarte -> jsxParserALaCarte
   Precise  -> jsxParserPrecise
 
-<<<<<<< HEAD
-phpParser :: c PHP.Term => (Language, SomeParser c Loc)
-phpParser = (PHP, SomeParser (AssignmentParser (ASTParser tree_sitter_php) PHP.assignment))
-=======
-markdownParser :: c Markdown.Term => (Language, SomeParser c Loc)
-markdownParser = (Markdown, SomeParser (AssignmentParser MarkdownParser Markdown.assignment))
-
 phpParserPrecise :: c PHPPrecise.Term => (Language, SomeParser c Loc)
 phpParserPrecise = (PHP, SomeParser (UnmarshalParser @PHPPrecise.Term PHPPrecise.tree_sitter_php))
->>>>>>> origin/master
 
 pythonParserALaCarte :: c PythonALaCarte.Term => (Language, SomeParser c Loc)
 pythonParserALaCarte = (Python, SomeParser (AssignmentParser (ASTParser tree_sitter_python) PythonALaCarte.assignment))
