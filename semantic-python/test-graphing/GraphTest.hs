@@ -23,6 +23,7 @@ import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import qualified Language.Python.Grammar as TSP
 import           Scope.Graph.Convert
+import           Scope.Types
 import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
@@ -102,7 +103,7 @@ expectedQualifiedImport = do
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 7) (Pos 0 13))
   newReference (Name.name "cheese") refProperties
 
-  withScope "cheese" $ do
+  withScope (CurrentScope "cheese") $ do
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 14) (Pos 0 18))
     newReference (Name.name "ints") refProperties
   pure Complete
@@ -141,7 +142,7 @@ assertFunctionArg = do
 expectedFunctionArg :: ScopeGraphEff sig m => m Result
 expectedFunctionArg = do
   (_, associatedScope) <- declareFunction (Just $ Name.name "foo") (Props.Function ScopeGraph.Function (Span (Pos 0 0) (Pos 1 12)))
-  withScope associatedScope $ do
+  withScope (CurrentScope associatedScope) $ do
     declare "x" (Props.Declaration ScopeGraph.Parameter ScopeGraph.Default Nothing (Span (Pos 0 8) (Pos 0 9)))
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 1 11) (Pos 1 12))
     newReference "x" refProperties
