@@ -23,6 +23,7 @@ import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import qualified Language.Python.Grammar as TSP
 import           Scope.Graph.Convert
+import           Scope.Types
 import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
