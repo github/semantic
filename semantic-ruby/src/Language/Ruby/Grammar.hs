@@ -4,13 +4,9 @@ module Language.Ruby.Grammar
 , Grammar(..)
 ) where
 
+import AST.Grammar.TH
 import Language.Haskell.TH
 import TreeSitter.Ruby (tree_sitter_ruby)
-import AST.Grammar.TH
-import TreeSitter.Language (addDependentFileRelative)
-
--- Regenerate template haskell code when these files change:
-addDependentFileRelative "../../../vendor/tree-sitter-ruby/src/parser.c"
 
 -- | Statically-known rules corresponding to symbols in the grammar.
 mkStaticallyKnownRuleGrammarData (mkName "Grammar") tree_sitter_ruby
