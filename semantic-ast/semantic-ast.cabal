@@ -69,7 +69,7 @@ library
                      , tree-sitter-python   ^>= 0.9.0.1
                      , text                 ^>= 1.2.3.1
                      , unordered-containers ^>= 0.2.10
-                     , hedgehog             ^>= 0.6 && <2
+                     , hedgehog              >= 0.6 && <2
                      , pathtype             ^>= 0.8.1
                      , Glob                 ^>= 0.10.0
                      , attoparsec           ^>= 0.13.2.2
