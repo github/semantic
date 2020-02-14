@@ -26,6 +26,7 @@ module SpecHelpers
 
 import qualified Analysis.File as File
 import           Analysis.Name as X
+import           Analysis.Project as X
 import           Control.Abstract
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
@@ -56,7 +57,6 @@ import           Data.Language as X hiding (Precise)
 import           Data.List.NonEmpty as X (NonEmpty (..))
 import           Data.Maybe as X
 import           Data.Monoid as X (First (..), Last (..), Monoid (..))
-import           Data.Project as X
 import           Data.Proxy as X
 import           Data.Semigroup as X (Semigroup (..))
 import           Data.Semilattice.Lower as X

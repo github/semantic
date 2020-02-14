@@ -1,8 +1,7 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Context
-      (Comment)
-      (Empty))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "main") 
+    (ParameterList)))

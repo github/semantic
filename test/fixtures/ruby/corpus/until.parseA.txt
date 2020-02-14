@@ -1,12 +1,24 @@
-(Statements
-  (While
-    (Not
-      (Send
-        (Identifier)))
-    (Statements))
-  (While
-    (Not
-      (Send
-        (Identifier)))
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Until 
+          (Do) 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "foo"))))))))) 
+  (Statement 
+    (UntilModifier 
+      (Statement 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "foo")))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "done"))))))))

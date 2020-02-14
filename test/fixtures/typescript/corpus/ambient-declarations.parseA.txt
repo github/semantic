@@ -1,104 +1,108 @@
-(Statements
-  (AmbientDeclaration
-    (Class
-      (TypeIdentifier)
-      (PublicFieldDefinition
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Empty))))
-  (AmbientDeclaration
-    (VariableDeclaration
-      (Assignment
-        (Annotation
-          (PredefinedType))
-        (Identifier)
-        (Empty))))
-  (AmbientDeclaration
-    (AmbientFunction
-      (Empty)
-      (Annotation
-        (PredefinedType))
-      (Identifier)
-      (RequiredParameter
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier)
-        (Empty))))
-  (AmbientDeclaration
-    (InternalModule
-      (Identifier)
-      (AmbientFunction
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier)
-        (RequiredParameter
-          (Empty)
-          (Annotation
-            (PredefinedType))
-          (Identifier)
-          (Empty)))
-      (VariableDeclaration
-        (Assignment
-          (Annotation
-            (PredefinedType))
-          (Identifier)
-          (Empty)))
-      (InterfaceDeclaration
-        (Empty)
-        (TypeIdentifier)
-        (ObjectType
-          (PropertySignature
-            (Empty)
-            (Annotation
-              (PredefinedType))
-            (Identifier))))
-      (InterfaceDeclaration
-        (Empty)
-        (TypeIdentifier)
-        (ObjectType
-          (PropertySignature
-            (Empty)
-            (Annotation
-              (PredefinedType))
-            (Identifier))
-          (PropertySignature
-            (Empty)
-            (Annotation
-              (PredefinedType))
-            (Identifier))
-          (PropertySignature
-            (Empty)
-            (Annotation
-              (PredefinedType))
-            (Identifier))))))
-  (AmbientDeclaration
-    (Class
-      (TypeIdentifier)
-      (Statements
-        (MethodSignature
-          (Empty)
-          (Empty)
-          (Empty)
-          (Identifier)
-          (RequiredParameter
-            (Empty)
-            (Annotation
-              (PredefinedType))
-            (Identifier)
-            (Empty)))
-        (PublicFieldDefinition
-          (Empty)
-          (Annotation
-            (PredefinedType))
-          (Identifier)
-          (Empty))
-        (MethodSignature
-          (Empty)
-          (Empty)
-          (Annotation
-            (PredefinedType))
-          (Identifier))))))
+(Program 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (ClassDeclaration 
+            (ClassBody 
+              (PublicFieldDefinition 
+                (PropertyIdentifier "constructor") 
+                (TypeAnnotation 
+                  (TypeIdentifier "Function")))) 
+            (TypeIdentifier "Error")))))) 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (VariableDeclaration 
+            (VariableDeclarator 
+              (Identifier "foo") 
+              (TypeAnnotation 
+                (PredefinedType "number")))))))) 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (FunctionSignature 
+            (TypeAnnotation 
+              (PredefinedType "void")) 
+            (Identifier "greet") 
+            (FormalParameters 
+              (RequiredParameter 
+                (Identifier "greeting") 
+                (TypeAnnotation 
+                  (PredefinedType "string"))))))))) 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (InternalModule 
+            (StatementBlock 
+              (Statement 
+                (Declaration 
+                  (FunctionSignature 
+                    (TypeAnnotation 
+                      (PredefinedType "string")) 
+                    (Identifier "makeGreeting") 
+                    (FormalParameters 
+                      (RequiredParameter 
+                        (Identifier "s") 
+                        (TypeAnnotation 
+                          (PredefinedType "string"))))))) 
+              (Statement 
+                (Declaration 
+                  (LexicalDeclaration 
+                    (VariableDeclarator 
+                      (Identifier "numberOfGreetings") 
+                      (TypeAnnotation 
+                        (PredefinedType "number")))))) 
+              (Statement 
+                (Declaration 
+                  (InterfaceDeclaration 
+                    (ObjectType 
+                      (PropertySignature 
+                        (PropertyIdentifier "verbose") 
+                        (TypeAnnotation 
+                          (PredefinedType "boolean")))) 
+                    (TypeIdentifier "LogOptions")))) 
+              (Statement 
+                (Declaration 
+                  (InterfaceDeclaration 
+                    (ObjectType 
+                      (PropertySignature 
+                        (PropertyIdentifier "modal") 
+                        (TypeAnnotation 
+                          (PredefinedType "boolean"))) 
+                      (PropertySignature 
+                        (PropertyIdentifier "title") 
+                        (TypeAnnotation 
+                          (PredefinedType "string"))) 
+                      (PropertySignature 
+                        (PropertyIdentifier "color") 
+                        (TypeAnnotation 
+                          (PredefinedType "string")))) 
+                    (TypeIdentifier "AlertOptions"))))) 
+            (Identifier "myLib")))))) 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (ClassDeclaration 
+            (ClassBody 
+              (MethodSignature 
+                (PropertyIdentifier "constructor") 
+                (FormalParameters 
+                  (RequiredParameter 
+                    (Identifier "greeting") 
+                    (TypeAnnotation 
+                      (PredefinedType "string"))))) 
+              (PublicFieldDefinition 
+                (PropertyIdentifier "greeting") 
+                (TypeAnnotation 
+                  (PredefinedType "string"))) 
+              (MethodSignature 
+                (TypeAnnotation 
+                  (PredefinedType "void")) 
+                (PropertyIdentifier "showGreeting") 
+                (FormalParameters))) 
+            (TypeIdentifier "Greeter")))))))

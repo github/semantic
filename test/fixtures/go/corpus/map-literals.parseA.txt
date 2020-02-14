@@ -1,18 +1,32 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Assignment
-      (Identifier)
-      (Composite
-        (Map
-          (Identifier)
-          (Identifier))
-        (Statements
-          (KeyValue
-            (TextElement)
-            (TextElement))
-          (KeyValue
-            (TextElement)
-            (TextElement)))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (CompositeLiteral 
+                  (LiteralValue 
+                    (KeyedElement 
+                      (Expression 
+                        (InterpretedStringLiteral)) 
+                      (Expression 
+                        (InterpretedStringLiteral))) 
+                    (KeyedElement 
+                      (Expression 
+                        (InterpretedStringLiteral)) 
+                      (Expression 
+                        (InterpretedStringLiteral)))) 
+                  (MapType 
+                    (Type 
+                      (SimpleType 
+                        (TypeIdentifier "string"))) 
+                    (Type 
+                      (SimpleType 
+                        (TypeIdentifier "string"))))))) 
+            (Identifier "s"))))) 
+    (Identifier "main") 
+    (ParameterList)))

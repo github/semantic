@@ -1,43 +1,56 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Match
-        (Statements)
-        (Pattern
-          (Statements
-            (Identifier)
-            (Call
-              (Identifier)
-              (Statements)
-              (Empty)))
-          (Statements)))
-      (Match
-        (Statements
-          (Identifier))
-        (Pattern
-          (Statements
-            (Statements
-              (Integer)
-              (Integer))
-            (Call
-              (Identifier)
-              (Statements)
-              (Empty))
-            (Call
-              (Identifier)
-              (Statements)
-              (Empty))
-            (Pattern
-              (Identifier)
-              (Empty)))
-          (DefaultPattern
-            (Statements
-              (Call
-                (Identifier)
-                (Statements)
-                (Empty))
-              (Break
-                (Empty)))))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ExpressionSwitchStatement 
+          (ExpressionCase 
+            (ExpressionList 
+              (Expression 
+                (Identifier "foo"))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "f1")) 
+                    (ArgumentList)))))))) 
+      (Statement 
+        (ExpressionSwitchStatement 
+          (Expression 
+            (Identifier "e")) 
+          (ExpressionCase 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "1")) 
+              (Expression 
+                (IntLiteral "2"))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "a")) 
+                    (ArgumentList))))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "b")) 
+                    (ArgumentList))))) 
+            (Statement 
+              (FallthroughStatement "fallthrough"))) 
+          (DefaultCase 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "c")) 
+                    (ArgumentList))))) 
+            (Statement 
+              (BreakStatement)))))) 
+    (Identifier "main") 
+    (ParameterList)))

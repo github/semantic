@@ -1,16 +1,72 @@
-(Statements
-  (Negate
-    (Integer))
-  (Integer)
-  (Integer)
-  (Integer)
-  (Negate
-    (Integer))
-  (Integer)
-  (Integer)
-  (Integer)
-  (Integer)
-  (Integer)
-  (Integer)
-  (Integer)
-  (Integer))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (UnaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Integer "1"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "0xDEAD"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "0XDEAD"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "1j"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (UnaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Integer "1j"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "0o123"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "0O123"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "0b001"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "0B001"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "1_1"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "0B1_1"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "0O1_1"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "0L"))))))

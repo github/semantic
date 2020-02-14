@@ -1,8 +1,18 @@
-(Statements
-  (Try
-    (Statements
-      (Send
-        (Identifier))
-      (Finally
-        (Send
-          (Identifier))))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Begin 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "foo")))))) 
+          (Ensure 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "bar"))))))))))))

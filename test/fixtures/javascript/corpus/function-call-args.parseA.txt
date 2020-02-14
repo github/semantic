@@ -1,30 +1,38 @@
-(Statements
-  (Call
-    (Identifier)
-    (Float)
-    (TextElement)
-    (Function
-      (Empty)
-      (Empty)
-      (Empty)
-      (RequiredParameter
-        (Empty)
-        (Empty)
-        (Identifier)
-        (Empty))
-      (RequiredParameter
-        (Empty)
-        (Empty)
-        (Identifier)
-        (Empty))
-      (StatementBlock
-        (Call
-          (MemberAccess
-            (Identifier)
-            (Identifier))
-          (Identifier)
-          (Empty))
-        (Return
-          (Identifier))))
-    (Boolean)
-    (Empty)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (CallExpression 
+          (Expression 
+            (Identifier "someFunction")) 
+          (Arguments 
+            (Expression 
+              (Number "1")) 
+            (Expression 
+              (String)) 
+            (Expression 
+              (Function 
+                (StatementBlock 
+                  (Statement 
+                    (ExpressionStatement 
+                      (Expression 
+                        (CallExpression 
+                          (Expression 
+                            (MemberExpression 
+                              (PropertyIdentifier "log") 
+                              (Expression 
+                                (Identifier "console")))) 
+                          (Arguments 
+                            (Expression 
+                              (Identifier "a"))))))) 
+                  (Statement 
+                    (ReturnStatement 
+                      (Expression 
+                        (Identifier "b"))))) 
+                (FormalParameters 
+                  (RequiredParameter 
+                    (Identifier "a")) 
+                  (RequiredParameter 
+                    (Identifier "b"))))) 
+            (Expression 
+              (True "true"))))))))

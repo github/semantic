@@ -1,4 +1,9 @@
-(Statements
-  (ScopeEntry
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (BeginBlock 
+      (Statement 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "foo")))))))))

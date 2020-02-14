@@ -1,4 +1,5 @@
-(Statements
-  (TextElement)
-  (Statements
-    (TextElement)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (HeredocBeginning "<<TEXT")))))

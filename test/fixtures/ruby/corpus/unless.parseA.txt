@@ -1,10 +1,25 @@
-(Statements
-  (If
-    (Not
-      (Send
-        (Identifier)))
-    (Statements
-      (Send
-        (Identifier)))
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Unless 
+          (Else 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "bat"))))))) 
+          (Then 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "bar"))))))) 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "foo")))))))))))

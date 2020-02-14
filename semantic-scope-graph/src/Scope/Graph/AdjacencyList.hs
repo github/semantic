@@ -29,6 +29,8 @@ import           Scope.Scope
 import           Scope.Types
 import           Source.Span
 
+newtype CurrentScope address = CurrentScope { unCurrentScope :: address }
+
 newtype ScopeGraph scope = ScopeGraph { unScopeGraph :: Map scope (Scope scope) }
   deriving (Eq, Ord, Show)
 
@@ -130,6 +132,12 @@ insertReference :: Reference -> ModuleInfo -> Span -> Kind -> Path scopeAddress 
 insertReference ref moduleInfo span kind path scope = scope { references = Map.alter (\case
   Nothing -> pure ([ ReferenceInfo span kind moduleInfo ], path)
   Just (refInfos, path) -> pure (ReferenceInfo span kind moduleInfo : refInfos, path)) ref (references scope) }
+
+-- | Adds a reference and a Hole path to the given scope.
+newReference :: Reference -> ReferenceInfo -> Scope scopeAddress -> Scope scopeAddress
+newReference ref info scope = scope { references = Map.alter (\case
+  Nothing -> pure ([ info ], Hole)
+  Just (refInfos, path) -> pure (info : refInfos, path)) ref (references scope) }
 
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Info scopeAddress, Position)
 lookupDeclaration name scope g = do

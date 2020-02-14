@@ -1,15 +1,20 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Type
-        (Identifier)
-        (Constructor
-          (Empty)
-          (Field
-            (Identifier)
-            (Statements
-              (Identifier)
-              (Identifier))))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "s3") 
+            (Type 
+              (SimpleType 
+                (StructType 
+                  (FieldDeclarationList 
+                    (FieldDeclaration 
+                      (FieldIdentifier "h") 
+                      (Token) 
+                      (FieldIdentifier "i") 
+                      (TypeIdentifier "int")))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

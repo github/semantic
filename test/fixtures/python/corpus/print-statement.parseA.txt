@@ -1,25 +1,45 @@
-(Statements
-  (Call
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (Or
-      (Integer)
-      (Integer))
-    (Empty))
-  (Call
-    (Identifier)
-    (Or
-      (Integer)
-      (Integer))
-    (Or
-      (Integer)
-      (Integer))
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (PrintStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "a"))) 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "b"))))) 
+  (SimpleStatement 
+    (PrintStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "c"))))) 
+  (SimpleStatement 
+    (PrintStatement 
+      (Expression 
+        (BooleanOperator 
+          (Token) 
+          (Expression 
+            (PrimaryExpression 
+              (Integer "0"))) 
+          (Expression 
+            (PrimaryExpression 
+              (Integer "1"))))))) 
+  (SimpleStatement 
+    (PrintStatement 
+      (Expression 
+        (BooleanOperator 
+          (Token) 
+          (Expression 
+            (PrimaryExpression 
+              (Integer "0"))) 
+          (Expression 
+            (PrimaryExpression 
+              (Integer "1"))))) 
+      (Expression 
+        (BooleanOperator 
+          (Token) 
+          (Expression 
+            (PrimaryExpression 
+              (Integer "1"))) 
+          (Expression 
+            (PrimaryExpression 
+              (Integer "0"))))))))

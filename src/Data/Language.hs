@@ -3,6 +3,8 @@ module Data.Language
   , LanguageMode(..)
   , PerLanguageModes(..)
   , defaultLanguageModes
+  , preciseLanguageModes
+  , aLaCarteLanguageModes
   , codeNavLanguages
   , supportedExts
   ) where
@@ -36,7 +38,10 @@ data PerLanguageModes = PerLanguageModes
   deriving (Eq, Ord, Show)
 
 defaultLanguageModes :: PerLanguageModes
-defaultLanguageModes = PerLanguageModes
+defaultLanguageModes = preciseLanguageModes
+
+aLaCarteLanguageModes :: PerLanguageModes
+aLaCarteLanguageModes = PerLanguageModes
   { pythonMode = ALaCarte
   , rubyMode = ALaCarte
   , goMode = ALaCarte
@@ -44,6 +49,17 @@ defaultLanguageModes = PerLanguageModes
   , tsxMode = ALaCarte
   , javascriptMode = ALaCarte
   , jsxMode = ALaCarte
+  }
+
+preciseLanguageModes :: PerLanguageModes
+preciseLanguageModes = PerLanguageModes
+  { pythonMode = Precise
+  , rubyMode = Precise
+  , goMode = Precise
+  , typescriptMode = Precise
+  , tsxMode = Precise
+  , javascriptMode = Precise
+  , jsxMode = Precise
   }
 
 data LanguageMode

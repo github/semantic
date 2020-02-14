@@ -1,4 +1,7 @@
-(Statements
-  (Array
-    (TextElement)
-    (TextElement)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (StringArray 
+          (BareString) 
+          (BareString))))))

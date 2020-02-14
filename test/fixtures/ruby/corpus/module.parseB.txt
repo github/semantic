@@ -1,7 +1,12 @@
-(Statements
-  (Module
-    (Identifier)
-    (Method
-      (Empty)
-      (Identifier)
-      (Statements))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Module 
+          (Constant "Foo") 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Method 
+                  (MethodName 
+                    (Identifier "bar")))))))))))

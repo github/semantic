@@ -1,12 +1,20 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Assignment
-      (Statements
-        (Identifier)
-        (Identifier))
-      (Statements
-        (Integer)
-        (Integer)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (ShortVarDeclaration 
+            (ExpressionList 
+              (Expression 
+                (Identifier "a")) 
+              (Expression 
+                (Identifier "b"))) 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "1")) 
+              (Expression 
+                (IntLiteral "2"))))))) 
+    (Identifier "main") 
+    (ParameterList)))

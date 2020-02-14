@@ -1,13 +1,36 @@
-(Statements
-  (Comprehension
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier)))
-  (Comprehension
-    (Plus
-      (Identifier)
-      (Integer))
-    (Statements
-      (Identifier)
-      (Identifier))))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (SetComprehension 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "f"))) 
+            (ForInClause 
+              (Variables 
+                (PrimaryExpression 
+                  (Identifier "e"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "d"))))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (SetComprehension 
+            (Expression 
+              (PrimaryExpression 
+                (BinaryOperator 
+                  (Token) 
+                  (PrimaryExpression 
+                    (Identifier "c")) 
+                  (PrimaryExpression 
+                    (Integer "1"))))) 
+            (ForInClause 
+              (Variables 
+                (PrimaryExpression 
+                  (Identifier "b"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "a"))))))))))

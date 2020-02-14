@@ -1,14 +1,23 @@
-(Statements
-  (Function
-    (Empty)
-    (Empty)
-    (Identifier)
-    (StatementBlock
-      (VariableDeclaration
-        (Assignment
-          (Empty)
-          (Identifier)
-          (Float)))
-      (Yield
-        (Update
-          (Identifier))))))
+(Program 
+  (Statement 
+    (Declaration 
+      (GeneratorFunctionDeclaration 
+        (StatementBlock 
+          (Statement 
+            (Declaration 
+              (VariableDeclaration 
+                (VariableDeclarator 
+                  (Expression 
+                    (Number "0")) 
+                  (Identifier "index"))))) 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (YieldExpression 
+                  (Expression 
+                    (UpdateExpression 
+                      (Token) 
+                      (Expression 
+                        (Identifier "i"))))))))) 
+        (Identifier "foo") 
+        (FormalParameters)))))

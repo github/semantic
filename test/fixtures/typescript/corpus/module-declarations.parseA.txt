@@ -1,3 +1,6 @@
-(Statements
-  (Module
-    (Identifier)))
+(Program 
+  (Statement 
+    (Declaration 
+      (Module 
+        (StatementBlock) 
+        (Identifier "Promise")))))

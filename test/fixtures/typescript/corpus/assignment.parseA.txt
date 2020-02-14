@@ -1,4 +1,8 @@
-(Statements
-  (Assignment
-    (Identifier)
-    (Float)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (AssignmentExpression 
+          (Identifier "x") 
+          (Expression 
+            (Number "0")))))))

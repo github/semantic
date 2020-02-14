@@ -1,16 +1,17 @@
-(Statements
-  (FutureImport
-    (Alias
-      (Identifier)
-      (Identifier)))
-  (FutureImport
-    (Alias
-      (Identifier)
-      (Identifier))
-    (Alias
-      (Identifier)
-      (Identifier)))
-  (FutureImport
-    (Alias
-      (Identifier)
-      (Identifier))))
+(Module 
+  (SimpleStatement 
+    (FutureImportStatement 
+      (DottedName 
+        (Identifier "division")))) 
+  (SimpleStatement 
+    (FutureImportStatement 
+      (DottedName 
+        (Identifier "unicode_literals")) 
+      (DottedName 
+        (Identifier "print_function")))) 
+  (SimpleStatement 
+    (FutureImportStatement 
+      (AliasedImport 
+        (Identifier "g") 
+        (DottedName 
+          (Identifier "generators"))))))

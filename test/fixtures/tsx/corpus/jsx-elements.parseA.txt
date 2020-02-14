@@ -1,48 +1,57 @@
-(Statements
-  (VariableDeclaration
-    (Assignment
-      (Empty)
-      (Identifier)
-      (JsxElement
-        (JsxOpeningElement
-          (Identifier)
-          (Empty)
-          (JsxExpression
-            (Call
-              (Identifier)
-              (MemberAccess
-                (Identifier)
-                (Identifier))
-              (Empty))))
-        (JsxExpression
-          (Identifier))
-        (JsxClosingElement
-          (Identifier)))))
-  (VariableDeclaration
-    (Assignment
-      (Empty)
-      (Identifier)
-      (JsxElement
-        (JsxOpeningElement
-          (NestedIdentifier
-            (Identifier)
-            (Identifier))
-          (Empty))
-        (JsxClosingElement
-          (NestedIdentifier
-            (Identifier)
-            (Identifier))))))
-  (VariableDeclaration
-    (Assignment
-      (Empty)
-      (Identifier)
-      (JsxSelfClosingElement
-        (NestedIdentifier
-          (Identifier)
-          (Identifier))
-        (JsxAttribute
-          (Identifier)
-          (Empty))
-        (JsxAttribute
-          (Identifier)
-          (TextElement))))))
+(Program 
+  (Statement 
+    (Declaration 
+      (VariableDeclaration 
+        (VariableDeclarator 
+          (Expression 
+            (JsxElement 
+              (JsxClosingElement 
+                (Identifier "Text")) 
+              (JsxOpeningElement 
+                (JsxExpression 
+                  (SpreadElement 
+                    (Expression 
+                      (CallExpression 
+                        (Expression 
+                          (Identifier "css")) 
+                        (Arguments 
+                          (Expression 
+                            (MemberExpression 
+                              (PropertyIdentifier "titleText") 
+                              (Expression 
+                                (Identifier "styles"))))))))) 
+                (Identifier "Text")) 
+              (JsxExpression 
+                (Expression 
+                  (Identifier "children"))))) 
+          (Identifier "a"))))) 
+  (Statement 
+    (Declaration 
+      (VariableDeclaration 
+        (VariableDeclarator 
+          (Expression 
+            (JsxElement 
+              (JsxClosingElement 
+                (NestedIdentifier 
+                  (Identifier "Foo") 
+                  (Identifier "Text"))) 
+              (JsxOpeningElement 
+                (NestedIdentifier 
+                  (Identifier "Foo") 
+                  (Identifier "Text"))))) 
+          (Identifier "b"))))) 
+  (Statement 
+    (Declaration 
+      (VariableDeclaration 
+        (VariableDeclarator 
+          (Expression 
+            (JsxSelfClosingElement 
+              (JsxAttribute 
+                (PropertyIdentifier "foo")) 
+              (JsxAttribute 
+                (PropertyIdentifier "bar") 
+                (String)) 
+              (NestedIdentifier 
+                (Identifier "Foo") 
+                (Identifier "Text")))) 
+          (Identifier "c"))))))

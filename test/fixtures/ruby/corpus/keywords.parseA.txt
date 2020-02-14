@@ -1,5 +1,19 @@
-(Statements
-  (File)
-  (Line)
-  (Send
-    (Identifier)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Variable 
+            (Identifier "__FILE__")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Variable 
+            (Identifier "__LINE__")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Variable 
+            (Identifier "__ENCODING__")))))))

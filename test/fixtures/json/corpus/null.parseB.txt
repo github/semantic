@@ -1,6 +1,5 @@
 (Document 
   (Value 
     (Array 
-      [ 
-        (Value 
-          (Null "null")) ])))
+      (Value 
+        (Null "null")))))

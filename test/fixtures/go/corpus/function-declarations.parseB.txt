@@ -1,58 +1,83 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements))
-  (Function
-    (Identifier)
-    (Statements))
-  (Function
-    (Identifier)
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))
-    (Statements
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (Identifier))
-    (Statements))
-  (Function
-    (Statements
-      (Statements
-        (Identifier))
-      (Statements
-        (Identifier)))
-    (Identifier)
-    (Statements))
-  (Function
-    (Statements
-      (Statements
-        (Identifier)
-        (Identifier))
-      (Statements
-        (Identifier)
-        (Identifier)))
-    (Identifier)
-    (Statements))
-  (Function
-    (Statements)
-    (Identifier)
-    (NoOp
-      (Empty)))
-  (Function
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Function
-    (Context
-      (Comment)
-      (Empty))
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Pointer
-        (Identifier)))
-    (Statements)))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "main") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "fa") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block) 
+    (SimpleType 
+      (TypeIdentifier "int")) 
+    (Identifier "fb") 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "a") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "int")))) 
+      (ParameterDeclaration 
+        (Identifier "b") 
+        (Token) 
+        (Identifier "c") 
+        (Token) 
+        (Identifier "d") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "string")))))) 
+  (FunctionDeclaration 
+    (Block) 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "int")))) 
+      (ParameterDeclaration 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "error"))))) 
+    (Identifier "fc") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block) 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "result") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "int")))) 
+      (ParameterDeclaration 
+        (Identifier "err") 
+        (Type 
+          (SimpleType 
+            (TypeIdentifier "error"))))) 
+    (Identifier "fd") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (EmptyStatement ";"))) 
+    (ParameterList) 
+    (Identifier "fe") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (SimpleType 
+      (TypeIdentifier "int")) 
+    (Identifier "lockOSThread") 
+    (ParameterList)) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "setcontext") 
+    (ParameterList 
+      (ParameterDeclaration 
+        (Identifier "c") 
+        (Type 
+          (SimpleType 
+            (PointerType 
+              (Type 
+                (SimpleType 
+                  (TypeIdentifier "u"))))))))))

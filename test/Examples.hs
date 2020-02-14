@@ -18,7 +18,7 @@ import           Control.Monad
 import           Data.Blob
 import           Data.Foldable
 import           Data.Int
-import           Data.Language (LanguageMode (..), PerLanguageModes (..))
+import           Data.Language (LanguageMode (..), PerLanguageModes (..), aLaCarteLanguageModes, preciseLanguageModes)
 import           Data.List
 import qualified Data.Text as Text
 import           Data.Traversable
@@ -258,28 +258,6 @@ okALaCarteSymbol _ _ = True
 
 filterALaCarteSymbols :: String -> [Text.Text] -> [Text.Text]
 filterALaCarteSymbols lang = filter (okALaCarteSymbol lang)
-
-aLaCarteLanguageModes :: PerLanguageModes
-aLaCarteLanguageModes = PerLanguageModes
-  { pythonMode = ALaCarte
-  , rubyMode = ALaCarte
-  , goMode = ALaCarte
-  , typescriptMode = ALaCarte
-  , tsxMode = ALaCarte
-  , javascriptMode = ALaCarte
-  , jsxMode = ALaCarte
-  }
-
-preciseLanguageModes :: PerLanguageModes
-preciseLanguageModes = PerLanguageModes
-  { pythonMode = Precise
-  , rubyMode = Precise
-  , goMode = Precise
-  , typescriptMode = Precise
-  , tsxMode = Precise
-  , javascriptMode = Precise
-  , jsxMode = Precise
-  }
 
 testOptions :: Config.Options
 testOptions = defaultOptions

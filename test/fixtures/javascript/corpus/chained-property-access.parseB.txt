@@ -1,21 +1,33 @@
-(Statements
-  (Return
-    (Call
-      (MemberAccess
-        (Call
-          (MemberAccess
-            (Call
-              (MemberAccess
-                (Identifier)
-                (Identifier))
-              (Empty))
-            (Identifier))
-          (MemberAccess
-            (Identifier)
-            (Identifier))
-          (Empty))
-        (Identifier))
-      (MemberAccess
-        (Identifier)
-        (Identifier))
-      (Empty))))
+(Program 
+  (Statement 
+    (ReturnStatement 
+      (Expression 
+        (CallExpression 
+          (Expression 
+            (MemberExpression 
+              (PropertyIdentifier "fail") 
+              (Expression 
+                (CallExpression 
+                  (Expression 
+                    (MemberExpression 
+                      (PropertyIdentifier "done") 
+                      (Expression 
+                        (CallExpression 
+                          (Expression 
+                            (MemberExpression 
+                              (PropertyIdentifier "promise") 
+                              (Expression 
+                                (Identifier "returned")))) 
+                          (Arguments))))) 
+                  (Arguments 
+                    (Expression 
+                      (MemberExpression 
+                        (PropertyIdentifier "resolve") 
+                        (Expression 
+                          (Identifier "otherDefer"))))))))) 
+          (Arguments 
+            (Expression 
+              (MemberExpression 
+                (PropertyIdentifier "reject") 
+                (Expression 
+                  (Identifier "otherDefer"))))))))))

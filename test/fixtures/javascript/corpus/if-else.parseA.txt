@@ -1,14 +1,41 @@
-(Statements
-  (If
-    (Identifier)
-    (Identifier)
-    (If
-      (Identifier)
-      (Identifier)
-      (If
-        (Identifier)
-        (Identifier)
-        (If
-          (Identifier)
-          (Identifier)
-          (Identifier))))))
+(Program 
+  (Statement 
+    (IfStatement 
+      (Statement 
+        (IfStatement 
+          (Statement 
+            (IfStatement 
+              (Statement 
+                (IfStatement 
+                  (Statement 
+                    (ExpressionStatement 
+                      (Expression 
+                        (Identifier "g")))) 
+                  (Statement 
+                    (ExpressionStatement 
+                      (Expression 
+                        (Identifier "f")))) 
+                  (ParenthesizedExpression 
+                    (Expression 
+                      (Identifier "e"))))) 
+              (Statement 
+                (ExpressionStatement 
+                  (Expression 
+                    (Identifier "d")))) 
+              (ParenthesizedExpression 
+                (Expression 
+                  (Identifier "c"))))) 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (Identifier "b")))) 
+          (ParenthesizedExpression 
+            (Expression 
+              (Identifier "a"))))) 
+      (Statement 
+        (ExpressionStatement 
+          (Expression 
+            (Identifier "y")))) 
+      (ParenthesizedExpression 
+        (Expression 
+          (Identifier "x"))))))
