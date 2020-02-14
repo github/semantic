@@ -15,6 +15,7 @@ module Language.JSON.AST
 
 import           Prelude hiding (String)
 import           AST.GenerateSyntax
-import qualified Language.JSON.Grammar as Grammar
+import           Language.Haskell.TH.Syntax (runIO)
+import qualified TreeSitter.JSON as JSON (getNodeTypesPath, tree_sitter_json)
 
-astDeclarationsForLanguage Grammar.tree_sitter_json "../../../vendor/tree-sitter-json/src/node-types.json"
+runIO JSON.getNodeTypesPath >>= astDeclarationsForLanguage JSON.tree_sitter_json

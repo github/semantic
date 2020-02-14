@@ -43,7 +43,7 @@ import qualified Data.Syntax.Type as Type
 import qualified Language.TSX.Syntax as TSX.Syntax
 import           Language.TSX.Term as TSX
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
-import           TreeSitter.TSX as Grammar
+import           Language.TSX.Grammar as Grammar
 
 type Assignment = Assignment.Assignment Grammar
 

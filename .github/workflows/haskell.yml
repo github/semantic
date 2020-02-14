@@ -37,7 +37,7 @@ jobs:
       name: Cache ~/.cabal/store
       with:
         path: ~/.cabal/store
-        key: ${{ runner.os }}-${{ matrix.ghc }}-v9-cabal-store
+        key: ${{ runner.os }}-${{ matrix.ghc }}-v10-cabal-store
 
     - uses: actions/cache@v1
       name: Cache dist-newstyle

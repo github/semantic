@@ -29,11 +29,12 @@ import           Control.Effect.ScopeGraph
 import           Data.Module (ModuleInfo)
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
+import           Scope.Types
 
 type SketchC addr m
   = StateC (ScopeGraph Name)
   ( StateC Name
-  ( ReaderC Name
+  ( ReaderC (CurrentScope Name)
   ( ReaderC ModuleInfo
   ( FreshC m
   ))))
@@ -46,7 +47,7 @@ runSketch ::
 runSketch info go
   = evalFresh 0
   . runReader @ModuleInfo info
-  . runReader @Name rootname
+  . runReader (CurrentScope rootname)
   . evalState @Name rootname
   . runState @(ScopeGraph Name) initialGraph
   $ go
