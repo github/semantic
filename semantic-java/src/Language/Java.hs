@@ -1,5 +1,6 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+-- | Semantic functionality for Java programs.
 module Language.Java
 ( Term(..)
 , Language.Java.Grammar.tree_sitter_java
