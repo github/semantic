@@ -6,7 +6,6 @@ module Language.TSX.Grammar
 
 import AST.Grammar.TH
 import Language.Haskell.TH
-import TreeSitter.Language (addDependentFileRelative)
 import TreeSitter.TSX (tree_sitter_tsx)
 
 -- | Statically-known rules corresponding to symbols in the grammar.

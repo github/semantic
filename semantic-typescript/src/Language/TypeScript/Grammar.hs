@@ -6,7 +6,6 @@ module Language.TypeScript.Grammar
 
 import AST.Grammar.TH
 import Language.Haskell.TH
-import TreeSitter.Language (addDependentFileRelative)
 import TreeSitter.TypeScript (tree_sitter_typescript)
 
 -- | Statically-known rules corresponding to symbols in the grammar.
