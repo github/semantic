@@ -27,15 +27,14 @@ common haskell
                      , semantic-analysis ^>= 0
                      , semantic-ast
                      , semantic-core ^>= 0.0
-                     , semantic-codegen
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
                      , semilattices ^>= 0
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.8
-                     , tree-sitter-python ^>= 0.8.1
+                     , tree-sitter ^>= 0.9
+                     , tree-sitter-python ^>= 0.9.0.1
                      , containers
   ghc-options:
     -Weverything
@@ -86,7 +85,6 @@ test-suite compiling
                , process ^>= 1.6.5
                , resourcet ^>= 1.2.2
                , semantic-analysis ^>= 0
-               , semantic-codegen
                , streaming ^>= 0.2.2
                , streaming-process ^>= 0.1
                , streaming-bytestring ^>= 0.1.6
@@ -107,9 +105,38 @@ test-suite graphing
 
   build-depends: base
                , semantic-python
-               , semantic-codegen
                , semantic-scope-graph
                , bytestring
                , pathtype
                , tasty
                , tasty-hunit
+
+
+test-suite test
+  import: haskell
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Test.hs
+  build-depends:    base
+                  , tree-sitter
+                  , tree-sitter-python
+                  , semantic-ast
+                  , bytestring ^>= 0.10.8.2
+                  , hedgehog >= 0.6 && <2
+                  , pathtype ^>= 0.8.1
+                  , text
+                  , tasty
+                  , tasty-hedgehog
+                  , tasty-hunit
+
+executable benchmark
+  import: haskell
+  hs-source-dirs: bench
+  ghc-options: -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
+  main-is: Bench.hs
+  build-depends:
+      base
+    , gauge ^>= 0.2.5
+    , bytestring
+    , tree-sitter
+    , tree-sitter-python

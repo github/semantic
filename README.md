@@ -82,7 +82,7 @@ Available options:
 | 3        | TypeScript     | ✅     | ✅     | ✅    | ✅  | ✅      | ✅          | 🚧  | |
 | 4        | Python         | ✅     | ✅     | ✅    | ✅  | ✅      | ✅           | 🚧 | |
 | 5        | Go             | ✅     | ✅     | ✅    | ✅  | ✅      | ✅           | 🚧 | |
-|          | PHP            | ✅     | ✅     | ✅    | ✅  | ✅      | | | |
+|          | PHP            | Temporarily disabled     | Temporarily disabled   | Temporarily disabled  | Temporarily disabled| Temporarily disabled    | | | |
 |          | Java           | 🚧     | 🚧     | 🚧    | 🔶  | ✅      |               | | |
 |          | JSON           | ✅     | ✅     | ✅    | N/A | N/A     | N/A          | N/A| |
 |          | JSX            | ✅     | ✅     | ✅    | 🔶  |         |              | | |
