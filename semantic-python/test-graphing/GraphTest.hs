@@ -103,7 +103,7 @@ expectedQualifiedImport = do
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 7) (Pos 0 13))
   newReference (Name.name "cheese") refProperties
 
-  withScope "cheese" $ do
+  withScope (CurrentScope "cheese") $ do
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 14) (Pos 0 18))
     newReference (Name.name "ints") refProperties
   pure Complete
