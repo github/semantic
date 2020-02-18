@@ -25,6 +25,7 @@ import           Scope.Graph.Convert
 import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
+import qualified Stack.Graph as Stack
 import           System.Exit (die)
 import           System.Path ((</>))
 import qualified System.Path as Path
@@ -54,7 +55,20 @@ The graph should be
 
 
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
-runScopeGraph p _src item = run . runSketch (Just p) $ scopeGraph item
+runScopeGraph p _src item = snd . run . runSketch (Just p) $ scopeGraph item
+
+runStackGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (Stack.Graph Stack.Node, Result)
+runStackGraph p _src item = (\(stack, (scopeGraph, result)) -> (stack, result)) . run . runSketch (Just p) $ scopeGraph item
+
+runScopeGraphTest :: Monad m => SketchC Name m Result -> m (ScopeGraph.ScopeGraph Name, Result)
+runScopeGraphTest val = do
+  result <- runSketch Nothing $ val
+  pure (snd result)
+
+runStackGraphTest :: Monad m => SketchC Name m Result -> m (Stack.Graph Stack.Node, Result)
+runStackGraphTest val = do
+  result <- runSketch Nothing $ val
+  pure ((\(stack, (scopeGraph, result)) -> (stack, result)) result)
 
 sampleGraphThing :: ScopeGraphEff sig m => m Result
 sampleGraphThing = do
@@ -69,19 +83,25 @@ graphFile fp = do
   pyModule <- either die pure tree
   pure $ runScopeGraph (Path.absRel fp) (Source.fromUTF8 file) pyModule
 
+stackGraphFile :: FilePath -> IO (Stack.Graph Stack.Node, Result)
+stackGraphFile fp = do
+  file <- ByteString.readFile fp
+  tree <- TS.parseByteString @Py.Term @Loc TSP.tree_sitter_python file
+  pyModule <- either die pure tree
+  pure $ runStackGraph (Path.absRel fp) (Source.fromUTF8 file) pyModule
 
 assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do
   let path = "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
   (result, Complete) <- graphFile path
-  (expecto, Complete) <- runM $ runSketch Nothing sampleGraphThing
+  (expecto, Complete) <- runScopeGraphTest sampleGraphThing
   HUnit.assertEqual "Should work for simple case" expecto result
 
 assertSimpleReference :: HUnit.Assertion
 assertSimpleReference = do
   let path = "semantic-python/test/fixtures/5-01-simple-reference.py"
   (result, Complete) <- graphFile path
-  (expecto, Complete) <- runM $ runSketch Nothing expectedReference
+  (expecto, Complete) <- runScopeGraphTest expectedReference
 
   HUnit.assertEqual "Should work for simple case" expecto result
 
@@ -113,9 +133,8 @@ assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
   let path = "semantic-python/test/fixtures/5-02-simple-function.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedLexicalScope) of
-    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
-    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <> show msg)
+  (expecto, Complete) <- runScopeGraphTest expectedLexicalScope
+  HUnit.assertEqual "Should work for simple case" expecto graph
 
 expectedLexicalScope :: ScopeGraphEff sig m => m Result
 expectedLexicalScope = do
@@ -129,9 +148,8 @@ assertFunctionArg :: HUnit.Assertion
 assertFunctionArg = do
   let path = "semantic-python/test/fixtures/5-03-function-argument.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedFunctionArg) of
-    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
-    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+  (expecto, Complete) <- runScopeGraphTest expectedFunctionArg
+  HUnit.assertEqual "Should work for simple case" expecto graph
 
 expectedFunctionArg :: ScopeGraphEff sig m => m Result
 expectedFunctionArg = do
@@ -150,25 +168,29 @@ assertWildcardImport :: HUnit.Assertion
 assertWildcardImport = do
   let path = "semantic-python/test/fixtures/cheese/6-01-imports.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedWildcardImport) of
-    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
-    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+  (expecto, Complete) <- runScopeGraphTest expectedWildcardImport
+  HUnit.assertEqual "Should work for simple case" expecto graph
 
 assertQualifiedImport :: HUnit.Assertion
 assertQualifiedImport = do
   let path = "semantic-python/test/fixtures/cheese/6-02-qualified-imports.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedQualifiedImport) of
-    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
-    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+  (expecto, Complete) <- runScopeGraphTest expectedQualifiedImport
+  HUnit.assertEqual "Should work for simple case" expecto graph
+
+assertStackQualifiedImport :: HUnit.Assertion
+assertStackQualifiedImport = do
+  let path = "semantic-python/test/fixtures/cheese/6-02-qualified-imports.py"
+  (graph, _) <- graphFile path
+  (expecto, Complete) <- runScopeGraphTest expectedQualifiedImport
+  HUnit.assertEqual "Should work for simple case" expecto graph
 
 assertImportFromSymbols :: HUnit.Assertion
 assertImportFromSymbols = do
   let path = "semantic-python/test/fixtures/cheese/6-03-import-from.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedImportFromSymbols) of
-    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
-    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+  (expecto, Complete) <- runScopeGraphTest expectedImportFromSymbols
+  HUnit.assertEqual "Should work for simple case" expecto graph
 
 expectedImportFromSymbols :: ScopeGraphEff sig m => m Result
 expectedImportFromSymbols = do
@@ -194,9 +216,8 @@ assertImportFromSymbolAliases :: HUnit.Assertion
 assertImportFromSymbolAliases = do
   let path = "semantic-python/test/fixtures/cheese/6-04-import-from-alias.py"
   (graph, _) <- graphFile path
-  case run (runSketch Nothing expectedImportFromSymbolAliases) of
-    (expecto, Complete) -> HUnit.assertEqual "Should work for simple case" expecto graph
-    (_, Todo msg)       -> HUnit.assertFailure ("Failed to complete:" <>  show msg)
+  (expecto, Complete) <- runScopeGraphTest expectedImportFromSymbolAliases
+  HUnit.assertEqual "Should work for simple case" expecto graph
 
 expectedImportFromSymbolAliases :: ScopeGraphEff sig m => m Result
 expectedImportFromSymbolAliases = do
@@ -229,20 +250,25 @@ main = do
 
   Tasty.defaultMain $
     Tasty.testGroup "Tests" [
-      Tasty.testGroup "declare" [
-        HUnit.testCase "toplevel assignment" assertSimpleAssignment
+      Tasty.testGroup "scope graph" [
+        Tasty.testGroup "declare" [
+          HUnit.testCase "toplevel assignment" assertSimpleAssignment
+        ],
+        Tasty.testGroup "reference" [
+          HUnit.testCase "simple reference" assertSimpleReference
+        ],
+        Tasty.testGroup "lexical scopes" [
+          HUnit.testCase "simple function scope" assertLexicalScope
+        , HUnit.testCase "simple function argument" assertFunctionArg
+        ],
+        Tasty.testGroup "imports" [
+          HUnit.testCase "simple function argument" assertWildcardImport
+          , HUnit.testCase "qualified imports" assertQualifiedImport
+          , HUnit.testCase "qualified imports with symbols" assertImportFromSymbols
+          , HUnit.testCase "qualified imports with symbol aliases" assertImportFromSymbolAliases
+        ]
       ],
-      Tasty.testGroup "reference" [
-        HUnit.testCase "simple reference" assertSimpleReference
-      ],
-      Tasty.testGroup "lexical scopes" [
-        HUnit.testCase "simple function scope" assertLexicalScope
-      , HUnit.testCase "simple function argument" assertFunctionArg
-      ],
-      Tasty.testGroup "imports" [
-        HUnit.testCase "simple function argument" assertWildcardImport
-        , HUnit.testCase "qualified imports" assertQualifiedImport
-        , HUnit.testCase "qualified imports with symbols" assertImportFromSymbols
-        , HUnit.testCase "qualified imports with symbol aliases" assertImportFromSymbolAliases
-      ]
+    Tasty.testGroup "stack graph" [
+      HUnit.testCase "qualified import" assertStackQualifiedImport
+    ]
     ]

@@ -32,6 +32,7 @@ library
     Scope.Reference
     Scope.Scope
     Scope.Types
+    Stack.Graph
     Data.Hole
     Data.Module
     Data.ScopeGraph
