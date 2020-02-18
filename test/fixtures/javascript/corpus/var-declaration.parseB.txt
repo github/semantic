@@ -1,14 +1,12 @@
-(Statements
-  (VariableDeclaration
-    (Assignment
-      (Empty)
-      (Identifier)
-      (Empty))
-    (Assignment
-      (Empty)
-      (Identifier)
-      (Hash))
-    (Assignment
-      (Empty)
-      (Identifier)
-      (Empty))))
+(Program 
+  (Statement 
+    (Declaration 
+      (VariableDeclaration 
+        (VariableDeclarator 
+          (Identifier "x")) 
+        (VariableDeclarator 
+          (Expression 
+            (Object)) 
+          (Identifier "y")) 
+        (VariableDeclarator 
+          (Identifier "z"))))))

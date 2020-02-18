@@ -1,9 +1,23 @@
-(Statements
-  (Send
-    (Identifier))
-  (Send
-    (Send
-      (Identifier))
-    (Identifier))
-  (Send
-    (Identifier)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Variable 
+            (Identifier "print")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Call 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "foo")))) 
+            (Identifier "bar")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Variable 
+            (Identifier "bar")))))))

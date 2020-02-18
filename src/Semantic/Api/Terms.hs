@@ -29,7 +29,7 @@ import           Data.Either
 import           Data.Foldable
 import           Data.Functor.Classes
 import           Data.Functor.Foldable
-import           Data.Graph.Algebraic (Edge(..), vertexList, edgeList)
+import           Data.Graph.Algebraic (Edge (..), edgeList, vertexList)
 import           Data.Language
 import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
@@ -55,6 +55,7 @@ import           Source.Loc
 import qualified Language.Go as GoPrecise
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
+import qualified Language.PHP as PHPPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Ruby as RubyPrecise
 import qualified Language.TSX as TSXPrecise
@@ -134,6 +135,9 @@ instance ShowTermBy 'Precise Java.Term where
 instance ShowTermBy 'Precise JSON.Term where
   showTermBy = serialize Show . void . JSON.getTerm
 
+instance ShowTermBy 'Precise PHPPrecise.Term where
+  showTermBy = serialize Show . void . PHPPrecise.getTerm
+
 instance ShowTermBy 'Precise PythonPrecise.Term where
   showTermBy = serialize Show . void . PythonPrecise.getTerm
 
@@ -170,6 +174,9 @@ instance SExprTermBy 'Precise Java.Term where
 
 instance SExprTermBy 'Precise JSON.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . JSON.getTerm
+
+instance SExprTermBy 'Precise PHPPrecise.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . PHPPrecise.getTerm
 
 instance SExprTermBy 'Precise PythonPrecise.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm

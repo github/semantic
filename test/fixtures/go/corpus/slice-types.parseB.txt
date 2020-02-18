@@ -1,17 +1,30 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Statements
-        (Type
-          (Identifier)
-          (Slice
-            (Slice
-              (Identifier)))))
-      (Statements
-        (Type
-          (Identifier)
-          (Slice
-            (Identifier)))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "a") 
+            (Type 
+              (SimpleType 
+                (SliceType 
+                  (Type 
+                    (SimpleType 
+                      (SliceType 
+                        (Type 
+                          (SimpleType 
+                            (TypeIdentifier "p")))))))))))) 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "c") 
+            (Type 
+              (SimpleType 
+                (SliceType 
+                  (Type 
+                    (SimpleType 
+                      (TypeIdentifier "y")))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

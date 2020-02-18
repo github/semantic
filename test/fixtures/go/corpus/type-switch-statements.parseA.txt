@@ -1,100 +1,166 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (TypeSwitch
-        (Statements
-          (Assignment
-            (Identifier)
-            (Identifier))
-          (Identifier))
-        (Statements
-          (Statements
-            (Identifier)
-            (Pointer
-              (MemberAccess
-                (Identifier)
-                (Identifier))))
-          (Context
-            (Comment)
-            (Statements
-              (Slice
-                (Identifier))
-              (Call
-                (Identifier)
-                (Statements)
-                (Empty))))
-          (Statements
-            (Pointer
-              (Identifier))
-            (Break
-              (Empty)))))
-      (TypeSwitch
-        (Statements
-          (Identifier)
-          (Identifier))
-        (Statements
-          (Statements
-            (Identifier)
-            (Call
-              (MemberAccess
-                (Identifier)
-                (Identifier))
-              (Statements
-                (TextElement)
-                (Times
-                  (Identifier)
-                  (Integer)))
-              (Empty)))
-          (Statements
-            (Identifier)
-            (Call
-              (MemberAccess
-                (Identifier)
-                (Identifier))
-              (Statements
-                (TextElement)
-                (DividedBy
-                  (Integer)
-                  (Identifier)))
-              (Empty)))
-          (Statements
-            (Identifier)
-            (Assignment
-              (Identifier)
-              (DividedBy
-                (Call
-                  (Identifier)
-                  (Identifier)
-                  (Empty))
-                (Integer)))
-            (Call
-              (MemberAccess
-                (Identifier)
-                (Identifier))
-              (Statements
-                (TextElement)
-                (Plus
-                  (Slice
-                    (Identifier)
-                    (Identifier)
-                    (Empty)
-                    (Empty))
-                  (Slice
-                    (Identifier)
-                    (Empty)
-                    (Identifier)
-                    (Empty))))
-              (Empty)))
-          (DefaultPattern
-            (Statements))))
-      (TypeSwitch
-        (Empty)
-        (Statements
-          (Identifier)
-          (Identifier)
-          (Context
-            (Comment)
-            (Empty)))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeSwitchStatement 
+          (Expression 
+            (Identifier "f")) 
+          (SimpleStatement 
+            (ShortVarDeclaration 
+              (ExpressionList 
+                (Expression 
+                  (Identifier "c"))) 
+              (ExpressionList 
+                (Expression 
+                  (Identifier "d"))))) 
+          (TypeCase 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "nil"))) 
+            (Token) 
+            (Type 
+              (SimpleType 
+                (PointerType 
+                  (Type 
+                    (SimpleType 
+                      (QualifiedType 
+                        (TypeIdentifier "LSym") 
+                        (PackageIdentifier "obj")))))))) 
+          (TypeCase 
+            (Type 
+              (SimpleType 
+                (SliceType 
+                  (Type 
+                    (SimpleType 
+                      (TypeIdentifier "Person")))))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "a")) 
+                    (ArgumentList)))))) 
+          (TypeCase 
+            (Type 
+              (SimpleType 
+                (PointerType 
+                  (Type 
+                    (SimpleType 
+                      (TypeIdentifier "Dog")))))) 
+            (Statement 
+              (BreakStatement))))) 
+      (Statement 
+        (TypeSwitchStatement 
+          (Expression 
+            (Identifier "i")) 
+          (ExpressionList 
+            (Expression 
+              (Identifier "v"))) 
+          (TypeCase 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "int"))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (SelectorExpression 
+                        (FieldIdentifier "Println") 
+                        (Expression 
+                          (Identifier "fmt")))) 
+                    (ArgumentList 
+                      (Expression 
+                        (InterpretedStringLiteral)) 
+                      (Expression 
+                        (BinaryExpression 
+                          (Token) 
+                          (Expression 
+                            (Identifier "v")) 
+                          (Expression 
+                            (IntLiteral "2")))))))))) 
+          (TypeCase 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "float64"))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (SelectorExpression 
+                        (FieldIdentifier "Println") 
+                        (Expression 
+                          (Identifier "fmt")))) 
+                    (ArgumentList 
+                      (Expression 
+                        (InterpretedStringLiteral)) 
+                      (Expression 
+                        (BinaryExpression 
+                          (Token) 
+                          (Expression 
+                            (IntLiteral "1")) 
+                          (Expression 
+                            (Identifier "v")))))))))) 
+          (TypeCase 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "string"))) 
+            (Statement 
+              (SimpleStatement 
+                (ShortVarDeclaration 
+                  (ExpressionList 
+                    (Expression 
+                      (Identifier "h"))) 
+                  (ExpressionList 
+                    (Expression 
+                      (BinaryExpression 
+                        (Token) 
+                        (Expression 
+                          (CallExpression 
+                            (Expression 
+                              (Identifier "len")) 
+                            (ArgumentList 
+                              (Expression 
+                                (Identifier "v"))))) 
+                        (Expression 
+                          (IntLiteral "2")))))))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (SelectorExpression 
+                        (FieldIdentifier "Println") 
+                        (Expression 
+                          (Identifier "fmt")))) 
+                    (ArgumentList 
+                      (Expression 
+                        (InterpretedStringLiteral)) 
+                      (Expression 
+                        (BinaryExpression 
+                          (Token) 
+                          (Expression 
+                            (SliceExpression 
+                              (Expression 
+                                (Identifier "h")) 
+                              (Expression 
+                                (Identifier "v")))) 
+                          (Expression 
+                            (SliceExpression 
+                              (Expression 
+                                (Identifier "h")) 
+                              (Expression 
+                                (Identifier "v")))))))))))) 
+          (DefaultCase))) 
+      (Statement 
+        (TypeSwitchStatement 
+          (Expression 
+            (Identifier "r")) 
+          (ExpressionList 
+            (Expression 
+              (Identifier "_")))))) 
+    (Identifier "main") 
+    (ParameterList)))

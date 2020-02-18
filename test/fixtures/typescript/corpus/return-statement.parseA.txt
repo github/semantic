@@ -1,3 +1,5 @@
-(Statements
-  (Return
-    (Float)))
+(Program 
+  (Statement 
+    (ReturnStatement 
+      (Expression 
+        (Number "5")))))

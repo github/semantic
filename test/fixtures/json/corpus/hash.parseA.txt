@@ -1,32 +1,23 @@
 (Document 
   (Value 
     (Object 
-      [ 
-        (Pair 
-          (Value 
-            (Number "1")) 
-          (String 
-            [ 
-              (StringContent 
-                []) ])) 
-        (Pair 
-          (Value 
-            (Number "2")) 
-          (String 
-            [ 
-              (StringContent 
-                []) ])) 
-        (Pair 
-          (Value 
-            (Number "3")) 
-          (String 
-            [ 
-              (StringContent 
-                []) ])) 
-        (Pair 
-          (Value 
-            (Number "4")) 
-          (String 
-            [ 
-              (StringContent 
-                []) ])) ])))
+      (Pair 
+        (Value 
+          (Number "1")) 
+        (String 
+          (StringContent))) 
+      (Pair 
+        (Value 
+          (Number "2")) 
+        (String 
+          (StringContent))) 
+      (Pair 
+        (Value 
+          (Number "3")) 
+        (String 
+          (StringContent))) 
+      (Pair 
+        (Value 
+          (Number "4")) 
+        (String 
+          (StringContent))))))

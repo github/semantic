@@ -1,8 +1,29 @@
-(Statements
-  (Integer)
-  (Integer)
-  (Integer)
-  (Integer)
-  (Integer)
-  (Integer)
-  (Float))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Integer "1234")))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Integer "1_234")))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Integer "0d1_234")))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Integer "0xa_bcd_ef0_123_456_789")))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Integer "0o1234567")))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Integer "0b1_0")))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Float "1.234_5e678_90")))))

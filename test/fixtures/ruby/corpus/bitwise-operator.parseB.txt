@@ -1,11 +1,27 @@
-(Statements
-  (BAnd
-    (Send
-      (Identifier))
-    (Send
-      (Identifier)))
-  (LShift
-    (Send
-      (Identifier))
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Binary 
+      (Token) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "a"))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "b"))))))) 
+  (Statement 
+    (Binary 
+      (Token) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "a"))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "b"))))))))

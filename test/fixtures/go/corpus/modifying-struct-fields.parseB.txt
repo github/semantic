@@ -1,19 +1,33 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Assignment
-      (Identifier)
-      (Reference
-        (Composite
-          (Identifier)
-          (Statements
-            (KeyValue
-              (Identifier)
-              (Call
-                (Identifier)
-                (MemberAccess
-                  (Identifier)
-                  (Identifier))
-                (Empty)))))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (ShortVarDeclaration 
+            (ExpressionList 
+              (Expression 
+                (Identifier "ctx"))) 
+            (ExpressionList 
+              (Expression 
+                (UnaryExpression 
+                  (Token) 
+                  (Expression 
+                    (CompositeLiteral 
+                      (LiteralValue 
+                        (KeyedElement 
+                          (FieldIdentifier "trackedLocksMu") 
+                          (Expression 
+                            (CallExpression 
+                              (Expression 
+                                (Identifier "new")) 
+                              (ArgumentList 
+                                (Type 
+                                  (SimpleType 
+                                    (QualifiedType 
+                                      (TypeIdentifier "Mutex") 
+                                      (PackageIdentifier "sync"))))))))) 
+                      (TypeIdentifier "uploadContext")))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

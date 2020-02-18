@@ -1,5 +1,9 @@
-(Statements
-  (Hash
-    (KeyValue
-      (TextElement)
-      (TextElement))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Object 
+          (Pair 
+            (Expression 
+              (String)) 
+            (String)))))))

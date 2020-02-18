@@ -1,24 +1,44 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Type
-        (Identifier)
-        (Function
-          (Statements
-            (Identifier))
-          (Identifier)))
-      (Type
-        (Identifier)
-        (Function
-          (Statements
-            (Identifier))
-          (Statements
-            (Identifier))
-          (Statements
-            (Statements
-              (Identifier))
-            (Statements
-              (Identifier))))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "a") 
+            (Type 
+              (SimpleType 
+                (FunctionType 
+                  (SimpleType 
+                    (TypeIdentifier "int")) 
+                  (ParameterList 
+                    (ParameterDeclaration 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "int"))))))))) 
+          (TypeSpec 
+            (TypeIdentifier "b") 
+            (Type 
+              (SimpleType 
+                (FunctionType 
+                  (ParameterList 
+                    (ParameterDeclaration 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "bool")))) 
+                    (ParameterDeclaration 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "error"))))) 
+                  (ParameterList 
+                    (ParameterDeclaration 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "int")))) 
+                    (ParameterDeclaration 
+                      (Type 
+                        (SimpleType 
+                          (TypeIdentifier "string")))))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

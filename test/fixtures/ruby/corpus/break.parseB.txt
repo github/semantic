@@ -1,7 +1,13 @@
-(Statements
-  (While
-    (Not
-      (Send
-        (Identifier)))
-    (Break
-      (Empty))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Until 
+          (Do 
+            (Statement 
+              (Break))) 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "b"))))))))))

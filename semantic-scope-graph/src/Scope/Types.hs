@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Scope.Types
   ( Slot (..)
   , EdgeLabel (..)
@@ -10,13 +10,15 @@ module Scope.Types
   , AccessControl (..)
   , Relation (..)
   , Declaration (..)
+  -- * Identificatory newtypes
+  , CurrentScope (..)
   ) where
 
+import Analysis.Name
 import Data.Aeson (ToJSON)
 import Data.Hashable
 import Data.Hole
 import Data.Semilattice.Lower
-import Analysis.Name
 import Data.Text (Text)
 import GHC.Generics (Generic)
 
@@ -114,3 +116,7 @@ data Relation = Default | Instance | Prelude | Gensym
 
 instance Lower Relation where
   lowerBound = Default
+-- | A newtype indicating that the wrapped datum represents a parent scope
+-- in some contextual computation.
+newtype CurrentScope address = CurrentScope { unCurrentScope :: address }
+

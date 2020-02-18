@@ -1,9 +1,15 @@
-(Statements
-  (Send
-    (Context
-      (Statements
-        (TextElement))
-      (Send
-        (Identifier)
-        (TextElement)))
-    (Identifier)))
+(Program 
+  (Statement 
+    (MethodCall 
+      (ArgumentList) 
+      (Call 
+        (Primary 
+          (Lhs 
+            (MethodCall 
+              (ArgumentList 
+                (Arg 
+                  (Primary 
+                    (HeredocBeginning "<<-SQL")))) 
+              (Variable 
+                (Identifier "select"))))) 
+        (Identifier "join")))))

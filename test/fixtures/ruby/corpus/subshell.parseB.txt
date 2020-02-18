@@ -1,2 +1,5 @@
-(Statements
-  (TextElement))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Subshell)))))

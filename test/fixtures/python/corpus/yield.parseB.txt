@@ -1,5 +1,7 @@
-(Statements
-  (Yield
-    (Empty))
-  (Yield
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Yield))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Yield))))

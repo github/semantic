@@ -1,16 +1,16 @@
-(Statements
-  (InterfaceDeclaration
-    (Empty)
-    (TypeIdentifier)
-    (ObjectType
-      (PropertySignature
-        (Empty)
-        (Annotation
-          (LiteralType
-            (TextElement)))
-        (Identifier))
-      (PropertySignature
-        (Readonly)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)))))
+(Program 
+  (Statement 
+    (Declaration 
+      (InterfaceDeclaration 
+        (ObjectType 
+          (PropertySignature 
+            (PropertyIdentifier "type") 
+            (TypeAnnotation 
+              (LiteralType 
+                (String)))) 
+          (PropertySignature 
+            (PropertyIdentifier "error") 
+            (TypeAnnotation 
+              (TypeIdentifier "Error")) 
+            (Readonly "readonly"))) 
+        (TypeIdentifier "IError")))))

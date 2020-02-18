@@ -1,27 +1,46 @@
-(Statements
-  (Send
-    (Identifier)
-    (Send
-      (Identifier))
-    (Function
-      (Empty)
-      (Statements)))
-  (Send
-    (Send
-      (Identifier))
-    (Identifier)
-    (Function
-      (Empty)
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (Statements)))
-  (Send
-    (Identifier)
-    (Send
-      (Identifier))
-    (Function
-      (Empty)
-      (Identifier)
-      (Statements)))
-  (Identifier))
+(Program 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a")))))) 
+      (DoBlock) 
+      (Variable 
+        (Identifier "foo")))) 
+  (Statement 
+    (MethodCall 
+      (DoBlock 
+        (BlockParameters 
+          (Identifier "x") 
+          (KeywordParameter 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "i"))))) 
+            (Identifier "name")) 
+          (SplatParameter 
+            (Identifier "args")))) 
+      (Call 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "foo")))) 
+        (Identifier "bar")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a")))))) 
+      (Block 
+        (BlockParameters 
+          (Identifier "x"))) 
+      (Variable 
+        (Identifier "foo")))) 
+  (Uninterpreted "\nword\nx\n"))

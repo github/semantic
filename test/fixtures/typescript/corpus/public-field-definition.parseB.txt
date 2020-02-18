@@ -1,66 +1,68 @@
-(Statements
-  (Class
-    (TypeIdentifier)
-    (Statements
-      (PublicFieldDefinition
-        (Readonly)
-        (Empty)
-        (Identifier)
-        (Empty))
-      (PublicFieldDefinition
-        (Readonly)
-        (Empty)
-        (Identifier)
-        (Empty))
-      (PublicFieldDefinition
-        (Readonly)
-        (Empty)
-        (Identifier)
-        (Empty))
-      (PublicFieldDefinition
-        (Readonly)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Readonly)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (TextElement))
-      (PublicFieldDefinition
-        (Empty)
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Identifier)
-        (Float)))))
+(Program 
+  (Statement 
+    (Declaration 
+      (ClassDeclaration 
+        (ClassBody 
+          (PublicFieldDefinition 
+            (PropertyIdentifier "foo") 
+            (Readonly "readonly")) 
+          (PublicFieldDefinition 
+            (PropertyIdentifier "foo1") 
+            (Readonly "readonly")) 
+          (PublicFieldDefinition 
+            (PropertyIdentifier "foo2") 
+            (AccessibilityModifier "public") 
+            (Readonly "readonly")) 
+          (PublicFieldDefinition 
+            (Expression 
+              (Number "1")) 
+            (PropertyIdentifier "foo3") 
+            (TypeAnnotation 
+              (TypeIdentifier "Number")) 
+            (AccessibilityModifier "public") 
+            (Readonly "readonly")) 
+          (PublicFieldDefinition 
+            (Expression 
+              (Number "1")) 
+            (PropertyIdentifier "foo4") 
+            (TypeAnnotation 
+              (TypeIdentifier "Number")) 
+            (AccessibilityModifier "private")) 
+          (PublicFieldDefinition 
+            (Expression 
+              (Number "1")) 
+            (PropertyIdentifier "foo5") 
+            (TypeAnnotation 
+              (TypeIdentifier "Number"))) 
+          (PublicFieldDefinition 
+            (Expression 
+              (Number "1")) 
+            (PropertyIdentifier "foo6") 
+            (TypeAnnotation 
+              (TypeIdentifier "Number"))) 
+          (PublicFieldDefinition 
+            (Expression 
+              (Number "1")) 
+            (PropertyIdentifier "foo7") 
+            (TypeAnnotation 
+              (TypeIdentifier "Number")) 
+            (AccessibilityModifier "public")) 
+          (PublicFieldDefinition 
+            (Expression 
+              (String)) 
+            (PropertyIdentifier "foo8") 
+            (TypeAnnotation 
+              (TypeIdentifier "String")) 
+            (AccessibilityModifier "protected") 
+            (Readonly "readonly")) 
+          (PublicFieldDefinition 
+            (Expression 
+              (Number "1")) 
+            (PropertyIdentifier "foo11") 
+            (TypeAnnotation 
+              (TypeIdentifier "Number"))) 
+          (PublicFieldDefinition 
+            (Expression 
+              (Number "2")) 
+            (PropertyIdentifier "foo10"))) 
+        (TypeIdentifier "Foo")))))

@@ -16,6 +16,7 @@ module Language.TypeScript.AST
 
 import           Prelude hiding (False, Float, Integer, String, True)
 import           AST.GenerateSyntax
-import qualified Language.TypeScript.Grammar as Grammar
+import           Language.Haskell.TH.Syntax (runIO)
+import qualified TreeSitter.TypeScript as TypeScript (getNodeTypesPath, tree_sitter_typescript)
 
-astDeclarationsForLanguage Grammar.tree_sitter_typescript "../../../vendor/tree-sitter-typescript/typescript/src/node-types.json"
+runIO TypeScript.getNodeTypesPath >>= astDeclarationsForLanguage TypeScript.tree_sitter_typescript

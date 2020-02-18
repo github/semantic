@@ -1,73 +1,113 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Select
-        (Statements
-          (Pattern
-            (Receive
-              (Identifier)
-              (ReceiveOperator
-                (Identifier)))
-            (Call
-              (Identifier)
-              (Identifier)
-              (Empty)))
-          (Pattern
-            (Send
-              (Identifier)
-              (Identifier))
-            (Call
-              (Identifier)
-              (Integer)
-              (Empty)))
-          (Pattern
-            (Receive
-              (Empty)
-              (ReceiveOperator
-                (Call
-                  (MemberAccess
-                    (Identifier)
-                    (Identifier))
-                  (Integer)
-                  (Empty))))
-            (Statements
-              (Call
-                (Identifier)
-                (Integer)
-                (Empty))
-              (PostIncrement
-                (Identifier))
-              (If
-                (Statements
-                  (Identifier))
-                (Statements
-                  (Send
-                    (Identifier)
-                    (Composite
-                      (Identifier)
-                      (Statements
-                        (Identifier)
-                        (Identifier))))
-                  (Return
-                    (Empty)))
-                (Empty))))
-          (DefaultPattern
-            (Return
-              (Empty)))))
-      (Select
-        (Statements
-          (Pattern
-            (Receive
-              (Empty)
-              (ReceiveOperator
-                (Identifier)))
-            (Statements))
-          (Pattern
-            (Receive
-              (Empty)
-              (ReceiveOperator
-                (Identifier)))
-            (Statements)))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SelectStatement 
+          (CommunicationCase 
+            (ReceiveStatement 
+              (ExpressionList 
+                (Expression 
+                  (Identifier "a"))) 
+              (Expression 
+                (UnaryExpression 
+                  (Token) 
+                  (Expression 
+                    (Identifier "c"))))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "println")) 
+                    (ArgumentList 
+                      (Expression 
+                        (Identifier "x")))))))) 
+          (CommunicationCase 
+            (SendStatement 
+              (Expression 
+                (Identifier "c")) 
+              (Expression 
+                (Identifier "b"))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "println")) 
+                    (ArgumentList 
+                      (Expression 
+                        (IntLiteral "5")))))))) 
+          (CommunicationCase 
+            (ReceiveStatement 
+              (Expression 
+                (UnaryExpression 
+                  (Token) 
+                  (Expression 
+                    (CallExpression 
+                      (Expression 
+                        (SelectorExpression 
+                          (FieldIdentifier "After") 
+                          (Expression 
+                            (Identifier "time")))) 
+                      (ArgumentList 
+                        (Expression 
+                          (IntLiteral "2")))))))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "println")) 
+                    (ArgumentList 
+                      (Expression 
+                        (IntLiteral "6"))))))) 
+            (Statement 
+              (SimpleStatement 
+                (IncStatement 
+                  (Expression 
+                    (Identifier "n"))))) 
+            (Statement 
+              (IfStatement 
+                (Block 
+                  (Statement 
+                    (SimpleStatement 
+                      (SendStatement 
+                        (Expression 
+                          (CompositeLiteral 
+                            (LiteralValue 
+                              (Element 
+                                (Expression 
+                                  (Identifier "n"))) 
+                              (Element 
+                                (Expression 
+                                  (Identifier "v")))) 
+                            (TypeIdentifier "result"))) 
+                        (Expression 
+                          (Identifier "waitDone"))))) 
+                  (Statement 
+                    (ReturnStatement))) 
+                (Expression 
+                  (Identifier "v"))))) 
+          (DefaultCase 
+            (Statement 
+              (ReturnStatement))))) 
+      (Statement 
+        (SelectStatement 
+          (CommunicationCase 
+            (ReceiveStatement 
+              (Expression 
+                (UnaryExpression 
+                  (Token) 
+                  (Expression 
+                    (Identifier "channel")))))) 
+          (CommunicationCase 
+            (ReceiveStatement 
+              (Expression 
+                (UnaryExpression 
+                  (Token) 
+                  (Expression 
+                    (Identifier "timeout"))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

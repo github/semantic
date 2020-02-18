@@ -1,21 +1,41 @@
-(Statements
-  (AugmentedAssignment
-    (Plus
-      (Identifier)
-      (Integer)))
-  (AugmentedAssignment
-    (Minus
-      (Identifier)
-      (Integer)))
-  (AugmentedAssignment
-    (Times
-      (Identifier)
-      (Integer)))
-  (AugmentedAssignment
-    (DividedBy
-      (Identifier)
-      (Integer)))
-  (AugmentedAssignment
-    (Power
-      (Identifier)
-      (Integer))))
+(Program 
+  (Statement 
+    (OperatorAssignment 
+      (Lhs 
+        (Variable 
+          (Identifier "x"))) 
+      (Arg 
+        (Primary 
+          (Integer "2"))))) 
+  (Statement 
+    (OperatorAssignment 
+      (Lhs 
+        (Variable 
+          (Identifier "x"))) 
+      (Arg 
+        (Primary 
+          (Integer "1"))))) 
+  (Statement 
+    (OperatorAssignment 
+      (Lhs 
+        (Variable 
+          (Identifier "x"))) 
+      (Arg 
+        (Primary 
+          (Integer "1"))))) 
+  (Statement 
+    (OperatorAssignment 
+      (Lhs 
+        (Variable 
+          (Identifier "x"))) 
+      (Arg 
+        (Primary 
+          (Integer "1"))))) 
+  (Statement 
+    (OperatorAssignment 
+      (Lhs 
+        (Variable 
+          (Identifier "x"))) 
+      (Arg 
+        (Primary 
+          (Integer "1"))))))

@@ -1,35 +1,88 @@
-(Statements
-  (Send
-    (Identifier)
-    (Send
-      (Identifier))
-    (Send
-      (Identifier))
-    (KeyValue
-      (SymbolElement)
-      (Integer))
-    (KeyValue
-      (SymbolElement)
-      (Boolean)))
-  (Send
-    (Send
-      (Identifier))
-    (Identifier))
-  (Send
-    (Identifier)
-    (Send
-      (Identifier))
-    (Send
-      (Identifier)))
-  (Send
-    (Identifier)
-    (Send
-      (Identifier)))
-  (Send
-    (Identifier)
-    (Send
-      (Identifier)))
-  (Send
-    (Identifier)
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a"))))) 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "b"))))) 
+        (Pair 
+          (Arg 
+            (Primary 
+              (Integer "1"))) 
+          (Symbol)) 
+        (Pair 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (True "true")))) 
+          (Symbol))) 
+      (Variable 
+        (Identifier "foo")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList) 
+      (Call 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "a")))) 
+        (Identifier "b")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (ParenthesizedStatements 
+              (Statement 
+                (Arg 
+                  (Primary 
+                    (Lhs 
+                      (Variable 
+                        (Identifier "b"))))))))) 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a")))))) 
+      (Variable 
+        (Identifier "foo")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (BlockArgument 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "block"))))))) 
+      (Variable 
+        (Identifier "foo")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (SplatArgument 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "a"))))))) 
+      (Variable 
+        (Identifier "foo")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (HashSplatArgument 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "b"))))))) 
+      (Variable 
+        (Identifier "foo")))))

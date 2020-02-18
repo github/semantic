@@ -1,15 +1,18 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Assignment
-        (Identifier)
-        (Identifier))
-      (Assignment
-        (Identifier)
-        (Statements))
-      (Assignment
-        (Identifier)
-        (Statements)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (Identifier "iota"))) 
+            (Identifier "zero")) 
+          (ConstSpec 
+            (Identifier "one")) 
+          (ConstSpec 
+            (Identifier "two"))))) 
+    (Identifier "main") 
+    (ParameterList)))

@@ -1,2 +1,5 @@
-(Statements
-  (This))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (This "this")))))

@@ -1,4 +1,10 @@
-(Statements
-  (LessThanEqual
-    (Identifier)
-    (Identifier)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (BinaryExpression 
+          (Token) 
+          (Expression 
+            (Identifier "x")) 
+          (Expression 
+            (Identifier "y")))))))

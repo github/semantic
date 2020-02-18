@@ -1,7 +1,12 @@
-(Statements
-  (Function
-    (Empty)
-    (Function
-      (Empty)
-      (Send
-        (Identifier)))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lambda 
+          (Block 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "foo"))))))))))))

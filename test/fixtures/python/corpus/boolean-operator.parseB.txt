@@ -1,7 +1,23 @@
-(Statements
-  (Or
-    (Identifier)
-    (Identifier))
-  (And
-    (Identifier)
-    (Identifier)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (BooleanOperator 
+          (Token) 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "foo"))) 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "bar"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (BooleanOperator 
+          (Token) 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "baz"))) 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "buzz"))))))))

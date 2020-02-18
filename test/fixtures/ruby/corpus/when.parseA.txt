@@ -1,18 +1,32 @@
-(Statements
-  (Match
-    (Send
-      (Identifier))
-    (Statements
-      (Pattern
-        (Statements
-          (Send
-            (Identifier)))
-        (Statements))))
-  (Match
-    (Empty)
-    (Statements
-      (Pattern
-        (Statements
-          (Boolean))
-        (Statements
-          (TextElement))))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Case 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "foo"))))) 
+          (When 
+            (Pattern 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "bar"))))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Case 
+          (When 
+            (Pattern 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (True "true"))))) 
+            (Then 
+              (Statement 
+                (Arg 
+                  (Primary 
+                    (String)))))))))))

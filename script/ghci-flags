@@ -50,12 +50,12 @@ function flags {
   # TODO: would be nice to figure this out from cabal.project & the .cabal files
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
-  echo "-isemantic-codegen/src"
   echo "-isemantic-core/src"
   echo "-isemantic-go/src"
   echo "-isemantic-java/src"
   echo "-isemantic-json/src"
   echo "-isemantic-parse/src"
+  echo "-isemantic-php/src"
   echo "-isemantic-python/src"
   echo "-isemantic-python/test"
   echo "-isemantic-ruby/src"

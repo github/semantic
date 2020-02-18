@@ -1,5 +1,4 @@
-(Statements
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (NonlocalStatement 
+      (Identifier "a"))))

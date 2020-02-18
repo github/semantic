@@ -1,4 +1,9 @@
-(Statements
-  (MemberAccess
-    (Identifier)
-    (Identifier)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Attribute 
+            (Identifier "b") 
+            (PrimaryExpression 
+              (Identifier "a"))))))))

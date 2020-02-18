@@ -1,19 +1,23 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Assignment
-        (Annotation
-          (Statements
-            (Identifier))
-          (Identifier))
-        (Statements))
-      (Assignment
-        (Annotation
-          (Statements
-            (Identifier)
-            (Identifier))
-          (Identifier))
-        (Statements)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (VarDeclaration 
+          (VarSpec 
+            (Identifier "zero") 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "int")))))) 
+      (Statement 
+        (VarDeclaration 
+          (VarSpec 
+            (Identifier "one") 
+            (Token) 
+            (Identifier "two") 
+            (Type 
+              (SimpleType 
+                (TypeIdentifier "uint64"))))))) 
+    (Identifier "main") 
+    (ParameterList)))
