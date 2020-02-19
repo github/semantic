@@ -186,8 +186,8 @@ assertQualifiedImport = do
 assertStackQualifiedImport :: HUnit.Assertion
 assertStackQualifiedImport = do
   let path = "semantic-python/test/fixtures/cheese/6-02-qualified-imports.py"
-  (graph, _) <- graphFile path
-  (expecto, Complete) <- runScopeGraphTest expectedQualifiedImport
+  (graph, _) <- stackGraphFile path
+  (expecto, Complete) <- runStackGraphTest expectedQualifiedImport
   HUnit.assertEqual "Should work for simple case" expecto graph
 
 assertImportFromSymbols :: HUnit.Assertion

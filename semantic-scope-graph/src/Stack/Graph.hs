@@ -17,7 +17,7 @@ data Direction = From | To
     deriving (Show, Eq, Ord)
 
 newtype Symbol = Symbol Text
-    deriving (IsString, Show, Eq)
+    deriving (IsString, Show, Eq, Ord)
 
 data Node = Root
   | Declaration Symbol
@@ -29,7 +29,7 @@ data Node = Root
   | ExportedScope
   | JumpToScope
   | IgnoreScope
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
 instance Lower Node where
   lowerBound = Root
