@@ -48,7 +48,7 @@ runSketch _rootpath go
   = evalFresh 1
   . runReader @Name rootname
   . evalState @Name rootname
-  . runState @(Stack.Graph Stack.Node) Stack.empty
+  . runState @(Stack.Graph Stack.Node) lowerBound
   . runState @(ScopeGraph Name) initialGraph
   $ go
   where
