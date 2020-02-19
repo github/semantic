@@ -54,4 +54,5 @@ library
     Language.PHP
     Language.PHP.AST
     Language.PHP.Grammar
+    Language.PHP.Tags
   hs-source-dirs: src
