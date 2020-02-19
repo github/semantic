@@ -1,10 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Stack.Graph (EdgeLabel(..), Graph(..), empty, Node, (>>-), (-<<), (>>>-)) where
+module Stack.Graph (EdgeLabel(..), Graph(..), Node, (>>-), (-<<)) where
 
 import           Algebra.Graph.Labelled ((-<), (>-))
 import qualified Algebra.Graph.Labelled as Labelled
+import           Data.Semilattice.Lower
 import           Data.String
 import           Data.Text (Text)
 
@@ -31,11 +32,14 @@ data Node = Root
   | IgnoreScope
   deriving (Show, Eq)
 
+instance Lower Node where
+  lowerBound = Root
+
 newtype Graph a = Graph { unGraph :: Labelled.Graph EdgeLabel a }
   deriving (Show, Eq)
 
-empty :: Graph Node
-empty = Graph (Labelled.vertex Root)
+instance Lower a => Lower (Graph a) where
+  lowerBound = Graph (Labelled.vertex lowerBound)
 
 (>>-) :: a -> a -> Labelled.Graph EdgeLabel a
 left >>- right = left -< From >- right
@@ -45,3 +49,6 @@ left -<< right = left -< To >- right
 
 (>>>-) :: Labelled.Graph EdgeLabel a -> Labelled.Graph EdgeLabel a -> Labelled.Graph EdgeLabel a
 left >>>- right = Labelled.connect From left right
+
+testGraph :: Graph Node
+testGraph = Graph $ (Scope "current" >>- Declaration "a") >>>- (PopSymbol "member" >>- Declaration "b") >>>- (Reference "b" >>- PushSymbol "member") >>>- (Reference "a" >>- Root)

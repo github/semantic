@@ -52,7 +52,7 @@ runSketch minfo go
   . runReader minfo
   . runReader (CurrentScope rootname)
   . evalState @Name rootname
-  . runState @(Stack.Graph Stack.Node) Stack.empty
+  . runState @(Stack.Graph Stack.Node) lowerBound
   . runState @(ScopeGraph Name) initialGraph
   $ go
   where
