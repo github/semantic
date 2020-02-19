@@ -2,6 +2,7 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 module Language.PHP.Tags (tags) where
@@ -59,7 +60,37 @@ instance ToTags PHP.FunctionDefinition where
   tags t@PHP.FunctionDefinition
     { PHP.ann = loc@Loc { byteRange }
     , PHP.name = PHP.Name { text }
+    } = yieldTag text Method loc byteRange >> gtags t
+
+instance ToTags PHP.MethodDeclaration where
+  tags t@PHP.MethodDeclaration
+    { PHP.ann = loc@Loc { byteRange }
+    , PHP.name = PHP.Name { text }
     } = yieldTag text Function loc byteRange >> gtags t
+
+instance ToTags PHP.FunctionCallExpression where
+  tags t@PHP.FunctionCallExpression
+    { PHP.ann = loc@Loc { byteRange }
+    , PHP.function = func
+    } = match func
+      where
+        yield name = yieldTag name Call loc byteRange >> gtags t
+        match expr = case expr of
+          Prj (PHP.VariableName { extraChildren = PHP.Name { text } })
+            -> yield text *> gtags t
+          Prj (PHP.QualifiedName { extraChildren = [Prj (PHP.Name { text })] })
+            -> yield text *> gtags t
+          _
+            -> gtags t
+
+instance ToTags PHP.MemberCallExpression where
+  tags t@PHP.MemberCallExpression
+    { PHP.ann = loc@Loc { byteRange }
+    , PHP.name = item
+    } = case item of
+    Prj (PHP.Name { text }) -> yieldTag text Call loc byteRange >> gtags t
+    _                       -> gtags t
+
 
 instance ToTags PHP.AnonymousFunctionCreationExpression
 instance ToTags PHP.AnonymousFunctionUseClause
@@ -105,7 +136,6 @@ instance ToTags PHP.Float
 instance ToTags PHP.ForStatement
 instance ToTags PHP.ForeachStatement
 instance ToTags PHP.FormalParameters
-instance ToTags PHP.FunctionCallExpression
 instance ToTags PHP.FunctionStaticDeclaration
 instance ToTags PHP.GlobalDeclaration
 instance ToTags PHP.GotoStatement
@@ -118,8 +148,6 @@ instance ToTags PHP.InterfaceDeclaration
 instance ToTags PHP.ListLiteral
 instance ToTags PHP.Literal
 instance ToTags PHP.MemberAccessExpression
-instance ToTags PHP.MemberCallExpression
-instance ToTags PHP.MethodDeclaration
 instance ToTags PHP.Name
 instance ToTags PHP.NamedLabelStatement
 instance ToTags PHP.NamespaceAliasingClause
