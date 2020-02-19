@@ -1,3 +1,5 @@
-(Statements
-  (Return
-    (This)))
+(Program 
+  (Statement 
+    (ReturnStatement 
+      (Expression 
+        (This "this")))))

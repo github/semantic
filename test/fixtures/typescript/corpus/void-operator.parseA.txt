@@ -1,5 +1,11 @@
-(Statements
-  (Void
-    (Call
-      (Identifier)
-      (Empty))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (UnaryExpression 
+          (Token) 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (Identifier "b")) 
+              (Arguments))))))))

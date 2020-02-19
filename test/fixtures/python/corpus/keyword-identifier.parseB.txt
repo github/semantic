@@ -1,3 +1,11 @@
-(Statements
-  (Identifier)
-  (Identifier))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "exec"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "print"))))))

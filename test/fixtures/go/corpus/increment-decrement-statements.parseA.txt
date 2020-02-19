@@ -1,10 +1,17 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (PostIncrement
-        (Identifier))
-      (PostDecrement
-        (Identifier)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (SimpleStatement 
+          (IncStatement 
+            (Expression 
+              (Identifier "i"))))) 
+      (Statement 
+        (SimpleStatement 
+          (DecStatement 
+            (Expression 
+              (Identifier "j")))))) 
+    (Identifier "main") 
+    (ParameterList)))

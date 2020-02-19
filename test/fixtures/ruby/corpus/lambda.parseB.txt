@@ -1,9 +1,19 @@
-(Statements
-  (Send
-    (Identifier)
-    (Function
-      (Empty)
-      (Identifier)
-      (Plus
-        (Identifier)
-        (Integer)))))
+(Program 
+  (Statement 
+    (MethodCall 
+      (Block 
+        (BlockParameters 
+          (Identifier "x")) 
+        (Statement 
+          (Binary 
+            (Token) 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "x"))))) 
+            (Arg 
+              (Primary 
+                (Integer "1")))))) 
+      (Variable 
+        (Identifier "lambda")))))

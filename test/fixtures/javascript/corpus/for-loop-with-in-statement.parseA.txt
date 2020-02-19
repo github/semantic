@@ -1,18 +1,41 @@
-(Statements
-  (For
-    (And
-      (Member
-        (Identifier)
-        (Identifier))
-      (Assignment
-        (Identifier)
-        (Float)))
-    (LessThan
-      (Identifier)
-      (Identifier))
-    (Update
-      (Identifier))
-    (Statements
-      (Call
-        (Identifier)
-        (Empty)))))
+(Program 
+  (Statement 
+    (ForStatement 
+      (Statement 
+        (StatementBlock 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (CallExpression 
+                  (Expression 
+                    (Identifier "doSomething")) 
+                  (Arguments))))))) 
+      (ExpressionStatement 
+        (Expression 
+          (BinaryExpression 
+            (Token) 
+            (Expression 
+              (BinaryExpression 
+                (Token) 
+                (Expression 
+                  (Identifier "key")) 
+                (Expression 
+                  (Identifier "something")))) 
+            (Expression 
+              (AssignmentExpression 
+                (Identifier "i") 
+                (Expression 
+                  (Number "0"))))))) 
+      (ExpressionStatement 
+        (Expression 
+          (BinaryExpression 
+            (Token) 
+            (Expression 
+              (Identifier "i")) 
+            (Expression 
+              (Identifier "n"))))) 
+      (Expression 
+        (UpdateExpression 
+          (Token) 
+          (Expression 
+            (Identifier "i")))))))

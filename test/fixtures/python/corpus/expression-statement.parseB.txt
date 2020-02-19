@@ -1,13 +1,38 @@
-(Statements
-  (Statements
-    (Integer)
-    (Integer)
-    (Integer))
-  (Identifier)
-  (Statements
-    (Integer)
-    (Integer)
-    (Integer))
-  (Plus
-    (Identifier)
-    (Identifier)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "1"))) 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "2"))) 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "3"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Identifier "b"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "3"))) 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "1"))) 
+      (Expression 
+        (PrimaryExpression 
+          (Integer "2"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "a")) 
+            (PrimaryExpression 
+              (Identifier "c"))))))))

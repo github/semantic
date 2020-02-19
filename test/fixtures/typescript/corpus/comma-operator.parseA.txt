@@ -1,8 +1,14 @@
-(Statements
-  (SequenceExpression
-    (Assignment
-      (Identifier)
-      (Float))
-    (Assignment
-      (Identifier)
-      (Float))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (SequenceExpression 
+        (Expression 
+          (AssignmentExpression 
+            (Identifier "a") 
+            (Expression 
+              (Number "1")))) 
+        (Expression 
+          (AssignmentExpression 
+            (Identifier "b") 
+            (Expression 
+              (Number "2"))))))))

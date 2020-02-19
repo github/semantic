@@ -1,6 +1,12 @@
-(Statements
-  (Send
-    (Identifier)
-    (KeyValue
-      (SymbolElement)
-      (Boolean))))
+(Program 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Pair 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (True "true")))) 
+          (Symbol))) 
+      (Variable 
+        (Identifier "foo")))))

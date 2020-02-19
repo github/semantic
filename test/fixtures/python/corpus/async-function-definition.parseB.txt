@@ -1,19 +1,37 @@
-(Statements
-  (Function
-    (Identifier)
-    (RequiredParameter
-      (Identifier))
-    (RequiredParameter
-      (Identifier))
-    (Statements
-      (Identifier)))
-  (Function
-    (Identifier)
-    (Statements
-      (Identifier)))
-  (Function
-    (Identifier)
-    (RequiredParameter
-      (Identifier))
-    (Statements
-      (Identifier))))
+(Module 
+  (CompoundStatement 
+    (FunctionDefinition 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "j")))))) 
+      (Identifier "g") 
+      (Parameters 
+        (Parameter 
+          (Identifier "i")) 
+        (Parameter 
+          (Identifier "j"))))) 
+  (CompoundStatement 
+    (FunctionDefinition 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "c")))))) 
+      (Identifier "a") 
+      (Parameters))) 
+  (CompoundStatement 
+    (FunctionDefinition 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "e")))))) 
+      (Identifier "d") 
+      (Parameters 
+        (Parameter 
+          (Identifier "c"))))))

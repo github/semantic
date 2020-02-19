@@ -43,6 +43,7 @@ import           GHC.TypeLits
 import qualified Language.Python.AST as Py
 import           Language.Python.Patterns
 import           Scope.Graph.Convert (Result (..), complete, todo)
+import           Scope.Types
 import           Source.Loc (Loc)
 import           Source.Span (Span, span_)
 
@@ -194,7 +195,7 @@ instance ToScopeGraph Py.FunctionDefinition where
       { Props.kind = ScopeGraph.Function
       , Props.span = ann^.span_
       }
-    withScope associatedScope $ do
+    withScope (CurrentScope associatedScope) $ do
       let declProps = Props.Declaration
             { Props.kind = ScopeGraph.Parameter
             , Props.relation = ScopeGraph.Default
@@ -245,7 +246,7 @@ instance ToScopeGraph Py.ImportStatement where
     for_ pairs $ \pair -> do
       case pair of
         (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
-          withScope (toName scopeIdentifier) $ do
+          withScope (CurrentScope (toName scopeIdentifier)) $ do
             let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
             newReference (toName referenceIdentifier) referenceProps
 

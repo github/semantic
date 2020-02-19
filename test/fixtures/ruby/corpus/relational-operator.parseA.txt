@@ -1,17 +1,40 @@
-(Statements
-  (Equal
-    (Send
-      (Identifier))
-    (Send
-      (Identifier)))
-  (Not
-    (Equal
-      (Send
-        (Identifier))
-      (Send
-        (Identifier))))
-  (Equal
-    (Send
-      (Identifier))
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Binary 
+      (Token) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "x"))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "y"))))))) 
+  (Statement 
+    (Binary 
+      (Token) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "x"))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "y"))))))) 
+  (Statement 
+    (Binary 
+      (Token) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "x"))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "y"))))))))

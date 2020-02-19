@@ -1,5 +1,7 @@
-(Statements
-  (DefaultExport
-    (Class
-      (TypeIdentifier)
-      (Statements))))
+(Program 
+  (Statement 
+    (ExportStatement 
+      (Expression 
+        (Class 
+          (ClassBody) 
+          (TypeIdentifier "Foo"))))))

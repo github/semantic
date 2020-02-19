@@ -20,7 +20,6 @@ module Parsing.Parser
 , jsxParserPrecise
 , jsxParser
 , markdownParser
-, phpParser
 , pythonParserALaCarte
 , pythonParserPrecise
 , pythonParser
@@ -42,6 +41,7 @@ module Parsing.Parser
 ) where
 
 import           Assigning.Assignment
+import           AST.Unmarshal
 import qualified CMarkGFM
 import           Data.AST
 import           Data.Functor.Classes
@@ -53,27 +53,25 @@ import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go as GoPrecise
 import qualified Language.Go.Assignment as GoALaCarte
+import           Language.Go.Grammar
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.Markdown.Assignment as Markdown
-import qualified Language.PHP.Assignment as PHP
+import qualified Language.PHP as PHPPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Assignment as PythonALaCarte
+import           Language.Python.Grammar
 import qualified Language.Ruby as RubyPrecise
 import qualified Language.Ruby.Assignment as RubyALaCarte
+import           Language.Ruby.Grammar (tree_sitter_ruby)
 import qualified Language.TSX as TSXPrecise
 import qualified Language.TSX.Assignment as TSXALaCarte
 import qualified Language.TypeScript as TypeScriptPrecise
 import qualified Language.TypeScript.Assignment as TypeScriptALaCarte
-import           Prelude hiding (fail)
-import           Language.Go.Grammar
-import qualified TreeSitter.Language as TS (Language, Symbol)
-import           TreeSitter.PHP
-import           Language.Python.Grammar
-import           Language.Ruby.Grammar (tree_sitter_ruby)
-import           TreeSitter.TSX
 import           Language.TypeScript.Grammar
-import           AST.Unmarshal
+import           Prelude hiding (fail)
+import qualified TreeSitter.Language as TS (Language, Symbol)
+import           TreeSitter.TSX
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
@@ -163,8 +161,8 @@ jsxParser modes = case jsxMode modes of
 markdownParser :: c Markdown.Term => (Language, SomeParser c Loc)
 markdownParser = (Markdown, SomeParser (AssignmentParser MarkdownParser Markdown.assignment))
 
-phpParser :: c PHP.Term => (Language, SomeParser c Loc)
-phpParser = (PHP, SomeParser (AssignmentParser (ASTParser tree_sitter_php) PHP.assignment))
+phpParserPrecise :: c PHPPrecise.Term => (Language, SomeParser c Loc)
+phpParserPrecise = (PHP, SomeParser (UnmarshalParser @PHPPrecise.Term PHPPrecise.tree_sitter_php))
 
 pythonParserALaCarte :: c PythonALaCarte.Term => (Language, SomeParser c Loc)
 pythonParserALaCarte = (Python, SomeParser (AssignmentParser (ASTParser tree_sitter_python) PythonALaCarte.assignment))
@@ -216,6 +214,7 @@ type family TermMode term where
   TermMode GoPrecise.Term         = 'Precise
   TermMode Java.Term              = 'Precise
   TermMode JSON.Term              = 'Precise
+  TermMode PHPPrecise.Term        = 'Precise
   TermMode PythonPrecise.Term     = 'Precise
   TermMode RubyPrecise.Term       = 'Precise
   TermMode TypeScriptPrecise.Term = 'Precise
@@ -226,7 +225,6 @@ type family TermMode term where
 aLaCarteParsers
   :: ( c GoALaCarte.Term
      , c Markdown.Term
-     , c PHP.Term
      , c PythonALaCarte.Term
      , c RubyALaCarte.Term
      , c TSXALaCarte.Term
@@ -237,7 +235,6 @@ aLaCarteParsers = Map.fromList
   [ javascriptParserALaCarte
   , jsxParserALaCarte
   , markdownParser
-  , phpParser
   , pythonParserALaCarte
   , rubyParserALaCarte
   , tsxParserALaCarte
@@ -252,6 +249,7 @@ preciseParsers
      , c PythonPrecise.Term
      , c RubyPrecise.Term
      , c GoPrecise.Term
+     , c PHPPrecise.Term
      , c TypeScriptPrecise.Term
      , c TSXPrecise.Term
      )
@@ -262,6 +260,7 @@ preciseParsers = Map.fromList
   , jsonParser
   , jsxParserPrecise
   , pythonParserPrecise
+  , phpParserPrecise
   , rubyParserPrecise
   , tsxParserPrecise
   , typescriptParserPrecise
@@ -275,7 +274,7 @@ allParsers
      , c Java.Term
      , c JSON.Term
      , c Markdown.Term
-     , c PHP.Term
+     , c PHPPrecise.Term
      , c PythonALaCarte.Term
      , c PythonPrecise.Term
      , c RubyALaCarte.Term
@@ -294,7 +293,7 @@ allParsers modes = Map.fromList
   , jsonParser
   , jsxParser modes
   , markdownParser
-  , phpParser
+  , phpParserPrecise
   , pythonParser modes
   , rubyParser modes
   , tsxParser modes

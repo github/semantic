@@ -1,12 +1,22 @@
-(Statements
-  (If
-    (Send
-      (Identifier))
-    (Statements)
-    (Empty))
-  (If
-    (Send
-      (Identifier))
-    (Statements
-      (Statements))
-    (Empty)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (If 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "x")))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (If 
+          (Then) 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "y")))))))))))

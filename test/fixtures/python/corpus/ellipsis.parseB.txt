@@ -1,2 +1,6 @@
-(Statements
-  (Ellipsis))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Ellipsis "..."))))))

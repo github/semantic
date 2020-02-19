@@ -1,15 +1,24 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Assignment
-        (Identifier)
-        (Integer))
-      (Assignment
-        (Identifier)
-        (Integer))
-      (Assignment
-        (Identifier)
-        (Integer)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "4"))) 
+            (Identifier "a")) 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "5"))) 
+            (Identifier "b")) 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (IntLiteral "6"))) 
+            (Identifier "c"))))) 
+    (Identifier "main") 
+    (ParameterList)))

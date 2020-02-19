@@ -1,4 +1,9 @@
-(Statements
-  (Assignment
-    (Identifier)
-    (Integer)))
+(Program 
+  (Statement 
+    (Assignment 
+      (Lhs 
+        (Variable 
+          (Identifier "x"))) 
+      (Arg 
+        (Primary 
+          (Integer "0"))))))

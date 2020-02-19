@@ -1,5 +1,1 @@
-(Statements
-  (Context
-    (Comment)
-    (Comment)
-    (Empty)))
+(Module)

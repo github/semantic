@@ -1,5 +1,5 @@
-(Statements
-  (Break
-    (Empty))
-  (Break
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (BreakStatement "break")) 
+  (SimpleStatement 
+    (BreakStatement "break")))

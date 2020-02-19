@@ -26,22 +26,25 @@ import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
 import           Control.Effect.ScopeGraph
+import           Data.Module (ModuleInfo)
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import qualified Stack.Graph as Stack
 import qualified System.Path as Path
+import           Scope.Types
 
 type SketchC addr m
   = StateC (ScopeGraph Name)
   ( StateC (Stack.Graph Stack.Node)
   ( StateC Name
-  ( ReaderC Name
+  ( ReaderC (CurrentScope Name)
+  ( ReaderC ModuleInfo
   ( FreshC m
   ))))
 
 runSketch ::
   (Functor m)
-  => Maybe Path.AbsRelFile
+  => ModuleInfo
   -> SketchC Name m a
   -> m (Stack.Graph Stack.Node, (ScopeGraph Name, a))
 runSketch _rootpath go

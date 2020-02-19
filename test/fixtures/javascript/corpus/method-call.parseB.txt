@@ -1,8 +1,15 @@
-(Statements
-  (Call
-    (MemberAccess
-      (Identifier)
-      (Identifier))
-    (Identifier)
-    (TextElement)
-    (Empty)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (CallExpression 
+          (Expression 
+            (MemberExpression 
+              (PropertyIdentifier "someMethod") 
+              (Expression 
+                (Identifier "object")))) 
+          (Arguments 
+            (Expression 
+              (Identifier "arg1")) 
+            (Expression 
+              (String))))))))

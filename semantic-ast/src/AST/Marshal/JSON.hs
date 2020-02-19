@@ -11,7 +11,7 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Marshal.JSON
+module AST.Marshal.JSON
 ( MarshalJSON(..)
 ) where
 

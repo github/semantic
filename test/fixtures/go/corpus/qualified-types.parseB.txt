@@ -1,11 +1,16 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Type
-        (Identifier)
-        (MemberAccess
-          (Identifier)
-          (Identifier))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "x") 
+            (Type 
+              (SimpleType 
+                (QualifiedType 
+                  (TypeIdentifier "z") 
+                  (PackageIdentifier "y")))))))) 
+    (Identifier "main") 
+    (ParameterList)))

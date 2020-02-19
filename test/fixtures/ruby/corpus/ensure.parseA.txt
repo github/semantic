@@ -1,7 +1,12 @@
-(Statements
-  (Try
-    (Statements
-      (Send
-        (Identifier))
-      (Finally
-        (Statements)))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Begin 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "foo")))))) 
+          (Ensure))))))

@@ -1,11 +1,17 @@
-(Statements
-  (Hash
-    (KeyValue
-      (TextElement)
-      (TextElement))
-    (KeyValue
-      (TextElement)
-      (TextElement))
-    (KeyValue
-      (TextElement)
-      (TextElement))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Object 
+          (Pair 
+            (Expression 
+              (String)) 
+            (String)) 
+          (Pair 
+            (Expression 
+              (String)) 
+            (String)) 
+          (Pair 
+            (Expression 
+              (String)) 
+            (String)))))))

@@ -1,11 +1,31 @@
-(Statements
-  (Comprehension
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier)))
-  (Comprehension
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (SetComprehension 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "c"))) 
+            (ForInClause 
+              (Variables 
+                (PrimaryExpression 
+                  (Identifier "b"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "a"))))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (SetComprehension 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "d"))) 
+            (ForInClause 
+              (Variables 
+                (PrimaryExpression 
+                  (Identifier "e"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "f"))))))))))

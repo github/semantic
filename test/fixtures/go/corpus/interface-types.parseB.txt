@@ -1,42 +1,59 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Statements
-        (Type
-          (Identifier)
-          (Interface
-            (Statements))))
-      (Statements
-        (Type
-          (Identifier)
-          (Interface
-            (MemberAccess
-              (Identifier)
-              (Identifier)))))
-      (Statements
-        (Type
-          (Identifier)
-          (Interface
-            (Statements
-              (Identifier)
-              (MemberAccess
-                (Identifier)
-                (Identifier))
-              (MethodSignature
-                (Identifier)
-                (Identifier)
-                (Statements
-                  (Identifier)
-                  (Identifier)))))))
-      (Context
-        (Comment)
-        (Statements
-          (Type
-            (Identifier)
-            (Interface
-              (MethodSignature
-                (Empty)
-                (Identifier)))))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "j1") 
+            (Type 
+              (SimpleType 
+                (InterfaceType 
+                  (MethodSpecList))))))) 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "j2") 
+            (Type 
+              (SimpleType 
+                (InterfaceType 
+                  (MethodSpecList 
+                    (QualifiedType 
+                      (TypeIdentifier "Reader") 
+                      (PackageIdentifier "io"))))))))) 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "j3") 
+            (Type 
+              (SimpleType 
+                (InterfaceType 
+                  (MethodSpecList 
+                    (TypeIdentifier "i1") 
+                    (QualifiedType 
+                      (TypeIdentifier "Reader") 
+                      (PackageIdentifier "io")) 
+                    (MethodSpec 
+                      (SimpleType 
+                        (TypeIdentifier "error")) 
+                      (FieldIdentifier "SomeMethod") 
+                      (ParameterList 
+                        (ParameterDeclaration 
+                          (Identifier "s") 
+                          (Type 
+                            (SimpleType 
+                              (TypeIdentifier "string"))))))))))))) 
+      (Statement 
+        (TypeDeclaration 
+          (TypeSpec 
+            (TypeIdentifier "OptionB") 
+            (Type 
+              (SimpleType 
+                (InterfaceType 
+                  (MethodSpecList 
+                    (MethodSpec 
+                      (FieldIdentifier "private") 
+                      (ParameterList)))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

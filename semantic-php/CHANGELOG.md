@@ -1,4 +1,4 @@
-# Revision history for semantic-codegen
+# Revision history for semantic-php
 
 ## 0.1.0.0 -- YYYY-mm-dd
 

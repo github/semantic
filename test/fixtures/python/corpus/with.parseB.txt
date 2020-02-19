@@ -1,32 +1,68 @@
-(Statements
-  (Let
-    (Empty)
-    (MemberAccess
-      (Identifier)
-      (Identifier))
-    (Statements
-      (Assignment
-        (Identifier)
-        (Boolean))))
-  (Let
-    (Empty)
-    (Call
-      (MemberAccess
-        (Identifier)
-        (Identifier))
-      (Identifier)
-      (TextElement)
-      (Identifier)
-      (Empty))
-    (Let
-      (Empty)
-      (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (TextElement)
-        (Identifier)
-        (Empty))
-      (Statements
-        (Identifier)))))
+(Module 
+  (CompoundStatement 
+    (WithStatement 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Assignment 
+              (ExpressionList 
+                (Expression 
+                  (PrimaryExpression 
+                    (Identifier "found")))) 
+              (ExpressionList 
+                (Expression 
+                  (PrimaryExpression 
+                    (False "False")))))))) 
+      (WithItem 
+        (Expression 
+          (PrimaryExpression 
+            (Attribute 
+              (Identifier "_lock") 
+              (PrimaryExpression 
+                (Identifier "cls")))))))) 
+  (CompoundStatement 
+    (WithStatement 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Expression 
+              (PrimaryExpression 
+                (Identifier "x")))))) 
+      (WithItem 
+        (Expression 
+          (PrimaryExpression 
+            (Call 
+              (PrimaryExpression 
+                (Attribute 
+                  (Identifier "object") 
+                  (PrimaryExpression 
+                    (Identifier "patch")))) 
+              (ArgumentList 
+                (Expression 
+                  (PrimaryExpression 
+                    (Identifier "sys"))) 
+                (Expression 
+                  (PrimaryExpression 
+                    (String))) 
+                (Expression 
+                  (PrimaryExpression 
+                    (Identifier "stdout")))))))) 
+      (WithItem 
+        (Expression 
+          (PrimaryExpression 
+            (Call 
+              (PrimaryExpression 
+                (Attribute 
+                  (Identifier "object") 
+                  (PrimaryExpression 
+                    (Identifier "patch")))) 
+              (ArgumentList 
+                (Expression 
+                  (PrimaryExpression 
+                    (Identifier "sys"))) 
+                (Expression 
+                  (PrimaryExpression 
+                    (String))) 
+                (Expression 
+                  (PrimaryExpression 
+                    (Identifier "stderr")))))))))))

@@ -29,8 +29,6 @@ import           Scope.Scope
 import           Scope.Types
 import           Source.Span
 
-newtype CurrentScope address = CurrentScope { unCurrentScope :: address }
-
 newtype ScopeGraph scope = ScopeGraph { unScopeGraph :: Map scope (Scope scope) }
   deriving (Eq, Ord, Show)
 
