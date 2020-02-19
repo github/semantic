@@ -244,7 +244,7 @@ data EvalError term address value return where
   DerefError          :: value -> EvalError term address value value
   ExportError         :: ModulePath -> Name -> EvalError term address value ()
   FloatFormatError    :: Text -> EvalError term address value Scientific
-  -- ^ Indicates that our evaluator wasn't able to make sense of these literals.
+  -- Indicates that our evaluator wasn't able to make sense of these literals.
   IntegerFormatError  :: Text -> EvalError term address value Integer
   NoNameError         :: term -> EvalError term address value Name
   RationalFormatError :: Text -> EvalError term address value Rational
