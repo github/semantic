@@ -19,6 +19,7 @@ import qualified Data.ByteString as ByteString
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Module (ModuleInfo (..))
 import qualified Data.ScopeGraph as ScopeGraph
+import           Data.Semilattice.Lower
 import qualified Language.Python ()
 import qualified Language.Python as Py (Term)
 import qualified Language.Python.Grammar as TSP
@@ -57,19 +58,20 @@ The graph should be
 
 
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
-runScopeGraph p _src item = snd . run . runSketch (Just p) $ scopeGraph item
+runScopeGraph p _src item = snd . run . runSketch minfo $ scopeGraph item
+  where minfo = lowerBound
 
 runStackGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (Stack.Graph Stack.Node, Result)
-runStackGraph p _src item = (\(stack, (scopeGraph, result)) -> (stack, result)) . run . runSketch (Just p) $ scopeGraph item
+runStackGraph p _src item = (\(stack, (scopeGraph, result)) -> (stack, result)) . run . runSketch lowerBound $ scopeGraph item
 
 runScopeGraphTest :: Monad m => SketchC Name m Result -> m (ScopeGraph.ScopeGraph Name, Result)
 runScopeGraphTest val = do
-  result <- runSketch Nothing $ val
+  result <- runSketch lowerBound $ val
   pure (snd result)
 
 runStackGraphTest :: Monad m => SketchC Name m Result -> m (Stack.Graph Stack.Node, Result)
 runStackGraphTest val = do
-  result <- runSketch Nothing $ val
+  result <- runSketch lowerBound $ val
   pure ((\(stack, (scopeGraph, result)) -> (stack, result)) result)
 
 sampleGraphThing :: ScopeGraphEff sig m => m Result
@@ -202,7 +204,7 @@ expectedImportFromSymbols = do
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 5) (Pos 0 11))
   newReference (Name.name "cheese") refProperties
 
-  withScope "cheese" $ do
+  withScope (CurrentScope "cheese") $ do
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 12) (Pos 0 16))
     newReference (Name.name "ints") refProperties
 
@@ -229,7 +231,7 @@ expectedImportFromSymbolAliases = do
   let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 5) (Pos 0 11))
   newReference (Name.name "cheese") refProperties
 
-  withScope "cheese" $ do
+  withScope (CurrentScope "cheese") $ do
     let refProperties = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (Span (Pos 0 12) (Pos 0 16))
     newReference (Name.name "ints") refProperties
 

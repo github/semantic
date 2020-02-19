@@ -29,9 +29,9 @@ import           Control.Effect.ScopeGraph
 import           Data.Module (ModuleInfo)
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
+import           Scope.Types
 import qualified Stack.Graph as Stack
 import qualified System.Path as Path
-import           Scope.Types
 
 type SketchC addr m
   = StateC (ScopeGraph Name)
@@ -40,16 +40,17 @@ type SketchC addr m
   ( ReaderC (CurrentScope Name)
   ( ReaderC ModuleInfo
   ( FreshC m
-  ))))
+  )))))
 
 runSketch ::
   (Functor m)
   => ModuleInfo
   -> SketchC Name m a
   -> m (Stack.Graph Stack.Node, (ScopeGraph Name, a))
-runSketch _rootpath go
+runSketch minfo go
   = evalFresh 1
-  . runReader @Name rootname
+  . runReader minfo
+  . runReader (CurrentScope rootname)
   . evalState @Name rootname
   . runState @(Stack.Graph Stack.Node) Stack.empty
   . runState @(ScopeGraph Name) initialGraph

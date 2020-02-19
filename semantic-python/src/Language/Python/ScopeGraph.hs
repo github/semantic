@@ -268,7 +268,7 @@ instance ToScopeGraph Py.ImportFromStatement where
     for_ pairs $ \pair -> do
       case pair of
         (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
-          withScope (toName scopeIdentifier) $ do
+          withScope (CurrentScope (toName scopeIdentifier)) $ do
             let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
             newReference (toName referenceIdentifier) referenceProps
 

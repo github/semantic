@@ -114,7 +114,7 @@ newScope edges = do
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
 newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
 newEdge label address = do
-  current <- currentScope
+  CurrentScope current <- currentScope
   modify (ScopeGraph.addImportEdge label (toList address) current)
 
 lookupScope :: ScopeGraphEff sig m => Name -> m (ScopeGraph.Scope Name)
