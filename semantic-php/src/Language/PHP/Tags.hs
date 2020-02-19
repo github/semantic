@@ -1,5 +1,7 @@
 {-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 module Language.PHP.Tags (tags) where
@@ -9,9 +11,11 @@ import           AST.Token
 import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
+import           Data.Text (Text)
 import qualified Language.PHP.AST as PHP
 import           Source.Loc
 import           Source.Source as Source
+import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags t where
@@ -44,6 +48,18 @@ gtags
   => t Loc
   -> m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
+
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
+yieldTag name kind loc range = do
+  src <- ask @Source
+  Tags.yield (Tag name kind loc (Tags.firstLine src range) Nothing)
+
+
+instance ToTags PHP.FunctionDefinition where
+  tags t@PHP.FunctionDefinition
+    { PHP.ann = loc@Loc { byteRange }
+    , PHP.name = PHP.Name { text }
+    } = yieldTag text Function loc byteRange >> gtags t
 
 instance ToTags PHP.AnonymousFunctionCreationExpression
 instance ToTags PHP.AnonymousFunctionUseClause
@@ -90,7 +106,6 @@ instance ToTags PHP.ForStatement
 instance ToTags PHP.ForeachStatement
 instance ToTags PHP.FormalParameters
 instance ToTags PHP.FunctionCallExpression
-instance ToTags PHP.FunctionDefinition
 instance ToTags PHP.FunctionStaticDeclaration
 instance ToTags PHP.GlobalDeclaration
 instance ToTags PHP.GotoStatement
