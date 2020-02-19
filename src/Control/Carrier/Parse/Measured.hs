@@ -61,18 +61,22 @@ runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
       config <- asks config
-      parseToAST (configTreeSitterParseTimeout config) language blob
-        >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
+      executeParserAction (parseToAST (configTreeSitterParseTimeout config) language blob)
 
   UnmarshalParser language ->
     time "parse.tree_sitter_precise_ast_parse" languageTag $ do
       config <- asks config
-      parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob
-        >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
+      executeParserAction (parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob)
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
 
-  where languageTag = [("language" :: String, show (blobLanguage blob))]
+  where 
+    languageTag = [("language" :: String, show (blobLanguage blob))]
+    executeParserAction act = do
+      -- Test harnesses can specify that parsing must fail, for testing purposes.
+      shouldFailFlag <- asks (Flag.toBool FailTestParsing . configFailParsingForTesting . config)
+      when shouldFailFlag (throwError (SomeException AssignmentTimedOut))
+      act >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
 data AssignmentTimedOut = AssignmentTimedOut deriving (Show)
 
