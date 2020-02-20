@@ -104,12 +104,13 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
 
 makeTraversalInstances :: TypeQ -> TypeQ -> Q [Dec]
 makeTraversalInstances ty ty' =
+makeTraversalInstances ty f =
   [d|
-  instance Foldable ($ty $ty') where
+  instance Foldable ($ty $f) where
     foldMap = foldMapDefault1
-  instance Functor ($ty $ty') where
+  instance Functor ($ty $f) where
     fmap = fmapDefault1
-  instance Traversable ($ty $ty') where
+  instance Traversable ($ty $f) where
     traverse = traverseDefault1
   |]
 
