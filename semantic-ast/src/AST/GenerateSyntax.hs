@@ -65,9 +65,9 @@ getAllSymbols language = do
 -- Auto-generate Haskell datatypes for sums, products and leaf types
 syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
-  typeParameterName      <- newName "a"
   extraTypeParameterName <- newName "f"
   let traversalInstances = makeTraversalInstances (conT name)
+  typeParameterName      <- newName "a"
       glue a b c = a : b <> c
       name = mkName nameStr
       generatedDatatype cons = dataD (cxt []) name [PlainTV extraTypeParameterName, PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
