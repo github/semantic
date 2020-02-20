@@ -63,13 +63,12 @@ test-suite test
   hs-source-dirs:   test
   main-is:          Test.hs
   build-depends:    base
-                  , tree-sitter
-                  , tree-sitter-tsx
-                  , semantic-ast
                   , bytestring ^>= 0.10.8.2
                   , hedgehog >= 0.6 && <2
                   , pathtype ^>= 0.8.1
-                  , text
+                  , semantic-ast
+                  , semantic-tsx
                   , tasty
                   , tasty-hedgehog
                   , tasty-hunit
+                  , text

@@ -1,12 +1,12 @@
 {-# LANGUAGE OverloadedStrings, TypeApplications #-}
 module Main (main) where
 
-import qualified System.Path as Path
-import           Test.Tasty
-import           TreeSitter.Java
-import qualified TreeSitter.Java.AST as Java
 import           AST.Test
 import           AST.Unmarshal
+import qualified Language.Java.AST as Java
+import           Language.Java.Grammar
+import qualified System.Path as Path
+import           Test.Tasty
 
 main :: IO ()
 main
