@@ -67,7 +67,7 @@ syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
   extraTypeParameterName <- newName "f"
   typeParameterName      <- newName "a"
-  let traversalInstances = makeTraversalInstances (conT extraTypeParameterName) (conT name)
+  let traversalInstances = makeTraversalInstances (varT extraTypeParameterName) (conT name)
       glue a b c = a : b <> c
       name = mkName nameStr
       generatedDatatype cons = dataD (cxt []) name [PlainTV extraTypeParameterName, PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
