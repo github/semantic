@@ -103,7 +103,6 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
 
 
 makeTraversalInstances :: TypeQ -> TypeQ -> Q [Dec]
-makeTraversalInstances ty ty' =
 makeTraversalInstances ty f =
   [d|
   instance Foldable ($ty $f) where
