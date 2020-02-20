@@ -102,14 +102,14 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
 
 
-makeTraversalInstances :: TypeQ -> Q [Dec]
-makeTraversalInstances ty =
+makeTraversalInstances :: TypeQ -> TypeQ -> Q [Dec]
+makeTraversalInstances ty ty' =
   [d|
-  instance Foldable $ty where
+  instance Foldable ($ty $ty') where
     foldMap = foldMapDefault1
-  instance Functor $ty where
+  instance Functor ($ty $ty') where
     fmap = fmapDefault1
-  instance Traversable $ty where
+  instance Traversable ($ty $ty') where
     traverse = traverseDefault1
   |]
 
