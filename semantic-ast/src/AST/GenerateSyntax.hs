@@ -87,8 +87,8 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
-      tsSymbol <- runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
-      pure [ TySynD name [] (ConT ''Token `AppT` LitT (StrTyLit datatypeName) `AppT` LitT (NumTyLit (fromIntegral tsSymbol))) ]
+      let tsSymbol = runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
+      fmap (pure @[]) (TH.tySynD name [] (conT ''Token `appT` litT (strTyLit datatypeName) `appT` litT (tsSymbol >>= numTyLit . fromIntegral)))
     LeafType datatypeName Named ->
       let con = ctorForLeafType datatypeName typeParameterName
           symbols = symbolMatchingInstance allSymbols name Named datatypeName
