@@ -10,7 +10,8 @@ import           Test.Tasty
 
 main :: IO ()
 main
-  =   readCorpusFiles (Path.relDir "tree-sitter-tsx/vendor/tree-sitter-typescript/tsx/corpus")
+  =   Path.absDir <$> Tsx.getTestCorpusDir
+  >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
   where parse = parseByteString @Tsx.Program @() tree_sitter_tsx
