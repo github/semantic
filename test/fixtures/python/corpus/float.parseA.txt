@@ -1,12 +1,57 @@
-(Statements
-  (Negate
-    (Float))
-  (Float)
-  (Float)
-  (Float)
-  (Float)
-  (Float)
-  (Float)
-  (Float)
-  (Float)
-  (Float))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (UnaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Float ".6_6"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (UnaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Float ".1_1"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Float "123.4123"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Float "123.123J"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Float "1_1.3_1"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Float "1_1."))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Float "1e+3_4j"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Float ".3e1_4"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Float "1_0.l"))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Float ".1l"))))))

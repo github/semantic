@@ -1,37 +1,121 @@
-(Statements
-  (Plus
-    (Identifier)
-    (Identifier))
-  (Minus
-    (Identifier)
-    (Identifier))
-  (Times
-    (Identifier)
-    (Identifier))
-  (DividedBy
-    (Identifier)
-    (Identifier))
-  (Modulo
-    (Identifier)
-    (Identifier))
-  (FloorDivision
-    (Identifier)
-    (Identifier))
-  (Power
-    (Identifier)
-    (Identifier))
-  (BOr
-    (Identifier)
-    (Identifier))
-  (BAnd
-    (Identifier)
-    (Identifier))
-  (BXOr
-    (Identifier)
-    (Identifier))
-  (LShift
-    (Identifier)
-    (Identifier))
-  (RShift
-    (Identifier)
-    (Identifier)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "a")) 
+            (PrimaryExpression 
+              (Identifier "b"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "c")) 
+            (PrimaryExpression 
+              (Identifier "d"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "e")) 
+            (PrimaryExpression 
+              (Identifier "f"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "g")) 
+            (PrimaryExpression 
+              (Identifier "h"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "i")) 
+            (PrimaryExpression 
+              (Identifier "j"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "k")) 
+            (PrimaryExpression 
+              (Identifier "l"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "m")) 
+            (PrimaryExpression 
+              (Identifier "n"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "o")) 
+            (PrimaryExpression 
+              (Identifier "p"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "q")) 
+            (PrimaryExpression 
+              (Identifier "r"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "s")) 
+            (PrimaryExpression 
+              (Identifier "t"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "u")) 
+            (PrimaryExpression 
+              (Identifier "v"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (BinaryOperator 
+            (Token) 
+            (PrimaryExpression 
+              (Identifier "w")) 
+            (PrimaryExpression 
+              (Identifier "x"))))))))

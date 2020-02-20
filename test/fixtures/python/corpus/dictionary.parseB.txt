@@ -1,17 +1,43 @@
-(Statements
-  (Hash
-    (KeyValue
-      (Identifier)
-      (Integer)))
-  (Hash)
-  (Assignment
-    (Identifier)
-    (Hash
-      (Context
-        (Comment)
-        (KeyValue
-          (Identifier)
-          (Identifier)))
-      (KeyValue
-        (Identifier)
-        (Identifier)))))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Dictionary 
+            (Pair 
+              (Expression 
+                (PrimaryExpression 
+                  (Integer "2"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "b"))))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Dictionary))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Assignment 
+        (ExpressionList 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "a")))) 
+        (ExpressionList 
+          (Expression 
+            (PrimaryExpression 
+              (Dictionary 
+                (Pair 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Identifier "d"))) 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Identifier "bar")))) 
+                (Pair 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Identifier "e"))) 
+                  (Expression 
+                    (PrimaryExpression 
+                      (Identifier "foo"))))))))))))

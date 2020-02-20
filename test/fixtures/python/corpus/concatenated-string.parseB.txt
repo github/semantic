@@ -1,6 +1,10 @@
-(Statements
-  (Statements
-    (TextElement)
-    (TextElement)
-    (TextElement)
-    (TextElement)))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (ConcatenatedString 
+            (String) 
+            (String) 
+            (String) 
+            (String)))))))

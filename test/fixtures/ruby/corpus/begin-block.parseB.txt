@@ -1,6 +1,15 @@
-(Statements
-  (Send
-    (Identifier))
-  (ScopeEntry
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Variable 
+            (Identifier "foo")))))) 
+  (Statement 
+    (BeginBlock 
+      (Statement 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "bar")))))))))

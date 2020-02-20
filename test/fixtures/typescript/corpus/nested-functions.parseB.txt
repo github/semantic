@@ -1,43 +1,45 @@
-(Statements
-  (Function
-    (Empty)
-    (Empty)
-    (Identifier)
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (StatementBlock
-      (Function
-        (Empty)
-        (Empty)
-        (Identifier)
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Identifier)
-          (Empty))
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Identifier)
-          (Empty))
-        (StatementBlock
-          (Call
-            (MemberAccess
-              (Identifier)
-              (Identifier))
-            (Identifier)
-            (Empty))
-          (Call
-            (MemberAccess
-              (Identifier)
-              (Identifier))
-            (Identifier)
-            (Empty)))))))
+(Program 
+  (Statement 
+    (Declaration 
+      (FunctionDeclaration 
+        (StatementBlock 
+          (Statement 
+            (Declaration 
+              (FunctionDeclaration 
+                (StatementBlock 
+                  (Statement 
+                    (ExpressionStatement 
+                      (Expression 
+                        (CallExpression 
+                          (Expression 
+                            (MemberExpression 
+                              (PropertyIdentifier "log") 
+                              (Expression 
+                                (Identifier "console")))) 
+                          (Arguments 
+                            (Expression 
+                              (Identifier "arg1"))))))) 
+                  (Statement 
+                    (ExpressionStatement 
+                      (Expression 
+                        (CallExpression 
+                          (Expression 
+                            (MemberExpression 
+                              (PropertyIdentifier "log") 
+                              (Expression 
+                                (Identifier "console")))) 
+                          (Arguments 
+                            (Expression 
+                              (Identifier "arg2")))))))) 
+                (Identifier "child") 
+                (FormalParameters 
+                  (RequiredParameter 
+                    (Identifier "arg3")) 
+                  (RequiredParameter 
+                    (Identifier "arg4"))))))) 
+        (Identifier "parent") 
+        (FormalParameters 
+          (RequiredParameter 
+            (Identifier "arg1")) 
+          (RequiredParameter 
+            (Identifier "arg2")))))))

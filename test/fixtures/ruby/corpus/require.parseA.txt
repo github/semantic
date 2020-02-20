@@ -1,7 +1,19 @@
-(Statements
-  (Require
-    (TextElement))
-  (Send
-    (Identifier)
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (String)))) 
+      (Variable 
+        (Identifier "require")))) 
+  (Statement 
+    (MethodCall 
+      (ArgumentList 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a")))))) 
+      (Variable 
+        (Identifier "foo")))))

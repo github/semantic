@@ -1,19 +1,39 @@
-(Statements
-  (For
-    (SequenceExpression
-      (Assignment
-        (Identifier)
-        (Float))
-      (Call
-        (Identifier)
-        (Empty)))
-    (LessThan
-      (Identifier)
-      (Float))
-    (Update
-      (Identifier))
-    (Statements
-      (Call
-        (Identifier)
-        (Identifier)
-        (Empty)))))
+(Program 
+  (Statement 
+    (ForStatement 
+      (Statement 
+        (StatementBlock 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (CallExpression 
+                  (Expression 
+                    (Identifier "log")) 
+                  (Arguments 
+                    (Expression 
+                      (Identifier "i"))))))))) 
+      (ExpressionStatement 
+        (SequenceExpression 
+          (Expression 
+            (AssignmentExpression 
+              (Identifier "i") 
+              (Expression 
+                (Number "0")))) 
+          (Expression 
+            (CallExpression 
+              (Expression 
+                (Identifier "init")) 
+              (Arguments))))) 
+      (ExpressionStatement 
+        (Expression 
+          (BinaryExpression 
+            (Token) 
+            (Expression 
+              (Identifier "i")) 
+            (Expression 
+              (Number "10"))))) 
+      (Expression 
+        (UpdateExpression 
+          (Token) 
+          (Expression 
+            (Identifier "i")))))))

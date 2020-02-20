@@ -1,4 +1,8 @@
-(Statements
-  (AmbientDeclaration
-    (InternalModule
-      (Identifier))))
+(Program 
+  (Statement 
+    (Declaration 
+      (AmbientDeclaration 
+        (Declaration 
+          (InternalModule 
+            (StatementBlock) 
+            (Identifier "Promise")))))))

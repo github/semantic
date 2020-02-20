@@ -1,12 +1,22 @@
-(Statements
-  (Try
-    (Statements
-      (Identifier))
-    (Catch
-      (Empty)
-      (Statements
-        (Identifier)))
-    (Finally
-      (Statements
-        (Identifier))))
-  (Empty))
+(Program 
+  (Statement 
+    (TryStatement 
+      (StatementBlock 
+        (Statement 
+          (ExpressionStatement 
+            (Expression 
+              (Identifier "f"))))) 
+      (CatchClause 
+        (StatementBlock 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (Identifier "h")))))) 
+      (FinallyClause 
+        (StatementBlock 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (Identifier "g")))))))) 
+  (Statement 
+    (EmptyStatement ";")))

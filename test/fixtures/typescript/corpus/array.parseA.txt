@@ -1,3 +1,7 @@
-(Statements
-  (Array
-    (TextElement)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Array 
+          (Expression 
+            (String)))))))

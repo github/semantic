@@ -1,8 +1,19 @@
-(Statements
-  (If
-    (Send
-      (Identifier))
-    (Send
-      (Identifier))
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Arg 
+      (Conditional 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "b"))))) 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "a"))))) 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "bar")))))))))

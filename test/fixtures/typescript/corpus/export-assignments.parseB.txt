@@ -1,3 +1,5 @@
-(Statements
-  (Return
-    (Identifier)))
+(Program 
+  (Statement 
+    (ReturnStatement 
+      (Expression 
+        (Identifier "Foo")))))

@@ -1,4 +1,10 @@
-(Statements
-  (InstanceOf
-    (Identifier)
-    (Identifier)))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (BinaryExpression 
+          (Token) 
+          (Expression 
+            (Identifier "x")) 
+          (Expression 
+            (Identifier "String")))))))

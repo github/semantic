@@ -1,7 +1,16 @@
-(Statements
-  (Module
-    (Identifier))
-  (Module
-    (ScopeResolution
-      (Identifier)
-      (Identifier))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Module 
+          (Constant "Foo"))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Module 
+          (ScopeResolution 
+            (Constant "B") 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Constant "A"))))))))))

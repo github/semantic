@@ -1,12 +1,19 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Statements
-      (Assignment
-        (Identifier)
-        (Complex))
-      (Assignment
-        (Identifier)
-        (Complex)))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ConstDeclaration 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (ImaginaryLiteral "01i"))) 
+            (Identifier "a")) 
+          (ConstSpec 
+            (ExpressionList 
+              (Expression 
+                (ImaginaryLiteral "1.e+100i"))) 
+            (Identifier "b"))))) 
+    (Identifier "main") 
+    (ParameterList)))

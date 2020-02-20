@@ -1,9 +1,13 @@
-(Statements
-  (Function
-    (Empty)
-    (Empty)
-    (Identifier)
-    (StatementBlock
-      (Return
-        (Boolean))))
-  (Empty))
+(Program 
+  (Statement 
+    (Declaration 
+      (FunctionDeclaration 
+        (StatementBlock 
+          (Statement 
+            (ReturnStatement 
+              (Expression 
+                (False "false"))))) 
+        (Identifier "anotherFunction") 
+        (FormalParameters)))) 
+  (Statement 
+    (EmptyStatement ";")))

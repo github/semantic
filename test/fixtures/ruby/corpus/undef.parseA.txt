@@ -1,27 +1,28 @@
-(Statements
-  (Call
-    (Identifier)
-    (SymbolElement)
-    (Empty))
-  (Call
-    (Identifier)
-    (Send
-      (Identifier))
-    (Empty))
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (SymbolElement)
-    (SymbolElement)
-    (Empty)))
+(Program 
+  (Statement 
+    (Undef 
+      (MethodName 
+        (Symbol)))) 
+  (Statement 
+    (Undef 
+      (MethodName 
+        (Identifier "foo")))) 
+  (Statement 
+    (Undef 
+      (MethodName 
+        (Setter 
+          (Identifier "foo"))))) 
+  (Statement 
+    (Undef 
+      (MethodName 
+        (Operator "+")))) 
+  (Statement 
+    (Undef 
+      (MethodName 
+        (GlobalVariable "$FOO")))) 
+  (Statement 
+    (Undef 
+      (MethodName 
+        (Symbol)) 
+      (MethodName 
+        (Symbol)))))

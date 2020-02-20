@@ -1,9 +1,10 @@
-(Statements
-  (VariableDeclaration
-    (Assignment
-      (Annotation
-        (Intersection
-          (TypeIdentifier)
-          (TypeIdentifier)))
-      (Identifier)
-      (Empty))))
+(Program 
+  (Statement 
+    (Declaration 
+      (LexicalDeclaration 
+        (VariableDeclarator 
+          (Identifier "x") 
+          (TypeAnnotation 
+            (IntersectionType 
+              (TypeIdentifier "A") 
+              (TypeIdentifier "B"))))))))

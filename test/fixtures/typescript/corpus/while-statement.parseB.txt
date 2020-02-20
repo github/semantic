@@ -1,8 +1,17 @@
-(Statements
-  (While
-    (Identifier)
-    (Statements
-      (Call
-        (Identifier)
-        (Empty))))
-  (Empty))
+(Program 
+  (Statement 
+    (WhileStatement 
+      (Statement 
+        (StatementBlock 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (CallExpression 
+                  (Expression 
+                    (Identifier "a")) 
+                  (Arguments))))))) 
+      (ParenthesizedExpression 
+        (Expression 
+          (Identifier "b"))))) 
+  (Statement 
+    (EmptyStatement ";")))

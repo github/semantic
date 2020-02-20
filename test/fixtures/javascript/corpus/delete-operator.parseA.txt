@@ -1,5 +1,12 @@
-(Statements
-  (Delete
-    (Subscript
-      (Identifier)
-      (TextElement))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (UnaryExpression 
+          (Token) 
+          (Expression 
+            (SubscriptExpression 
+              (Expression 
+                (Identifier "thing")) 
+              (Expression 
+                (String)))))))))

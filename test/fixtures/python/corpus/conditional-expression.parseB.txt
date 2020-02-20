@@ -1,15 +1,39 @@
-(Statements
-  (Assignment
-    (Identifier)
-    (If
-      (Identifier)
-      (Identifier)
-      (Identifier)))
-  (If
-    (Identifier)
-    (Call
-      (Identifier)
-      (Empty))
-    (Call
-      (Identifier)
-      (Empty))))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Assignment 
+        (ExpressionList 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "e")))) 
+        (ExpressionList 
+          (Expression 
+            (ConditionalExpression 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "d"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "f"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Identifier "g"))))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ConditionalExpression 
+          (Expression 
+            (PrimaryExpression 
+              (Call 
+                (PrimaryExpression 
+                  (Identifier "foo")) 
+                (ArgumentList)))) 
+          (Expression 
+            (PrimaryExpression 
+              (Identifier "b"))) 
+          (Expression 
+            (PrimaryExpression 
+              (Call 
+                (PrimaryExpression 
+                  (Identifier "c")) 
+                (ArgumentList)))))))))

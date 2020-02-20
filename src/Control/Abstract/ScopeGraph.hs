@@ -80,6 +80,7 @@ import           Data.Map (Map)
 import           Data.Maybe.Exts
 import           GHC.Generics (Generic1)
 import           Prelude hiding (lookup)
+import           Scope.Types (CurrentScope (..))
 import           Source.Span
 
 lookup :: ( Ord address
@@ -217,8 +218,6 @@ newPreludeScope edges = do
   name <- gensym
   address <- alloc name
   address <$ modify (ScopeGraph.newPreludeScope address edges)
-
-newtype CurrentScope address = CurrentScope { unCurrentScope :: address }
 
 currentScope :: Has (Reader (CurrentScope address)) sig m
              => Evaluator term address value m address

@@ -1,57 +1,46 @@
-(Statements
-  (Class
-    (TypeParameter
-      (TypeIdentifier)
-      (Empty)
-      (Empty))
-    (TypeIdentifier)
-    (ExtendsClause
-      (TypeIdentifier))
-    (Statements
-      (PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Identifier)
-        (Float))
-      (Method
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Identifier)
-          (Empty))
-        (StatementBlock
-          (Return
-            (Identifier))))
-      (Method
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Identifier)
-          (Empty))
-        (StatementBlock
-          (Return
-            (Identifier))))
-      (Method
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-        (RequiredParameter
-          (Empty)
-          (Empty)
-          (Identifier)
-          (Empty))
-        (StatementBlock
-          (Return
-            (Identifier)))))))
+(Program 
+  (Statement 
+    (Declaration 
+      (ClassDeclaration 
+        (ClassBody 
+          (PublicFieldDefinition 
+            (Expression 
+              (Number "5")) 
+            (PropertyIdentifier "bar")) 
+          (MethodDefinition 
+            (StatementBlock 
+              (Statement 
+                (ReturnStatement 
+                  (Expression 
+                    (Identifier "a"))))) 
+            (PropertyIdentifier "one") 
+            (FormalParameters 
+              (RequiredParameter 
+                (Identifier "a")))) 
+          (MethodDefinition 
+            (StatementBlock 
+              (Statement 
+                (ReturnStatement 
+                  (Expression 
+                    (Identifier "b"))))) 
+            (PropertyIdentifier "two") 
+            (FormalParameters 
+              (RequiredParameter 
+                (Identifier "b")))) 
+          (MethodDefinition 
+            (StatementBlock 
+              (Statement 
+                (ReturnStatement 
+                  (Expression 
+                    (Identifier "c"))))) 
+            (PropertyIdentifier "three") 
+            (FormalParameters 
+              (RequiredParameter 
+                (Identifier "c"))))) 
+        (TypeIdentifier "Foo") 
+        (TypeParameters 
+          (TypeParameter 
+            (TypeIdentifier "Bar"))) 
+        (ClassHeritage 
+          (ExtendsClause 
+            (TypeIdentifier "Baz")))))))

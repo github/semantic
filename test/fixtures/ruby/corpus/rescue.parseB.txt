@@ -1,12 +1,25 @@
-(Statements
-  (Try
-    (Statements
-      (Send
-        (Identifier))
-      (Catch
-        (Statements
-          (Statements
-            (Send
-              (Identifier))))
-        (Send
-          (Identifier))))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Begin 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "foo")))))) 
+          (Rescue 
+            (Exceptions 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "x")))))) 
+            (Then 
+              (Statement 
+                (Arg 
+                  (Primary 
+                    (Lhs 
+                      (Variable 
+                        (Identifier "bar")))))))))))))

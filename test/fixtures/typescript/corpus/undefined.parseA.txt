@@ -1,2 +1,5 @@
-(Statements
-  (Undefined))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Undefined "undefined")))))

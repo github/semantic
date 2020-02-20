@@ -7,6 +7,8 @@ module Scope.Types
   , Domain (..)
   , Kind (..)
   , AccessControl (..)
+  -- * Identificatory newtypes
+  , CurrentScope (..)
   ) where
 
 import Data.Aeson (ToJSON)
@@ -92,3 +94,8 @@ instance Ord AccessControl where
   -- | Public AccessControl "on the left" has access only to Public AccessControl "on the right".
   (<=) Public Public       = True
   (<=) Public _            = False
+
+-- | A newtype indicating that the wrapped datum represents a parent scope
+-- in some contextual computation.
+newtype CurrentScope address = CurrentScope { unCurrentScope :: address }
+

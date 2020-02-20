@@ -1,9 +1,16 @@
-(Statements
-  (Try
-    (Statements
-      (Send
-        (Identifier))
-      (Else
-        (Empty)
-        (Send
-          (Identifier))))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Begin 
+          (Statement 
+            (MethodCall 
+              (ArgumentList) 
+              (Variable 
+                (Identifier "foo")))) 
+          (Else 
+            (Statement 
+              (MethodCall 
+                (ArgumentList) 
+                (Variable 
+                  (Identifier "bar"))))))))))
