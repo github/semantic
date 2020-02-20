@@ -84,7 +84,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       in glue <$> newType <*> hasFieldInstance <*> traversalInstances
     ProductType datatypeName named children fields ->
       let con = ctorForProductType datatypeName typeParameterName children fields
-          symbols = symbolMatchingInstance allSymbols name named datatypeName
+          symbols = symbolMatchingInstance allSymbols extraTypeParameterName name named datatypeName
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
@@ -92,7 +92,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       fmap (pure @[]) (tySynD name [] (conT ''Token `appT` litT (strTyLit datatypeName) `appT` litT (tsSymbol >>= numTyLit . fromIntegral)))
     LeafType datatypeName Named ->
       let con = ctorForLeafType datatypeName typeParameterName
-          symbols = symbolMatchingInstance allSymbols name Named datatypeName
+          symbols = symbolMatchingInstance allSymbols extraTypeParameterName name Named datatypeName
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
