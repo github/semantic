@@ -124,7 +124,7 @@ symbolMatchingInstance :: [(String, Named)] -> Name -> Name -> Named -> Datatype
 symbolMatchingInstance allSymbols extratypeParametername name named (DatatypeName str) = do
   let tsSymbols = elemIndices (str, named) allSymbols
       names = intercalate ", " $ fmap (debugPrefix . (!!) allSymbols) tsSymbols
-  [d|instance TS.SymbolMatching $(conT name) where
+  [d|instance TS.SymbolMatching ($(conT name) $(varT extratypeParametername)) where
       matchedSymbols _   = tsSymbols
       showFailure _ node = "expected " <> $(litE (stringL names))
                         <> " but got " <> if nodeSymbol node == 65535 then "ERROR" else genericIndex debugSymbolNames (nodeSymbol node)
