@@ -1,21 +1,20 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 
-module Stack.Graph (EdgeLabel(..), Graph(..), Node, (>>-), (-<<)) where
+{-# LANGUAGE OverloadedLists #-}
+module Stack.Graph (Direction(..), Graph(..), Node, (>>-), (-<<), scope) where
 
+import           Algebra.Graph.Label (Label)
 import           Algebra.Graph.Labelled ((-<), (>-))
 import qualified Algebra.Graph.Labelled as Labelled
 import           Data.Semilattice.Lower
 import           Data.String
 import           Data.Text (Text)
+import           GHC.Exts
 
-data EdgeLabel = Empty | From | To
+data Direction = From | To
     deriving (Show, Eq, Ord)
-instance Monoid EdgeLabel where
-    mempty = Empty
-
-instance Semigroup EdgeLabel where
-    _ <> b = b
 
 newtype Symbol = Symbol Text
     deriving (IsString, Show, Eq)
@@ -35,20 +34,24 @@ data Node = Root
 instance Lower Node where
   lowerBound = Root
 
-newtype Graph a = Graph { unGraph :: Labelled.Graph EdgeLabel a }
-  deriving (Show, Eq)
+newtype Graph a = Graph { unGraph :: Labelled.Graph (Label Direction) a }
+  deriving (Show)
 
 instance Lower a => Lower (Graph a) where
   lowerBound = Graph (Labelled.vertex lowerBound)
 
-(>>-) :: a -> a -> Labelled.Graph EdgeLabel a
-left >>- right = left -< From >- right
+scope, declaration, popSymbol, reference, pushSymbol :: Symbol -> Graph Node
+scope = Graph . Labelled.vertex . Scope
+declaration = Graph . Labelled.vertex . Declaration
+reference = Graph . Labelled.vertex . Reference
+popSymbol = Graph . Labelled.vertex . PopSymbol
+pushSymbol = Graph . Labelled.vertex . PushSymbol
+root :: Graph Node
+root = Graph (Labelled.vertex Root)
 
-(-<<) :: a -> a -> Labelled.Graph EdgeLabel a
-left -<< right = left -< To >- right
-
-(>>>-) :: Labelled.Graph EdgeLabel a -> Labelled.Graph EdgeLabel a -> Labelled.Graph EdgeLabel a
-left >>>- right = Labelled.connect From left right
+(>>-), (-<<) :: Graph a -> Graph a -> Graph a
+Graph left >>- Graph right = Graph (Labelled.connect [From] left right)
+(-<<) = flip (>>-)
 
 testGraph :: Graph Node
-testGraph = Graph $ (Scope "current" >>- Declaration "a") >>>- (PopSymbol "member" >>- Declaration "b") >>>- (Reference "b" >>- PushSymbol "member") >>>- (Reference "a" >>- Root)
+testGraph = (scope "current" >>- declaration "a") >>- (popSymbol "member" >>- declaration "b") >>- (reference "b" >>- pushSymbol "member") >>- (reference "a" >>- root)
