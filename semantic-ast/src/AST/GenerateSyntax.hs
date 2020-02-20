@@ -69,17 +69,17 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
   let traversalInstances = makeTraversalInstances (conT name)
       glue a b c = a : b <> c
       name = mkName nameStr
-      generatedDatatype cons = TH.dataD (TH.cxt []) name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
-      deriveStockClause = TH.derivClause (Just StockStrategy) [ TH.conT ''Eq, TH.conT ''Ord, TH.conT ''Show, TH.conT ''Generic, TH.conT ''Generic1]
-      deriveAnyClassClause = TH.derivClause (Just AnyclassStrategy) [TH.conT ''TS.Unmarshal, TH.conT ''Traversable1 `TH.appT` TH.varT (mkName "someConstraint")]
-      deriveGN = TH.derivClause (Just NewtypeStrategy) [TH.conT ''TS.SymbolMatching]
+      generatedDatatype cons = dataD (cxt []) name [PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
+      deriveStockClause = derivClause (Just StockStrategy) [ conT ''Eq, conT ''Ord, conT ''Show, conT ''Generic, conT ''Generic1]
+      deriveAnyClassClause = derivClause (Just AnyclassStrategy) [conT ''TS.Unmarshal, conT ''Traversable1 `appT` varT (mkName "someConstraint")]
+      deriveGN = derivClause (Just NewtypeStrategy) [conT ''TS.SymbolMatching]
   case datatype of
     SumType (DatatypeName _) _ subtypes ->
       let types' = fieldTypesToNestedSum subtypes
           fieldName = mkName ("get" <> nameStr)
-          con = recC name [TH.varBangType fieldName (TH.bangType strictness (types' `appT` varT typeParameterName))]
+          con = recC name [varBangType fieldName (bangType strictness (types' `appT` varT typeParameterName))]
           hasFieldInstance = makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
-          newType = TH.newtypeD (TH.cxt []) name [TH.plainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
+          newType = newtypeD (cxt []) name [plainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
       in glue <$> newType <*> hasFieldInstance <*> traversalInstances
     ProductType datatypeName named children fields ->
       let con = ctorForProductType datatypeName typeParameterName children fields
@@ -88,7 +88,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
       let tsSymbol = runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
-      fmap (pure @[]) (TH.tySynD name [] (conT ''Token `appT` litT (strTyLit datatypeName) `appT` litT (tsSymbol >>= numTyLit . fromIntegral)))
+      fmap (pure @[]) (tySynD name [] (conT ''Token `appT` litT (strTyLit datatypeName) `appT` litT (tsSymbol >>= numTyLit . fromIntegral)))
     LeafType datatypeName Named ->
       let con = ctorForLeafType datatypeName typeParameterName
           symbols = symbolMatchingInstance allSymbols name Named datatypeName
