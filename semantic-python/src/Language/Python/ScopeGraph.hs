@@ -308,7 +308,7 @@ instance ToScopeGraph Py.NonlocalStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.Module where
   scopeGraph term = do
-    currentName <- currentScope
+    ScopeGraph.CurrentScope currentName <- currentScope
     name <- newScope (Map.singleton ScopeGraph.Lexical [ currentName ])
     putCurrentScope name
 

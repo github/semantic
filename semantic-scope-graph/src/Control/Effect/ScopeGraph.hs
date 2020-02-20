@@ -86,10 +86,10 @@ withScope :: ScopeGraphEff sig m
           -> m a
           -> m a
 withScope scope action = do
-  s <- get @Name
+  CurrentScope s <- get @(CurrentScope Name)
   put scope
   x <- action
-  put s
+  put (CurrentScope s)
   pure x
 
 

@@ -120,7 +120,6 @@ test-suite stack-graph
 
   build-depends: base
                , semantic-python
-               , semantic-codegen
                , semantic-scope-graph
                , bytestring
                , pathtype
