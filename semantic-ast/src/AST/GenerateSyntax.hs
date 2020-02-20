@@ -138,14 +138,14 @@ debugPrefix (name, Named)     = name
 debugPrefix (name, Anonymous) = "_" <> name
 
 -- | Build Q Constructor for product types (nodes with fields)
-ctorForProductType :: DatatypeName -> Name -> Maybe Children -> [(String, Field)] -> Q Con
-ctorForProductType constructorName typeParameterName children fields = ctorForTypes constructorName lists where
+ctorForProductType :: DatatypeName -> Name -> Name -> Maybe Children -> [(String, Field)] -> Q Con
+ctorForProductType constructorName extraTypeParameterName typeParameterName children fields = ctorForTypes constructorName lists where
   lists = annotation : fieldList <> childList
   annotation = ("ann", varT typeParameterName)
   fieldList = map (fmap toType) fields
   childList = toList $ fmap toTypeChild children
   toType (MkField required fieldTypes mult) =
-    let ftypes = fieldTypesToNestedSum fieldTypes `appT` varT typeParameterName
+    let ftypes = fieldTypesToNestedSum extraTypeParameterName fieldTypes `appT` varT typeParameterName
     in case (required, mult) of
       (Required, Multiple) -> appT (conT ''NonEmpty) ftypes
       (Required, Single)   -> ftypes
