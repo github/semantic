@@ -76,14 +76,14 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       deriveGN = derivClause (Just NewtypeStrategy) [conT ''TS.SymbolMatching]
   case datatype of
     SumType (DatatypeName _) _ subtypes ->
-      let types' = fieldTypesToNestedSum subtypes
+      let types' = fieldTypesToNestedSum extraTypeParameterName subtypes
           fieldName = mkName ("get" <> nameStr)
           con = recC name [varBangType fieldName (bangType strictness (types' `appT` varT typeParameterName))]
           hasFieldInstance = makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
           newType = newtypeD (cxt []) name [plainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
       in glue <$> newType <*> hasFieldInstance <*> traversalInstances
     ProductType datatypeName named children fields ->
-      let con = ctorForProductType datatypeName typeParameterName children fields
+      let con = ctorForProductType datatypeName typeParameterName extraTypeParameterName children fields
           symbols = symbolMatchingInstance allSymbols extraTypeParameterName name named datatypeName
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
