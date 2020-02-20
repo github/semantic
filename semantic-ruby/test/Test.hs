@@ -10,7 +10,8 @@ import           Test.Tasty
 
 main :: IO ()
 main
-  =   readCorpusFiles (Path.relDir "tree-sitter-ruby/vendor/tree-sitter-ruby/test/corpus")
+  =   Path.absDir <$> Rb.getTestCorpusDir
+  >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
   where parse = parseByteString @Rb.Program @() tree_sitter_ruby
