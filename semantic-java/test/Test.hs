@@ -10,7 +10,8 @@ import           Test.Tasty
 
 main :: IO ()
 main
-  =   readCorpusFiles (Path.relDir "tree-sitter-java/vendor/tree-sitter-java/corpus")
+  =   Path.absDir <$> Java.getTestCorpusDir
+  >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
   where
