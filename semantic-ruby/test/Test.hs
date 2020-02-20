@@ -1,16 +1,17 @@
 {-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications #-}
 module Main (main) where
 
-import qualified System.Path as Path
-import           Test.Tasty
-import           TreeSitter.Ruby
-import qualified TreeSitter.Ruby.AST as Rb
 import           AST.Test
 import           AST.Unmarshal
+import qualified Language.Ruby.AST as Rb
+import           Language.Ruby.Grammar
+import qualified System.Path as Path
+import           Test.Tasty
 
 main :: IO ()
 main
-  =   readCorpusFiles (Path.relDir "tree-sitter-ruby/vendor/tree-sitter-ruby/test/corpus")
+  =   Path.absDir <$> Rb.getTestCorpusDir
+  >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
   where parse = parseByteString @Rb.Program @() tree_sitter_ruby

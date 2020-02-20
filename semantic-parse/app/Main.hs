@@ -14,7 +14,7 @@ import Options.Applicative hiding (style)
 import Text.Pretty.Simple (pPrint, pPrintNoColor)
 import Data.Foldable (traverse_)
 import Control.Monad ((>=>))
-import Marshal.JSON (marshal)
+import AST.Marshal.JSON (marshal)
 import Data.ByteString.Lazy.Char8 (putStrLn)
 import Data.Aeson.Encode.Pretty (encodePretty)
 

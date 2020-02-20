@@ -1,16 +1,17 @@
 {-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications #-}
 module Main (main) where
 
-import qualified System.Path as Path
-import           Test.Tasty
-import           TreeSitter.JSON
-import qualified TreeSitter.JSON.AST as JSON
 import           AST.Test
 import           AST.Unmarshal
+import qualified Language.JSON.AST as JSON
+import           Language.JSON.Grammar
+import qualified System.Path as Path
+import           Test.Tasty
 
 main :: IO ()
 main
-  =   readCorpusFiles (Path.relDir "tree-sitter-json/vendor/tree-sitter-json/corpus")
+  =   Path.absDir <$> JSON.getTestCorpusDir
+  >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
   where parse = parseByteString @JSON.Document @() tree_sitter_json
