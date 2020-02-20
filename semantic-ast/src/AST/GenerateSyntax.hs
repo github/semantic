@@ -120,8 +120,8 @@ makeHasFieldInstance ty param elim =
       getField = TS.gann . $elim |]
 
 -- | Create TH-generated SymbolMatching instances for sums, products, leaves
-symbolMatchingInstance :: [(String, Named)] -> Name -> Named -> DatatypeName -> Q [Dec]
 symbolMatchingInstance allSymbols name named (DatatypeName str) = do
+symbolMatchingInstance :: [(String, Named)] -> Name -> Name -> Named -> DatatypeName -> Q [Dec]
   let tsSymbols = elemIndices (str, named) allSymbols
       names = intercalate ", " $ fmap (debugPrefix . (!!) allSymbols) tsSymbols
   [d|instance TS.SymbolMatching $(conT name) where
