@@ -10,7 +10,8 @@ import           Test.Tasty
 
 main :: IO ()
 main
-  =   readCorpusFiles (Path.relDir "tree-sitter-go/vendor/tree-sitter-go/corpus")
+  =   Path.absDir <$> Go.getTestCorpusDir
+  >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
   where parse = parseByteString @Go.SourceFile @() tree_sitter_go
