@@ -168,11 +168,11 @@ ctorForTypes (DatatypeName constructorName) types = recC (toName Named construct
 
 
 -- | Convert field types to Q types
-fieldTypesToNestedSum :: NonEmpty AST.Deserialize.Type -> Q TH.Type
-fieldTypesToNestedSum xs = go (toList xs)
+fieldTypesToNestedSum :: Name -> NonEmpty AST.Deserialize.Type -> Q TH.Type
+fieldTypesToNestedSum extraTypeParameterName xs = go (toList xs)
   where
     combine lhs rhs = (conT ''(:+:) `appT` lhs) `appT` rhs -- (((((a :+: b) :+: c) :+: d)) :+: e)   ((a :+: b) :+: (c :+: d))
-    convertToQType (MkType (DatatypeName n) named) = conT (toName named n)
+    convertToQType (MkType (DatatypeName n) named) = conT (toName named n) `appT` (varT extraTypeParameterName)
     go [x] = convertToQType x
     go xs  = let (l,r) = splitAt (length xs `div` 2) xs in combine (go l) (go r)
 
