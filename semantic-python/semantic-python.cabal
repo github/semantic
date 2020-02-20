@@ -111,6 +111,21 @@ test-suite graphing
                , tasty
                , tasty-hunit
 
+test-suite stack-graph
+  import: haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test-stack-graph
+  main-is: StackTest.hs
+  ghc-options: -threaded
+
+  build-depends: base
+               , semantic-python
+               , semantic-codegen
+               , semantic-scope-graph
+               , bytestring
+               , pathtype
+               , tasty
+               , tasty-hunit
 
 test-suite test
   import: haskell

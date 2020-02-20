@@ -36,9 +36,9 @@ import qualified System.Path as Path
 type SketchC addr m
   = StateC (ScopeGraph Name)
   ( StateC (Stack.Graph Stack.Node)
-  ( StateC Name
-  ( ReaderC (CurrentScope Name)
+  ( StateC (CurrentScope Name)
   ( ReaderC ModuleInfo
+  ( FreshC m
   ( FreshC m
   )))))
 
@@ -50,11 +50,11 @@ runSketch ::
 runSketch minfo go
   = evalFresh 1
   . runReader minfo
-  . runReader (CurrentScope rootname)
-  . evalState @Name rootname
-  . runState @(Stack.Graph Stack.Node) lowerBound
+  . evalState (CurrentScope rootname)
+  . runState @(Stack.Graph Stack.Node) initialStackGraph
   . runState @(ScopeGraph Name) initialGraph
   $ go
   where
     rootname = Name.nameI 0
     initialGraph = ScopeGraph.insertScope rootname lowerBound lowerBound
+    initialStackGraph = Stack.singleton (Stack.scope rootname)

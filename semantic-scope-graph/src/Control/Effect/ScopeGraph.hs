@@ -19,6 +19,7 @@ module Control.Effect.ScopeGraph
   , declare
   -- Scope Manipulation
   , currentScope
+  , putCurrentScope
   , newEdge
   , newReference
   , newScope
@@ -45,6 +46,7 @@ import           Data.Text (Text)
 import           GHC.Records
 import qualified Scope.Reference as Reference
 import           Source.Span
+import qualified Stack.Graph as Stack
 
 import           Scope.Graph.AdjacencyList (ScopeGraph)
 import qualified Scope.Graph.AdjacencyList as AdjacencyList
@@ -63,24 +65,32 @@ maybeM f = maybe f pure
 
 type ScopeGraphEff sig m
   = ( Has (State (ScopeGraph Name)) sig m
-    , Has (State Name) sig m
+    , Has (State (Stack.Graph Stack.Node)) sig m
+    , Has (State (CurrentScope Name)) sig m
     , Has (Reader Module.ModuleInfo) sig m
     , Has Fresh sig m
-    , Has (Reader (CurrentScope Name)) sig m
-    , Has (Reader Module.ModuleInfo) sig m
     )
 
 graphInProgress :: ScopeGraphEff sig m => m (ScopeGraph Name)
 graphInProgress = get
 
+
 currentScope :: ScopeGraphEff sig m => m (CurrentScope Name)
-currentScope = ask
+currentScope = get @(CurrentScope Name)
+
+putCurrentScope :: ScopeGraphEff sig m => Name -> m ()
+putCurrentScope = put . CurrentScope
 
 withScope :: ScopeGraphEff sig m
           => CurrentScope Name
           -> m a
           -> m a
-withScope scope = local (const scope)
+withScope scope action = do
+  s <- get @Name
+  put scope
+  x <- action
+  put s
+  pure x
 
 
 declare :: ScopeGraphEff sig m => Name -> Props.Declaration -> m ()
@@ -109,6 +119,7 @@ reference n decl props = do
 newScope :: forall sig m . ScopeGraphEff sig m => Map ScopeGraph.EdgeLabel [Name] -> m Name
 newScope edges = do
   name <- Name.gensym
+  modify (Stack.newScope name edges)
   name <$ modify (ScopeGraph.newScope name edges)
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.

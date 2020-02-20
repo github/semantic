@@ -306,7 +306,13 @@ instance ToScopeGraph Py.None where scopeGraph = mempty
 
 instance ToScopeGraph Py.NonlocalStatement where scopeGraph = todo
 
-instance ToScopeGraph Py.Module where scopeGraph = onChildren
+instance ToScopeGraph Py.Module where
+  scopeGraph term = do
+    currentName <- currentScope
+    name <- newScope (Map.singleton ScopeGraph.Lexical [ currentName ])
+    putCurrentScope name
+
+    onChildren term
 
 instance ToScopeGraph Py.ReturnStatement where
   scopeGraph (Py.ReturnStatement _ mVal) = maybe (pure mempty) scopeGraph mVal

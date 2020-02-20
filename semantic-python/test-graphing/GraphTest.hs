@@ -61,18 +61,10 @@ runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> 
 runScopeGraph p _src item = snd . run . runSketch minfo $ scopeGraph item
   where minfo = lowerBound
 
-runStackGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (Stack.Graph Stack.Node, Result)
-runStackGraph p _src item = (\(stack, (scopeGraph, result)) -> (stack, result)) . run . runSketch lowerBound $ scopeGraph item
-
 runScopeGraphTest :: Monad m => SketchC Name m Result -> m (ScopeGraph.ScopeGraph Name, Result)
 runScopeGraphTest val = do
   result <- runSketch lowerBound $ val
   pure (snd result)
-
-runStackGraphTest :: Monad m => SketchC Name m Result -> m (Stack.Graph Stack.Node, Result)
-runStackGraphTest val = do
-  result <- runSketch lowerBound $ val
-  pure ((\(stack, (scopeGraph, result)) -> (stack, result)) result)
 
 sampleGraphThing :: ScopeGraphEff sig m => m Result
 sampleGraphThing = do
@@ -86,13 +78,6 @@ graphFile fp = do
   tree <- TS.parseByteString @Py.Term @Loc TSP.tree_sitter_python file
   pyModule <- either die pure tree
   pure $ runScopeGraph (Path.absRel fp) (Source.fromUTF8 file) pyModule
-
-stackGraphFile :: FilePath -> IO (Stack.Graph Stack.Node, Result)
-stackGraphFile fp = do
-  file <- ByteString.readFile fp
-  tree <- TS.parseByteString @Py.Term @Loc TSP.tree_sitter_python file
-  pyModule <- either die pure tree
-  pure $ runStackGraph (Path.absRel fp) (Source.fromUTF8 file) pyModule
 
 assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do
@@ -183,13 +168,6 @@ assertQualifiedImport = do
   (expecto, Complete) <- runScopeGraphTest expectedQualifiedImport
   HUnit.assertEqual "Should work for simple case" expecto graph
 
-assertStackQualifiedImport :: HUnit.Assertion
-assertStackQualifiedImport = do
-  let path = "semantic-python/test/fixtures/cheese/6-02-qualified-imports.py"
-  (graph, _) <- stackGraphFile path
-  (expecto, Complete) <- runStackGraphTest expectedQualifiedImport
-  HUnit.assertEqual "Should work for simple case" expecto graph
-
 assertImportFromSymbols :: HUnit.Assertion
 assertImportFromSymbols = do
   let path = "semantic-python/test/fixtures/cheese/6-03-import-from.py"
@@ -272,8 +250,5 @@ main = do
           , HUnit.testCase "qualified imports with symbols" assertImportFromSymbols
           , HUnit.testCase "qualified imports with symbol aliases" assertImportFromSymbolAliases
         ]
-      ],
-    Tasty.testGroup "stack graph" [
-      HUnit.testCase "qualified import" assertStackQualifiedImport
-    ]
+      ]
     ]
