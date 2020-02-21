@@ -1,29 +1,30 @@
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE ViewPatterns #-}
 module Stack.Graph.Export
   ( toGraphViz
   , openGraphViz
   ) where
 
-import Data.String
-import Stack.Graph
-import Algebra.Graph.Export.Dot (Attribute (..))
+import           Algebra.Graph.Export.Dot (Attribute (..))
 import qualified Algebra.Graph.Export.Dot as Dot
-import System.IO.Temp
-import System.IO
-import System.Process (system)
-import Control.Monad
-import Control.Concurrent
+import           Analysis.Name
+import           Control.Concurrent
+import           Control.Monad
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
-import qualified Streaming.Process
-import Streaming
-import qualified Streaming.Prelude as Stream
-import qualified System.Process as Process
 import qualified Data.Char as Char
-import Analysis.Name
+import           Data.String
 import qualified Data.Text as T
+import           Stack.Graph
+import           Streaming
+import qualified Streaming.Prelude as Stream
+import qualified Streaming.Process
+import           System.IO
+import           System.IO.Temp
+import           System.Process (system)
+import qualified System.Process as Process
 
 sym :: Symbol -> String
-sym = T.unpack .formatName . unSymbol
+sym = T.unpack .formatName
 
 nodeToDotName :: Node -> String
 nodeToDotName = \case
@@ -53,23 +54,23 @@ nodeAttributes = \case
 
 
 
-nodeStyle :: Dot.Style Node String
+nodeStyle :: Dot.Style (Tagged Node) String
 nodeStyle = Dot.Style
   { Dot.graphName = "stack_graph"
   , Dot.preamble = []
   , Dot.graphAttributes = []
   , Dot.defaultVertexAttributes = []
   , Dot.defaultEdgeAttributes = []
-  , Dot.vertexName = nodeToDotName
-  , Dot.vertexAttributes = nodeAttributes
+  , Dot.vertexName = nodeToDotName . contents
+  , Dot.vertexAttributes = nodeAttributes . contents
   , Dot.edgeAttributes = mempty
   }
 
-toGraphViz :: Graph Node -> String
+toGraphViz :: Graph (Tagged Node) -> String
 toGraphViz = Dot.export nodeStyle
 
 openGraphViz :: Graph Node -> IO ()
-openGraphViz g = do
+openGraphViz (tagGraphUniquely -> g) = do
   -- Not using streaming-process's temporary file support, because we don't want
   -- to clean this up immediately after we're done using it.
   (pngPath, pngH) <- openTempFile "/tmp" "stack-graph.svg"
