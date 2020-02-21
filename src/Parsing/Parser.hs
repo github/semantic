@@ -19,7 +19,7 @@ module Parsing.Parser
 , jsxParserALaCarte
 , jsxParserPrecise
 , jsxParser
-, markdownParser
+, phpParserPrecise
 , pythonParserALaCarte
 , pythonParserPrecise
 , pythonParser
@@ -42,21 +42,17 @@ module Parsing.Parser
 
 import           Assigning.Assignment
 import           AST.Unmarshal
-import qualified CMarkGFM
 import           Data.AST
-import           Data.Functor.Classes
 import           Data.Language
 import           Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Data.Syntax as Syntax
-import           Data.Term
 import           Foreign.Ptr
 import qualified Language.Go as GoPrecise
 import qualified Language.Go.Assignment as GoALaCarte
 import           Language.Go.Grammar
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
-import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP as PHPPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Assignment as PythonALaCarte
@@ -76,16 +72,14 @@ import           TreeSitter.TSX
 -- | A parser from 'Source' onto some term type.
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
-  ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST [] grammar)
+  ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser 'Unmarshal'ing to a precise AST type using a 'TS.Language'.
   UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
-  AssignmentParser :: (TS.Symbol grammar, Syntax.HasErrors term, Eq1 ast, Foldable term, Foldable ast, Functor ast)
-                   => Parser (AST ast grammar)          -- ^ A parser producing AST.
-                   -> Assignment ast grammar (term Loc) -- ^ An assignment from AST onto 'Term's.
+  AssignmentParser :: (TS.Symbol grammar, Syntax.HasErrors term, Foldable term)
+                   => Parser (AST grammar)          -- ^ A parser producing AST.
+                   -> Assignment grammar (term Loc) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (term Loc)                 -- ^ A parser producing 'Term's.
-  -- | A parser for 'Markdown' using cmark.
-  MarkdownParser :: Parser (AST (TermF [] CMarkGFM.NodeType) Markdown.Grammar)
 
 
 -- $abstract
@@ -158,9 +152,6 @@ jsxParser modes = case jsxMode modes of
   ALaCarte -> jsxParserALaCarte
   Precise  -> jsxParserPrecise
 
-markdownParser :: c Markdown.Term => (Language, SomeParser c Loc)
-markdownParser = (Markdown, SomeParser (AssignmentParser MarkdownParser Markdown.assignment))
-
 phpParserPrecise :: c PHPPrecise.Term => (Language, SomeParser c Loc)
 phpParserPrecise = (PHP, SomeParser (UnmarshalParser @PHPPrecise.Term PHPPrecise.tree_sitter_php))
 
@@ -224,7 +215,6 @@ type family TermMode term where
 -- | The canonical set of parsers producing à la carte terms.
 aLaCarteParsers
   :: ( c GoALaCarte.Term
-     , c Markdown.Term
      , c PythonALaCarte.Term
      , c RubyALaCarte.Term
      , c TSXALaCarte.Term
@@ -234,7 +224,6 @@ aLaCarteParsers
 aLaCarteParsers = Map.fromList
   [ javascriptParserALaCarte
   , jsxParserALaCarte
-  , markdownParser
   , pythonParserALaCarte
   , rubyParserALaCarte
   , tsxParserALaCarte
@@ -273,7 +262,6 @@ allParsers
      , c GoPrecise.Term
      , c Java.Term
      , c JSON.Term
-     , c Markdown.Term
      , c PHPPrecise.Term
      , c PythonALaCarte.Term
      , c PythonPrecise.Term
@@ -292,7 +280,6 @@ allParsers modes = Map.fromList
   , javascriptParser modes
   , jsonParser
   , jsxParser modes
-  , markdownParser
   , phpParserPrecise
   , pythonParser modes
   , rubyParser modes

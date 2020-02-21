@@ -77,16 +77,16 @@ makeTerm1' syntax = case toList syntax of
   _     -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (Empty :< syntaxes, Sum syntaxes ~ Syntax term, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
+emptyTerm :: (Empty :< syntaxes, Sum syntaxes ~ Syntax term, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment grammar (term Loc)
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
   where startLocation Loc{..} = Loc (Range.point (Range.start byteRange)) (Span.point (Span.start span))
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc) -> Assignment.Assignment ast grammar (term Loc)
+handleError :: (HasCallStack, Error :< syntaxes, Sum syntaxes ~ Syntax term, Enum grammar, Ix grammar, Show grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment grammar (term Loc) -> Assignment.Assignment grammar (term Loc)
 handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (Error :< syntaxes, Sum syntaxes ~ Syntax term, Bounded grammar, Enum grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment ast grammar (term Loc)
+parseError :: (Error :< syntaxes, Sum syntaxes ~ Syntax term, Bounded grammar, Enum grammar, Apply Foldable syntaxes, IsTerm term) => Assignment.Assignment grammar (term Loc)
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.

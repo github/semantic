@@ -40,12 +40,12 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
+import           Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import           Language.TypeScript.Term as TypeScript
-import           Language.TypeScript.Grammar as Grammar
 
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment (Term Loc)

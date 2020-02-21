@@ -134,10 +134,10 @@ spec = do
 
   describe "eof" $ do
     it "matches at the end of branches" $
-      fst <$> runAssignment "" eof (makeState [] :: State [] Grammar) `shouldBe` Right ()
+      fst <$> runAssignment "" eof (makeState [] :: State Grammar) `shouldBe` Right ()
 
     it "matches before anonymous nodes at the end of branches" $
-      fst <$> runAssignment "magenta" eof (makeState [ node Magenta 0 7 [] ] :: State [] Grammar) `shouldBe` Right ()
+      fst <$> runAssignment "magenta" eof (makeState [ node Magenta 0 7 [] ] :: State Grammar) `shouldBe` Right ()
 
   describe "catchError" $ do
     it "catches failed committed choices" $
@@ -253,7 +253,7 @@ spec = do
       `shouldBe`
       Left [ "symbol" ]
 
-node :: symbol -> Int -> Int -> [AST [] symbol] -> AST [] symbol
+node :: symbol -> Int -> Int -> [AST symbol] -> AST symbol
 node symbol start end children = Term (Node symbol (Loc (Range start end) (Span (Pos 1 (succ start)) (Pos 1 (succ end)))) `In` children)
 
 data Grammar = Palette | Red | Green | Blue | Magenta
@@ -266,14 +266,14 @@ instance Symbol Grammar where
 data Out = Out T.Text | OutError T.Text
   deriving (Eq, Show)
 
-red :: HasCallStack => Assignment [] Grammar Out
+red :: HasCallStack => Assignment Grammar Out
 red = Out <$ symbol Red <*> source
 
-green :: HasCallStack => Assignment [] Grammar Out
+green :: HasCallStack => Assignment Grammar Out
 green = Out <$ symbol Green <*> source
 
-blue :: HasCallStack => Assignment [] Grammar Out
+blue :: HasCallStack => Assignment Grammar Out
 blue = Out <$ symbol Blue <*> source
 
-magenta :: HasCallStack => Assignment [] Grammar Out
+magenta :: HasCallStack => Assignment Grammar Out
 magenta = Out <$ symbol Magenta <*> source
