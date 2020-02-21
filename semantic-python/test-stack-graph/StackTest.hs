@@ -16,6 +16,7 @@ import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import           Control.Monad
 import qualified Data.ByteString as ByteString
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Map.Strict as Map
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import           Debug.Trace
@@ -52,6 +53,9 @@ stackGraphFile fp = do
 
 expectedQualifiedImport :: ScopeGraphEff sig m => m Result
 expectedQualifiedImport = do
+  ScopeGraph.CurrentScope currentName <- currentScope
+  name <- newScope (Map.singleton ScopeGraph.Lexical [ currentName ])
+  putCurrentScope name
   pure Complete
 
 assertQualifiedImport :: HUnit.Assertion
