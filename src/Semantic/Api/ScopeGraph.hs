@@ -2,7 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Semantic.Api.ScopeGraph
   ( parseScopeGraph
-  , ScopeGraph(..)
+  , TempScopeGraph(..)
   , SGNode(..)
   , SGPath(..)
   ) where
@@ -52,7 +52,7 @@ parseScopeGraph blobs = do
           & P.paths .~ mempty
           & P.errors .~ [defMessage & P.error .~ pack e]
 
-        graphToFile :: ScopeGraph -> ScopeGraphFile
+        graphToFile :: TempScopeGraph -> ScopeGraphFile
         graphToFile graph
           = defMessage
           & P.path .~ blobPath'
@@ -83,8 +83,8 @@ parseScopeGraph blobs = do
 
 
 -- TODO: These are temporary, will replace with proper datatypes from the scope graph work.
-data ScopeGraph
-  = ScopeGraph
+data TempScopeGraph
+  = TempScopeGraph
   { scopeGraphNodes :: [SGNode]
   , scopeGraphPaths :: [SGPath]
   }
@@ -111,15 +111,15 @@ data SGNode
   , nodeSpan :: Loc.Span
   }
 
-graphForBlob :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m ScopeGraph
+graphForBlob :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m TempScopeGraph
 graphForBlob blob = parseWith toScopeGraphParsers (pure . toScopeGraph blob) blob
   where
     toScopeGraphParsers :: Map Language (Parser.SomeParser ToScopeGraph Loc)
     toScopeGraphParsers = Parser.preciseParsers
 
 class ToScopeGraph term where
-  toScopeGraph :: Blob -> term Loc -> ScopeGraph
+  toScopeGraph :: Blob -> term Loc -> TempScopeGraph
 
 instance ToScopeGraph term where
   -- TODO: Need to produce the graph here
-  toScopeGraph _ _ = ScopeGraph mempty mempty
+  toScopeGraph _ _ = TempScopeGraph mempty mempty
