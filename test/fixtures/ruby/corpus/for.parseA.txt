@@ -1,39 +1,91 @@
-(Statements
-  (ForEach
-    (Statements
-      (Send
-        (Identifier)))
-    (Send
-      (Identifier))
-    (Send
-      (Identifier)))
-  (ForEach
-    (Statements
-      (Send
-        (Identifier))
-      (Send
-        (Identifier)))
-    (Send
-      (Identifier))
-    (Send
-      (Identifier)))
-  (ForEach
-    (Statements
-      (Send
-        (Identifier)))
-    (Enumeration
-      (Integer)
-      (Integer)
-      (Empty))
-    (Boolean))
-  (ForEach
-    (Statements
-      (Send
-        (Identifier))
-      (Send
-        (Identifier)))
-    (Enumeration
-      (Integer)
-      (Integer)
-      (Empty))
-    (Boolean)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (For 
+          (Lhs 
+            (Variable 
+              (Identifier "x"))) 
+          (Do 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "f"))))))) 
+          (In 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "y")))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (For 
+          (Lhs 
+            (Variable 
+              (Identifier "x"))) 
+          (Lhs 
+            (Variable 
+              (Identifier "y"))) 
+          (Do 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "f"))))))) 
+          (In 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "z")))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (For 
+          (Lhs 
+            (Variable 
+              (Identifier "n"))) 
+          (Do 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (True "true")))))) 
+          (In 
+            (Arg 
+              (Range 
+                (Arg 
+                  (Primary 
+                    (Integer "1"))) 
+                (Arg 
+                  (Primary 
+                    (Integer "3")))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (For 
+          (Lhs 
+            (Variable 
+              (Identifier "n"))) 
+          (Lhs 
+            (Variable 
+              (Identifier "m"))) 
+          (Do 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (True "true")))))) 
+          (In 
+            (Arg 
+              (Range 
+                (Arg 
+                  (Primary 
+                    (Integer "1"))) 
+                (Arg 
+                  (Primary 
+                    (Integer "3")))))))))))

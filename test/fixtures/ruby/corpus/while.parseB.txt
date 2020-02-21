@@ -1,6 +1,17 @@
-(Statements
-  (While
-    (Send
-      (Identifier))
-    (Send
-      (Identifier))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (While 
+          (Do 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "bar"))))))) 
+          (Arg 
+            (Primary 
+              (Lhs 
+                (Variable 
+                  (Identifier "foo"))))))))))

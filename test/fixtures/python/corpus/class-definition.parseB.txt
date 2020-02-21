@@ -1,36 +1,70 @@
-(Statements
-  (Class
-    (Identifier)
-    (Identifier)
-    (Statements
-      (Function
-        (Identifier)
-        (RequiredParameter
-          (Identifier))
-        (Statements
-          (Return
-            (Empty))))))
-  (Class
-    (Identifier)
-    (Statements
-      (Function
-        (Identifier)
-        (RequiredParameter
-          (Identifier))
-        (Statements
-          (Return
-            (Identifier))))))
-  (Class
-    (Identifier)
-    (Identifier)
-    (Statements
-      (Assignment
-        (Identifier)
-        (Identifier)
-        (Empty))
-      (Assignment
-        (Subscript
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (Empty)))))
+(Module 
+  (CompoundStatement 
+    (ClassDefinition 
+      (Block 
+        (CompoundStatement 
+          (FunctionDefinition 
+            (Block 
+              (SimpleStatement 
+                (ReturnStatement))) 
+            (Identifier "method1") 
+            (Parameters 
+              (Parameter 
+                (Identifier "self")))))) 
+      (ArgumentList 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "method1")))) 
+      (Identifier "D"))) 
+  (CompoundStatement 
+    (ClassDefinition 
+      (Block 
+        (CompoundStatement 
+          (FunctionDefinition 
+            (Block 
+              (SimpleStatement 
+                (ReturnStatement 
+                  (ExpressionList 
+                    (Expression 
+                      (PrimaryExpression 
+                        (Identifier "c"))))))) 
+            (Identifier "b") 
+            (Parameters 
+              (Parameter 
+                (Identifier "self")))))) 
+      (Identifier "B"))) 
+  (CompoundStatement 
+    (ClassDefinition 
+      (Block 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Assignment 
+              (ExpressionList 
+                (Expression 
+                  (PrimaryExpression 
+                    (Identifier "g")))) 
+              (Type 
+                (Expression 
+                  (PrimaryExpression 
+                    (Identifier "str"))))))) 
+        (SimpleStatement 
+          (ExpressionStatement 
+            (Assignment 
+              (ExpressionList 
+                (Expression 
+                  (PrimaryExpression 
+                    (Identifier "h")))) 
+              (Type 
+                (Expression 
+                  (PrimaryExpression 
+                    (Subscript 
+                      (Expression 
+                        (PrimaryExpression 
+                          (Identifier "int"))) 
+                      (PrimaryExpression 
+                        (Identifier "Optional")))))))))) 
+      (ArgumentList 
+        (Expression 
+          (PrimaryExpression 
+            (Identifier "e")))) 
+      (Identifier "E"))))

@@ -25,14 +25,13 @@ common haskell
                      , fused-syntax
                      , parsers ^>= 0.12.10
                      , semantic-ast
-                     , semantic-codegen
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.8
-                     , tree-sitter-tsx ^>= 0.4.2
+                     , tree-sitter ^>= 0.9
+                     , tree-sitter-tsx ^>= 0.5.0.1
 
   ghc-options:
     -Weverything
@@ -54,5 +53,22 @@ library
   exposed-modules:
     Language.TSX
     Language.TSX.AST
+    Language.TSX.Grammar
     Language.TSX.Tags
   hs-source-dirs: src
+
+test-suite test
+  import: haskell
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Test.hs
+  build-depends:    base
+                  , bytestring ^>= 0.10.8.2
+                  , hedgehog >= 0.6 && <2
+                  , pathtype ^>= 0.8.1
+                  , semantic-ast
+                  , semantic-tsx
+                  , tasty
+                  , tasty-hedgehog
+                  , tasty-hunit
+                  , text

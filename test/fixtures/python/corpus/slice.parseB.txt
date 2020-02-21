@@ -1,26 +1,46 @@
-(Statements
-  (Subscript
-    (Identifier)
-    (Enumeration
-      (Integer)
-      (Integer)
-      (Empty))
-    (Ellipsis))
-  (Subscript
-    (Identifier)
-    (Enumeration
-      (Empty)
-      (Empty)
-      (Empty)))
-  (Subscript
-    (Identifier)
-    (Enumeration
-      (Integer)
-      (Empty)
-      (Empty)))
-  (Subscript
-    (Identifier)
-    (Enumeration
-      (Empty)
-      (Empty)
-      (Empty))))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Subscript 
+            (Slice 
+              (Expression 
+                (PrimaryExpression 
+                  (Integer "4"))) 
+              (Expression 
+                (PrimaryExpression 
+                  (Integer "5")))) 
+            (Token) 
+            (Expression 
+              (PrimaryExpression 
+                (Ellipsis "..."))) 
+            (PrimaryExpression 
+              (Identifier "c"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Subscript 
+            (Slice) 
+            (PrimaryExpression 
+              (Identifier "a"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Subscript 
+            (Slice 
+              (Expression 
+                (PrimaryExpression 
+                  (Integer "3")))) 
+            (PrimaryExpression 
+              (Identifier "d"))))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (PrimaryExpression 
+          (Subscript 
+            (Slice) 
+            (PrimaryExpression 
+              (Identifier "e"))))))))

@@ -1,9 +1,23 @@
-(Statements
-  (Symbol
-    (InterpolationElement
-      (Send
-        (Identifier))))
-  (String
-    (InterpolationElement
-      (Send
-        (Identifier)))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Symbol 
+          (Interpolation 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "foo"))))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (String 
+          (Interpolation 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "foo"))))))))))))

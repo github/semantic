@@ -1,14 +1,13 @@
 (Document 
   (Value 
     (Array 
-      [ 
-        (Value 
-          (Number "2")) 
-        (Value 
-          (Number "3")) 
-        (Value 
-          (Number "4")) 
-        (Value 
-          (Number "5")) 
-        (Value 
-          (Number "6")) ])))
+      (Value 
+        (Number "2")) 
+      (Value 
+        (Number "3")) 
+      (Value 
+        (Number "4")) 
+      (Value 
+        (Number "5")) 
+      (Value 
+        (Number "6")))))

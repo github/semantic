@@ -1,5 +1,14 @@
-(Statements
-  (Array
-    (TextElement)
-    (TextElement)
-    (TextElement)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Array 
+          (Arg 
+            (Primary 
+              (String))) 
+          (Arg 
+            (Primary 
+              (String))) 
+          (Arg 
+            (Primary 
+              (String))))))))

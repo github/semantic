@@ -1,12 +1,24 @@
-(Statements
-  (If
-    (MemberAccess
-      (Identifier)
-      (Identifier))
-    (Statements
-      (Call
-        (Identifier)
-        (Identifier)
-        (Empty))
-      (Identifier))
-    (Empty)))
+(Program 
+  (Statement 
+    (IfStatement 
+      (Statement 
+        (StatementBlock 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (CallExpression 
+                  (Expression 
+                    (Identifier "log")) 
+                  (Arguments 
+                    (Expression 
+                      (Identifier "c"))))))) 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (Identifier "d")))))) 
+      (ParenthesizedExpression 
+        (Expression 
+          (MemberExpression 
+            (PropertyIdentifier "b") 
+            (Expression 
+              (Identifier "a"))))))))

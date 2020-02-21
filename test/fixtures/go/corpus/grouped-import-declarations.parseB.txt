@@ -1,13 +1,17 @@
-(Statements
-  (Package
-    (Identifier))
-  (Statements
-    (QualifiedImport
-      (Identifier))
-    (Import
-      (TextElement))
-    (QualifiedImport
-      (Identifier)))
-  (Function
-    (Identifier)
-    (Statements)))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (ImportDeclaration 
+    (ImportSpecList 
+      (ImportSpec 
+        (InterpretedStringLiteral)) 
+      (ImportSpec 
+        (InterpretedStringLiteral) 
+        (Dot ".")) 
+      (ImportSpec 
+        (InterpretedStringLiteral) 
+        (PackageIdentifier "alias")))) 
+  (FunctionDeclaration 
+    (Block) 
+    (Identifier "main") 
+    (ParameterList)))

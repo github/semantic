@@ -1,3 +1,6 @@
-(Statements
-  (Send
-    (Identifier)))
+(Program 
+  (Statement 
+    (MethodCall 
+      (ArgumentList) 
+      (Variable 
+        (Identifier "bar")))))

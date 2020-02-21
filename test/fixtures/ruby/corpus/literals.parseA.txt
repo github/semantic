@@ -1,16 +1,54 @@
-(Statements
-  (Boolean)
-  (Boolean)
-  (Null)
-  (SymbolElement)
-  (Integer)
-  (This)
-  (ZSuper)
-  (Enumeration
-    (Integer)
-    (Integer)
-    (Empty))
-  (Enumeration
-    (Integer)
-    (Integer)
-    (Empty)))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (True "true"))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (False "false"))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Nil "nil"))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Symbol)))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Integer "1234")))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Variable 
+            (Self "self")))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Lhs 
+          (Variable 
+            (Super "super")))))) 
+  (Statement 
+    (Arg 
+      (Range 
+        (Arg 
+          (Primary 
+            (Integer "1"))) 
+        (Arg 
+          (Primary 
+            (Integer "3")))))) 
+  (Statement 
+    (Arg 
+      (Range 
+        (Arg 
+          (Primary 
+            (Integer "1"))) 
+        (Arg 
+          (Primary 
+            (Integer "5")))))))

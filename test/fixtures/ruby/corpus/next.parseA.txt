@@ -1,9 +1,17 @@
-(Statements
-  (ForEach
-    (Statements
-      (Send
-        (Identifier)))
-    (Send
-      (Identifier))
-    (Continue
-      (Empty))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (For 
+          (Lhs 
+            (Variable 
+              (Identifier "x"))) 
+          (Do 
+            (Statement 
+              (Next))) 
+          (In 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "y")))))))))))

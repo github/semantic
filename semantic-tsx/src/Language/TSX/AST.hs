@@ -12,10 +12,12 @@
 
 module Language.TSX.AST
 ( module Language.TSX.AST
+, TSX.getTestCorpusDir
 ) where
 
 import           Prelude hiding (False, Float, Integer, String, True)
 import           AST.GenerateSyntax
-import qualified TreeSitter.TSX as Grammar
+import           Language.Haskell.TH.Syntax (runIO)
+import qualified TreeSitter.TSX as TSX (getNodeTypesPath, getTestCorpusDir, tree_sitter_tsx)
 
-astDeclarationsForLanguage Grammar.tree_sitter_tsx "../../../vendor/tree-sitter-typescript/tsx/src/node-types.json"
+runIO TSX.getNodeTypesPath >>= astDeclarationsForLanguage TSX.tree_sitter_tsx

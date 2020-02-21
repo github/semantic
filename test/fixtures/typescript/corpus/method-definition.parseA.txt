@@ -1,11 +1,13 @@
-(Statements
-  (Class
-    (TypeIdentifier)
-    (Method
-      (Empty)
-      (Empty)
-      (Annotation
-        (TypeIdentifier))
-      (Empty)
-      (Identifier)
-      (StatementBlock))))
+(Program 
+  (Statement 
+    (Declaration 
+      (ClassDeclaration 
+        (ClassBody 
+          (MethodDefinition 
+            (TypeAnnotation 
+              (TypeIdentifier "Int")) 
+            (StatementBlock) 
+            (PropertyIdentifier "foo") 
+            (FormalParameters) 
+            (AccessibilityModifier "public"))) 
+        (TypeIdentifier "Foo")))))

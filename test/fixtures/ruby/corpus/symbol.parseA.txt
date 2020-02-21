@@ -1,4 +1,13 @@
-(Statements
-  (SymbolElement)
-  (SymbolElement)
-  (SymbolElement))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Symbol)))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Symbol)))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Symbol)))))

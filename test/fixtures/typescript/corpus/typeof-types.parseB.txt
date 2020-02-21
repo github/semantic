@@ -1,14 +1,16 @@
-(Statements
-  (VariableDeclaration
-    (Assignment
-      (Annotation
-        (TypeQuery
-          (Identifier)))
-      (Identifier)
-      (Empty)))
-  (VariableDeclaration
-    (Assignment
-      (Annotation
-        (TypeIdentifier))
-      (Identifier)
-      (Empty))))
+(Program 
+  (Statement 
+    (Declaration 
+      (LexicalDeclaration 
+        (VariableDeclarator 
+          (Identifier "foo") 
+          (TypeAnnotation 
+            (TypeQuery 
+              (Identifier "Bar"))))))) 
+  (Statement 
+    (Declaration 
+      (LexicalDeclaration 
+        (VariableDeclarator 
+          (Identifier "bar") 
+          (TypeAnnotation 
+            (TypeIdentifier "G")))))))

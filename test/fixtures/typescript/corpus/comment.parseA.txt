@@ -1,4 +1,1 @@
-(Statements
-  (Context
-    (Comment)
-    (Empty)))
+(Program)

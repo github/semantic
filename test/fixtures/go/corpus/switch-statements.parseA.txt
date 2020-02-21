@@ -1,39 +1,57 @@
-(Statements
-  (Package
-    (Identifier))
-  (Function
-    (Identifier)
-    (Match
-      (Statements)
-      (Pattern
-        (Statements
-          (LessThan
-            (Identifier)
-            (Identifier))
-          (Call
-            (Identifier)
-            (Statements)
-            (Empty)))
-        (Pattern
-          (Statements
-            (LessThan
-              (Identifier)
-              (Identifier))
-            (Context
-              (Comment)
-              (Call
-                (Identifier)
-                (Statements)
-                (Empty))))
-          (Context
-            (Comment)
-            (Pattern
-              (Statements
-                (Equal
-                  (Identifier)
-                  (Integer))
-                (Call
-                  (Identifier)
-                  (Statements)
-                  (Empty)))
-              (Statements))))))))
+(SourceFile 
+  (PackageClause 
+    (PackageIdentifier "main")) 
+  (FunctionDeclaration 
+    (Block 
+      (Statement 
+        (ExpressionSwitchStatement 
+          (ExpressionCase 
+            (ExpressionList 
+              (Expression 
+                (BinaryExpression 
+                  (Token) 
+                  (Expression 
+                    (Identifier "x")) 
+                  (Expression 
+                    (Identifier "y"))))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "f1")) 
+                    (ArgumentList)))))) 
+          (ExpressionCase 
+            (ExpressionList 
+              (Expression 
+                (BinaryExpression 
+                  (Token) 
+                  (Expression 
+                    (Identifier "x")) 
+                  (Expression 
+                    (Identifier "z"))))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "g")) 
+                    (ArgumentList)))))) 
+          (ExpressionCase 
+            (ExpressionList 
+              (Expression 
+                (BinaryExpression 
+                  (Token) 
+                  (Expression 
+                    (Identifier "x")) 
+                  (Expression 
+                    (IntLiteral "4"))))) 
+            (Statement 
+              (SimpleStatement 
+                (Expression 
+                  (CallExpression 
+                    (Expression 
+                      (Identifier "h")) 
+                    (ArgumentList))))))))) 
+    (Identifier "main") 
+    (ParameterList)))

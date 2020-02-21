@@ -38,7 +38,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Language.PHP.Syntax as Syntax
 import           Language.PHP.Term as PHP
-import           TreeSitter.PHP as Grammar
+import           Language.PHP.Grammar as Grammar
 
 type Assignment = Assignment.Assignment [] Grammar
 

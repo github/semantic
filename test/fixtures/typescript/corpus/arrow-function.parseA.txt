@@ -1,18 +1,15 @@
-(Statements
-  (Function
-    (Empty)
-    (Empty)
-    (Empty)
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (StatementBlock
-      (Return
-        (Identifier)))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (ArrowFunction 
+          (StatementBlock 
+            (Statement 
+              (ReturnStatement 
+                (Expression 
+                  (Identifier "h"))))) 
+          (FormalParameters 
+            (RequiredParameter 
+              (Identifier "f")) 
+            (RequiredParameter 
+              (Identifier "g"))))))))

@@ -25,14 +25,13 @@ common haskell
                      , fused-syntax
                      , parsers ^>= 0.12.10
                      , semantic-ast
-                     , semantic-codegen
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.8
-                     , tree-sitter-ruby ^>= 0.4.1
+                     , tree-sitter ^>= 0.9
+                     , tree-sitter-ruby ^>= 0.5.0.2
 
   ghc-options:
     -Weverything
@@ -57,3 +56,43 @@ library
     Language.Ruby.Grammar
     Language.Ruby.Tags
   hs-source-dirs: src
+
+test-suite test
+  import:           haskell
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Test.hs
+  build-depends:    base
+                  , bytestring ^>= 0.10.8.2
+                  , hedgehog >= 0.6 && <2
+                  , pathtype ^>= 0.8.1
+                  , semantic-ast
+                  , semantic-ruby
+                  , tasty
+                  , tasty-hedgehog
+                  , tasty-hunit
+                  , text
+
+executable benchmarks
+  import:              haskell
+  hs-source-dirs:      bench
+  -- type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  other-modules:       Parsing
+  ghc-options:         -static -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
+  build-depends:       base
+                     , gauge ^>= 0.2.5
+                     , bytestring
+                     , Glob
+                     , lens >= 4.17 && < 4.19
+                     , pathtype ^>= 0.8.1
+                     , semantic-ruby
+
+executable tree-sitter-ruby
+  import: haskell
+  hs-source-dirs:      app
+  ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
+  main-is:             Main.hs
+  build-depends:       base
+                     , bytestring
+                     , semantic-ruby

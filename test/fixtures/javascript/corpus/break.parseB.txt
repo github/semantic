@@ -1,21 +1,44 @@
-(Statements
-  (For
-    (Assignment
-      (Identifier)
-      (Float))
-    (LessThan
-      (Identifier)
-      (Float))
-    (Update
-      (Identifier))
-    (Statements
-      (If
-        (StrictEqual
-          (Identifier)
-          (Float))
-        (Statements
-          (Continue
-            (Empty)))
-        (Empty))
-      (Empty)
-      (Identifier))))
+(Program 
+  (Statement 
+    (ForStatement 
+      (Statement 
+        (StatementBlock 
+          (Statement 
+            (IfStatement 
+              (Statement 
+                (StatementBlock 
+                  (Statement 
+                    (ContinueStatement)))) 
+              (ParenthesizedExpression 
+                (Expression 
+                  (BinaryExpression 
+                    (Token) 
+                    (Expression 
+                      (Identifier "i")) 
+                    (Expression 
+                      (Number "4"))))))) 
+          (Statement 
+            (EmptyStatement ";")) 
+          (Statement 
+            (ExpressionStatement 
+              (Expression 
+                (Identifier "i")))))) 
+      (ExpressionStatement 
+        (Expression 
+          (AssignmentExpression 
+            (Identifier "i") 
+            (Expression 
+              (Number "0"))))) 
+      (ExpressionStatement 
+        (Expression 
+          (BinaryExpression 
+            (Token) 
+            (Expression 
+              (Identifier "i")) 
+            (Expression 
+              (Number "10"))))) 
+      (Expression 
+        (UpdateExpression 
+          (Token) 
+          (Expression 
+            (Identifier "i")))))))

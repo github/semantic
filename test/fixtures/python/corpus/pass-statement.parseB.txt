@@ -1,5 +1,5 @@
-(Statements
-  (NoOp
-    (Empty))
-  (NoOp
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (PassStatement "pass")) 
+  (SimpleStatement 
+    (PassStatement "pass")))

@@ -1,13 +1,32 @@
-(Statements
-  (ForEach
-    (Statements
-      (Send
-        (Identifier)))
-    (Array
-      (Integer)
-      (Integer)
-      (Integer))
-    (Send
-      (Identifier)
-      (Send
-        (Identifier)))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (For 
+          (Lhs 
+            (Variable 
+              (Identifier "i"))) 
+          (Do 
+            (Statement 
+              (MethodCall 
+                (ArgumentList 
+                  (Arg 
+                    (Primary 
+                      (Lhs 
+                        (Variable 
+                          (Identifier "i")))))) 
+                (Variable 
+                  (Identifier "print"))))) 
+          (In 
+            (Arg 
+              (Primary 
+                (Array 
+                  (Arg 
+                    (Primary 
+                      (Integer "1"))) 
+                  (Arg 
+                    (Primary 
+                      (Integer "2"))) 
+                  (Arg 
+                    (Primary 
+                      (Integer "3"))))))))))))

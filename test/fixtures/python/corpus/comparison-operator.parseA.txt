@@ -1,35 +1,81 @@
-(Statements
-  (LessThan
-    (Identifier)
-    (Identifier))
-  (LessThanEqual
-    (Identifier)
-    (Identifier))
-  (Not
-    (Equal
-      (Identifier)
-      (Identifier)))
-  (GreaterThanEqual
-    (Identifier)
-    (Identifier))
-  (GreaterThan
-    (Identifier)
-    (Identifier))
-  (Not
-    (Equal
-      (Identifier)
-      (Identifier)))
-  (Member
-    (Identifier)
-    (Identifier))
-  (Equal
-    (Identifier)
-    (Identifier))
-  (Not
-    (Member
-      (Identifier)
-      (Identifier)))
-  (Not
-    (Equal
-      (Identifier)
-      (Identifier))))
+(Module 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "a")) 
+          (PrimaryExpression 
+            (Identifier "b")))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "c")) 
+          (PrimaryExpression 
+            (Identifier "d")))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "e")) 
+          (PrimaryExpression 
+            (Identifier "f")))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "g")) 
+          (PrimaryExpression 
+            (Identifier "h")))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "i")) 
+          (PrimaryExpression 
+            (Identifier "j")))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "k")) 
+          (PrimaryExpression 
+            (Identifier "l")))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "m")) 
+          (PrimaryExpression 
+            (Identifier "n")))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "o")) 
+          (PrimaryExpression 
+            (Identifier "p")))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "q")) 
+          (PrimaryExpression 
+            (Identifier "r")))))) 
+  (SimpleStatement 
+    (ExpressionStatement 
+      (Expression 
+        (ComparisonOperator 
+          (PrimaryExpression 
+            (Identifier "s")) 
+          (PrimaryExpression 
+            (Identifier "t")))))))

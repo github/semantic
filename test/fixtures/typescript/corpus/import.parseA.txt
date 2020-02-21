@@ -1,17 +1,64 @@
-(Statements
-  (Import)
-  (QualifiedAliasedImport
-    (Identifier))
-  (Import)
-  (Import)
-  (Import)
-  (Statements
-    (Import)
-    (Import))
-  (Statements
-    (Import)
-    (QualifiedAliasedImport
-      (Identifier)))
-  (SideEffectImport)
-  (QualifiedAliasedImport
-    (Identifier)))
+(Program 
+  (Statement 
+    (ImportStatement 
+      (String) 
+      (ImportClause 
+        (Identifier "defaultMember")))) 
+  (Statement 
+    (ImportStatement 
+      (String) 
+      (ImportClause 
+        (NamespaceImport 
+          (Identifier "name"))))) 
+  (Statement 
+    (ImportStatement 
+      (String) 
+      (ImportClause 
+        (NamedImports 
+          (ImportSpecifier 
+            (Identifier "member")))))) 
+  (Statement 
+    (ImportStatement 
+      (String) 
+      (ImportClause 
+        (NamedImports 
+          (ImportSpecifier 
+            (Identifier "member1")) 
+          (ImportSpecifier 
+            (Identifier "member2")))))) 
+  (Statement 
+    (ImportStatement 
+      (String) 
+      (ImportClause 
+        (NamedImports 
+          (ImportSpecifier 
+            (Identifier "member1")) 
+          (ImportSpecifier 
+            (Identifier "alias2") 
+            (Identifier "member2")))))) 
+  (Statement 
+    (ImportStatement 
+      (String) 
+      (ImportClause 
+        (Identifier "defaultMember") 
+        (NamedImports 
+          (ImportSpecifier 
+            (Identifier "member1")) 
+          (ImportSpecifier 
+            (Identifier "alias2") 
+            (Identifier "member2")))))) 
+  (Statement 
+    (ImportStatement 
+      (String) 
+      (ImportClause 
+        (Identifier "defaultMember") 
+        (NamespaceImport 
+          (Identifier "name"))))) 
+  (Statement 
+    (ImportStatement 
+      (String))) 
+  (Statement 
+    (ImportStatement 
+      (ImportRequireClause 
+        (Identifier "zip") 
+        (String)))))

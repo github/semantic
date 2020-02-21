@@ -1,9 +1,19 @@
-(Statements
-  (Method
-    (Empty)
-    (Identifier)
-    (Statements
-      (Try
-        (Send
-          (Identifier)
-          (TextElement))))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "foo")) 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Begin 
+                  (Statement 
+                    (MethodCall 
+                      (ArgumentList 
+                        (Arg 
+                          (Primary 
+                            (String)))) 
+                      (Variable 
+                        (Identifier "puts")))))))))))))

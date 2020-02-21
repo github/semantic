@@ -139,7 +139,7 @@ instance ToTags Java.FieldAccess
 instance ToTags Java.FieldDeclaration
 instance ToTags Java.FinallyClause
 instance ToTags Java.FloatingPointType
--- instance ToTags Java.ForInit
+instance ToTags Java.ForInit
 instance ToTags Java.ForStatement
 instance ToTags Java.FormalParameter
 instance ToTags Java.FormalParameters
@@ -159,7 +159,7 @@ instance ToTags Java.LabeledStatement
 instance ToTags Java.LambdaExpression
 instance ToTags Java.Literal
 instance ToTags Java.LocalVariableDeclaration
--- instance ToTags Java.LocalVariableDeclarationStatement
+instance ToTags Java.LocalVariableDeclarationStatement
 instance ToTags Java.MarkerAnnotation
 -- instance ToTags Java.MethodDeclaration
 -- instance ToTags Java.MethodInvocation

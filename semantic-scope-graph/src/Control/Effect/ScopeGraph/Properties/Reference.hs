@@ -20,7 +20,7 @@ data Reference = Reference
   { kind     :: ScopeGraph.Kind
   , relation :: ScopeGraph.Relation
   , span     :: Span
-    } deriving (Generic, Show)
+  } deriving (Generic, Show)
 
 instance HasSpan Reference where
   span_ = lens span (\r s -> r { span = s })

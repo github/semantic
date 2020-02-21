@@ -1,56 +1,98 @@
-(Statements
-  (Try
-    (Statements
-      (Send
-        (Identifier))
-      (Catch
-        (Statements
-          (Statements
-            (Identifier)))
-        (Statements))
-      (Catch
-        (Statements
-          (Statements
-            (Identifier)
-            (Identifier))
-          (Statements
-            (Send
-              (Identifier))))
-        (Send
-          (Identifier)))
-      (Else
-        (Empty)
-        (Send
-          (Identifier)))
-      (Finally
-        (Send
-          (Identifier)))))
-  (Method
-    (Empty)
-    (Identifier)
-    (Statements
-      (Catch
-        (Statements
-          (Statements
-            (Identifier)))
-        (Statements))
-      (Catch
-        (Statements
-          (Statements
-            (Identifier)
-            (Identifier))
-          (Statements
-            (Send
-              (Identifier))))
-        (Statements))
-      (Else
-        (Empty)
-        (Statements))
-      (Finally
-        (Statements))))
-  (Try
-    (Send
-      (Identifier))
-    (Catch
-      (Null)
-      (Empty))))
+(Program 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Begin 
+          (Statement 
+            (Arg 
+              (Primary 
+                (Lhs 
+                  (Variable 
+                    (Identifier "foo")))))) 
+          (Rescue 
+            (Exceptions 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Constant "Error"))))))) 
+          (Rescue 
+            (Exceptions 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Constant "StandardError"))))) 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Constant "TimeoutError")))))) 
+            (Then 
+              (Statement 
+                (Arg 
+                  (Primary 
+                    (Lhs 
+                      (Variable 
+                        (Identifier "x"))))))) 
+            (ExceptionVariable 
+              (Lhs 
+                (Variable 
+                  (Identifier "x"))))) 
+          (Else 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "z"))))))) 
+          (Ensure 
+            (Statement 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Identifier "y"))))))))))) 
+  (Statement 
+    (Arg 
+      (Primary 
+        (Method 
+          (MethodName 
+            (Identifier "foo")) 
+          (Rescue 
+            (Exceptions 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Constant "Error"))))))) 
+          (Rescue 
+            (Exceptions 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Constant "StandardError"))))) 
+              (Arg 
+                (Primary 
+                  (Lhs 
+                    (Variable 
+                      (Constant "TimeoutError")))))) 
+            (ExceptionVariable 
+              (Lhs 
+                (Variable 
+                  (Identifier "x"))))) 
+          (Else) 
+          (Ensure))))) 
+  (Statement 
+    (RescueModifier 
+      (Statement 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "bar")))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Nil "nil")))))))

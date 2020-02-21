@@ -1,10 +1,8 @@
-(Statements
-  (Call
-    (Identifier)
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty)))
+(Module 
+  (SimpleStatement 
+    (GlobalStatement 
+      (Identifier "b") 
+      (Identifier "a"))) 
+  (SimpleStatement 
+    (GlobalStatement 
+      (Identifier "c"))))

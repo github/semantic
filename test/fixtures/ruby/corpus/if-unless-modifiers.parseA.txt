@@ -1,8 +1,14 @@
-(Statements
-  (If
-    (Not
-      (Send
-        (Identifier)))
-    (Send
-      (Identifier))
-    (Empty)))
+(Program 
+  (Statement 
+    (UnlessModifier 
+      (Statement 
+        (Arg 
+          (Primary 
+            (Lhs 
+              (Variable 
+                (Identifier "print")))))) 
+      (Arg 
+        (Primary 
+          (Lhs 
+            (Variable 
+              (Identifier "foo"))))))))

@@ -12,10 +12,12 @@
 
 module Language.Ruby.AST
 ( module Language.Ruby.AST
+, Ruby.getTestCorpusDir
 ) where
 
 import           Prelude hiding (False, Float, Integer, Rational, String, True)
 import           AST.GenerateSyntax
-import qualified Language.Ruby.Grammar as Grammar
+import           Language.Haskell.TH.Syntax (runIO)
+import qualified TreeSitter.Ruby as Ruby (getNodeTypesPath, getTestCorpusDir, tree_sitter_ruby)
 
-astDeclarationsForLanguage Grammar.tree_sitter_ruby "../../../vendor/tree-sitter-ruby/src/node-types.json"
+runIO Ruby.getNodeTypesPath >>= astDeclarationsForLanguage Ruby.tree_sitter_ruby

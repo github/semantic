@@ -1,2 +1,5 @@
-(Statements
-  (Float))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Number "102")))))

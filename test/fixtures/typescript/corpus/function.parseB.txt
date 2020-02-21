@@ -1,18 +1,17 @@
-(Statements
-  (Function
-    (Empty)
-    (Annotation
-      (TypeIdentifier))
-    (Empty)
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Empty))
-    (StatementBlock
-      (Identifier))))
+(Program 
+  (Statement 
+    (ExpressionStatement 
+      (Expression 
+        (Function 
+          (TypeAnnotation 
+            (TypeIdentifier "int")) 
+          (StatementBlock 
+            (Statement 
+              (ExpressionStatement 
+                (Expression 
+                  (Identifier "arg1"))))) 
+          (FormalParameters 
+            (RequiredParameter 
+              (Identifier "arg1")) 
+            (RequiredParameter 
+              (Identifier "arg2"))))))))

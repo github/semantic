@@ -1,4 +1,10 @@
-{-# LANGUAGE ConstraintKinds, DeriveFunctor, ExistentialQuantification, FlexibleContexts, GADTs, RankNTypes, StandaloneDeriving #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE StandaloneDeriving #-}
 module Control.Effect.Parse
 ( -- * Parse effect
   Parse(..)
@@ -13,15 +19,15 @@ module Control.Effect.Parse
 , run
 ) where
 
-import Control.Algebra
-import Control.Effect.Error
-import Control.Exception (SomeException)
-import Data.Bitraversable
-import Data.Blob
-import Data.Edit
-import Data.Language
+import           Control.Algebra
+import           Control.Effect.Error
+import           Control.Exception (SomeException)
+import           Data.Bitraversable
+import           Data.Blob
+import           Data.Edit
+import           Data.Language
 import qualified Data.Map as Map
-import Parsing.Parser
+import           Parsing.Parser
 
 data Parse m k
   = forall term . Parse (Parser term) Blob (term -> m k)

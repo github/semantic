@@ -4,12 +4,12 @@
 packages: .
           semantic-analysis
           semantic-ast
-          semantic-codegen
           semantic-core
           semantic-go
           semantic-java
           semantic-json
           semantic-parse
+          semantic-php
           semantic-python
           semantic-ruby
           semantic-scope-graph

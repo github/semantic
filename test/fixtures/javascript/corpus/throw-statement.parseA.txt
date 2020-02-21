@@ -1,6 +1,9 @@
-(Statements
-  (Throw
-    (New
-      (Identifier)
-      (Empty)
-      (TextElement))))
+(Program 
+  (Statement 
+    (ThrowStatement 
+      (Expression 
+        (NewExpression 
+          (Arguments 
+            (Expression 
+              (String))) 
+          (Identifier "Error"))))))
