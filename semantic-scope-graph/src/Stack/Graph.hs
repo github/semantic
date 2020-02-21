@@ -101,7 +101,12 @@ singleton = Class.vertex
 newScope :: Name -> Map Scope.EdgeLabel [Name] -> Graph Node -> Graph Node
 newScope name edges graph =
   Map.foldrWithKey (\_ scopes graph ->
-    foldr (\scope' graph -> Graph $ Algebraic.simplify $ Algebraic.overlay (unGraph graph) (unGraph $ (scope scope') >>- (scope name))) graph scopes) graph edges
+    foldr (\scope' graph ->
+      simplify $ Class.overlay (Class.edges [(Scope name, Scope scope')]) (graph))
+      graph scopes) graph edges
+
+simplify :: Ord a => Graph a -> Graph a
+simplify = Graph . Algebraic.simplify . unGraph
 
 testGraph :: Graph Node
 testGraph = mconcat
