@@ -4,26 +4,26 @@ module Stack.Graph.Export
   , openGraphViz
   ) where
 
-import Data.String
-import Stack.Graph
-import Algebra.Graph.Export.Dot (Attribute (..))
+import           Algebra.Graph.Export.Dot (Attribute (..))
 import qualified Algebra.Graph.Export.Dot as Dot
-import System.IO.Temp
-import System.IO
-import System.Process (system)
-import Control.Monad
-import Control.Concurrent
+import           Analysis.Name
+import           Control.Concurrent
+import           Control.Monad
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
-import qualified Streaming.Process
-import Streaming
-import qualified Streaming.Prelude as Stream
-import qualified System.Process as Process
 import qualified Data.Char as Char
-import Analysis.Name
+import           Data.String
 import qualified Data.Text as T
+import           Stack.Graph
+import           Streaming
+import qualified Streaming.Prelude as Stream
+import qualified Streaming.Process
+import           System.IO
+import           System.IO.Temp
+import           System.Process (system)
+import qualified System.Process as Process
 
 sym :: Symbol -> String
-sym = T.unpack .formatName . unSymbol
+sym = T.unpack . formatName
 
 nodeToDotName :: Node -> String
 nodeToDotName = \case
@@ -79,4 +79,3 @@ openGraphViz g = do
     (void . ByteStream.hPut pngH . hoist ByteStream.putStrLn)
   hFlush pngH
   void $ system ("open " <> pngPath)
-
