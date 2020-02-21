@@ -56,4 +56,4 @@ runSketch minfo go
   where
     rootname = Name.nameI 0
     initialGraph = ScopeGraph.insertScope rootname lowerBound lowerBound
-    initialStackGraph = (Stack.scope (Stack.Symbol rootname))
+    initialStackGraph = (Stack.scope rootname)

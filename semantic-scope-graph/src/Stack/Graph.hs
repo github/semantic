@@ -1,7 +1,7 @@
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 
 {-# LANGUAGE OverloadedLists #-}
 module Stack.Graph
@@ -32,16 +32,15 @@ module Stack.Graph
 
 import qualified Algebra.Graph as Algebraic
 import qualified Algebra.Graph.Class as Class
+import qualified Algebra.Graph.ToGraph as ToGraph
 import           Analysis.Name (Name)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Semilattice.Lower
 import           Data.String
 import qualified Scope.Types as Scope
-import qualified Algebra.Graph.ToGraph as ToGraph
 
-newtype Symbol = Symbol { unSymbol :: Name }
-    deriving (IsString, Show, Eq, Ord)
+type Symbol = Name
 
 data Node = Root
   | Declaration Symbol
@@ -102,7 +101,7 @@ singleton = Class.vertex
 newScope :: Name -> Map Scope.EdgeLabel [Name] -> Graph Node -> Graph Node
 newScope name edges graph =
   Map.foldrWithKey (\_ scopes graph ->
-    foldr (\scope' graph -> (scope (Symbol name)) >>- (scope scope') >>- graph) graph scopes) graph ((fmap Symbol) <$> edges)
+    foldr (\scope' graph -> Graph $ Algebraic.simplify $ Algebraic.overlay (unGraph graph) (unGraph $ (scope scope') >>- (scope name))) graph scopes) graph edges
 
 testGraph :: Graph Node
 testGraph = mconcat
