@@ -16,6 +16,7 @@ module Stack.Graph
   , Class.vertex
   , Class.overlay
   , Class.connect
+  , Class.edges
   -- * Smart constructors
   , scope
   , newScope
@@ -24,7 +25,9 @@ module Stack.Graph
   , popSymbol
   , pushSymbol
   , root
+  -- * Testing stuff
   , testGraph
+  , edgeTest
   ) where
 
 import qualified Algebra.Graph as Algebraic
@@ -35,8 +38,9 @@ import qualified Data.Map.Strict as Map
 import           Data.Semilattice.Lower
 import           Data.String
 import qualified Scope.Types as Scope
+import qualified Algebra.Graph.ToGraph as ToGraph
 
-newtype Symbol = Symbol Name
+newtype Symbol = Symbol { unSymbol :: Name }
     deriving (IsString, Show, Eq, Ord)
 
 data Node = Root
@@ -57,12 +61,22 @@ instance Lower Node where
 newtype Graph a = Graph { unGraph :: Algebraic.Graph a }
   deriving (Eq, Show)
 
+instance Semigroup (Graph a) where
+  (<>) = Class.overlay
+
+instance Monoid (Graph a) where
+  mempty = Class.empty
+
 instance Class.Graph (Stack.Graph.Graph a) where
   type Vertex (Stack.Graph.Graph a) = a
   empty = Graph Class.empty
   vertex = Graph . Class.vertex
   overlay (Graph a) (Graph b) = Graph (Class.overlay a b)
-  connect (Graph a) (Graph b) = Graph (Class.overlay a b)
+  connect (Graph a) (Graph b) = Graph (Class.connect a b)
+
+instance Ord a => ToGraph.ToGraph (Stack.Graph.Graph a) where
+  type ToVertex (Stack.Graph.Graph a) = a
+  toGraph = ToGraph.toGraph . unGraph
 
 instance Lower a => Lower (Graph a) where
   lowerBound = Graph (Algebraic.vertex lowerBound)
@@ -77,6 +91,7 @@ pushSymbol = Class.vertex . PushSymbol
 root :: Graph Node
 root = Graph (Algebraic.vertex Root)
 
+
 (>>-), (-<<) :: Graph a -> Graph a -> Graph a
 Graph left >>- Graph right = Graph (Algebraic.connect left right)
 (-<<) = flip (>>-)
@@ -90,4 +105,22 @@ newScope name edges graph =
     foldr (\scope' graph -> (scope (Symbol name)) >>- (scope scope') >>- graph) graph scopes) graph ((fmap Symbol) <$> edges)
 
 testGraph :: Graph Node
-testGraph = (scope "current" >>- declaration "a") >>- (popSymbol "member" >>- declaration "b") >>- (reference "b" >>- pushSymbol "member") >>- (reference "a" >>- root)
+testGraph = mconcat
+  [ (scope "current" >>- (declaration "a" >>- popSymbol "member"))
+  , (popSymbol "member" >>- declaration "b")
+  , (declaration "b" >>- reference "b")
+  , (reference "b" >>- pushSymbol "member")
+  , (pushSymbol "member" >>- reference "a")
+  , (reference "a" >>- root)
+  ]
+
+edgeTest :: Graph Node
+edgeTest = Class.edges
+  [ (Scope "current" , Declaration "a")
+  , (Declaration "a" , PopSymbol "member")
+  , (PopSymbol "member" , Declaration "b")
+  , (Declaration "b" , Reference "b")
+  , (Reference "b" , PushSymbol "member")
+  , (PushSymbol "member" , Reference "a")
+  , (Reference "a" , Root)
+  ]
