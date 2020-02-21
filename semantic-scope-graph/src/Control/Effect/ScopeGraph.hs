@@ -17,6 +17,7 @@ module Control.Effect.ScopeGraph
   ( ScopeGraph
   , ScopeGraphEff
   , declare
+  , addDeclarations
   -- Scope Manipulation
   , currentScope
   , putCurrentScope
@@ -45,6 +46,7 @@ import           Data.Semilattice.Lower
 import           Data.Text (Text)
 import           GHC.Records
 import qualified Scope.Reference as Reference
+import           Source.Loc
 import           Source.Span
 import qualified Stack.Graph as Stack
 
@@ -92,6 +94,8 @@ withScope scope action = do
   put (CurrentScope s)
   pure x
 
+addDeclarations :: ScopeGraphEff sig m => NonEmpty (Loc, Name) -> m ()
+addDeclarations names = undefined
 
 declare :: ScopeGraphEff sig m => Name -> Props.Declaration -> m ()
 declare n props = do

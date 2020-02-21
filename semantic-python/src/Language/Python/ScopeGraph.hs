@@ -236,6 +236,8 @@ instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where
   scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier ann name) :| _))) :| [])) = do
+    addDeclarations ((\(Py.Identifier ann name) -> (ann, Name.name name)) <$> names)
+
     let toName (Py.Identifier _ name) = Name.name name
     newEdge ScopeGraph.Import (toName <$> names)
 
