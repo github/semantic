@@ -33,6 +33,7 @@ library
     Scope.Scope
     Scope.Types
     Stack.Graph
+    Stack.Graph.Export
     Data.Hole
     Data.Module
     Data.ScopeGraph
@@ -47,10 +48,15 @@ library
     , hashable
     , lens
     , pathtype
+    , process
     , semantic-analysis
     , semantic-source    ^>= 0.0.2
     , semilattices
+    , streaming
+    , streaming-bytestring
+    , streaming-process
     , text               ^>= 1.2.3.1
+    , temporary
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:
