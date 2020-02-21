@@ -82,12 +82,13 @@ Available options:
 | 3        | TypeScript     | ✅     | ✅     | ✅    | ✅  | ✅      | ✅          | 🚧  | |
 | 4        | Python         | ✅     | ✅     | ✅    | ✅  | ✅      | ✅           | 🚧 | |
 | 5        | Go             | ✅     | ✅     | ✅    | ✅  | ✅      | ✅           | 🚧 | |
-|          | PHP            | Temporarily disabled     | Temporarily disabled   | Temporarily disabled  | Temporarily disabled| Temporarily disabled    | | | |
+|          | PHP            | 🚧     | 🚧   | 🚧  | 🚧| 🚧    | | | |
+|          | Java           | 🚧     | N/A    | 🚧    | 🚧  | ✅      |               | | |
+|          | JSON           | ✅     | N/A    | ✅    | N/A | N/A     | N/A          | N/A| |
 |          | Java           | 🚧     | 🚧     | 🚧    | 🔶  | ✅      |               | | |
-|          | JSON           | ✅     | ✅     | ✅    | N/A | N/A     | N/A          | N/A| |
 |          | JSX            | ✅     | ✅     | ✅    | 🔶  |         |              | | |
 |          | Haskell        | 🚧     | 🚧     | 🚧    | 🔶  | 🚧       |              | | |
-|          | Markdown       | ✅     | ✅     | ✅    | 🔶  | N/A     | N/A          | N/A | &nbsp; |
+|          | Markdown       | 🚧     | 🚧     | 🚧    | 🚧  | N/A     | N/A          | N/A | &nbsp; |
 
 * ✅ — Supported
 * 🔶 — Partial support

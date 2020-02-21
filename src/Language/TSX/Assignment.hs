@@ -45,7 +45,7 @@ import           Language.TSX.Term as TSX
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
 import           Language.TSX.Grammar as Grammar
 
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in TSX’s grammar onto a program in TSX’s syntax.
 assignment :: Assignment (Term Loc)

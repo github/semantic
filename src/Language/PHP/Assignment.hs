@@ -40,7 +40,7 @@ import qualified Language.PHP.Syntax as Syntax
 import           Language.PHP.Term as PHP
 import           Language.PHP.Grammar as Grammar
 
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment (Term Loc)
