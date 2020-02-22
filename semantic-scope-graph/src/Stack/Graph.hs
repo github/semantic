@@ -100,9 +100,6 @@ instance Ord a => ToGraph.ToGraph (Stack.Graph.Graph a) where
 instance Lower a => Lower (Graph a) where
   lowerBound = Graph (Algebraic.vertex lowerBound)
 
-simplify :: Ord a => Graph a -> Graph a
-simplify = Graph . Algebraic.simplify . unGraph
-
 scope, declaration, popSymbol, reference, pushSymbol :: Symbol -> Graph Node
 scope = Class.vertex . Scope
 declaration = Class.vertex . Declaration
