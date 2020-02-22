@@ -24,7 +24,7 @@ import Data.Unique
 import GHC.Generics
 
 -- | If creating 'Tagged' values manually, it is your responsibility
--- to ensure that the provided 'Int'. Consider using 'taggedM'.
+-- to ensure that the provided 'Int' is actually unique. Consider using 'taggedM'.
 data Tagged a = a :# !Int
   deriving (Functor, Foldable, Traversable, Generic)
 
