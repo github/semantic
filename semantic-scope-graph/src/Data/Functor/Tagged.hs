@@ -3,7 +3,6 @@
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE OverloadedStrings #-}
 -- | A functor associating an 'Int' tag value with a datum. Useful for describing unique IDs.
 module Data.Functor.Tagged
   ( Tagged (..)
