@@ -7,16 +7,19 @@
 module Stack.Graph
   ( Graph(..)
   , Node(..)
-  , Symbol(..)
+  , Symbol
+  -- * Constructors and glue
   , (>>-)
   , (-<<)
   , singleton
+  , fromLinearNodes
   -- * Reexports
   , Class.empty
   , Class.vertex
   , Class.overlay
   , Class.connect
   , Class.edges
+  , simplify
   -- * Smart constructors
   , scope
   , newScope
@@ -27,6 +30,7 @@ module Stack.Graph
   , root
   -- * Testing stuff
   , testGraph
+  , testGraph2
   , edgeTest
   ) where
 
@@ -37,7 +41,6 @@ import           Analysis.Name (Name)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Semilattice.Lower
-import           Data.String
 import qualified Scope.Types as Scope
 
 type Symbol = Name
@@ -80,6 +83,10 @@ instance Ord a => ToGraph.ToGraph (Stack.Graph.Graph a) where
 instance Lower a => Lower (Graph a) where
   lowerBound = Graph (Algebraic.vertex lowerBound)
 
+-- | Given @a, b, c@ this returns @a --> b --> c@.
+fromLinearNodes :: [a] -> Graph a
+fromLinearNodes n = Class.edges $ zip (init n) (drop 1 n)
+
 scope, declaration, popSymbol, reference, pushSymbol :: Symbol -> Graph Node
 scope = Class.vertex . Scope
 declaration = Class.vertex . Declaration
@@ -108,6 +115,18 @@ newScope name edges graph =
 simplify :: Ord a => Graph a -> Graph a
 simplify = Graph . Algebraic.simplify . unGraph
 
+testEdgeList :: [Node]
+testEdgeList =
+  [ Scope "current"
+  , Declaration "a"
+  , PopSymbol "member"
+  , Declaration "b"
+  , Reference "b"
+  , PushSymbol "member"
+  , Reference "a"
+  , Root
+  ]
+
 testGraph :: Graph Node
 testGraph = mconcat
   [ (scope "current" >>- (declaration "a" >>- popSymbol "member"))
@@ -117,6 +136,9 @@ testGraph = mconcat
   , (pushSymbol "member" >>- reference "a")
   , (reference "a" >>- root)
   ]
+
+testGraph2 :: Graph Node
+testGraph2 = fromLinearNodes testEdgeList
 
 edgeTest :: Graph Node
 edgeTest = Class.edges
