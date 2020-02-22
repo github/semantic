@@ -116,7 +116,7 @@ validity p = sconcat [vStart, vEnd, vSize]
       (One, JumpToScope{}) -> Valid
       (One, IgnoreScope{}) -> Valid
       (One, _)             -> Invalid
-      _                    -> Valid
+      _otherwise           -> Valid
 
 data Completion = Partial | Complete
 
