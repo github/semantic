@@ -11,11 +11,12 @@
 {-# LANGUAGE TypeApplications #-}
 module Language.JSON.AST
 ( module Language.JSON.AST
+, JSON.getTestCorpusDir
 ) where
 
 import           Prelude hiding (String)
 import           AST.GenerateSyntax
 import           Language.Haskell.TH.Syntax (runIO)
-import qualified TreeSitter.JSON as JSON (getNodeTypesPath, tree_sitter_json)
+import qualified TreeSitter.JSON as JSON (getNodeTypesPath, getTestCorpusDir, tree_sitter_json)
 
 runIO JSON.getNodeTypesPath >>= astDeclarationsForLanguage JSON.tree_sitter_json

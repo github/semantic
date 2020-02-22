@@ -8,8 +8,8 @@ import qualified Data.ByteString as B
 import           Gauge
 import           System.Exit (die)
 import           System.Environment (getArgs)
-import           Language.Python.Grammar
 import qualified Language.Python.AST as Py
+import           Language.Python.Grammar
 import           AST.Unmarshal
 
 main :: IO ()

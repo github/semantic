@@ -180,9 +180,6 @@ library
                      , Diffing.Algorithm.SES
                      , Diffing.Interpreter
                      -- Language-specific grammar/syntax types, & assignments
-                     , Language.Markdown.Assignment
-                     , Language.Markdown.Syntax
-                     , Language.Markdown.Term
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Term
@@ -209,7 +206,6 @@ library
                      , Language.Python.Term
                      , Numeric.Exts
                      -- Parser glue
-                     , Parsing.CMark
                      , Parsing.Parser
                      , Parsing.TreeSitter
                      -- Rendering formats
@@ -260,7 +256,6 @@ library
                      , ansi-terminal >= 0.8.2 && <1
                      , array ^>= 0.5.3.0
                      , attoparsec ^>= 0.13.2.2
-                     , cmark-gfm == 0.1.8
                      , deepseq ^>= 1.4.4.0
                      , directory-tree ^>= 0.12.1
                      , filepath ^>= 1.4.2.1

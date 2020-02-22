@@ -2,6 +2,7 @@
 module AST.Test
   ( CorpusExample(..)
   , readCorpusFiles
+  , readCorpusFiles'
   , parseCorpusFile
   , testCorpus
   ) where
@@ -22,7 +23,7 @@ import           System.FilePath.Glob
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-testCorpus :: (ByteString -> IO (Either String (t a))) -> Path.RelFile -> IO TestTree
+testCorpus :: (ByteString -> IO (Either String (t a))) -> Path.AbsRelFile -> IO TestTree
 testCorpus parse path = do
   xs <- parseCorpusFile path
   case xs of
@@ -50,10 +51,15 @@ readCorpusFiles parent = do
   files <- globDir1 (compile "**/*.txt") (Path.toString dir)
   pure (Path.relPath <$> files)
 
+readCorpusFiles' :: Path.AbsDir ->  IO [Path.AbsRelFile]
+readCorpusFiles' dir = do
+  files <- globDir1 (compile "**/*.txt") (Path.toString dir)
+  pure (Path.file <$> files)
+
 data CorpusExample = CorpusExample { name :: String, code :: ByteString }
   deriving (Eq, Show)
 
-parseCorpusFile :: Path.RelFile -> IO (Either String [CorpusExample])
+parseCorpusFile :: Path.AbsRelFile -> IO (Either String [CorpusExample])
 parseCorpusFile path = do
   c <- Data.ByteString.readFile (Path.toString path)
   pure $ parseOnly corpusParser c

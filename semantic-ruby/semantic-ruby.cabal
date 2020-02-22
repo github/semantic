@@ -31,7 +31,7 @@ common haskell
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.9
-                     , tree-sitter-ruby ^>= 0.5.0.1
+                     , tree-sitter-ruby ^>= 0.5.0.2
 
   ghc-options:
     -Weverything
@@ -63,16 +63,15 @@ test-suite test
   hs-source-dirs:   test
   main-is:          Test.hs
   build-depends:    base
-                  , tree-sitter
-                  , tree-sitter-ruby
-                  , semantic-ast
                   , bytestring ^>= 0.10.8.2
                   , hedgehog >= 0.6 && <2
                   , pathtype ^>= 0.8.1
-                  , text
+                  , semantic-ast
+                  , semantic-ruby
                   , tasty
                   , tasty-hedgehog
                   , tasty-hunit
+                  , text
 
 executable benchmarks
   import:              haskell
@@ -87,8 +86,7 @@ executable benchmarks
                      , Glob
                      , lens >= 4.17 && < 4.19
                      , pathtype ^>= 0.8.1
-                     , tree-sitter
-                     , tree-sitter-ruby
+                     , semantic-ruby
 
 executable tree-sitter-ruby
   import: haskell
@@ -97,5 +95,4 @@ executable tree-sitter-ruby
   main-is:             Main.hs
   build-depends:       base
                      , bytestring
-                     , tree-sitter
-                     , tree-sitter-ruby
+                     , semantic-ruby

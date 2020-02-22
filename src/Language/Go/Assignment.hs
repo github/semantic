@@ -16,6 +16,7 @@ import qualified Assigning.Assignment as Assignment
 import           Control.Monad
 import qualified Data.Abstract.ScopeGraph as ScopeGraph (AccessControl (..))
 import           Data.ImportPath ()
+import           Data.ImportPath (defaultAlias, importPath)
 import           Data.List.NonEmpty (NonEmpty (..), some1)
 import           Data.Sum
 import           Data.Syntax
@@ -28,13 +29,12 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import           Language.Go.Grammar as Grammar
 import           Language.Go.Syntax as Go.Syntax hiding (labelName, runeLiteral)
 import           Language.Go.Term as Go
 import           Language.Go.Type as Go.Type
-import Data.ImportPath (importPath, defaultAlias)
-import           Language.Go.Grammar as Grammar
 
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in Go's grammar onto a program in Go's syntax.
 assignment :: Assignment (Term Loc)

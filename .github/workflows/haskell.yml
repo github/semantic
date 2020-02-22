@@ -52,7 +52,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        script/bootstrap
+        cabal v2-update
         cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
         cabal v2-build     --project-file=cabal.project.ci all --only-dependencies
 
@@ -61,7 +61,14 @@ jobs:
         cabal v2-build --project-file=cabal.project.ci
         cabal v2-run   --project-file=cabal.project.ci semantic:test
         cabal v2-run   --project-file=cabal.project.ci semantic-core:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-go:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-java:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-json:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-python:test
         cabal v2-run   --project-file=cabal.project.ci semantic-python:test:compiling
         cabal v2-run   --project-file=cabal.project.ci semantic-python:test:graphing
+        cabal v2-run   --project-file=cabal.project.ci semantic-ruby:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-tsx:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-typescript:test
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:test; cd ..
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:doctest -- src; cd ..

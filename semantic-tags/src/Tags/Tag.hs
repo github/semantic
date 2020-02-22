@@ -23,5 +23,5 @@ data Kind
   | Module
   -- References
   | Call
-  -- | Constant -- TODO: New kind for constant references
+  -- Constant -- TODO: New kind for constant references
   deriving (Bounded, Enum, Eq, Show)

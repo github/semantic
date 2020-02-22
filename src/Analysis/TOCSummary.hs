@@ -28,15 +28,12 @@ import qualified Data.Error as Error
 import           Data.Flag
 import           Data.Foldable (toList)
 import           Data.Language as Language
-import           Data.List.NonEmpty (nonEmpty)
-import           Data.Semigroup (sconcat)
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import           Data.Term
 import           Data.Text (Text)
 import qualified Data.Text as T
-import qualified Language.Markdown.Syntax as Markdown
 import           Source.Loc as Loc
 import           Source.Range
 import           Source.Source as Source
@@ -110,16 +107,6 @@ class HasDeclarationBy (strategy :: Strategy) syntax where
 instance HasDeclarationBy 'Default syntax where
   toDeclarationBy _ _ _ = Nothing
 
-
--- | Produce a 'Heading' from the first line of the heading of a 'Markdown.Heading' node.
-instance HasDeclarationBy 'Custom Markdown.Heading where
-  toDeclarationBy blob@Blob{..} ann (Markdown.Heading level terms _)
-    = Just $ Declaration (Heading level) (headingText terms) (Loc.span ann) (blobLanguage blob)
-    where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
-          headingByteRange (t, _) = byteRange (termAnnotation t)
-          getSource = firstLine . toText . Source.slice blobSource
-          firstLine = T.takeWhile (/= '\n')
-
 -- | Produce an 'Error' for 'Syntax.Error' nodes.
 instance HasDeclarationBy 'Custom Syntax.Error where
   toDeclarationBy blob@Blob{..} ann err@Syntax.Error{}
@@ -167,7 +154,6 @@ data Strategy = Default | Custom
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method   = 'Custom
-  DeclarationStrategy Markdown.Heading     = 'Custom
   DeclarationStrategy Syntax.Error         = 'Custom
   DeclarationStrategy (Sum _)              = 'Custom
   DeclarationStrategy _                    = 'Default

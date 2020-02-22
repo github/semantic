@@ -11,7 +11,7 @@ module Control.Carrier.Parse.Measured
 ( -- * Parse carrier
   ParseC(..)
   -- * Exceptions
-, ParserCancelled(..)
+, AssignmentTimedOut(..)
   -- * Parse effect
 , module Control.Effect.Parse
 ) where
@@ -30,7 +30,6 @@ import qualified Data.Error as Error
 import qualified Data.Flag as Flag
 import           Data.Foldable
 import qualified Data.Syntax as Syntax
-import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Semantic.Config
@@ -71,11 +70,7 @@ runParser blob@Blob{..} parser = case parser of
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
 
-  MarkdownParser ->
-    time "parse.cmark_parse" languageTag $
-      let term = cmarkParser blobSource
-      in length term `seq` pure term
-  where
+  where 
     languageTag = [("language" :: String, show (blobLanguage blob))]
     executeParserAction act = do
       -- Test harnesses can specify that parsing must fail, for testing purposes.
@@ -83,10 +78,10 @@ runParser blob@Blob{..} parser = case parser of
       when shouldFailFlag (throwError (SomeException AssignmentTimedOut))
       act >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
-data ParserCancelled = ParserTimedOut | AssignmentTimedOut
-  deriving (Show)
+data AssignmentTimedOut = AssignmentTimedOut deriving (Show)
 
-instance Exception ParserCancelled
+instance Exception AssignmentTimedOut
+
 
 
 runAssignment
