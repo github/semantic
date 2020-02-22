@@ -47,7 +47,7 @@ import           Data.Function
 import           Data.Functor.Tagged
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import           Data.Maybe
+import           Data.Maybe.Exts
 import           Data.Semilattice.Lower
 import qualified Scope.Types as Scope
 
@@ -123,7 +123,7 @@ tagGraphUniquely
     where
       go n = do
         mSeen <- gets (Map.lookup n)
-        vert  <- maybe ((n :#) <$> fresh) pure mSeen
+        vert  <- maybeM (taggedM n) mSeen
         when (isNothing mSeen) (modify (Map.insert n vert))
         pure (Class.vertex vert)
 
