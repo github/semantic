@@ -1,4 +1,5 @@
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE ViewPatterns #-}
 module Stack.Graph.Export
   ( toGraphViz
   , openGraphViz
@@ -25,35 +26,25 @@ import qualified System.Process as Process
 sym :: Symbol -> String
 sym = T.unpack . formatName
 
-nodeToDotName :: Node -> String
-nodeToDotName = \case
-  Declaration s -> "decl_" <> sym s
-  Reference s -> "ref_" <> sym s
-  PushSymbol s -> "pushsym_" <> sym s
-  PopSymbol s -> "popsym_" <> sym s
-  PushScope -> "pushscope"
-  Scope s -> "scope_" <> sym s
-  ExportedScope -> "exported"
-  JumpToScope -> "jump"
-  IgnoreScope -> "ignore"
-  Root -> "root"
+nodeToDotName :: Tagged Node -> String
+nodeToDotName (_ :# i) = "node_" <> show i
 
-nodeAttributes :: Node -> [Dot.Attribute String]
-nodeAttributes = \case
+nodeAttributes :: Tagged Node -> [Dot.Attribute String]
+nodeAttributes (node :# idx) = case node of
   Declaration s -> [ "shape" := "rect", "label" := sym s, "color" := "red", "penwidth" := "5" ]
   Reference s   -> [ "shape" := "rect", "label" := sym s, "color" := "green", "peripheries" := "2"]
   PushSymbol s  -> [ "shape" := "rect", "label" := sym s, "color" := "green", "style" := "dashed"]
-  PopSymbol s  ->  [ "shape" := "diamond", "label" := sym s, "color" := "green", "style" := "dashed"]
-  PushScope     -> [ "shape" := "rect", "label" := "PUSH"]
+  PopSymbol s   -> [ "shape" := "diamond", "label" := sym s, "color" := "green", "style" := "dashed"]
+  PushScope     -> [ "shape" := "rect", "label" := ("PUSH " <> show idx)]
   Scope s       -> [ "shape" := "circle", "label" := sym s, "style" := "filled"]
-  ExportedScope -> [ "shape" := "circle"]
-  JumpToScope   -> [ "shape" := "circle"]
+  ExportedScope -> [ "shape" := "circle", "label" := show idx]
+  JumpToScope   -> [ "shape" := "circle", "label" := show idx]
   IgnoreScope   -> [ "shape" := "rect", "label" := "IGNORE", "color" := "purple"]
-  Root          -> [ "shape" := "circle", "style" := "filled"]
+  Root          -> [ "shape" := "circle", "style" := "filled", "label" := "root", "fillcolor" := "black", "fontcolor" := "white"]
 
 
 
-nodeStyle :: Dot.Style Node String
+nodeStyle :: Dot.Style (Tagged Node) String
 nodeStyle = Dot.Style
   { Dot.graphName = "stack_graph"
   , Dot.preamble = []
@@ -65,11 +56,11 @@ nodeStyle = Dot.Style
   , Dot.edgeAttributes = mempty
   }
 
-toGraphViz :: Graph Node -> String
+toGraphViz :: Graph (Tagged Node) -> String
 toGraphViz = Dot.export nodeStyle
 
 openGraphViz :: Graph Node -> IO ()
-openGraphViz g = do
+openGraphViz (tagGraphUniquely -> g) = do
   -- Not using streaming-process's temporary file support, because we don't want
   -- to clean this up immediately after we're done using it.
   (pngPath, pngH) <- openTempFile "/tmp" "stack-graph.svg"
