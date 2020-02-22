@@ -67,8 +67,6 @@ checkEdgeInvariants Path{ startingNode, endingNode, edges }
          Edge { sourceNode  } :<| (_ :|> Edge { sinkNode })
            -> check startingNode sourceNode <> check endingNode sinkNode
 
-
-
 -- | The starting node of a path must be the root node, an exported
 -- scope node, or a reference node. The ending node of a path must be
 -- the root node, a jump to scope node, a resolved jump to scope node,
@@ -105,18 +103,14 @@ validity :: Path -> Validity
 validity p = sconcat [vStart, vEnd, vSize]
   where
     vStart = case extract (startingNode p) of
-      Reference{} | null (startingSymbolStack p), startingScopeStackSize p == Zero
-                    -> Valid
-                  | otherwise
-                    -> Invalid
-      _ -> Valid
+      Reference{} | null (startingSymbolStack p), startingScopeStackSize p == Zero -> Valid
+                  | otherwise -> Invalid
+      _otherwise -> Valid
 
     vEnd = case extract (endingNode p) of
-      Declaration{} | null (endingSymbolStack p), null (endingScopeStack p)
-                      -> Valid
-                    | otherwise
-                      -> Invalid
-      _ -> Valid
+      Declaration{} | null (endingSymbolStack p), null (endingScopeStack p) -> Valid
+                    | otherwise -> Invalid
+      _otherwise -> Valid
 
     vSize = case (startingScopeStackSize p, extract (endingNode p)) of
       (One, JumpToScope{}) -> Valid
