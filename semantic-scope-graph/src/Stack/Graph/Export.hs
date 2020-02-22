@@ -24,7 +24,7 @@ import           System.Process (system)
 import qualified System.Process as Process
 
 sym :: Symbol -> String
-sym = T.unpack .formatName
+sym = T.unpack . formatName
 
 nodeToDotName :: Tagged Node -> String
 nodeToDotName (_ :# i) = "node_" <> show i
@@ -70,4 +70,3 @@ openGraphViz (tagGraphUniquely -> g) = do
     (void . ByteStream.hPut pngH . hoist ByteStream.putStrLn)
   hFlush pngH
   void $ system ("open " <> pngPath)
-
