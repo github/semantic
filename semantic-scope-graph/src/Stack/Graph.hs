@@ -1,14 +1,16 @@
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
-
-{-# LANGUAGE OverloadedLists #-}
 module Stack.Graph
   ( Graph(..)
   , Node(..)
   , Symbol
   -- * Constructors and glue
+  , Tagged (..)
   , (>>-)
   , (-<<)
   , singleton
@@ -28,6 +30,8 @@ module Stack.Graph
   , popSymbol
   , pushSymbol
   , root
+  -- * Miscellany
+  , tagGraphUniquely
   -- * Testing stuff
   , testGraph
   , testGraph2
@@ -38,8 +42,16 @@ import qualified Algebra.Graph as Algebraic
 import qualified Algebra.Graph.Class as Class
 import qualified Algebra.Graph.ToGraph as ToGraph
 import           Analysis.Name (Name)
+import           Control.Applicative
+import           Control.Carrier.Fresh.Strict
+import           Control.Carrier.State.Strict
+import           Control.Lens.Getter
+import           Control.Monad
+import           Data.Function
+import           Data.Functor.Tagged
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import           Data.Maybe.Exts
 import           Data.Semilattice.Lower
 import qualified Scope.Types as Scope
 
@@ -56,6 +68,15 @@ data Node = Root
   | JumpToScope
   | IgnoreScope
   deriving (Show, Eq, Ord)
+
+-- This overlapping instance is problematic but helps us make sure we don't differentiate two root nodes.
+instance {-# OVERLAPS #-} Eq (Tagged Node) where
+  x == y = case (view contents y, view contents x) of
+    (Root, Root) -> True
+    _            -> view identifier x == view identifier y
+
+instance Ord (Tagged Node) where
+  compare = compare `on` view identifier
 
 instance Lower Node where
   lowerBound = Root
@@ -97,6 +118,22 @@ pushSymbol = Class.vertex . PushSymbol
 root :: Graph Node
 root = Graph (Algebraic.vertex Root)
 
+tagGraphUniquely :: Graph Node -> Graph (Tagged Node)
+tagGraphUniquely
+  = simplify
+  . run
+  . evalFresh 0
+  . evalState @(Map Node (Tagged Node)) mempty
+  . foldg (pure Class.empty) go (liftA2 Class.overlay) (liftA2 Class.connect)
+    where
+      go n = do
+        mSeen <- gets (Map.lookup n)
+        vert  <- maybeM (taggedM n) mSeen
+        when (isNothing mSeen) (modify (Map.insert n vert))
+        pure (Class.vertex vert)
+
+foldg :: b -> (a -> b) -> (b -> b -> b) -> (b -> b -> b) -> Graph a -> b
+foldg a b c d = Algebraic.foldg a b c d . unGraph
 
 (>>-), (-<<) :: Graph a -> Graph a -> Graph a
 Graph left >>- Graph right = Graph (Algebraic.connect left right)
@@ -129,7 +166,8 @@ testEdgeList =
 
 testGraph :: Graph Node
 testGraph = mconcat
-  [ (scope "current" >>- (declaration "a" >>- popSymbol "member"))
+  [ (scope "current" >>- declaration "a")
+  , (declaration "a" >>- popSymbol "member")
   , (popSymbol "member" >>- declaration "b")
   , (declaration "b" >>- reference "b")
   , (reference "b" >>- pushSymbol "member")
