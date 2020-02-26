@@ -52,7 +52,7 @@ le = LanguageExample
 examples :: [LanguageExample]
 examples =
   [ le "go" "**/*.go" goFileSkips goDirSkips
-  , le "python" "**/*.py" mempty mempty
+  , le "python" "**/*.py" pythonFileSkips mempty
   , le "ruby" "**/*.rb" rubySkips mempty
   , le "typescript" "**/*.[jt]s" typescriptSkips mempty
   , le "typescript" "**/*.[jt]sx" tsxSkips mempty
@@ -98,6 +98,14 @@ goDirSkips = Path.relDir <$>
   , "go/test/syntax"
   , "go/test/method4.dir"
   , "go/test"
+  ]
+
+pythonFileSkips :: [Path.RelFile]
+pythonFileSkips = Path.relPath <$>
+  [
+  -- Assignment doesn't handle f-strings
+    "thealgorithms/analysis/compression_analysis/psnr.py"
+  , "thealgorithms/maths/greater_common_divisor.py"
   ]
 
 rubySkips :: [Path.RelFile]
