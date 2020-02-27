@@ -18,6 +18,7 @@ import           Control.DeepSeq (NFData)
 import           Data.Aeson ((.:), (.=))
 import qualified Data.Aeson as A
 import           Data.Hashable (Hashable)
+import           Data.Semilattice.Lower (Lower (..))
 import           GHC.Generics (Generic)
 import           GHC.Stack (SrcLoc (..))
 
@@ -44,6 +45,10 @@ instance A.FromJSON Span where
   parseJSON = A.withObject "Span" $ \o -> Span
     <$> o .: "start"
     <*> o .: "end"
+
+instance Lower Span where
+  lowerBound = Span lowerBound lowerBound
+
 
 -- | Construct a Span with a given value for both its start and end positions.
 point :: Pos -> Span
@@ -77,6 +82,10 @@ instance A.FromJSON Pos where
   parseJSON arr = do
     [ line, col ] <- A.parseJSON arr
     pure $ Pos line col
+
+instance Lower Pos where
+  lowerBound = Pos 1 1
+
 
 line_, column_ :: Lens' Pos Int
 line_   = lens line   (\p l -> p { line   = l })
