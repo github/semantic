@@ -7,7 +7,7 @@ CodeGen is the process for auto-generating language-specific, strongly-typed AST
 To get started, first make sure your language has:
 
 1. An existing [tree-sitter](http://tree-sitter.github.io/tree-sitter/) parser;
-2. An existing Cabal package in this repository for said language. This will provide an interface into tree-sitter's C source. [Here](https://github.com/tree-sitter/haskell-tree-sitter/tree/master/tree-sitter-python) is an example of a library for Python, a supported language that the remaining documentation will refer to.
+2. An existing Cabal package in [tree-sitter](http://tree-sitter.github.io/tree-sitter/) for said language. This will provide an interface into tree-sitter's C source. [Here](https://github.com/tree-sitter/haskell-tree-sitter/tree/master/tree-sitter-python) is an example of a library for Python, a supported language that the remaining documentation will refer to.
 
 ### CodeGen Pipeline
 
