@@ -37,6 +37,7 @@ data Language
     | Ruby
     | TypeScript
     | PHP
+    | QL
     | TSX
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum)
 
@@ -68,17 +69,20 @@ instance SLanguage 'JSX where
 instance SLanguage 'Markdown where
   reflect _ = Markdown
 
+instance SLanguage 'PHP where
+  reflect _ = PHP
+
 instance SLanguage 'Python where
   reflect _ = Python
+
+instance SLanguage 'QL where
+  reflect _ = QL
 
 instance SLanguage 'Ruby where
   reflect _ = Ruby
 
 instance SLanguage 'TypeScript where
   reflect _ = TypeScript
-
-instance SLanguage 'PHP where
-  reflect _ = PHP
 
 instance FromJSON Language where
   parseJSON = withText "Language" $ \l ->
@@ -118,6 +122,7 @@ languageToText = \case
   TypeScript -> "TypeScript"
   TSX -> "TSX"
   PHP -> "PHP"
+  QL -> "QL"
 
 textToLanguage :: T.Text -> Language
 textToLanguage = \case
@@ -133,4 +138,5 @@ textToLanguage = \case
   "TypeScript" -> TypeScript
   "TSX" -> TSX
   "PHP" -> PHP
+  "QL" -> QL
   _ -> Unknown
