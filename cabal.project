@@ -11,11 +11,14 @@ packages: .
           semantic-parse
           semantic-php
           semantic-python
+          semantic-ql
           semantic-ruby
           semantic-scope-graph
           semantic-tsx
           semantic-typescript
           semantic-tags
+          tree-sitter-ql
+          semantic-source
 
 -- Packages brought in from other repos instead of hackage
 -- ATTENTION: remember to update cabal.project.ci when bumping SHAs here!
