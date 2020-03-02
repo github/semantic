@@ -32,6 +32,7 @@ module Stack.Graph
   , root
   -- * Miscellany
   , tagGraphUniquely
+  , simplify
   -- * Testing stuff
   , testGraph
   , testGraph2

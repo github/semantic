@@ -48,6 +48,7 @@ import           GHC.Records
 import qualified Scope.Reference as Reference
 import           Source.Loc
 import           Source.Span
+import           Stack.Graph ((-<<), (>>-))
 import qualified Stack.Graph as Stack
 
 import           Scope.Graph.AdjacencyList (ScopeGraph)
@@ -59,6 +60,8 @@ import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props.Reference
 import           Control.Effect.State
+
+import qualified Algebra.Graph.Class as Class
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
@@ -94,9 +97,6 @@ withScope scope action = do
   put (CurrentScope s)
   pure x
 
-addDeclarations :: ScopeGraphEff sig m => NonEmpty (Loc, Name) -> m ()
-addDeclarations names = undefined
-
 declare :: ScopeGraphEff sig m => Name -> Props.Declaration -> m ()
 declare n props = do
   CurrentScope current <- currentScope
@@ -125,6 +125,16 @@ newScope edges = do
   name <- Name.gensym
   modify (Stack.newScope name edges)
   name <$ modify (ScopeGraph.newScope name edges)
+
+
+addDeclarations :: ScopeGraphEff sig m => NonEmpty (Loc, Name) -> m ()
+addDeclarations names = do
+  graph <- get @(Stack.Graph Stack.Node)
+  CurrentScope current <- currentScope
+
+  let graph' = foldr (\(ann, name) graph ->
+        graph -<< (Stack.declaration "reference") -<< (Stack.pushSymbol name)) mempty names
+  put (Stack.simplify (Class.overlay (Stack.scope current >>- graph') graph))
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
 newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
