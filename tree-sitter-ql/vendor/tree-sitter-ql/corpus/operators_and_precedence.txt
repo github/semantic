@@ -1,0 +1,123 @@
+============
+And vs Or 1
+============
+
+from Foo f
+where f = f and f = f or f = f
+select f
+
+---
+
+(ql (moduleMember 
+  (select 
+    (varDecl (typeExpr (className)) (varName (simpleId))) 
+    (disjunction 
+      (conjunction 
+        (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))) 
+        (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId))))) 
+      (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId))))) 
+    (asExprs (asExpr (variable (varName (simpleId))))))))
+
+============
+And vs Or 2
+============
+
+from Foo f
+where f = f or f = f and f = f
+select f
+
+---
+
+(ql (moduleMember 
+  (select (varDecl (typeExpr (className)) (varName (simpleId))) 
+    (disjunction 
+      (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))) 
+      (conjunction 
+        (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))) 
+        (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))))) 
+    (asExprs (asExpr (variable (varName (simpleId)))))))) 
+
+============
+Or vs implies
+============
+
+from Foo f
+where (f = f or f = f implies f = f)
+  and (f = f implies f = f or f = f)
+select f
+
+---
+
+(ql (moduleMember 
+  (select 
+    (varDecl (typeExpr (className)) (varName (simpleId))) 
+    (conjunction 
+      (par_expr 
+        (implication 
+          (disjunction 
+            (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))) 
+            (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId))))) 
+        (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId))))))
+      (par_expr 
+        (implication 
+          (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))) 
+          (disjunction 
+            (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))) 
+            (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))))))) 
+    (asExprs (asExpr (variable (varName (simpleId))))))))
+
+============
+if then else
+============
+
+from Foo f
+where if f = f then f = f else f = f
+select f
+
+---
+
+(ql (moduleMember 
+  (select 
+    (varDecl (typeExpr (className)) (varName (simpleId))) 
+    (if_term 
+      (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))) 
+      (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId)))) 
+      (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId))))) 
+  (asExprs (asExpr (variable (varName (simpleId))))))))
+
+==========
+and vs not
+==========
+
+from Foo f
+where not f = f and f = f
+select f
+
+---
+
+(ql (moduleMember 
+  (select 
+    (varDecl (typeExpr (className)) (varName (simpleId))) 
+    (conjunction 
+      (negation (not) (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId))))) 
+      (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId))))) 
+    (asExprs (asExpr (variable (varName (simpleId))))))))
+
+==========
+call vs plus
+==========
+
+select a+(b)
+
+---
+
+(ql (moduleMember (select (asExprs (asExpr (classless_predicate_call (aritylessPredicateExpr (literalId)) (closure (plus)) (variable (varName (simpleId)))))))))
+
+==========
+cast vs subtract
+==========
+
+select (A)-(b)
+
+---
+(ql (moduleMember (select (asExprs (asExpr (prefix_cast (typeExpr (className)) (unary_expr (unop (minus)) (par_expr (variable (varName (simpleId)))))))))))

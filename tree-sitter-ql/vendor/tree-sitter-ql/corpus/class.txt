@@ -1,0 +1,59 @@
+===========
+empty class
+===========
+
+class Foo extends Bar {}
+
+---
+(ql (moduleMember (dataclass (class) (className) (extends) (typeExpr (className))))) 
+
+===================================
+class with characteristic predicate
+===================================
+
+abstract class Foo extends Bar {
+
+  pragma[inline]
+  Foo() {
+    this = this
+  }
+
+}
+
+---
+
+(ql (moduleMember 
+  (annotation (annotName)) 
+  (dataclass (class) (className) (extends) (typeExpr (className)) 
+    (classMember (annotation (annotName)  (annotArg (simpleId))) 
+      (charpred (className) 
+        (comp_term (variable (this)) (compop (eq)) (variable (this)))))))) 
+==================
+class with members
+==================
+
+class X extends Y {
+  m::F f;
+
+  m::F a() {
+    result = f
+  }
+}
+
+---
+
+(ql (moduleMember 
+  (dataclass (class) (className) (extends) (typeExpr (className)) 
+    (classMember (field (varDecl (typeExpr (moduleExpr (simpleId)) (className)) (varName (simpleId))))) 
+    (classMember (memberPredicate (returnType (typeExpr (moduleExpr (simpleId))  (className))) (predicateName) 
+    (body (comp_term (variable (result)) (compop (eq)) (variable (varName (simpleId))))))))))
+
+===========
+class alias
+===========
+
+class X = foo::Bas;
+
+---
+(ql (moduleMember 
+  (dataclass (class) (className) (typeAliasBody (eq) (typeExpr (moduleExpr (simpleId)) (className))))))

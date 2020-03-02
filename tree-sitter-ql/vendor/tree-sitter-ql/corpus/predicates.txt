@@ -1,0 +1,66 @@
+=======
+no-body
+=======
+
+predicate foo();
+
+mod::Type foo(int arg, Foo arg);
+
+---
+
+(ql 
+  (moduleMember (classlessPredicate (returnType (predicate)) (predicateName) (empty))) 
+  (moduleMember (classlessPredicate (returnType (typeExpr (moduleExpr (simpleId)) (className))) (predicateName) 
+    (varDecl (typeExpr (typeLiteral)) (varName (simpleId))) (varDecl (typeExpr (className)) (varName (simpleId))) (empty))))
+
+================
+simple predicate
+================
+
+predicate foo(F f){
+  f = f
+}
+
+int predicateWithResult(){
+  result = 43
+}
+
+---
+
+ (ql 
+    (moduleMember (classlessPredicate (returnType (predicate)) (predicateName) (varDecl (typeExpr (className)) (varName (simpleId))) (body 
+      (comp_term (variable (varName (simpleId))) (compop (eq)) (variable (varName (simpleId))))))) 
+    (moduleMember (classlessPredicate (returnType (typeExpr (typeLiteral))) (predicateName) (body 
+      (comp_term (variable (result)) (compop (eq)) (literal (integer)))))))
+
+=====================
+higher-order relation
+=====================
+
+int foo(X x, Y y) = name(pred1/1, pred2/3)(x.x(), result)
+
+---
+
+(ql (moduleMember 
+  (classlessPredicate 
+    (returnType (typeExpr (typeLiteral))) 
+    (predicateName) 
+    (varDecl (typeExpr (className)) (varName (simpleId))) 
+    (varDecl (typeExpr (className)) (varName (simpleId))) 
+    (higherOrderTerm (eq) (literalId) 
+      (predicateExpr (aritylessPredicateExpr (literalId)) (slash) (integer)) 
+      (predicateExpr (aritylessPredicateExpr (literalId)) (slash) (integer)) 
+      (qualified_expr (variable (varName (simpleId))) (qualifiedRhs (predicateName))) 
+      (variable (result)))))) 
+
+===============
+predicate alias
+===============
+
+predicate foo = somePredicate/12;
+
+---
+
+(ql (moduleMember (classlessPredicate 
+  (returnType (predicate)) 
+  (predicateName) (predicateAliasBody (eq) (predicateExpr (aritylessPredicateExpr (literalId)) (slash) (integer)))))) 

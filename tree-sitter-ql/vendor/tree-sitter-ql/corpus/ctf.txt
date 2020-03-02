@@ -1,0 +1,23 @@
+=========================
+dataflow example from ctf
+=========================
+
+from Configuration cfg, DataFlow::PathNode source, DataFlow::PathNode sink
+where cfg.hasFlowPath(source, sink)
+select sink.getNode(), source, sink, "Potential XSS vulnerability in plugin."
+
+---
+
+(ql (moduleMember 
+  (select 
+    (varDecl (typeExpr (className)) (varName (simpleId))) 
+    (varDecl (typeExpr (moduleExpr (simpleId)) (className)) (varName (simpleId))) 
+    (varDecl (typeExpr (moduleExpr (simpleId)) (className)) (varName (simpleId))) 
+    (qualified_expr 
+      (variable (varName (simpleId))) 
+      (qualifiedRhs (predicateName) (variable (varName (simpleId))) (variable (varName (simpleId))))) 
+    (asExprs 
+      (asExpr (qualified_expr (variable (varName (simpleId))) (qualifiedRhs (predicateName)))) 
+      (asExpr (variable (varName (simpleId)))) 
+      (asExpr (variable (varName (simpleId)))) 
+      (asExpr (literal (string)))))))
