@@ -46,7 +46,7 @@ To parse source code and produce ASTs locally:
 1. Load the REPL for a given language:
 
 ```
-cabal new-repl lib:tree-sitter-python
+cabal new-repl lib:semantic-ast
 ```
 
 2. Set language extensions, `OverloadedStrings` and `TypeApplications`, and import relevant modules, `AST.Unmarshal`, `Source.Range` and `Source.Span`:
