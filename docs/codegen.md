@@ -43,7 +43,7 @@ ___
 
 To parse source code and produce ASTs locally:
 
-1. Load the REPL for a given language:
+1. Load the REPL:
 
 ```
 cabal new-repl lib:semantic-ast
@@ -166,38 +166,34 @@ Right
 
 ### Inspecting auto-generated datatypes
 
-Datatypes are derived from a language and its `node-types.json` file using the GenerateSyntax API. Definition can be viewed in the REPL just as they would for any other datatype, using `:i`:
+Datatypes are derived from a language and its `node-types.json` file using the `GenerateSyntax` API. These datatypes can be viewed in the REPL just as they would for any other datatype, using `:i` after loading the language-specific `AST.hs` module for a given language. 
 
 ```
-:i TreeSitter.Python.AST.Module
+:l semantic-python/src/Language/Python/AST.hs
+Ok, six modules loaded.
+*Language.Python.AST Source.Span Source.Range> :i Module
 ```
 
 This shows us the auto-generated `Module` datatype:
 
 ```Haskell
-data TreeSitter.Python.AST.Module a
-  = TreeSitter.Python.AST.Module {TreeSitter.Python.AST.ann :: a,
-                                  TreeSitter.Python.AST.extraChildren :: [(GHC.Generics.:+:)
-                                                                            TreeSitter.Python.AST.CompoundStatement
-                                                                            TreeSitter.Python.AST.SimpleStatement
-                                                                            a]}
-  	-- Defined at TreeSitter/Python/AST.hs:10:1
-instance Show a => Show (TreeSitter.Python.AST.Module a)
-  -- Defined at TreeSitter/Python/AST.hs:10:1
-instance Ord a => Ord (TreeSitter.Python.AST.Module a)
-  -- Defined at TreeSitter/Python/AST.hs:10:1
-instance Eq a => Eq (TreeSitter.Python.AST.Module a)
-  -- Defined at TreeSitter/Python/AST.hs:10:1
-instance Traversable TreeSitter.Python.AST.Module
-  -- Defined at TreeSitter/Python/AST.hs:10:1
-instance Functor TreeSitter.Python.AST.Module
-  -- Defined at TreeSitter/Python/AST.hs:10:1
-instance Foldable TreeSitter.Python.AST.Module
-  -- Defined at TreeSitter/Python/AST.hs:10:1
-instance Unmarshal TreeSitter.Python.AST.Module
-  -- Defined at TreeSitter/Python/AST.hs:10:1
-instance SymbolMatching TreeSitter.Python.AST.Module
-  -- Defined at TreeSitter/Python/AST.hs:10:1
+data Module a
+  = Module {Language.Python.AST.ann :: a,
+            Language.Python.AST.extraChildren :: [(GHC.Generics.:+:)
+                                                    CompoundStatement SimpleStatement a]}
+  	-- Defined at /Users/aymannadeem/github/semantic/semantic-python/src/Language/Python/AST.hs:23:1
+instance Show a => Show (Module a)
+  -- Defined at /Users/aymannadeem/github/semantic/semantic-python/src/Language/Python/AST.hs:23:1
+instance Ord a => Ord (Module a)
+  -- Defined at /Users/aymannadeem/github/semantic/semantic-python/src/Language/Python/AST.hs:23:1
+instance Eq a => Eq (Module a)
+  -- Defined at /Users/aymannadeem/github/semantic/semantic-python/src/Language/Python/AST.hs:23:1
+instance Traversable Module
+  -- Defined at /Users/aymannadeem/github/semantic/semantic-python/src/Language/Python/AST.hs:23:1
+instance Functor Module
+  -- Defined at /Users/aymannadeem/github/semantic/semantic-python/src/Language/Python/AST.hs:23:1
+instance Foldable Module
+  -- Defined at /Users/aymannadeem/github/semantic/semantic-python/src/Language/Python/AST.hs:23:1
 ```
 
 ### Tests
