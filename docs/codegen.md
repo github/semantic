@@ -110,7 +110,7 @@ As of right now, Hedgehog tests are minimal and only in place for the Python lib
 
 To run tests:
 
-`cabal v2-test tree-sitter-python`
+`cabal v2-test semantic-python`
 
 ### Additional notes
 
