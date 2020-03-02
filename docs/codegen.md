@@ -43,10 +43,10 @@ ___
 
 To parse source code and produce ASTs locally:
 
-1. Load the REPL:
+1. Load the REPL for a given language package:
 
 ```
-cabal new-repl lib:semantic-ast
+cabal new-repl lib:semantic-python
 ```
 
 2. Set language extensions, `OverloadedStrings` and `TypeApplications`, and import relevant modules, `AST.Unmarshal`, `Source.Range` and `Source.Span`:
@@ -60,108 +60,16 @@ import Source.Range
 import AST.Unmarshal
 ```
 
-3. You can now call `parseByteString`, passing in the desired language you wish to parse (in this case Python exemplified by `tree_sitter_python`), and the source code (in this case an integer `1`). Since the function is constrained by `(Unmarshal t, UnmarshalAnn a)`, you can use type applications to provide a top-level node `t`, an entry point into the tree, in addition to a polymorphic annotation `a` used to represent range and span:
+3. You can now call `parseByteString`, passing in the desired language you wish to parse (in this case Python is given by the argument `Language.Python.Grammar.tree_sitter_python`), and the source code (in this case an integer `1`). Since the function is constrained by `(Unmarshal t, UnmarshalAnn a)`, you can use type applications to provide a top-level node `t`, an entry point into the tree, in addition to a polymorphic annotation `a` used to represent range and span. In this case, that top-level root node is `Module`, and the annotation is given by `Span` and `Range` as defined in the [semantic-source](https://github.com/github/semantic/tree/master/semantic-source/src/Source) package:
 
 ```
-parseByteString @TreeSitter.Python.AST.Module @(Source.Span.Span, Source.Range.Range) tree_sitter_python "1"
+TS.parseByteString @Language.Python.AST.Module @(Source.Span.Span, Source.Range.Range) Language.Python.Grammar.tree_sitter_python "1"
 ```
 
 This generates the following AST:
 
 ```
-Right
-    ( Module
-        { ann =
-            ( Range
-                { start = 0
-                , end = 1
-                }
-            , Span
-                { start = Pos
-                    { line = 0
-                    , column = 0
-                    }
-                , end = Pos
-                    { line = 0
-                    , column = 1
-                    }
-                }
-            )
-        , extraChildren =
-            [ R1
-                ( SimpleStatement
-                    ( L1
-                        ( R1
-                            ( R1
-                                ( L1
-                                    ( ExpressionStatement
-                                        { ann =
-                                            ( Range
-                                                { start = 0
-                                                , end = 1
-                                                }
-                                            , Span
-                                                { start = Pos
-                                                    { line = 0
-                                                    , column = 0
-                                                    }
-                                                , end = Pos
-                                                    { line = 0
-                                                    , column = 1
-                                                    }
-                                                }
-                                            )
-                                        , extraChildren = L1
-                                            ( L1
-                                                ( Expression
-                                                    ( L1
-                                                        ( L1
-                                                            ( L1
-                                                                ( PrimaryExpression
-                                                                    ( R1
-                                                                        ( L1
-                                                                            ( L1
-                                                                                ( L1
-                                                                                    ( Integer
-                                                                                        { ann =
-                                                                                            ( Range
-                                                                                                { start = 0
-                                                                                                , end = 1
-                                                                                                }
-                                                                                            , Span
-                                                                                                { start = Pos
-                                                                                                    { line = 0
-                                                                                                    , column = 0
-                                                                                                    }
-                                                                                                , end = Pos
-                                                                                                    { line = 0
-                                                                                                    , column = 1
-                                                                                                    }
-                                                                                                }
-                                                                                            )
-                                                                                        , text = "1"
-                                                                                        }
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                )
-                                                            )
-                                                        )
-                                                    )
-                                                )
-                                            ) :| []
-                                        }
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            ]
-        }
-    )
+Right (Module {ann = (Span {start = Pos {line = 0, column = 0}, end = Pos {line = 0, column = 1}},Range {start = 0, end = 1}), extraChildren = [R1 (SimpleStatement {getSimpleStatement = L1 (R1 (R1 (L1 (ExpressionStatement {ann = (Span {start = Pos {line = 0, column = 0}, end = Pos {line = 0, column = 1}},Range {start = 0, end = 1}), extraChildren = L1 (L1 (Expression {getExpression = L1 (L1 (L1 (PrimaryExpression {getPrimaryExpression = R1 (L1 (L1 (L1 (Integer {ann = (Span {start = Pos {line = 0, column = 0}, end = Pos {line = 0, column = 1}},Range {start = 0, end = 1}), text = "1"}))))})))})) :| []}))))})]})
 ```
 
 ### Inspecting auto-generated datatypes
