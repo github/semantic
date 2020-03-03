@@ -32,7 +32,6 @@ module Stack.Graph
   , root
   -- * Miscellany
   , tagGraphUniquely
-  , simplify
   -- * Testing stuff
   , testGraph
   , testGraph2
@@ -52,7 +51,7 @@ import           Data.Function
 import           Data.Functor.Tagged
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import           Data.Maybe.Exts
+import           Data.Maybe
 import           Data.Semilattice.Lower
 import qualified Scope.Types as Scope
 
@@ -152,6 +151,9 @@ newScope name edges graph =
 
 simplify :: Ord a => Graph a -> Graph a
 simplify = Graph . Algebraic.simplify . unGraph
+
+maybeM :: Applicative f => f a -> Maybe a -> f a
+maybeM f = maybe f pure
 
 testEdgeList :: [Node]
 testEdgeList =
