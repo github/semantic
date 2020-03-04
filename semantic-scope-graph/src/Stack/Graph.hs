@@ -22,6 +22,8 @@ module Stack.Graph
   , Class.connect
   , Class.edges
   , simplify
+  , edgeSet
+  , removeEdge
   -- * Smart constructors
   , scope
   , newScope
@@ -53,6 +55,8 @@ import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Maybe
 import           Data.Semilattice.Lower
+import           Data.Set (Set)
+import qualified Data.Set as Set
 import qualified Scope.Types as Scope
 
 type Symbol = Name
@@ -118,6 +122,9 @@ pushSymbol = Class.vertex . PushSymbol
 root :: Graph Node
 root = Graph (Algebraic.vertex Root)
 
+edgeSet :: Graph Node -> Set (Node, Node)
+edgeSet graph = Algebraic.edgeSet (unGraph graph)
+
 tagGraphUniquely :: Graph Node -> Graph (Tagged Node)
 tagGraphUniquely
   = simplify
@@ -151,6 +158,9 @@ newScope name edges graph =
 
 simplify :: Ord a => Graph a -> Graph a
 simplify = Graph . Algebraic.simplify . unGraph
+
+removeEdge :: Ord a => a -> a -> Graph a -> Graph a
+removeEdge a b = Graph . Algebraic.removeEdge a b . unGraph
 
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure

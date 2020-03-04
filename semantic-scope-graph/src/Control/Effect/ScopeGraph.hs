@@ -38,11 +38,13 @@ import           Control.Effect.Fresh
 import           Control.Effect.Reader
 import           Control.Lens
 import           Data.List.NonEmpty
+import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import qualified Data.Module as Module
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
+import qualified Data.Set as Set
 import           Data.Text (Text)
 import           GHC.Records
 import qualified Scope.Reference as Reference
@@ -61,6 +63,7 @@ import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props.Reference
 import           Control.Effect.State
 
+import qualified Algebra.Graph as Graph
 import qualified Algebra.Graph.Class as Class
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
@@ -132,9 +135,16 @@ addDeclarations names = do
   graph <- get @(Stack.Graph Stack.Node)
   CurrentScope current <- currentScope
 
-  let graph' = foldr (\(ann, name) graph ->
-        graph -<< (Stack.declaration "reference") -<< (Stack.pushSymbol name)) mempty names
-  put (Stack.simplify (Class.overlay (Stack.scope current >>- graph') graph))
+  let graph' = foldr (\(_, name) graph ->
+        graph -<< (Stack.popSymbol "member") -<< (Stack.declaration name)) mempty (NonEmpty.init names)
+      graph'' = graph' >>- (Stack.declaration (snd $ NonEmpty.last names))
+      graph''' = foldr (\(_, name) graph ->
+        graph -<< (Stack.pushSymbol "member") -<< (Stack.reference name)) mempty (NonEmpty.init $ NonEmpty.reverse names)
+      graph'''' = graph'' >>- graph''' >>- (Stack.reference (snd $ NonEmpty.head names))
+      currentEdges = Set.filter (\(left, right) -> left == Stack.Scope current) (Stack.edgeSet graph)
+      rootNodes = Set.map snd currentEdges
+      graphh = foldMap (\(left, right) -> Stack.removeEdge left right graph) currentEdges
+  put (Stack.simplify (Class.overlay (Stack.scope current >>- graph'''' >>- Class.vertex (Set.elemAt 0 rootNodes)) graphh))
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
 newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
