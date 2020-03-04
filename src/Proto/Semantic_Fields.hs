@@ -365,11 +365,6 @@ symbols ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "symbols" a) =>
   Lens.Family2.LensLike' f s a
 symbols = Data.ProtoLens.Field.field @"symbols"
-syntax ::
-  forall f s a.
-  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "syntax" a) =>
-  Lens.Family2.LensLike' f s a
-syntax = Data.ProtoLens.Field.field @"syntax"
 target ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "target" a) =>

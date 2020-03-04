@@ -13,10 +13,10 @@ module Proto.Semantic (
         _DiffTreeVertex'Merged, Docstring(), File(), InsertedTerm(),
         MergedTerm(), ParseError(), ParseTreeFileGraph(),
         ParseTreeGraphResponse(), ParseTreeRequest(),
-        ParseTreeScopeGraphResponse(), ParseTreeSymbolResponse(),
-        PingRequest(), PingResponse(), Position(), ReplacedTerm(),
-        ScopeGraphFile(), ScopeGraphNode(), ScopeGraphPath(), Span(),
-        Symbol(), TOCSummaryChange(), TOCSummaryError(), TOCSummaryFile(),
+        ParseTreeStackGraphResponse(), ParseTreeSymbolResponse(),
+        PingRequest(), PingResponse(), Position(), ReplacedTerm(), Span(),
+        StackGraphFile(), StackGraphNode(), StackGraphPath(), Symbol(),
+        TOCSummaryChange(), TOCSummaryError(), TOCSummaryFile(),
         TermEdge(), TermVertex()
     ) where
 import qualified Data.ProtoLens.Runtime.Control.DeepSeq as Control.DeepSeq
@@ -3538,64 +3538,64 @@ instance Control.DeepSeq.NFData ParseTreeRequest where
              (Control.DeepSeq.deepseq (_ParseTreeRequest'blobs x__) ())
 {- | Fields :
      
-         * 'Proto.Semantic_Fields.files' @:: Lens' ParseTreeScopeGraphResponse [ScopeGraphFile]@
-         * 'Proto.Semantic_Fields.vec'files' @:: Lens' ParseTreeScopeGraphResponse (Data.Vector.Vector ScopeGraphFile)@ -}
-data ParseTreeScopeGraphResponse
-  = ParseTreeScopeGraphResponse'_constructor {_ParseTreeScopeGraphResponse'files :: !(Data.Vector.Vector ScopeGraphFile),
-                                              _ParseTreeScopeGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
+         * 'Proto.Semantic_Fields.files' @:: Lens' ParseTreeStackGraphResponse [StackGraphFile]@
+         * 'Proto.Semantic_Fields.vec'files' @:: Lens' ParseTreeStackGraphResponse (Data.Vector.Vector StackGraphFile)@ -}
+data ParseTreeStackGraphResponse
+  = ParseTreeStackGraphResponse'_constructor {_ParseTreeStackGraphResponse'files :: !(Data.Vector.Vector StackGraphFile),
+                                              _ParseTreeStackGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
   deriving (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show ParseTreeScopeGraphResponse where
+instance Prelude.Show ParseTreeStackGraphResponse where
   showsPrec _ __x __s
     = Prelude.showChar
         '{'
         (Prelude.showString
            (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField ParseTreeScopeGraphResponse "files" [ScopeGraphFile] where
+instance Data.ProtoLens.Field.HasField ParseTreeStackGraphResponse "files" [StackGraphFile] where
   fieldOf _
     = (Prelude..)
         (Lens.Family2.Unchecked.lens
-           _ParseTreeScopeGraphResponse'files
-           (\ x__ y__ -> x__ {_ParseTreeScopeGraphResponse'files = y__}))
+           _ParseTreeStackGraphResponse'files
+           (\ x__ y__ -> x__ {_ParseTreeStackGraphResponse'files = y__}))
         (Lens.Family2.Unchecked.lens
            Data.Vector.Generic.toList
            (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField ParseTreeScopeGraphResponse "vec'files" (Data.Vector.Vector ScopeGraphFile) where
+instance Data.ProtoLens.Field.HasField ParseTreeStackGraphResponse "vec'files" (Data.Vector.Vector StackGraphFile) where
   fieldOf _
     = (Prelude..)
         (Lens.Family2.Unchecked.lens
-           _ParseTreeScopeGraphResponse'files
-           (\ x__ y__ -> x__ {_ParseTreeScopeGraphResponse'files = y__}))
+           _ParseTreeStackGraphResponse'files
+           (\ x__ y__ -> x__ {_ParseTreeStackGraphResponse'files = y__}))
         Prelude.id
-instance Data.ProtoLens.Message ParseTreeScopeGraphResponse where
+instance Data.ProtoLens.Message ParseTreeStackGraphResponse where
   messageName _
-    = Data.Text.pack "github.semantic.ParseTreeScopeGraphResponse"
+    = Data.Text.pack "github.semantic.ParseTreeStackGraphResponse"
   fieldsByTag
     = let
         files__field_descriptor
           = Data.ProtoLens.FieldDescriptor
               "files"
               (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor ScopeGraphFile)
+                 Data.ProtoLens.FieldTypeDescriptor StackGraphFile)
               (Data.ProtoLens.RepeatedField
                  Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"files")) ::
-              Data.ProtoLens.FieldDescriptor ParseTreeScopeGraphResponse
+              Data.ProtoLens.FieldDescriptor ParseTreeStackGraphResponse
       in
         Data.Map.fromList [(Data.ProtoLens.Tag 1, files__field_descriptor)]
   unknownFields
     = Lens.Family2.Unchecked.lens
-        _ParseTreeScopeGraphResponse'_unknownFields
+        _ParseTreeStackGraphResponse'_unknownFields
         (\ x__ y__
-           -> x__ {_ParseTreeScopeGraphResponse'_unknownFields = y__})
+           -> x__ {_ParseTreeStackGraphResponse'_unknownFields = y__})
   defMessage
-    = ParseTreeScopeGraphResponse'_constructor
-        {_ParseTreeScopeGraphResponse'files = Data.Vector.Generic.empty,
-         _ParseTreeScopeGraphResponse'_unknownFields = []}
+    = ParseTreeStackGraphResponse'_constructor
+        {_ParseTreeStackGraphResponse'files = Data.Vector.Generic.empty,
+         _ParseTreeStackGraphResponse'_unknownFields = []}
   parseMessage
     = let
         loop ::
-          ParseTreeScopeGraphResponse
-          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld ScopeGraphFile
-             -> Data.ProtoLens.Encoding.Bytes.Parser ParseTreeScopeGraphResponse
+          ParseTreeStackGraphResponse
+          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld StackGraphFile
+             -> Data.ProtoLens.Encoding.Bytes.Parser ParseTreeStackGraphResponse
         loop x mutable'files
           = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
                if end then
@@ -3641,7 +3641,7 @@ instance Data.ProtoLens.Message ParseTreeScopeGraphResponse where
           (do mutable'files <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
                                  Data.ProtoLens.Encoding.Growing.new
               loop Data.ProtoLens.defMessage mutable'files)
-          "ParseTreeScopeGraphResponse"
+          "ParseTreeStackGraphResponse"
   buildMessage
     = \ _x
         -> (Data.Monoid.<>)
@@ -3660,13 +3660,13 @@ instance Data.ProtoLens.Message ParseTreeScopeGraphResponse where
                 (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'files") _x))
              (Data.ProtoLens.Encoding.Wire.buildFieldSet
                 (Lens.Family2.view Data.ProtoLens.unknownFields _x))
-instance Control.DeepSeq.NFData ParseTreeScopeGraphResponse where
+instance Control.DeepSeq.NFData ParseTreeStackGraphResponse where
   rnf
     = \ x__
         -> Control.DeepSeq.deepseq
-             (_ParseTreeScopeGraphResponse'_unknownFields x__)
+             (_ParseTreeStackGraphResponse'_unknownFields x__)
              (Control.DeepSeq.deepseq
-                (_ParseTreeScopeGraphResponse'files x__) ())
+                (_ParseTreeStackGraphResponse'files x__) ())
 {- | Fields :
      
          * 'Proto.Semantic_Fields.files' @:: Lens' ParseTreeSymbolResponse [File]@
@@ -4588,1125 +4588,6 @@ instance Control.DeepSeq.NFData ReplacedTerm where
                       (Control.DeepSeq.deepseq (_ReplacedTerm'afterSpan x__) ()))))
 {- | Fields :
      
-         * 'Proto.Semantic_Fields.path' @:: Lens' ScopeGraphFile Data.Text.Text@
-         * 'Proto.Semantic_Fields.language' @:: Lens' ScopeGraphFile Data.Text.Text@
-         * 'Proto.Semantic_Fields.nodes' @:: Lens' ScopeGraphFile [ScopeGraphNode]@
-         * 'Proto.Semantic_Fields.vec'nodes' @:: Lens' ScopeGraphFile (Data.Vector.Vector ScopeGraphNode)@
-         * 'Proto.Semantic_Fields.paths' @:: Lens' ScopeGraphFile [ScopeGraphPath]@
-         * 'Proto.Semantic_Fields.vec'paths' @:: Lens' ScopeGraphFile (Data.Vector.Vector ScopeGraphPath)@
-         * 'Proto.Semantic_Fields.errors' @:: Lens' ScopeGraphFile [ParseError]@
-         * 'Proto.Semantic_Fields.vec'errors' @:: Lens' ScopeGraphFile (Data.Vector.Vector ParseError)@ -}
-data ScopeGraphFile
-  = ScopeGraphFile'_constructor {_ScopeGraphFile'path :: !Data.Text.Text,
-                                 _ScopeGraphFile'language :: !Data.Text.Text,
-                                 _ScopeGraphFile'nodes :: !(Data.Vector.Vector ScopeGraphNode),
-                                 _ScopeGraphFile'paths :: !(Data.Vector.Vector ScopeGraphPath),
-                                 _ScopeGraphFile'errors :: !(Data.Vector.Vector ParseError),
-                                 _ScopeGraphFile'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show ScopeGraphFile where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField ScopeGraphFile "path" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphFile'path
-           (\ x__ y__ -> x__ {_ScopeGraphFile'path = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphFile "language" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphFile'language
-           (\ x__ y__ -> x__ {_ScopeGraphFile'language = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphFile "nodes" [ScopeGraphNode] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphFile'nodes
-           (\ x__ y__ -> x__ {_ScopeGraphFile'nodes = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField ScopeGraphFile "vec'nodes" (Data.Vector.Vector ScopeGraphNode) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphFile'nodes
-           (\ x__ y__ -> x__ {_ScopeGraphFile'nodes = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphFile "paths" [ScopeGraphPath] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphFile'paths
-           (\ x__ y__ -> x__ {_ScopeGraphFile'paths = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField ScopeGraphFile "vec'paths" (Data.Vector.Vector ScopeGraphPath) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphFile'paths
-           (\ x__ y__ -> x__ {_ScopeGraphFile'paths = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphFile "errors" [ParseError] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphFile'errors
-           (\ x__ y__ -> x__ {_ScopeGraphFile'errors = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField ScopeGraphFile "vec'errors" (Data.Vector.Vector ParseError) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphFile'errors
-           (\ x__ y__ -> x__ {_ScopeGraphFile'errors = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message ScopeGraphFile where
-  messageName _ = Data.Text.pack "github.semantic.ScopeGraphFile"
-  fieldsByTag
-    = let
-        path__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "path"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"path")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphFile
-        language__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "language"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"language")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphFile
-        nodes__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "nodes"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor ScopeGraphNode)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"nodes")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphFile
-        paths__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "paths"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor ScopeGraphPath)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"paths")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphFile
-        errors__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "errors"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor ParseError)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"errors")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphFile
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, path__field_descriptor),
-           (Data.ProtoLens.Tag 2, language__field_descriptor),
-           (Data.ProtoLens.Tag 3, nodes__field_descriptor),
-           (Data.ProtoLens.Tag 4, paths__field_descriptor),
-           (Data.ProtoLens.Tag 5, errors__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _ScopeGraphFile'_unknownFields
-        (\ x__ y__ -> x__ {_ScopeGraphFile'_unknownFields = y__})
-  defMessage
-    = ScopeGraphFile'_constructor
-        {_ScopeGraphFile'path = Data.ProtoLens.fieldDefault,
-         _ScopeGraphFile'language = Data.ProtoLens.fieldDefault,
-         _ScopeGraphFile'nodes = Data.Vector.Generic.empty,
-         _ScopeGraphFile'paths = Data.Vector.Generic.empty,
-         _ScopeGraphFile'errors = Data.Vector.Generic.empty,
-         _ScopeGraphFile'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          ScopeGraphFile
-          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld ParseError
-             -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld ScopeGraphNode
-                -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld ScopeGraphPath
-                   -> Data.ProtoLens.Encoding.Bytes.Parser ScopeGraphFile
-        loop x mutable'errors mutable'nodes mutable'paths
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do frozen'errors <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                         (Data.ProtoLens.Encoding.Growing.unsafeFreeze
-                                            mutable'errors)
-                      frozen'nodes <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'nodes)
-                      frozen'paths <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'paths)
-                      (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields
-                           (\ !t -> Prelude.reverse t)
-                           (Lens.Family2.set
-                              (Data.ProtoLens.Field.field @"vec'errors")
-                              frozen'errors
-                              (Lens.Family2.set
-                                 (Data.ProtoLens.Field.field @"vec'nodes")
-                                 frozen'nodes
-                                 (Lens.Family2.set
-                                    (Data.ProtoLens.Field.field @"vec'paths") frozen'paths x))))
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "path"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"path") y x)
-                                  mutable'errors
-                                  mutable'nodes
-                                  mutable'paths
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "language"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"language") y x)
-                                  mutable'errors
-                                  mutable'nodes
-                                  mutable'paths
-                        26
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "nodes"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'nodes y)
-                                loop x mutable'errors v mutable'paths
-                        34
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "paths"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'paths y)
-                                loop x mutable'errors mutable'nodes v
-                        42
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "errors"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'errors y)
-                                loop x v mutable'nodes mutable'paths
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-                                  mutable'errors
-                                  mutable'nodes
-                                  mutable'paths
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do mutable'errors <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                  Data.ProtoLens.Encoding.Growing.new
-              mutable'nodes <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                 Data.ProtoLens.Encoding.Growing.new
-              mutable'paths <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                 Data.ProtoLens.Encoding.Growing.new
-              loop
-                Data.ProtoLens.defMessage
-                mutable'errors
-                mutable'nodes
-                mutable'paths)
-          "ScopeGraphFile"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"path") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                      ((Prelude..)
-                         (\ bs
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                         Data.Text.Encoding.encodeUtf8
-                         _v))
-             ((Data.Monoid.<>)
-                (let
-                   _v = Lens.Family2.view (Data.ProtoLens.Field.field @"language") _x
-                 in
-                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                       Data.Monoid.mempty
-                   else
-                       (Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                         ((Prelude..)
-                            (\ bs
-                               -> (Data.Monoid.<>)
-                                    (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                       (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                    (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                            Data.Text.Encoding.encodeUtf8
-                            _v))
-                ((Data.Monoid.<>)
-                   (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                      (\ _v
-                         -> (Data.Monoid.<>)
-                              (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
-                              ((Prelude..)
-                                 (\ bs
-                                    -> (Data.Monoid.<>)
-                                         (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                            (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                         (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                 Data.ProtoLens.encodeMessage
-                                 _v))
-                      (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'nodes") _x))
-                   ((Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                         (\ _v
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
-                                 ((Prelude..)
-                                    (\ bs
-                                       -> (Data.Monoid.<>)
-                                            (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                               (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                            (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                    Data.ProtoLens.encodeMessage
-                                    _v))
-                         (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'paths") _x))
-                      ((Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                            (\ _v
-                               -> (Data.Monoid.<>)
-                                    (Data.ProtoLens.Encoding.Bytes.putVarInt 42)
-                                    ((Prelude..)
-                                       (\ bs
-                                          -> (Data.Monoid.<>)
-                                               (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                                  (Prelude.fromIntegral
-                                                     (Data.ByteString.length bs)))
-                                               (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                       Data.ProtoLens.encodeMessage
-                                       _v))
-                            (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'errors") _x))
-                         (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                            (Lens.Family2.view Data.ProtoLens.unknownFields _x))))))
-instance Control.DeepSeq.NFData ScopeGraphFile where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_ScopeGraphFile'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_ScopeGraphFile'path x__)
-                (Control.DeepSeq.deepseq
-                   (_ScopeGraphFile'language x__)
-                   (Control.DeepSeq.deepseq
-                      (_ScopeGraphFile'nodes x__)
-                      (Control.DeepSeq.deepseq
-                         (_ScopeGraphFile'paths x__)
-                         (Control.DeepSeq.deepseq (_ScopeGraphFile'errors x__) ())))))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.id' @:: Lens' ScopeGraphNode Data.Int.Int32@
-         * 'Proto.Semantic_Fields.name' @:: Lens' ScopeGraphNode Data.Text.Text@
-         * 'Proto.Semantic_Fields.line' @:: Lens' ScopeGraphNode Data.Text.Text@
-         * 'Proto.Semantic_Fields.syntax' @:: Lens' ScopeGraphNode Data.Text.Text@
-         * 'Proto.Semantic_Fields.isDefinition' @:: Lens' ScopeGraphNode Prelude.Bool@
-         * 'Proto.Semantic_Fields.span' @:: Lens' ScopeGraphNode Span@
-         * 'Proto.Semantic_Fields.maybe'span' @:: Lens' ScopeGraphNode (Prelude.Maybe Span)@ -}
-data ScopeGraphNode
-  = ScopeGraphNode'_constructor {_ScopeGraphNode'id :: !Data.Int.Int32,
-                                 _ScopeGraphNode'name :: !Data.Text.Text,
-                                 _ScopeGraphNode'line :: !Data.Text.Text,
-                                 _ScopeGraphNode'syntax :: !Data.Text.Text,
-                                 _ScopeGraphNode'isDefinition :: !Prelude.Bool,
-                                 _ScopeGraphNode'span :: !(Prelude.Maybe Span),
-                                 _ScopeGraphNode'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show ScopeGraphNode where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField ScopeGraphNode "id" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphNode'id (\ x__ y__ -> x__ {_ScopeGraphNode'id = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphNode "name" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphNode'name
-           (\ x__ y__ -> x__ {_ScopeGraphNode'name = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphNode "line" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphNode'line
-           (\ x__ y__ -> x__ {_ScopeGraphNode'line = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphNode "syntax" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphNode'syntax
-           (\ x__ y__ -> x__ {_ScopeGraphNode'syntax = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphNode "isDefinition" Prelude.Bool where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphNode'isDefinition
-           (\ x__ y__ -> x__ {_ScopeGraphNode'isDefinition = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphNode "span" Span where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphNode'span
-           (\ x__ y__ -> x__ {_ScopeGraphNode'span = y__}))
-        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
-instance Data.ProtoLens.Field.HasField ScopeGraphNode "maybe'span" (Prelude.Maybe Span) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphNode'span
-           (\ x__ y__ -> x__ {_ScopeGraphNode'span = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message ScopeGraphNode where
-  messageName _ = Data.Text.pack "github.semantic.ScopeGraphNode"
-  fieldsByTag
-    = let
-        id__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "id"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"id")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphNode
-        name__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "name"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"name")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphNode
-        line__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "line"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"line")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphNode
-        syntax__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "syntax"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"syntax")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphNode
-        isDefinition__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "is_definition"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.BoolField ::
-                 Data.ProtoLens.FieldTypeDescriptor Prelude.Bool)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"isDefinition")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphNode
-        span__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "span"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor Span)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'span")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphNode
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, id__field_descriptor),
-           (Data.ProtoLens.Tag 2, name__field_descriptor),
-           (Data.ProtoLens.Tag 3, line__field_descriptor),
-           (Data.ProtoLens.Tag 4, syntax__field_descriptor),
-           (Data.ProtoLens.Tag 5, isDefinition__field_descriptor),
-           (Data.ProtoLens.Tag 6, span__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _ScopeGraphNode'_unknownFields
-        (\ x__ y__ -> x__ {_ScopeGraphNode'_unknownFields = y__})
-  defMessage
-    = ScopeGraphNode'_constructor
-        {_ScopeGraphNode'id = Data.ProtoLens.fieldDefault,
-         _ScopeGraphNode'name = Data.ProtoLens.fieldDefault,
-         _ScopeGraphNode'line = Data.ProtoLens.fieldDefault,
-         _ScopeGraphNode'syntax = Data.ProtoLens.fieldDefault,
-         _ScopeGraphNode'isDefinition = Data.ProtoLens.fieldDefault,
-         _ScopeGraphNode'span = Prelude.Nothing,
-         _ScopeGraphNode'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          ScopeGraphNode
-          -> Data.ProtoLens.Encoding.Bytes.Parser ScopeGraphNode
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        8 -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "id"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"id") y x)
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "name"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"name") y x)
-                        26
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "line"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"line") y x)
-                        34
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "syntax"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"syntax") y x)
-                        40
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          ((Prelude./=) 0) Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "is_definition"
-                                loop
-                                  (Lens.Family2.set
-                                     (Data.ProtoLens.Field.field @"isDefinition") y x)
-                        50
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "span"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"span") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "ScopeGraphNode"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"id") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 8)
-                      ((Prelude..)
-                         Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
-             ((Data.Monoid.<>)
-                (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"name") _x
-                 in
-                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                       Data.Monoid.mempty
-                   else
-                       (Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                         ((Prelude..)
-                            (\ bs
-                               -> (Data.Monoid.<>)
-                                    (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                       (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                    (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                            Data.Text.Encoding.encodeUtf8
-                            _v))
-                ((Data.Monoid.<>)
-                   (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"line") _x
-                    in
-                      if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                          Data.Monoid.mempty
-                      else
-                          (Data.Monoid.<>)
-                            (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
-                            ((Prelude..)
-                               (\ bs
-                                  -> (Data.Monoid.<>)
-                                       (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                          (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                       (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                               Data.Text.Encoding.encodeUtf8
-                               _v))
-                   ((Data.Monoid.<>)
-                      (let
-                         _v = Lens.Family2.view (Data.ProtoLens.Field.field @"syntax") _x
-                       in
-                         if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                             Data.Monoid.mempty
-                         else
-                             (Data.Monoid.<>)
-                               (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
-                               ((Prelude..)
-                                  (\ bs
-                                     -> (Data.Monoid.<>)
-                                          (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                             (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                          (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                  Data.Text.Encoding.encodeUtf8
-                                  _v))
-                      ((Data.Monoid.<>)
-                         (let
-                            _v
-                              = Lens.Family2.view (Data.ProtoLens.Field.field @"isDefinition") _x
-                          in
-                            if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                                Data.Monoid.mempty
-                            else
-                                (Data.Monoid.<>)
-                                  (Data.ProtoLens.Encoding.Bytes.putVarInt 40)
-                                  ((Prelude..)
-                                     Data.ProtoLens.Encoding.Bytes.putVarInt
-                                     (\ b -> if b then 1 else 0)
-                                     _v))
-                         ((Data.Monoid.<>)
-                            (case
-                                 Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'span") _x
-                             of
-                               Prelude.Nothing -> Data.Monoid.mempty
-                               (Prelude.Just _v)
-                                 -> (Data.Monoid.<>)
-                                      (Data.ProtoLens.Encoding.Bytes.putVarInt 50)
-                                      ((Prelude..)
-                                         (\ bs
-                                            -> (Data.Monoid.<>)
-                                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                                    (Prelude.fromIntegral
-                                                       (Data.ByteString.length bs)))
-                                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                         Data.ProtoLens.encodeMessage
-                                         _v))
-                            (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                               (Lens.Family2.view Data.ProtoLens.unknownFields _x)))))))
-instance Control.DeepSeq.NFData ScopeGraphNode where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_ScopeGraphNode'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_ScopeGraphNode'id x__)
-                (Control.DeepSeq.deepseq
-                   (_ScopeGraphNode'name x__)
-                   (Control.DeepSeq.deepseq
-                      (_ScopeGraphNode'line x__)
-                      (Control.DeepSeq.deepseq
-                         (_ScopeGraphNode'syntax x__)
-                         (Control.DeepSeq.deepseq
-                            (_ScopeGraphNode'isDefinition x__)
-                            (Control.DeepSeq.deepseq (_ScopeGraphNode'span x__) ()))))))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.startingSymbolStack' @:: Lens' ScopeGraphPath Data.Text.Text@
-         * 'Proto.Semantic_Fields.startingScopeStackSize' @:: Lens' ScopeGraphPath Data.Int.Int32@
-         * 'Proto.Semantic_Fields.from' @:: Lens' ScopeGraphPath Data.Int.Int32@
-         * 'Proto.Semantic_Fields.edges' @:: Lens' ScopeGraphPath Data.Text.Text@
-         * 'Proto.Semantic_Fields.to' @:: Lens' ScopeGraphPath Data.Int.Int32@
-         * 'Proto.Semantic_Fields.endingScopeStack' @:: Lens' ScopeGraphPath Data.Text.Text@
-         * 'Proto.Semantic_Fields.endingSymbolStack' @:: Lens' ScopeGraphPath Data.Text.Text@ -}
-data ScopeGraphPath
-  = ScopeGraphPath'_constructor {_ScopeGraphPath'startingSymbolStack :: !Data.Text.Text,
-                                 _ScopeGraphPath'startingScopeStackSize :: !Data.Int.Int32,
-                                 _ScopeGraphPath'from :: !Data.Int.Int32,
-                                 _ScopeGraphPath'edges :: !Data.Text.Text,
-                                 _ScopeGraphPath'to :: !Data.Int.Int32,
-                                 _ScopeGraphPath'endingScopeStack :: !Data.Text.Text,
-                                 _ScopeGraphPath'endingSymbolStack :: !Data.Text.Text,
-                                 _ScopeGraphPath'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show ScopeGraphPath where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField ScopeGraphPath "startingSymbolStack" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphPath'startingSymbolStack
-           (\ x__ y__ -> x__ {_ScopeGraphPath'startingSymbolStack = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphPath "startingScopeStackSize" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphPath'startingScopeStackSize
-           (\ x__ y__ -> x__ {_ScopeGraphPath'startingScopeStackSize = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphPath "from" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphPath'from
-           (\ x__ y__ -> x__ {_ScopeGraphPath'from = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphPath "edges" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphPath'edges
-           (\ x__ y__ -> x__ {_ScopeGraphPath'edges = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphPath "to" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphPath'to (\ x__ y__ -> x__ {_ScopeGraphPath'to = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphPath "endingScopeStack" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphPath'endingScopeStack
-           (\ x__ y__ -> x__ {_ScopeGraphPath'endingScopeStack = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ScopeGraphPath "endingSymbolStack" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ScopeGraphPath'endingSymbolStack
-           (\ x__ y__ -> x__ {_ScopeGraphPath'endingSymbolStack = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message ScopeGraphPath where
-  messageName _ = Data.Text.pack "github.semantic.ScopeGraphPath"
-  fieldsByTag
-    = let
-        startingSymbolStack__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "starting_symbol_stack"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"startingSymbolStack")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphPath
-        startingScopeStackSize__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "starting_scope_stack_size"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"startingScopeStackSize")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphPath
-        from__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "from"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"from")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphPath
-        edges__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "edges"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"edges")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphPath
-        to__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "to"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"to")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphPath
-        endingScopeStack__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "ending_scope_stack"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"endingScopeStack")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphPath
-        endingSymbolStack__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "ending_symbol_stack"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"endingSymbolStack")) ::
-              Data.ProtoLens.FieldDescriptor ScopeGraphPath
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, startingSymbolStack__field_descriptor),
-           (Data.ProtoLens.Tag 2, startingScopeStackSize__field_descriptor),
-           (Data.ProtoLens.Tag 3, from__field_descriptor),
-           (Data.ProtoLens.Tag 4, edges__field_descriptor),
-           (Data.ProtoLens.Tag 5, to__field_descriptor),
-           (Data.ProtoLens.Tag 6, endingScopeStack__field_descriptor),
-           (Data.ProtoLens.Tag 7, endingSymbolStack__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _ScopeGraphPath'_unknownFields
-        (\ x__ y__ -> x__ {_ScopeGraphPath'_unknownFields = y__})
-  defMessage
-    = ScopeGraphPath'_constructor
-        {_ScopeGraphPath'startingSymbolStack = Data.ProtoLens.fieldDefault,
-         _ScopeGraphPath'startingScopeStackSize = Data.ProtoLens.fieldDefault,
-         _ScopeGraphPath'from = Data.ProtoLens.fieldDefault,
-         _ScopeGraphPath'edges = Data.ProtoLens.fieldDefault,
-         _ScopeGraphPath'to = Data.ProtoLens.fieldDefault,
-         _ScopeGraphPath'endingScopeStack = Data.ProtoLens.fieldDefault,
-         _ScopeGraphPath'endingSymbolStack = Data.ProtoLens.fieldDefault,
-         _ScopeGraphPath'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          ScopeGraphPath
-          -> Data.ProtoLens.Encoding.Bytes.Parser ScopeGraphPath
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "starting_symbol_stack"
-                                loop
-                                  (Lens.Family2.set
-                                     (Data.ProtoLens.Field.field @"startingSymbolStack") y x)
-                        16
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "starting_scope_stack_size"
-                                loop
-                                  (Lens.Family2.set
-                                     (Data.ProtoLens.Field.field @"startingScopeStackSize") y x)
-                        24
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "from"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"from") y x)
-                        34
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "edges"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"edges") y x)
-                        40
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "to"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"to") y x)
-                        50
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "ending_scope_stack"
-                                loop
-                                  (Lens.Family2.set
-                                     (Data.ProtoLens.Field.field @"endingScopeStack") y x)
-                        58
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "ending_symbol_stack"
-                                loop
-                                  (Lens.Family2.set
-                                     (Data.ProtoLens.Field.field @"endingSymbolStack") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "ScopeGraphPath"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let
-                _v
-                  = Lens.Family2.view
-                      (Data.ProtoLens.Field.field @"startingSymbolStack") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                      ((Prelude..)
-                         (\ bs
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                         Data.Text.Encoding.encodeUtf8
-                         _v))
-             ((Data.Monoid.<>)
-                (let
-                   _v
-                     = Lens.Family2.view
-                         (Data.ProtoLens.Field.field @"startingScopeStackSize") _x
-                 in
-                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                       Data.Monoid.mempty
-                   else
-                       (Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.putVarInt 16)
-                         ((Prelude..)
-                            Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
-                ((Data.Monoid.<>)
-                   (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"from") _x
-                    in
-                      if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                          Data.Monoid.mempty
-                      else
-                          (Data.Monoid.<>)
-                            (Data.ProtoLens.Encoding.Bytes.putVarInt 24)
-                            ((Prelude..)
-                               Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
-                   ((Data.Monoid.<>)
-                      (let
-                         _v = Lens.Family2.view (Data.ProtoLens.Field.field @"edges") _x
-                       in
-                         if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                             Data.Monoid.mempty
-                         else
-                             (Data.Monoid.<>)
-                               (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
-                               ((Prelude..)
-                                  (\ bs
-                                     -> (Data.Monoid.<>)
-                                          (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                             (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                          (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                  Data.Text.Encoding.encodeUtf8
-                                  _v))
-                      ((Data.Monoid.<>)
-                         (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"to") _x
-                          in
-                            if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                                Data.Monoid.mempty
-                            else
-                                (Data.Monoid.<>)
-                                  (Data.ProtoLens.Encoding.Bytes.putVarInt 40)
-                                  ((Prelude..)
-                                     Data.ProtoLens.Encoding.Bytes.putVarInt
-                                     Prelude.fromIntegral
-                                     _v))
-                         ((Data.Monoid.<>)
-                            (let
-                               _v
-                                 = Lens.Family2.view
-                                     (Data.ProtoLens.Field.field @"endingScopeStack") _x
-                             in
-                               if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                                   Data.Monoid.mempty
-                               else
-                                   (Data.Monoid.<>)
-                                     (Data.ProtoLens.Encoding.Bytes.putVarInt 50)
-                                     ((Prelude..)
-                                        (\ bs
-                                           -> (Data.Monoid.<>)
-                                                (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                                   (Prelude.fromIntegral
-                                                      (Data.ByteString.length bs)))
-                                                (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                        Data.Text.Encoding.encodeUtf8
-                                        _v))
-                            ((Data.Monoid.<>)
-                               (let
-                                  _v
-                                    = Lens.Family2.view
-                                        (Data.ProtoLens.Field.field @"endingSymbolStack") _x
-                                in
-                                  if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                                      Data.Monoid.mempty
-                                  else
-                                      (Data.Monoid.<>)
-                                        (Data.ProtoLens.Encoding.Bytes.putVarInt 58)
-                                        ((Prelude..)
-                                           (\ bs
-                                              -> (Data.Monoid.<>)
-                                                   (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                                      (Prelude.fromIntegral
-                                                         (Data.ByteString.length bs)))
-                                                   (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                           Data.Text.Encoding.encodeUtf8
-                                           _v))
-                               (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                                  (Lens.Family2.view Data.ProtoLens.unknownFields _x))))))))
-instance Control.DeepSeq.NFData ScopeGraphPath where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_ScopeGraphPath'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_ScopeGraphPath'startingSymbolStack x__)
-                (Control.DeepSeq.deepseq
-                   (_ScopeGraphPath'startingScopeStackSize x__)
-                   (Control.DeepSeq.deepseq
-                      (_ScopeGraphPath'from x__)
-                      (Control.DeepSeq.deepseq
-                         (_ScopeGraphPath'edges x__)
-                         (Control.DeepSeq.deepseq
-                            (_ScopeGraphPath'to x__)
-                            (Control.DeepSeq.deepseq
-                               (_ScopeGraphPath'endingScopeStack x__)
-                               (Control.DeepSeq.deepseq
-                                  (_ScopeGraphPath'endingSymbolStack x__) ())))))))
-{- | Fields :
-     
          * 'Proto.Semantic_Fields.start' @:: Lens' Span Position@
          * 'Proto.Semantic_Fields.maybe'start' @:: Lens' Span (Prelude.Maybe Position)@
          * 'Proto.Semantic_Fields.end' @:: Lens' Span Position@
@@ -5865,6 +4746,1124 @@ instance Control.DeepSeq.NFData Span where
              (_Span'_unknownFields x__)
              (Control.DeepSeq.deepseq
                 (_Span'start x__) (Control.DeepSeq.deepseq (_Span'end x__) ()))
+{- | Fields :
+     
+         * 'Proto.Semantic_Fields.path' @:: Lens' StackGraphFile Data.Text.Text@
+         * 'Proto.Semantic_Fields.language' @:: Lens' StackGraphFile Data.Text.Text@
+         * 'Proto.Semantic_Fields.nodes' @:: Lens' StackGraphFile [StackGraphNode]@
+         * 'Proto.Semantic_Fields.vec'nodes' @:: Lens' StackGraphFile (Data.Vector.Vector StackGraphNode)@
+         * 'Proto.Semantic_Fields.paths' @:: Lens' StackGraphFile [StackGraphPath]@
+         * 'Proto.Semantic_Fields.vec'paths' @:: Lens' StackGraphFile (Data.Vector.Vector StackGraphPath)@
+         * 'Proto.Semantic_Fields.errors' @:: Lens' StackGraphFile [ParseError]@
+         * 'Proto.Semantic_Fields.vec'errors' @:: Lens' StackGraphFile (Data.Vector.Vector ParseError)@ -}
+data StackGraphFile
+  = StackGraphFile'_constructor {_StackGraphFile'path :: !Data.Text.Text,
+                                 _StackGraphFile'language :: !Data.Text.Text,
+                                 _StackGraphFile'nodes :: !(Data.Vector.Vector StackGraphNode),
+                                 _StackGraphFile'paths :: !(Data.Vector.Vector StackGraphPath),
+                                 _StackGraphFile'errors :: !(Data.Vector.Vector ParseError),
+                                 _StackGraphFile'_unknownFields :: !Data.ProtoLens.FieldSet}
+  deriving (Prelude.Eq, Prelude.Ord)
+instance Prelude.Show StackGraphFile where
+  showsPrec _ __x __s
+    = Prelude.showChar
+        '{'
+        (Prelude.showString
+           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
+instance Data.ProtoLens.Field.HasField StackGraphFile "path" Data.Text.Text where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphFile'path
+           (\ x__ y__ -> x__ {_StackGraphFile'path = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphFile "language" Data.Text.Text where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphFile'language
+           (\ x__ y__ -> x__ {_StackGraphFile'language = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphFile "nodes" [StackGraphNode] where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphFile'nodes
+           (\ x__ y__ -> x__ {_StackGraphFile'nodes = y__}))
+        (Lens.Family2.Unchecked.lens
+           Data.Vector.Generic.toList
+           (\ _ y__ -> Data.Vector.Generic.fromList y__))
+instance Data.ProtoLens.Field.HasField StackGraphFile "vec'nodes" (Data.Vector.Vector StackGraphNode) where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphFile'nodes
+           (\ x__ y__ -> x__ {_StackGraphFile'nodes = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphFile "paths" [StackGraphPath] where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphFile'paths
+           (\ x__ y__ -> x__ {_StackGraphFile'paths = y__}))
+        (Lens.Family2.Unchecked.lens
+           Data.Vector.Generic.toList
+           (\ _ y__ -> Data.Vector.Generic.fromList y__))
+instance Data.ProtoLens.Field.HasField StackGraphFile "vec'paths" (Data.Vector.Vector StackGraphPath) where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphFile'paths
+           (\ x__ y__ -> x__ {_StackGraphFile'paths = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphFile "errors" [ParseError] where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphFile'errors
+           (\ x__ y__ -> x__ {_StackGraphFile'errors = y__}))
+        (Lens.Family2.Unchecked.lens
+           Data.Vector.Generic.toList
+           (\ _ y__ -> Data.Vector.Generic.fromList y__))
+instance Data.ProtoLens.Field.HasField StackGraphFile "vec'errors" (Data.Vector.Vector ParseError) where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphFile'errors
+           (\ x__ y__ -> x__ {_StackGraphFile'errors = y__}))
+        Prelude.id
+instance Data.ProtoLens.Message StackGraphFile where
+  messageName _ = Data.Text.pack "github.semantic.StackGraphFile"
+  fieldsByTag
+    = let
+        path__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "path"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"path")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphFile
+        language__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "language"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional
+                 (Data.ProtoLens.Field.field @"language")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphFile
+        nodes__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "nodes"
+              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
+                 Data.ProtoLens.FieldTypeDescriptor StackGraphNode)
+              (Data.ProtoLens.RepeatedField
+                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"nodes")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphFile
+        paths__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "paths"
+              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
+                 Data.ProtoLens.FieldTypeDescriptor StackGraphPath)
+              (Data.ProtoLens.RepeatedField
+                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"paths")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphFile
+        errors__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "errors"
+              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
+                 Data.ProtoLens.FieldTypeDescriptor ParseError)
+              (Data.ProtoLens.RepeatedField
+                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"errors")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphFile
+      in
+        Data.Map.fromList
+          [(Data.ProtoLens.Tag 1, path__field_descriptor),
+           (Data.ProtoLens.Tag 2, language__field_descriptor),
+           (Data.ProtoLens.Tag 3, nodes__field_descriptor),
+           (Data.ProtoLens.Tag 4, paths__field_descriptor),
+           (Data.ProtoLens.Tag 5, errors__field_descriptor)]
+  unknownFields
+    = Lens.Family2.Unchecked.lens
+        _StackGraphFile'_unknownFields
+        (\ x__ y__ -> x__ {_StackGraphFile'_unknownFields = y__})
+  defMessage
+    = StackGraphFile'_constructor
+        {_StackGraphFile'path = Data.ProtoLens.fieldDefault,
+         _StackGraphFile'language = Data.ProtoLens.fieldDefault,
+         _StackGraphFile'nodes = Data.Vector.Generic.empty,
+         _StackGraphFile'paths = Data.Vector.Generic.empty,
+         _StackGraphFile'errors = Data.Vector.Generic.empty,
+         _StackGraphFile'_unknownFields = []}
+  parseMessage
+    = let
+        loop ::
+          StackGraphFile
+          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld ParseError
+             -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld StackGraphNode
+                -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld StackGraphPath
+                   -> Data.ProtoLens.Encoding.Bytes.Parser StackGraphFile
+        loop x mutable'errors mutable'nodes mutable'paths
+          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
+               if end then
+                   do frozen'errors <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                         (Data.ProtoLens.Encoding.Growing.unsafeFreeze
+                                            mutable'errors)
+                      frozen'nodes <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'nodes)
+                      frozen'paths <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'paths)
+                      (let missing = []
+                       in
+                         if Prelude.null missing then
+                             Prelude.return ()
+                         else
+                             Prelude.fail
+                               ((Prelude.++)
+                                  "Missing required fields: "
+                                  (Prelude.show (missing :: [Prelude.String]))))
+                      Prelude.return
+                        (Lens.Family2.over
+                           Data.ProtoLens.unknownFields
+                           (\ !t -> Prelude.reverse t)
+                           (Lens.Family2.set
+                              (Data.ProtoLens.Field.field @"vec'errors")
+                              frozen'errors
+                              (Lens.Family2.set
+                                 (Data.ProtoLens.Field.field @"vec'nodes")
+                                 frozen'nodes
+                                 (Lens.Family2.set
+                                    (Data.ProtoLens.Field.field @"vec'paths") frozen'paths x))))
+               else
+                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                      case tag of
+                        10
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                                       Data.ProtoLens.Encoding.Bytes.getBytes
+                                                         (Prelude.fromIntegral len)
+                                           Data.ProtoLens.Encoding.Bytes.runEither
+                                             (case Data.Text.Encoding.decodeUtf8' value of
+                                                (Prelude.Left err)
+                                                  -> Prelude.Left (Prelude.show err)
+                                                (Prelude.Right r) -> Prelude.Right r))
+                                       "path"
+                                loop
+                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"path") y x)
+                                  mutable'errors
+                                  mutable'nodes
+                                  mutable'paths
+                        18
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                                       Data.ProtoLens.Encoding.Bytes.getBytes
+                                                         (Prelude.fromIntegral len)
+                                           Data.ProtoLens.Encoding.Bytes.runEither
+                                             (case Data.Text.Encoding.decodeUtf8' value of
+                                                (Prelude.Left err)
+                                                  -> Prelude.Left (Prelude.show err)
+                                                (Prelude.Right r) -> Prelude.Right r))
+                                       "language"
+                                loop
+                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"language") y x)
+                                  mutable'errors
+                                  mutable'nodes
+                                  mutable'paths
+                        26
+                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                            Data.ProtoLens.Encoding.Bytes.isolate
+                                              (Prelude.fromIntegral len)
+                                              Data.ProtoLens.parseMessage)
+                                        "nodes"
+                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                       (Data.ProtoLens.Encoding.Growing.append mutable'nodes y)
+                                loop x mutable'errors v mutable'paths
+                        34
+                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                            Data.ProtoLens.Encoding.Bytes.isolate
+                                              (Prelude.fromIntegral len)
+                                              Data.ProtoLens.parseMessage)
+                                        "paths"
+                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                       (Data.ProtoLens.Encoding.Growing.append mutable'paths y)
+                                loop x mutable'errors mutable'nodes v
+                        42
+                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                            Data.ProtoLens.Encoding.Bytes.isolate
+                                              (Prelude.fromIntegral len)
+                                              Data.ProtoLens.parseMessage)
+                                        "errors"
+                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                       (Data.ProtoLens.Encoding.Growing.append mutable'errors y)
+                                loop x v mutable'nodes mutable'paths
+                        wire
+                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
+                                        wire
+                                loop
+                                  (Lens.Family2.over
+                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
+                                  mutable'errors
+                                  mutable'nodes
+                                  mutable'paths
+      in
+        (Data.ProtoLens.Encoding.Bytes.<?>)
+          (do mutable'errors <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                  Data.ProtoLens.Encoding.Growing.new
+              mutable'nodes <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                 Data.ProtoLens.Encoding.Growing.new
+              mutable'paths <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                 Data.ProtoLens.Encoding.Growing.new
+              loop
+                Data.ProtoLens.defMessage
+                mutable'errors
+                mutable'nodes
+                mutable'paths)
+          "StackGraphFile"
+  buildMessage
+    = \ _x
+        -> (Data.Monoid.<>)
+             (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"path") _x
+              in
+                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                    Data.Monoid.mempty
+                else
+                    (Data.Monoid.<>)
+                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
+                      ((Prelude..)
+                         (\ bs
+                            -> (Data.Monoid.<>)
+                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                         Data.Text.Encoding.encodeUtf8
+                         _v))
+             ((Data.Monoid.<>)
+                (let
+                   _v = Lens.Family2.view (Data.ProtoLens.Field.field @"language") _x
+                 in
+                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                       Data.Monoid.mempty
+                   else
+                       (Data.Monoid.<>)
+                         (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
+                         ((Prelude..)
+                            (\ bs
+                               -> (Data.Monoid.<>)
+                                    (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                       (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                    (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                            Data.Text.Encoding.encodeUtf8
+                            _v))
+                ((Data.Monoid.<>)
+                   (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
+                      (\ _v
+                         -> (Data.Monoid.<>)
+                              (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
+                              ((Prelude..)
+                                 (\ bs
+                                    -> (Data.Monoid.<>)
+                                         (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                            (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                         (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                 Data.ProtoLens.encodeMessage
+                                 _v))
+                      (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'nodes") _x))
+                   ((Data.Monoid.<>)
+                      (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
+                         (\ _v
+                            -> (Data.Monoid.<>)
+                                 (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
+                                 ((Prelude..)
+                                    (\ bs
+                                       -> (Data.Monoid.<>)
+                                            (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                               (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                            (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                    Data.ProtoLens.encodeMessage
+                                    _v))
+                         (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'paths") _x))
+                      ((Data.Monoid.<>)
+                         (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
+                            (\ _v
+                               -> (Data.Monoid.<>)
+                                    (Data.ProtoLens.Encoding.Bytes.putVarInt 42)
+                                    ((Prelude..)
+                                       (\ bs
+                                          -> (Data.Monoid.<>)
+                                               (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                                  (Prelude.fromIntegral
+                                                     (Data.ByteString.length bs)))
+                                               (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                       Data.ProtoLens.encodeMessage
+                                       _v))
+                            (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'errors") _x))
+                         (Data.ProtoLens.Encoding.Wire.buildFieldSet
+                            (Lens.Family2.view Data.ProtoLens.unknownFields _x))))))
+instance Control.DeepSeq.NFData StackGraphFile where
+  rnf
+    = \ x__
+        -> Control.DeepSeq.deepseq
+             (_StackGraphFile'_unknownFields x__)
+             (Control.DeepSeq.deepseq
+                (_StackGraphFile'path x__)
+                (Control.DeepSeq.deepseq
+                   (_StackGraphFile'language x__)
+                   (Control.DeepSeq.deepseq
+                      (_StackGraphFile'nodes x__)
+                      (Control.DeepSeq.deepseq
+                         (_StackGraphFile'paths x__)
+                         (Control.DeepSeq.deepseq (_StackGraphFile'errors x__) ())))))
+{- | Fields :
+     
+         * 'Proto.Semantic_Fields.id' @:: Lens' StackGraphNode Data.Int.Int64@
+         * 'Proto.Semantic_Fields.name' @:: Lens' StackGraphNode Data.Text.Text@
+         * 'Proto.Semantic_Fields.line' @:: Lens' StackGraphNode Data.Text.Text@
+         * 'Proto.Semantic_Fields.kind' @:: Lens' StackGraphNode Data.Text.Text@
+         * 'Proto.Semantic_Fields.isDefinition' @:: Lens' StackGraphNode Prelude.Bool@
+         * 'Proto.Semantic_Fields.span' @:: Lens' StackGraphNode Span@
+         * 'Proto.Semantic_Fields.maybe'span' @:: Lens' StackGraphNode (Prelude.Maybe Span)@ -}
+data StackGraphNode
+  = StackGraphNode'_constructor {_StackGraphNode'id :: !Data.Int.Int64,
+                                 _StackGraphNode'name :: !Data.Text.Text,
+                                 _StackGraphNode'line :: !Data.Text.Text,
+                                 _StackGraphNode'kind :: !Data.Text.Text,
+                                 _StackGraphNode'isDefinition :: !Prelude.Bool,
+                                 _StackGraphNode'span :: !(Prelude.Maybe Span),
+                                 _StackGraphNode'_unknownFields :: !Data.ProtoLens.FieldSet}
+  deriving (Prelude.Eq, Prelude.Ord)
+instance Prelude.Show StackGraphNode where
+  showsPrec _ __x __s
+    = Prelude.showChar
+        '{'
+        (Prelude.showString
+           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
+instance Data.ProtoLens.Field.HasField StackGraphNode "id" Data.Int.Int64 where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphNode'id (\ x__ y__ -> x__ {_StackGraphNode'id = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphNode "name" Data.Text.Text where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphNode'name
+           (\ x__ y__ -> x__ {_StackGraphNode'name = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphNode "line" Data.Text.Text where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphNode'line
+           (\ x__ y__ -> x__ {_StackGraphNode'line = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphNode "kind" Data.Text.Text where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphNode'kind
+           (\ x__ y__ -> x__ {_StackGraphNode'kind = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphNode "isDefinition" Prelude.Bool where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphNode'isDefinition
+           (\ x__ y__ -> x__ {_StackGraphNode'isDefinition = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphNode "span" Span where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphNode'span
+           (\ x__ y__ -> x__ {_StackGraphNode'span = y__}))
+        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
+instance Data.ProtoLens.Field.HasField StackGraphNode "maybe'span" (Prelude.Maybe Span) where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphNode'span
+           (\ x__ y__ -> x__ {_StackGraphNode'span = y__}))
+        Prelude.id
+instance Data.ProtoLens.Message StackGraphNode where
+  messageName _ = Data.Text.pack "github.semantic.StackGraphNode"
+  fieldsByTag
+    = let
+        id__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "id"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.Int64Field ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int64)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"id")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphNode
+        name__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "name"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"name")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphNode
+        line__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "line"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"line")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphNode
+        kind__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "kind"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"kind")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphNode
+        isDefinition__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "is_definition"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.BoolField ::
+                 Data.ProtoLens.FieldTypeDescriptor Prelude.Bool)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional
+                 (Data.ProtoLens.Field.field @"isDefinition")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphNode
+        span__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "span"
+              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
+                 Data.ProtoLens.FieldTypeDescriptor Span)
+              (Data.ProtoLens.OptionalField
+                 (Data.ProtoLens.Field.field @"maybe'span")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphNode
+      in
+        Data.Map.fromList
+          [(Data.ProtoLens.Tag 1, id__field_descriptor),
+           (Data.ProtoLens.Tag 2, name__field_descriptor),
+           (Data.ProtoLens.Tag 3, line__field_descriptor),
+           (Data.ProtoLens.Tag 4, kind__field_descriptor),
+           (Data.ProtoLens.Tag 5, isDefinition__field_descriptor),
+           (Data.ProtoLens.Tag 6, span__field_descriptor)]
+  unknownFields
+    = Lens.Family2.Unchecked.lens
+        _StackGraphNode'_unknownFields
+        (\ x__ y__ -> x__ {_StackGraphNode'_unknownFields = y__})
+  defMessage
+    = StackGraphNode'_constructor
+        {_StackGraphNode'id = Data.ProtoLens.fieldDefault,
+         _StackGraphNode'name = Data.ProtoLens.fieldDefault,
+         _StackGraphNode'line = Data.ProtoLens.fieldDefault,
+         _StackGraphNode'kind = Data.ProtoLens.fieldDefault,
+         _StackGraphNode'isDefinition = Data.ProtoLens.fieldDefault,
+         _StackGraphNode'span = Prelude.Nothing,
+         _StackGraphNode'_unknownFields = []}
+  parseMessage
+    = let
+        loop ::
+          StackGraphNode
+          -> Data.ProtoLens.Encoding.Bytes.Parser StackGraphNode
+        loop x
+          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
+               if end then
+                   do (let missing = []
+                       in
+                         if Prelude.null missing then
+                             Prelude.return ()
+                         else
+                             Prelude.fail
+                               ((Prelude.++)
+                                  "Missing required fields: "
+                                  (Prelude.show (missing :: [Prelude.String]))))
+                      Prelude.return
+                        (Lens.Family2.over
+                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
+               else
+                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                      case tag of
+                        8 -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          Prelude.fromIntegral
+                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
+                                       "id"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"id") y x)
+                        18
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                                       Data.ProtoLens.Encoding.Bytes.getBytes
+                                                         (Prelude.fromIntegral len)
+                                           Data.ProtoLens.Encoding.Bytes.runEither
+                                             (case Data.Text.Encoding.decodeUtf8' value of
+                                                (Prelude.Left err)
+                                                  -> Prelude.Left (Prelude.show err)
+                                                (Prelude.Right r) -> Prelude.Right r))
+                                       "name"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"name") y x)
+                        26
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                                       Data.ProtoLens.Encoding.Bytes.getBytes
+                                                         (Prelude.fromIntegral len)
+                                           Data.ProtoLens.Encoding.Bytes.runEither
+                                             (case Data.Text.Encoding.decodeUtf8' value of
+                                                (Prelude.Left err)
+                                                  -> Prelude.Left (Prelude.show err)
+                                                (Prelude.Right r) -> Prelude.Right r))
+                                       "line"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"line") y x)
+                        34
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                                       Data.ProtoLens.Encoding.Bytes.getBytes
+                                                         (Prelude.fromIntegral len)
+                                           Data.ProtoLens.Encoding.Bytes.runEither
+                                             (case Data.Text.Encoding.decodeUtf8' value of
+                                                (Prelude.Left err)
+                                                  -> Prelude.Left (Prelude.show err)
+                                                (Prelude.Right r) -> Prelude.Right r))
+                                       "kind"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"kind") y x)
+                        40
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          ((Prelude./=) 0) Data.ProtoLens.Encoding.Bytes.getVarInt)
+                                       "is_definition"
+                                loop
+                                  (Lens.Family2.set
+                                     (Data.ProtoLens.Field.field @"isDefinition") y x)
+                        50
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                           Data.ProtoLens.Encoding.Bytes.isolate
+                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
+                                       "span"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"span") y x)
+                        wire
+                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
+                                        wire
+                                loop
+                                  (Lens.Family2.over
+                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
+      in
+        (Data.ProtoLens.Encoding.Bytes.<?>)
+          (do loop Data.ProtoLens.defMessage) "StackGraphNode"
+  buildMessage
+    = \ _x
+        -> (Data.Monoid.<>)
+             (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"id") _x
+              in
+                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                    Data.Monoid.mempty
+                else
+                    (Data.Monoid.<>)
+                      (Data.ProtoLens.Encoding.Bytes.putVarInt 8)
+                      ((Prelude..)
+                         Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
+             ((Data.Monoid.<>)
+                (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"name") _x
+                 in
+                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                       Data.Monoid.mempty
+                   else
+                       (Data.Monoid.<>)
+                         (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
+                         ((Prelude..)
+                            (\ bs
+                               -> (Data.Monoid.<>)
+                                    (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                       (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                    (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                            Data.Text.Encoding.encodeUtf8
+                            _v))
+                ((Data.Monoid.<>)
+                   (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"line") _x
+                    in
+                      if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                          Data.Monoid.mempty
+                      else
+                          (Data.Monoid.<>)
+                            (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
+                            ((Prelude..)
+                               (\ bs
+                                  -> (Data.Monoid.<>)
+                                       (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                          (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                       (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                               Data.Text.Encoding.encodeUtf8
+                               _v))
+                   ((Data.Monoid.<>)
+                      (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"kind") _x
+                       in
+                         if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                             Data.Monoid.mempty
+                         else
+                             (Data.Monoid.<>)
+                               (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
+                               ((Prelude..)
+                                  (\ bs
+                                     -> (Data.Monoid.<>)
+                                          (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                             (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                          (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                  Data.Text.Encoding.encodeUtf8
+                                  _v))
+                      ((Data.Monoid.<>)
+                         (let
+                            _v
+                              = Lens.Family2.view (Data.ProtoLens.Field.field @"isDefinition") _x
+                          in
+                            if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                                Data.Monoid.mempty
+                            else
+                                (Data.Monoid.<>)
+                                  (Data.ProtoLens.Encoding.Bytes.putVarInt 40)
+                                  ((Prelude..)
+                                     Data.ProtoLens.Encoding.Bytes.putVarInt
+                                     (\ b -> if b then 1 else 0)
+                                     _v))
+                         ((Data.Monoid.<>)
+                            (case
+                                 Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'span") _x
+                             of
+                               Prelude.Nothing -> Data.Monoid.mempty
+                               (Prelude.Just _v)
+                                 -> (Data.Monoid.<>)
+                                      (Data.ProtoLens.Encoding.Bytes.putVarInt 50)
+                                      ((Prelude..)
+                                         (\ bs
+                                            -> (Data.Monoid.<>)
+                                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                                    (Prelude.fromIntegral
+                                                       (Data.ByteString.length bs)))
+                                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                         Data.ProtoLens.encodeMessage
+                                         _v))
+                            (Data.ProtoLens.Encoding.Wire.buildFieldSet
+                               (Lens.Family2.view Data.ProtoLens.unknownFields _x)))))))
+instance Control.DeepSeq.NFData StackGraphNode where
+  rnf
+    = \ x__
+        -> Control.DeepSeq.deepseq
+             (_StackGraphNode'_unknownFields x__)
+             (Control.DeepSeq.deepseq
+                (_StackGraphNode'id x__)
+                (Control.DeepSeq.deepseq
+                   (_StackGraphNode'name x__)
+                   (Control.DeepSeq.deepseq
+                      (_StackGraphNode'line x__)
+                      (Control.DeepSeq.deepseq
+                         (_StackGraphNode'kind x__)
+                         (Control.DeepSeq.deepseq
+                            (_StackGraphNode'isDefinition x__)
+                            (Control.DeepSeq.deepseq (_StackGraphNode'span x__) ()))))))
+{- | Fields :
+     
+         * 'Proto.Semantic_Fields.startingSymbolStack' @:: Lens' StackGraphPath Data.Text.Text@
+         * 'Proto.Semantic_Fields.startingScopeStackSize' @:: Lens' StackGraphPath Data.Int.Int64@
+         * 'Proto.Semantic_Fields.from' @:: Lens' StackGraphPath Data.Int.Int64@
+         * 'Proto.Semantic_Fields.edges' @:: Lens' StackGraphPath Data.Text.Text@
+         * 'Proto.Semantic_Fields.to' @:: Lens' StackGraphPath Data.Int.Int64@
+         * 'Proto.Semantic_Fields.endingScopeStack' @:: Lens' StackGraphPath Data.Text.Text@
+         * 'Proto.Semantic_Fields.endingSymbolStack' @:: Lens' StackGraphPath Data.Text.Text@ -}
+data StackGraphPath
+  = StackGraphPath'_constructor {_StackGraphPath'startingSymbolStack :: !Data.Text.Text,
+                                 _StackGraphPath'startingScopeStackSize :: !Data.Int.Int64,
+                                 _StackGraphPath'from :: !Data.Int.Int64,
+                                 _StackGraphPath'edges :: !Data.Text.Text,
+                                 _StackGraphPath'to :: !Data.Int.Int64,
+                                 _StackGraphPath'endingScopeStack :: !Data.Text.Text,
+                                 _StackGraphPath'endingSymbolStack :: !Data.Text.Text,
+                                 _StackGraphPath'_unknownFields :: !Data.ProtoLens.FieldSet}
+  deriving (Prelude.Eq, Prelude.Ord)
+instance Prelude.Show StackGraphPath where
+  showsPrec _ __x __s
+    = Prelude.showChar
+        '{'
+        (Prelude.showString
+           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
+instance Data.ProtoLens.Field.HasField StackGraphPath "startingSymbolStack" Data.Text.Text where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphPath'startingSymbolStack
+           (\ x__ y__ -> x__ {_StackGraphPath'startingSymbolStack = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphPath "startingScopeStackSize" Data.Int.Int64 where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphPath'startingScopeStackSize
+           (\ x__ y__ -> x__ {_StackGraphPath'startingScopeStackSize = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphPath "from" Data.Int.Int64 where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphPath'from
+           (\ x__ y__ -> x__ {_StackGraphPath'from = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphPath "edges" Data.Text.Text where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphPath'edges
+           (\ x__ y__ -> x__ {_StackGraphPath'edges = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphPath "to" Data.Int.Int64 where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphPath'to (\ x__ y__ -> x__ {_StackGraphPath'to = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphPath "endingScopeStack" Data.Text.Text where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphPath'endingScopeStack
+           (\ x__ y__ -> x__ {_StackGraphPath'endingScopeStack = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphPath "endingSymbolStack" Data.Text.Text where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphPath'endingSymbolStack
+           (\ x__ y__ -> x__ {_StackGraphPath'endingSymbolStack = y__}))
+        Prelude.id
+instance Data.ProtoLens.Message StackGraphPath where
+  messageName _ = Data.Text.pack "github.semantic.StackGraphPath"
+  fieldsByTag
+    = let
+        startingSymbolStack__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "starting_symbol_stack"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional
+                 (Data.ProtoLens.Field.field @"startingSymbolStack")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphPath
+        startingScopeStackSize__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "starting_scope_stack_size"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.Int64Field ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int64)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional
+                 (Data.ProtoLens.Field.field @"startingScopeStackSize")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphPath
+        from__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "from"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.Int64Field ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int64)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"from")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphPath
+        edges__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "edges"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"edges")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphPath
+        to__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "to"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.Int64Field ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int64)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"to")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphPath
+        endingScopeStack__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "ending_scope_stack"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional
+                 (Data.ProtoLens.Field.field @"endingScopeStack")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphPath
+        endingSymbolStack__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "ending_symbol_stack"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional
+                 (Data.ProtoLens.Field.field @"endingSymbolStack")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphPath
+      in
+        Data.Map.fromList
+          [(Data.ProtoLens.Tag 1, startingSymbolStack__field_descriptor),
+           (Data.ProtoLens.Tag 2, startingScopeStackSize__field_descriptor),
+           (Data.ProtoLens.Tag 3, from__field_descriptor),
+           (Data.ProtoLens.Tag 4, edges__field_descriptor),
+           (Data.ProtoLens.Tag 5, to__field_descriptor),
+           (Data.ProtoLens.Tag 6, endingScopeStack__field_descriptor),
+           (Data.ProtoLens.Tag 7, endingSymbolStack__field_descriptor)]
+  unknownFields
+    = Lens.Family2.Unchecked.lens
+        _StackGraphPath'_unknownFields
+        (\ x__ y__ -> x__ {_StackGraphPath'_unknownFields = y__})
+  defMessage
+    = StackGraphPath'_constructor
+        {_StackGraphPath'startingSymbolStack = Data.ProtoLens.fieldDefault,
+         _StackGraphPath'startingScopeStackSize = Data.ProtoLens.fieldDefault,
+         _StackGraphPath'from = Data.ProtoLens.fieldDefault,
+         _StackGraphPath'edges = Data.ProtoLens.fieldDefault,
+         _StackGraphPath'to = Data.ProtoLens.fieldDefault,
+         _StackGraphPath'endingScopeStack = Data.ProtoLens.fieldDefault,
+         _StackGraphPath'endingSymbolStack = Data.ProtoLens.fieldDefault,
+         _StackGraphPath'_unknownFields = []}
+  parseMessage
+    = let
+        loop ::
+          StackGraphPath
+          -> Data.ProtoLens.Encoding.Bytes.Parser StackGraphPath
+        loop x
+          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
+               if end then
+                   do (let missing = []
+                       in
+                         if Prelude.null missing then
+                             Prelude.return ()
+                         else
+                             Prelude.fail
+                               ((Prelude.++)
+                                  "Missing required fields: "
+                                  (Prelude.show (missing :: [Prelude.String]))))
+                      Prelude.return
+                        (Lens.Family2.over
+                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
+               else
+                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                      case tag of
+                        10
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                                       Data.ProtoLens.Encoding.Bytes.getBytes
+                                                         (Prelude.fromIntegral len)
+                                           Data.ProtoLens.Encoding.Bytes.runEither
+                                             (case Data.Text.Encoding.decodeUtf8' value of
+                                                (Prelude.Left err)
+                                                  -> Prelude.Left (Prelude.show err)
+                                                (Prelude.Right r) -> Prelude.Right r))
+                                       "starting_symbol_stack"
+                                loop
+                                  (Lens.Family2.set
+                                     (Data.ProtoLens.Field.field @"startingSymbolStack") y x)
+                        16
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          Prelude.fromIntegral
+                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
+                                       "starting_scope_stack_size"
+                                loop
+                                  (Lens.Family2.set
+                                     (Data.ProtoLens.Field.field @"startingScopeStackSize") y x)
+                        24
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          Prelude.fromIntegral
+                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
+                                       "from"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"from") y x)
+                        34
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                                       Data.ProtoLens.Encoding.Bytes.getBytes
+                                                         (Prelude.fromIntegral len)
+                                           Data.ProtoLens.Encoding.Bytes.runEither
+                                             (case Data.Text.Encoding.decodeUtf8' value of
+                                                (Prelude.Left err)
+                                                  -> Prelude.Left (Prelude.show err)
+                                                (Prelude.Right r) -> Prelude.Right r))
+                                       "edges"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"edges") y x)
+                        40
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          Prelude.fromIntegral
+                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
+                                       "to"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"to") y x)
+                        50
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                                       Data.ProtoLens.Encoding.Bytes.getBytes
+                                                         (Prelude.fromIntegral len)
+                                           Data.ProtoLens.Encoding.Bytes.runEither
+                                             (case Data.Text.Encoding.decodeUtf8' value of
+                                                (Prelude.Left err)
+                                                  -> Prelude.Left (Prelude.show err)
+                                                (Prelude.Right r) -> Prelude.Right r))
+                                       "ending_scope_stack"
+                                loop
+                                  (Lens.Family2.set
+                                     (Data.ProtoLens.Field.field @"endingScopeStack") y x)
+                        58
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                                       Data.ProtoLens.Encoding.Bytes.getBytes
+                                                         (Prelude.fromIntegral len)
+                                           Data.ProtoLens.Encoding.Bytes.runEither
+                                             (case Data.Text.Encoding.decodeUtf8' value of
+                                                (Prelude.Left err)
+                                                  -> Prelude.Left (Prelude.show err)
+                                                (Prelude.Right r) -> Prelude.Right r))
+                                       "ending_symbol_stack"
+                                loop
+                                  (Lens.Family2.set
+                                     (Data.ProtoLens.Field.field @"endingSymbolStack") y x)
+                        wire
+                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
+                                        wire
+                                loop
+                                  (Lens.Family2.over
+                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
+      in
+        (Data.ProtoLens.Encoding.Bytes.<?>)
+          (do loop Data.ProtoLens.defMessage) "StackGraphPath"
+  buildMessage
+    = \ _x
+        -> (Data.Monoid.<>)
+             (let
+                _v
+                  = Lens.Family2.view
+                      (Data.ProtoLens.Field.field @"startingSymbolStack") _x
+              in
+                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                    Data.Monoid.mempty
+                else
+                    (Data.Monoid.<>)
+                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
+                      ((Prelude..)
+                         (\ bs
+                            -> (Data.Monoid.<>)
+                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                         Data.Text.Encoding.encodeUtf8
+                         _v))
+             ((Data.Monoid.<>)
+                (let
+                   _v
+                     = Lens.Family2.view
+                         (Data.ProtoLens.Field.field @"startingScopeStackSize") _x
+                 in
+                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                       Data.Monoid.mempty
+                   else
+                       (Data.Monoid.<>)
+                         (Data.ProtoLens.Encoding.Bytes.putVarInt 16)
+                         ((Prelude..)
+                            Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
+                ((Data.Monoid.<>)
+                   (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"from") _x
+                    in
+                      if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                          Data.Monoid.mempty
+                      else
+                          (Data.Monoid.<>)
+                            (Data.ProtoLens.Encoding.Bytes.putVarInt 24)
+                            ((Prelude..)
+                               Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
+                   ((Data.Monoid.<>)
+                      (let
+                         _v = Lens.Family2.view (Data.ProtoLens.Field.field @"edges") _x
+                       in
+                         if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                             Data.Monoid.mempty
+                         else
+                             (Data.Monoid.<>)
+                               (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
+                               ((Prelude..)
+                                  (\ bs
+                                     -> (Data.Monoid.<>)
+                                          (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                             (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                          (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                  Data.Text.Encoding.encodeUtf8
+                                  _v))
+                      ((Data.Monoid.<>)
+                         (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"to") _x
+                          in
+                            if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                                Data.Monoid.mempty
+                            else
+                                (Data.Monoid.<>)
+                                  (Data.ProtoLens.Encoding.Bytes.putVarInt 40)
+                                  ((Prelude..)
+                                     Data.ProtoLens.Encoding.Bytes.putVarInt
+                                     Prelude.fromIntegral
+                                     _v))
+                         ((Data.Monoid.<>)
+                            (let
+                               _v
+                                 = Lens.Family2.view
+                                     (Data.ProtoLens.Field.field @"endingScopeStack") _x
+                             in
+                               if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                                   Data.Monoid.mempty
+                               else
+                                   (Data.Monoid.<>)
+                                     (Data.ProtoLens.Encoding.Bytes.putVarInt 50)
+                                     ((Prelude..)
+                                        (\ bs
+                                           -> (Data.Monoid.<>)
+                                                (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                                   (Prelude.fromIntegral
+                                                      (Data.ByteString.length bs)))
+                                                (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                        Data.Text.Encoding.encodeUtf8
+                                        _v))
+                            ((Data.Monoid.<>)
+                               (let
+                                  _v
+                                    = Lens.Family2.view
+                                        (Data.ProtoLens.Field.field @"endingSymbolStack") _x
+                                in
+                                  if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                                      Data.Monoid.mempty
+                                  else
+                                      (Data.Monoid.<>)
+                                        (Data.ProtoLens.Encoding.Bytes.putVarInt 58)
+                                        ((Prelude..)
+                                           (\ bs
+                                              -> (Data.Monoid.<>)
+                                                   (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                                      (Prelude.fromIntegral
+                                                         (Data.ByteString.length bs)))
+                                                   (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                           Data.Text.Encoding.encodeUtf8
+                                           _v))
+                               (Data.ProtoLens.Encoding.Wire.buildFieldSet
+                                  (Lens.Family2.view Data.ProtoLens.unknownFields _x))))))))
+instance Control.DeepSeq.NFData StackGraphPath where
+  rnf
+    = \ x__
+        -> Control.DeepSeq.deepseq
+             (_StackGraphPath'_unknownFields x__)
+             (Control.DeepSeq.deepseq
+                (_StackGraphPath'startingSymbolStack x__)
+                (Control.DeepSeq.deepseq
+                   (_StackGraphPath'startingScopeStackSize x__)
+                   (Control.DeepSeq.deepseq
+                      (_StackGraphPath'from x__)
+                      (Control.DeepSeq.deepseq
+                         (_StackGraphPath'edges x__)
+                         (Control.DeepSeq.deepseq
+                            (_StackGraphPath'to x__)
+                            (Control.DeepSeq.deepseq
+                               (_StackGraphPath'endingScopeStack x__)
+                               (Control.DeepSeq.deepseq
+                                  (_StackGraphPath'endingSymbolStack x__) ())))))))
 {- | Fields :
      
          * 'Proto.Semantic_Fields.symbol' @:: Lens' Symbol Data.Text.Text@

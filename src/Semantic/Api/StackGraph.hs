@@ -1,8 +1,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
-module Semantic.Api.ScopeGraph
-  ( parseScopeGraph
-  , TempScopeGraph(..)
+module Semantic.Api.StackGraph
+  ( parseStackGraph
+  , TempStackGraph(..)
   , SGNode(..)
   , SGPath(..)
   ) where
@@ -27,19 +27,22 @@ import           Source.Loc as Loc
 import           Semantic.Task
 import qualified Parsing.Parser as Parser
 
--- import qualified Language.Go as Go
-
-parseScopeGraph :: ( Has Distribute sig m
-                   , Has (Error SomeException) sig m
-                   , Has Parse sig m, Traversable t
+parseStackGraph :: ( Has (Error SomeException) sig m
+                   , Has Distribute sig m
+                   , Has Parse sig m
+                   , Traversable t
                    )
   => t Blob
-  -> m ParseTreeScopeGraphResponse
-parseScopeGraph blobs = do
+  -> m ParseTreeStackGraphResponse
+parseStackGraph blobs = do
   terms <- distributeFor blobs go
   pure $ defMessage & P.files .~ toList terms
   where
-    go :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m ScopeGraphFile
+    go :: ( Has (Error SomeException) sig m
+          , Has Parse sig m
+          )
+      => Blob
+      -> m StackGraphFile
     go blob = catching $ graphToFile <$> graphForBlob blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
@@ -52,7 +55,7 @@ parseScopeGraph blobs = do
           & P.paths .~ mempty
           & P.errors .~ [defMessage & P.error .~ pack e]
 
-        graphToFile :: TempScopeGraph -> ScopeGraphFile
+        graphToFile :: TempStackGraph -> StackGraphFile
         graphToFile graph
           = defMessage
           & P.path .~ blobPath'
@@ -60,17 +63,17 @@ parseScopeGraph blobs = do
           & P.nodes .~ fmap nodeToNode (scopeGraphNodes graph)
           & P.paths .~ fmap pathToPath (scopeGraphPaths graph)
 
-        nodeToNode :: SGNode -> ScopeGraphNode
+        nodeToNode :: SGNode -> StackGraphNode
         nodeToNode node
           = defMessage
           & P.id .~ nodeId node
           & P.name .~ nodeName node
           & P.line .~ nodeLine node
-          & P.syntax .~ nodeSyntax node
+          & P.kind .~ nodeKind node
           & P.isDefinition .~ nodeIsDefinition node
           & P.maybe'span ?~ converting # nodeSpan node
 
-        pathToPath :: SGPath -> ScopeGraphPath
+        pathToPath :: SGPath -> StackGraphPath
         pathToPath path
           = defMessage
           & P.startingSymbolStack .~ pathStartingSymbolStack path
@@ -83,8 +86,8 @@ parseScopeGraph blobs = do
 
 
 -- TODO: These are temporary, will replace with proper datatypes from the scope graph work.
-data TempScopeGraph
-  = TempScopeGraph
+data TempStackGraph
+  = TempStackGraph
   { scopeGraphNodes :: [SGNode]
   , scopeGraphPaths :: [SGPath]
   }
@@ -92,10 +95,10 @@ data TempScopeGraph
 data SGPath
   = SGPath
   { pathStartingSymbolStack :: Text
-  , pathStartingScopeStackSize :: Int32
-  , pathFrom :: Int32
+  , pathStartingScopeStackSize :: Int64
+  , pathFrom :: Int64
   , pathEdges :: Text
-  , pathTo :: Int32
+  , pathTo :: Int64
   , pathEndingScopeStack :: Text
   , pathEndingSymbolStack :: Text
   }
@@ -103,23 +106,23 @@ data SGPath
 
 data SGNode
   = SGNode
-  { nodeId :: Int32
+  { nodeId :: Int64
   , nodeName :: Text
   , nodeLine :: Text
-  , nodeSyntax :: Text
+  , nodeKind :: Text
   , nodeIsDefinition :: Bool
   , nodeSpan :: Loc.Span
   }
 
-graphForBlob :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m TempScopeGraph
-graphForBlob blob = parseWith toScopeGraphParsers (pure . toScopeGraph blob) blob
+graphForBlob :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m TempStackGraph
+graphForBlob blob = parseWith toStackGraphParsers (pure . toStackGraph blob) blob
   where
-    toScopeGraphParsers :: Map Language (Parser.SomeParser ToScopeGraph Loc)
-    toScopeGraphParsers = Parser.preciseParsers
+    toStackGraphParsers :: Map Language (Parser.SomeParser ToStackGraph Loc)
+    toStackGraphParsers = Parser.preciseParsers
 
-class ToScopeGraph term where
-  toScopeGraph :: Blob -> term Loc -> TempScopeGraph
+class ToStackGraph term where
+  toStackGraph :: Blob -> term Loc -> TempStackGraph
 
-instance ToScopeGraph term where
+instance ToStackGraph term where
   -- TODO: Need to produce the graph here
-  toScopeGraph _ _ = TempScopeGraph mempty mempty
+  toStackGraph _ _ = TempStackGraph mempty mempty
