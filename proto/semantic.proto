@@ -197,11 +197,11 @@ message StackGraphNode {
 }
 
 message StackGraphPath {
-  string starting_symbol_stack = 1;
+  repeated string starting_symbol_stack = 1;
   int64 starting_scope_stack_size = 2;
   int64 from = 3;
   string edges = 4;
   int64 to = 5;
-  string ending_scope_stack = 6;
-  string ending_symbol_stack = 7;
+  repeated string ending_scope_stack = 6;
+  repeated string ending_symbol_stack = 7;
 }

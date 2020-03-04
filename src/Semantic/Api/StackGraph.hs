@@ -94,13 +94,13 @@ data TempStackGraph
 
 data SGPath
   = SGPath
-  { pathStartingSymbolStack :: Text
+  { pathStartingSymbolStack :: [Text]
   , pathStartingScopeStackSize :: Int64
   , pathFrom :: Int64
   , pathEdges :: Text
   , pathTo :: Int64
-  , pathEndingScopeStack :: Text
-  , pathEndingSymbolStack :: Text
+  , pathEndingScopeStack :: [Text]
+  , pathEndingSymbolStack :: [Text]
   }
   deriving (Eq, Show)
 

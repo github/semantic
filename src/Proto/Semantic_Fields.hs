@@ -404,6 +404,20 @@ vec'edges ::
    Data.ProtoLens.Field.HasField s "vec'edges" a) =>
   Lens.Family2.LensLike' f s a
 vec'edges = Data.ProtoLens.Field.field @"vec'edges"
+vec'endingScopeStack ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "vec'endingScopeStack" a) =>
+  Lens.Family2.LensLike' f s a
+vec'endingScopeStack
+  = Data.ProtoLens.Field.field @"vec'endingScopeStack"
+vec'endingSymbolStack ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "vec'endingSymbolStack" a) =>
+  Lens.Family2.LensLike' f s a
+vec'endingSymbolStack
+  = Data.ProtoLens.Field.field @"vec'endingSymbolStack"
 vec'errors ::
   forall f s a.
   (Prelude.Functor f,
@@ -428,6 +442,13 @@ vec'paths ::
    Data.ProtoLens.Field.HasField s "vec'paths" a) =>
   Lens.Family2.LensLike' f s a
 vec'paths = Data.ProtoLens.Field.field @"vec'paths"
+vec'startingSymbolStack ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "vec'startingSymbolStack" a) =>
+  Lens.Family2.LensLike' f s a
+vec'startingSymbolStack
+  = Data.ProtoLens.Field.field @"vec'startingSymbolStack"
 vec'symbols ::
   forall f s a.
   (Prelude.Functor f,
