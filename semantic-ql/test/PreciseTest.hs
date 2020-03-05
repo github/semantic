@@ -14,7 +14,7 @@ main
   >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
-  where parse = parseByteString @QL.Module @() tree_sitter_ql
+  where parse = parseByteString @QL.Ql @() tree_sitter_ql
 
 tests :: [TestTree] -> TestTree
-tests = testGroup "tree-sitter-python corpus tests"
+tests = testGroup "tree-sitter-ql corpus tests"
