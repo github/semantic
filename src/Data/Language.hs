@@ -15,7 +15,7 @@ import qualified Data.Text as T
 import           Source.Language
 
 codeNavLanguages :: [Language]
-codeNavLanguages = [Go, Java, Ruby, Python, JavaScript, TypeScript, PHP]
+codeNavLanguages = [Go, Java, QL, Ruby, Python, JavaScript, TypeScript, PHP]
 
 supportedExts :: [String]
 supportedExts = foldr append mempty supportedLanguages
