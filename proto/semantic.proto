@@ -27,6 +27,10 @@ message ParseTreeGraphResponse {
   repeated ParseTreeFileGraph files = 1;
 }
 
+message ParseTreeStackGraphResponse {
+  repeated StackGraphFile files = 1;
+}
+
 message ParseTreeFileGraph {
   string path = 1;
   string language = 2;
@@ -173,4 +177,31 @@ message Position {
 message Span {
   Position start = 1;
   Position end = 2;
+}
+
+message StackGraphFile {
+  string path = 1;
+  string language = 2;
+  repeated StackGraphNode nodes = 3;
+  repeated StackGraphPath paths = 4;
+  repeated ParseError errors = 5;
+}
+
+message StackGraphNode {
+  int64 id = 1;
+  string name = 2;
+  string line = 3;
+  string kind = 4;
+  bool is_definition = 5;
+  Span span = 6;
+}
+
+message StackGraphPath {
+  repeated string starting_symbol_stack = 1;
+  int64 starting_scope_stack_size = 2;
+  int64 from = 3;
+  string edges = 4;
+  int64 to = 5;
+  repeated string ending_scope_stack = 6;
+  repeated string ending_symbol_stack = 7;
 }
