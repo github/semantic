@@ -11,6 +11,7 @@ packages: .
           semantic-parse
           semantic-php
           semantic-python
+          semantic-ql
           semantic-ruby
           semantic-scope-graph
           semantic-tsx
@@ -61,6 +62,9 @@ package semantic-parse
   ghc-options: -Werror
 
 package semantic-python
+  ghc-options: -Werror
+
+package semantic-ql
   ghc-options: -Werror
 
 package semantic-ruby

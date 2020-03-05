@@ -58,6 +58,8 @@ function flags {
   echo "-isemantic-php/src"
   echo "-isemantic-python/src"
   echo "-isemantic-python/test"
+  echo "-isemantic-ql/src"
+  echo "-isemantic-ql/test"
   echo "-isemantic-ruby/src"
   echo "-isemantic-scope-graph/src"
   echo "-isemantic-tsx/src"
