@@ -5,7 +5,8 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-module Language.QL.Tags (tags) where
+
+module Language.QL.Tags (ToTags(..)) where
 
 import           AST.Element
 import           AST.Token
@@ -13,6 +14,7 @@ import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Text (Text)
+import           Data.List.NonEmpty(NonEmpty(..))
 import qualified Language.QL.AST as QL
 import           Source.Loc
 import           Source.Source as Source
@@ -56,65 +58,47 @@ yieldTag name kind loc range = do
   Tags.yield (Tag name kind loc (Tags.firstLine src range) Nothing)
 
 
--- instance ToTags QL.FunctionDefinition where
---   tags t@QL.FunctionDefinition
---     { QL.ann = loc@Loc { byteRange }
---     , QL.name = QL.Name { text }
---     } = yieldTag text Method loc byteRange >> gtags t
---
--- instance ToTags QL.MethodDeclaration where
---   tags t@QL.MethodDeclaration
---     { QL.ann = loc@Loc { byteRange }
---     , QL.name = QL.Name { text }
---     } = yieldTag text Function loc byteRange >> gtags t
---
--- instance ToTags QL.FunctionCallExpression where
---   tags t@QL.FunctionCallExpression
---     { QL.ann = loc@Loc { byteRange }
---     , QL.function = func
---     } = match func
---       where
---         yield name = yieldTag name Call loc byteRange >> gtags t
---         match expr = case expr of
---           Prj (QL.VariableName { extraChildren = QL.Name { text } })
---             -> yield text *> gtags t
---           Prj (QL.QualifiedName { extraChildren = [Prj (QL.Name { text })] })
---             -> yield text *> gtags t
---           _
---             -> gtags t
---
--- instance ToTags QL.MemberCallExpression where
---   tags t@QL.MemberCallExpression
---     { QL.ann = loc@Loc { byteRange }
---     , QL.name = item
---     } = case item of
---     Prj (QL.Name { text }) -> yieldTag text Call loc byteRange >> gtags t
---     _                       -> gtags t
---
---
 instance ToTags QL.Module where
-  tags t@QL.Module
-    { QL.ann = loc@Loc { byteRange }
-    , QL.name = QL.ModuleName { QL.name = QL.SimpleId { text } }
-    } = yieldTag text Module loc byteRange >> gtags t
+  tags t@(QL.Module loc@Loc { byteRange } term) =
+    case term of
+      Prj (QL.ModuleName { extraChildren = Prj (QL.SimpleId { text })}) :| _ -> yieldTag text Module loc byteRange >> gtags t
+      _                                                                      -> gtags t
 
 instance ToTags QL.ClasslessPredicate where
-    tags t@QL.ClasslessPredicate
-      { QL.ann = loc@Loc { byteRange }
-      , QL.name = QL.PredicateName { text }
-      } = yieldTag text Function loc byteRange >> gtags t
+    tags t@(QL.ClasslessPredicate loc@Loc {byteRange } term) =
+      case term of
+        Prj (QL.PredicateName { text } ) :| _ -> yieldTag text Function loc byteRange >> gtags t
+        _                                     -> gtags t
 
 instance ToTags QL.AritylessPredicateExpr where
-    tags t@QL.AritylessPredicateExpr
-      { QL.ann = loc@Loc { byteRange }
-      , QL.name = QL.LiteralId { text }
-      } = yieldTag text Call loc byteRange >> gtags t
+    tags t@(QL.AritylessPredicateExpr loc@Loc { byteRange } term) =
+      case term of
+        Prj (QL.LiteralId { text }) :| _ -> yieldTag text Call loc byteRange >> gtags t
+        _                                -> gtags t
 
-instance ToTags QL.Dataclass
-instance ToTags QL.MemberPredicate
-instance ToTags QL.Datatype
-instance ToTags QL.DatatypeBranch
-instance ToTags QL.MemberCall
+instance ToTags QL.Dataclass where
+    tags t@(QL.Dataclass loc@Loc { byteRange } term) =
+      case term of
+        Prj (QL.ClassName { text }) :| _ -> yieldTag text Class loc byteRange >> gtags t
+        _                                -> gtags t
+
+instance ToTags QL.MemberPredicate where
+    tags t@(QL.MemberPredicate loc@Loc { byteRange } term) =
+      case term of
+        Prj (QL.PredicateName { text }) :| _ -> yieldTag text Method loc byteRange >> gtags t
+        _                                    -> gtags t
+
+instance ToTags QL.Datatype where
+    tags t@(QL.Datatype loc@Loc { byteRange } term) =
+      case term of
+        Prj (QL.ClassName { text }) :| _ -> yieldTag text Class loc byteRange >> gtags t
+        _                                    -> gtags t
+
+instance ToTags QL.DatatypeBranch where
+    tags t@(QL.DatatypeBranch loc@Loc { byteRange } term) =
+      case term of
+        Prj (QL.ClassName { text }) :| _ -> yieldTag text Class loc byteRange >> gtags t
+        _                                    -> gtags t
 
 instance ToTags QL.AddExpr
 instance ToTags QL.Any
@@ -200,9 +184,9 @@ instance ToTags QL.QualModuleExpr
 instance ToTags QL.Conjunction
 instance ToTags QL.Integer
 instance ToTags QL.QualifiedExpr
+instance ToTags QL.QualifiedRhs
 instance ToTags QL.Count
 instance ToTags QL.Le
-instance ToTags QL.PostfixCast
 instance ToTags QL.Class
 instance ToTags QL.Literal
 instance ToTags QL.Quantified
