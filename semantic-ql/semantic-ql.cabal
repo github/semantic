@@ -56,3 +56,19 @@ library
     Language.QL.Grammar
     Language.QL.Tags
   hs-source-dirs: src
+
+test-suite test
+  import: haskell
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          PreciseTest.hs
+  build-depends:    base
+                  , bytestring ^>= 0.10.8.2
+                  , hedgehog >= 0.6 && <2
+                  , pathtype ^>= 0.8.1
+                  , semantic-ast
+                  , semantic-ql
+                  , tasty
+                  , tasty-hedgehog
+                  , tasty-hunit
+                  , text
