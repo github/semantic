@@ -27,7 +27,11 @@ message ParseTreeGraphResponse {
   repeated ParseTreeFileGraph files = 1;
 }
 
-message ParseTreeStackGraphResponse {
+message StackGraphRequest {
+  repeated Blob blobs = 1;
+}
+
+message StackGraphResponse {
   repeated StackGraphFile files = 1;
 }
 

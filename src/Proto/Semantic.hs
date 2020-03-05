@@ -13,12 +13,13 @@ module Proto.Semantic (
         _DiffTreeVertex'Merged, Docstring(), File(), InsertedTerm(),
         MergedTerm(), ParseError(), ParseTreeFileGraph(),
         ParseTreeGraphResponse(), ParseTreeRequest(),
-        ParseTreeStackGraphResponse(), ParseTreeSymbolResponse(),
-        PingRequest(), PingResponse(), Position(), ReplacedTerm(), Span(),
-        StackGraphFile(), StackGraphNode(), StackGraphNode'NodeType(..),
+        ParseTreeSymbolResponse(), PingRequest(), PingResponse(),
+        Position(), ReplacedTerm(), Span(), StackGraphFile(),
+        StackGraphNode(), StackGraphNode'NodeType(..),
         StackGraphNode'NodeType(),
         StackGraphNode'NodeType'UnrecognizedValue, StackGraphPath(),
-        Symbol(), TOCSummaryChange(), TOCSummaryError(), TOCSummaryFile(),
+        StackGraphRequest(), StackGraphResponse(), Symbol(),
+        TOCSummaryChange(), TOCSummaryError(), TOCSummaryFile(),
         TermEdge(), TermVertex()
     ) where
 import qualified Data.ProtoLens.Runtime.Control.DeepSeq as Control.DeepSeq
@@ -3540,137 +3541,6 @@ instance Control.DeepSeq.NFData ParseTreeRequest where
              (Control.DeepSeq.deepseq (_ParseTreeRequest'blobs x__) ())
 {- | Fields :
      
-         * 'Proto.Semantic_Fields.files' @:: Lens' ParseTreeStackGraphResponse [StackGraphFile]@
-         * 'Proto.Semantic_Fields.vec'files' @:: Lens' ParseTreeStackGraphResponse (Data.Vector.Vector StackGraphFile)@ -}
-data ParseTreeStackGraphResponse
-  = ParseTreeStackGraphResponse'_constructor {_ParseTreeStackGraphResponse'files :: !(Data.Vector.Vector StackGraphFile),
-                                              _ParseTreeStackGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show ParseTreeStackGraphResponse where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField ParseTreeStackGraphResponse "files" [StackGraphFile] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeStackGraphResponse'files
-           (\ x__ y__ -> x__ {_ParseTreeStackGraphResponse'files = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField ParseTreeStackGraphResponse "vec'files" (Data.Vector.Vector StackGraphFile) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeStackGraphResponse'files
-           (\ x__ y__ -> x__ {_ParseTreeStackGraphResponse'files = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message ParseTreeStackGraphResponse where
-  messageName _
-    = Data.Text.pack "github.semantic.ParseTreeStackGraphResponse"
-  fieldsByTag
-    = let
-        files__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "files"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor StackGraphFile)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"files")) ::
-              Data.ProtoLens.FieldDescriptor ParseTreeStackGraphResponse
-      in
-        Data.Map.fromList [(Data.ProtoLens.Tag 1, files__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _ParseTreeStackGraphResponse'_unknownFields
-        (\ x__ y__
-           -> x__ {_ParseTreeStackGraphResponse'_unknownFields = y__})
-  defMessage
-    = ParseTreeStackGraphResponse'_constructor
-        {_ParseTreeStackGraphResponse'files = Data.Vector.Generic.empty,
-         _ParseTreeStackGraphResponse'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          ParseTreeStackGraphResponse
-          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld StackGraphFile
-             -> Data.ProtoLens.Encoding.Bytes.Parser ParseTreeStackGraphResponse
-        loop x mutable'files
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do frozen'files <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'files)
-                      (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields
-                           (\ !t -> Prelude.reverse t)
-                           (Lens.Family2.set
-                              (Data.ProtoLens.Field.field @"vec'files") frozen'files x))
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "files"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'files y)
-                                loop x v
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-                                  mutable'files
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do mutable'files <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                 Data.ProtoLens.Encoding.Growing.new
-              loop Data.ProtoLens.defMessage mutable'files)
-          "ParseTreeStackGraphResponse"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                (\ _v
-                   -> (Data.Monoid.<>)
-                        (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                        ((Prelude..)
-                           (\ bs
-                              -> (Data.Monoid.<>)
-                                   (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                      (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                   (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                           Data.ProtoLens.encodeMessage
-                           _v))
-                (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'files") _x))
-             (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                (Lens.Family2.view Data.ProtoLens.unknownFields _x))
-instance Control.DeepSeq.NFData ParseTreeStackGraphResponse where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_ParseTreeStackGraphResponse'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_ParseTreeStackGraphResponse'files x__) ())
-{- | Fields :
-     
          * 'Proto.Semantic_Fields.files' @:: Lens' ParseTreeSymbolResponse [File]@
          * 'Proto.Semantic_Fields.vec'files' @:: Lens' ParseTreeSymbolResponse (Data.Vector.Vector File)@ -}
 data ParseTreeSymbolResponse
@@ -6057,6 +5927,262 @@ instance Control.DeepSeq.NFData StackGraphPath where
                                (_StackGraphPath'endingScopeStack x__)
                                (Control.DeepSeq.deepseq
                                   (_StackGraphPath'endingSymbolStack x__) ())))))))
+{- | Fields :
+     
+         * 'Proto.Semantic_Fields.blobs' @:: Lens' StackGraphRequest [Blob]@
+         * 'Proto.Semantic_Fields.vec'blobs' @:: Lens' StackGraphRequest (Data.Vector.Vector Blob)@ -}
+data StackGraphRequest
+  = StackGraphRequest'_constructor {_StackGraphRequest'blobs :: !(Data.Vector.Vector Blob),
+                                    _StackGraphRequest'_unknownFields :: !Data.ProtoLens.FieldSet}
+  deriving (Prelude.Eq, Prelude.Ord)
+instance Prelude.Show StackGraphRequest where
+  showsPrec _ __x __s
+    = Prelude.showChar
+        '{'
+        (Prelude.showString
+           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
+instance Data.ProtoLens.Field.HasField StackGraphRequest "blobs" [Blob] where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphRequest'blobs
+           (\ x__ y__ -> x__ {_StackGraphRequest'blobs = y__}))
+        (Lens.Family2.Unchecked.lens
+           Data.Vector.Generic.toList
+           (\ _ y__ -> Data.Vector.Generic.fromList y__))
+instance Data.ProtoLens.Field.HasField StackGraphRequest "vec'blobs" (Data.Vector.Vector Blob) where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphRequest'blobs
+           (\ x__ y__ -> x__ {_StackGraphRequest'blobs = y__}))
+        Prelude.id
+instance Data.ProtoLens.Message StackGraphRequest where
+  messageName _ = Data.Text.pack "github.semantic.StackGraphRequest"
+  fieldsByTag
+    = let
+        blobs__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "blobs"
+              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
+                 Data.ProtoLens.FieldTypeDescriptor Blob)
+              (Data.ProtoLens.RepeatedField
+                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"blobs")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphRequest
+      in
+        Data.Map.fromList [(Data.ProtoLens.Tag 1, blobs__field_descriptor)]
+  unknownFields
+    = Lens.Family2.Unchecked.lens
+        _StackGraphRequest'_unknownFields
+        (\ x__ y__ -> x__ {_StackGraphRequest'_unknownFields = y__})
+  defMessage
+    = StackGraphRequest'_constructor
+        {_StackGraphRequest'blobs = Data.Vector.Generic.empty,
+         _StackGraphRequest'_unknownFields = []}
+  parseMessage
+    = let
+        loop ::
+          StackGraphRequest
+          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld Blob
+             -> Data.ProtoLens.Encoding.Bytes.Parser StackGraphRequest
+        loop x mutable'blobs
+          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
+               if end then
+                   do frozen'blobs <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'blobs)
+                      (let missing = []
+                       in
+                         if Prelude.null missing then
+                             Prelude.return ()
+                         else
+                             Prelude.fail
+                               ((Prelude.++)
+                                  "Missing required fields: "
+                                  (Prelude.show (missing :: [Prelude.String]))))
+                      Prelude.return
+                        (Lens.Family2.over
+                           Data.ProtoLens.unknownFields
+                           (\ !t -> Prelude.reverse t)
+                           (Lens.Family2.set
+                              (Data.ProtoLens.Field.field @"vec'blobs") frozen'blobs x))
+               else
+                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                      case tag of
+                        10
+                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                            Data.ProtoLens.Encoding.Bytes.isolate
+                                              (Prelude.fromIntegral len)
+                                              Data.ProtoLens.parseMessage)
+                                        "blobs"
+                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                       (Data.ProtoLens.Encoding.Growing.append mutable'blobs y)
+                                loop x v
+                        wire
+                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
+                                        wire
+                                loop
+                                  (Lens.Family2.over
+                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
+                                  mutable'blobs
+      in
+        (Data.ProtoLens.Encoding.Bytes.<?>)
+          (do mutable'blobs <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                 Data.ProtoLens.Encoding.Growing.new
+              loop Data.ProtoLens.defMessage mutable'blobs)
+          "StackGraphRequest"
+  buildMessage
+    = \ _x
+        -> (Data.Monoid.<>)
+             (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
+                (\ _v
+                   -> (Data.Monoid.<>)
+                        (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
+                        ((Prelude..)
+                           (\ bs
+                              -> (Data.Monoid.<>)
+                                   (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                      (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                   (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                           Data.ProtoLens.encodeMessage
+                           _v))
+                (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'blobs") _x))
+             (Data.ProtoLens.Encoding.Wire.buildFieldSet
+                (Lens.Family2.view Data.ProtoLens.unknownFields _x))
+instance Control.DeepSeq.NFData StackGraphRequest where
+  rnf
+    = \ x__
+        -> Control.DeepSeq.deepseq
+             (_StackGraphRequest'_unknownFields x__)
+             (Control.DeepSeq.deepseq (_StackGraphRequest'blobs x__) ())
+{- | Fields :
+     
+         * 'Proto.Semantic_Fields.files' @:: Lens' StackGraphResponse [StackGraphFile]@
+         * 'Proto.Semantic_Fields.vec'files' @:: Lens' StackGraphResponse (Data.Vector.Vector StackGraphFile)@ -}
+data StackGraphResponse
+  = StackGraphResponse'_constructor {_StackGraphResponse'files :: !(Data.Vector.Vector StackGraphFile),
+                                     _StackGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
+  deriving (Prelude.Eq, Prelude.Ord)
+instance Prelude.Show StackGraphResponse where
+  showsPrec _ __x __s
+    = Prelude.showChar
+        '{'
+        (Prelude.showString
+           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
+instance Data.ProtoLens.Field.HasField StackGraphResponse "files" [StackGraphFile] where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphResponse'files
+           (\ x__ y__ -> x__ {_StackGraphResponse'files = y__}))
+        (Lens.Family2.Unchecked.lens
+           Data.Vector.Generic.toList
+           (\ _ y__ -> Data.Vector.Generic.fromList y__))
+instance Data.ProtoLens.Field.HasField StackGraphResponse "vec'files" (Data.Vector.Vector StackGraphFile) where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphResponse'files
+           (\ x__ y__ -> x__ {_StackGraphResponse'files = y__}))
+        Prelude.id
+instance Data.ProtoLens.Message StackGraphResponse where
+  messageName _ = Data.Text.pack "github.semantic.StackGraphResponse"
+  fieldsByTag
+    = let
+        files__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "files"
+              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
+                 Data.ProtoLens.FieldTypeDescriptor StackGraphFile)
+              (Data.ProtoLens.RepeatedField
+                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"files")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphResponse
+      in
+        Data.Map.fromList [(Data.ProtoLens.Tag 1, files__field_descriptor)]
+  unknownFields
+    = Lens.Family2.Unchecked.lens
+        _StackGraphResponse'_unknownFields
+        (\ x__ y__ -> x__ {_StackGraphResponse'_unknownFields = y__})
+  defMessage
+    = StackGraphResponse'_constructor
+        {_StackGraphResponse'files = Data.Vector.Generic.empty,
+         _StackGraphResponse'_unknownFields = []}
+  parseMessage
+    = let
+        loop ::
+          StackGraphResponse
+          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld StackGraphFile
+             -> Data.ProtoLens.Encoding.Bytes.Parser StackGraphResponse
+        loop x mutable'files
+          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
+               if end then
+                   do frozen'files <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'files)
+                      (let missing = []
+                       in
+                         if Prelude.null missing then
+                             Prelude.return ()
+                         else
+                             Prelude.fail
+                               ((Prelude.++)
+                                  "Missing required fields: "
+                                  (Prelude.show (missing :: [Prelude.String]))))
+                      Prelude.return
+                        (Lens.Family2.over
+                           Data.ProtoLens.unknownFields
+                           (\ !t -> Prelude.reverse t)
+                           (Lens.Family2.set
+                              (Data.ProtoLens.Field.field @"vec'files") frozen'files x))
+               else
+                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                      case tag of
+                        10
+                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                            Data.ProtoLens.Encoding.Bytes.isolate
+                                              (Prelude.fromIntegral len)
+                                              Data.ProtoLens.parseMessage)
+                                        "files"
+                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                       (Data.ProtoLens.Encoding.Growing.append mutable'files y)
+                                loop x v
+                        wire
+                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
+                                        wire
+                                loop
+                                  (Lens.Family2.over
+                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
+                                  mutable'files
+      in
+        (Data.ProtoLens.Encoding.Bytes.<?>)
+          (do mutable'files <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
+                                 Data.ProtoLens.Encoding.Growing.new
+              loop Data.ProtoLens.defMessage mutable'files)
+          "StackGraphResponse"
+  buildMessage
+    = \ _x
+        -> (Data.Monoid.<>)
+             (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
+                (\ _v
+                   -> (Data.Monoid.<>)
+                        (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
+                        ((Prelude..)
+                           (\ bs
+                              -> (Data.Monoid.<>)
+                                   (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                      (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                   (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                           Data.ProtoLens.encodeMessage
+                           _v))
+                (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'files") _x))
+             (Data.ProtoLens.Encoding.Wire.buildFieldSet
+                (Lens.Family2.view Data.ProtoLens.unknownFields _x))
+instance Control.DeepSeq.NFData StackGraphResponse where
+  rnf
+    = \ x__
+        -> Control.DeepSeq.deepseq
+             (_StackGraphResponse'_unknownFields x__)
+             (Control.DeepSeq.deepseq (_StackGraphResponse'files x__) ())
 {- | Fields :
      
          * 'Proto.Semantic_Fields.symbol' @:: Lens' Symbol Data.Text.Text@

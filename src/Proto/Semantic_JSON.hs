@@ -134,13 +134,34 @@ instance ToJSON ParseTreeGraphResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance FromJSONPB ParseTreeStackGraphResponse where
-  parseJSONPB = withObject "ParseTreeStackGraphResponse" $ \obj -> do
+instance FromJSONPB StackGraphRequest where
+  parseJSONPB = withObject "StackGraphRequest" $ \obj -> do
+    blobs' <- obj .: "blobs"
+    pure $ defMessage
+      & P.blobs .~ blobs'
+
+instance ToJSONPB StackGraphRequest where
+  toJSONPB x = object
+    [ "blobs" .= (x^.blobs)
+    ]
+  toEncodingPB x = pairs
+    [ "blobs" .= (x^.blobs)
+    ]
+
+instance FromJSON StackGraphRequest where
+  parseJSON = parseJSONPB
+
+instance ToJSON StackGraphRequest where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB StackGraphResponse where
+  parseJSONPB = withObject "StackGraphResponse" $ \obj -> do
     files' <- obj .: "files"
     pure $ defMessage
       & P.files .~ files'
 
-instance ToJSONPB ParseTreeStackGraphResponse where
+instance ToJSONPB StackGraphResponse where
   toJSONPB x = object
     [ "files" .= (x^.files)
     ]
@@ -148,10 +169,10 @@ instance ToJSONPB ParseTreeStackGraphResponse where
     [ "files" .= (x^.files)
     ]
 
-instance FromJSON ParseTreeStackGraphResponse where
+instance FromJSON StackGraphResponse where
   parseJSON = parseJSONPB
 
-instance ToJSON ParseTreeStackGraphResponse where
+instance ToJSON StackGraphResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 

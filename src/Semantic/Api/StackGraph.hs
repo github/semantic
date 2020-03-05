@@ -34,7 +34,7 @@ parseStackGraph :: ( Has (Error SomeException) sig m
                    , Traversable t
                    )
   => t Blob
-  -> m ParseTreeStackGraphResponse
+  -> m StackGraphResponse
 parseStackGraph blobs = do
   terms <- distributeFor blobs go
   pure $ defMessage & P.files .~ toList terms
