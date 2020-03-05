@@ -180,12 +180,6 @@ inserted ::
    Data.ProtoLens.Field.HasField s "inserted" a) =>
   Lens.Family2.LensLike' f s a
 inserted = Data.ProtoLens.Field.field @"inserted"
-isDefinition ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "isDefinition" a) =>
-  Lens.Family2.LensLike' f s a
-isDefinition = Data.ProtoLens.Field.field @"isDefinition"
 kind ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "kind" a) =>
@@ -290,6 +284,12 @@ name ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "name" a) =>
   Lens.Family2.LensLike' f s a
 name = Data.ProtoLens.Field.field @"name"
+nodeType ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "nodeType" a) =>
+  Lens.Family2.LensLike' f s a
+nodeType = Data.ProtoLens.Field.field @"nodeType"
 nodes ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "nodes" a) =>
