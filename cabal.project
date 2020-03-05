@@ -17,7 +17,6 @@ packages: .
           semantic-tsx
           semantic-typescript
           semantic-tags
-          tree-sitter-ql
           semantic-source
 
 -- Packages brought in from other repos instead of hackage
