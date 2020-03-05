@@ -888,15 +888,15 @@ instance FromJSONPB StackGraphNode where
     name' <- obj .: "name"
     line' <- obj .: "line"
     kind' <- obj .: "kind"
-    isDefinition' <- obj .: "isDefinition"
     span' <- obj A..:? "span"
+    nodeType' <- obj .: "nodeType"
     pure $ defMessage
       & P.id .~ id'
       & P.name .~ name'
       & P.line .~ line'
       & P.kind .~ kind'
-      & P.isDefinition .~ isDefinition'
       & P.maybe'span .~ span'
+      & P.nodeType .~ nodeType'
 
 instance ToJSONPB StackGraphNode where
   toJSONPB x = object
@@ -904,22 +904,41 @@ instance ToJSONPB StackGraphNode where
     , "name" .= (x^.name)
     , "line" .= (x^.line)
     , "kind" .= (x^.kind)
-    , "isDefinition" .= (x^.isDefinition)
     , "span" .= (x^.maybe'span)
+    , "nodeType" .= (x^.nodeType)
     ]
   toEncodingPB x = pairs
     [ "id" .= (x^.id)
     , "name" .= (x^.name)
     , "line" .= (x^.line)
     , "kind" .= (x^.kind)
-    , "isDefinition" .= (x^.isDefinition)
     , "span" .= (x^.maybe'span)
+    , "nodeType" .= (x^.nodeType)
     ]
 
 instance FromJSON StackGraphNode where
   parseJSON = parseJSONPB
 
 instance ToJSON StackGraphNode where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB StackGraphNode'NodeType where
+  parseJSONPB (JSONPB.String "ROOT_SCOPE") = pure StackGraphNode'ROOT_SCOPE
+  parseJSONPB (JSONPB.String "JUMP_TO_SCOPE") = pure StackGraphNode'JUMP_TO_SCOPE
+  parseJSONPB (JSONPB.String "EXPORTED_SCOPE") = pure StackGraphNode'EXPORTED_SCOPE
+  parseJSONPB (JSONPB.String "DEFINITION") = pure StackGraphNode'DEFINITION
+  parseJSONPB (JSONPB.String "REFERENCE") = pure StackGraphNode'REFERENCE
+  parseJSONPB x = typeMismatch "NodeType" x
+
+instance ToJSONPB StackGraphNode'NodeType where
+  toJSONPB x _ = A.String . T.toUpper . T.pack $ show x
+  toEncodingPB x _ = E.text . T.toUpper . T.pack  $ show x
+
+instance FromJSON StackGraphNode'NodeType where
+  parseJSON = parseJSONPB
+
+instance ToJSON StackGraphNode'NodeType where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 

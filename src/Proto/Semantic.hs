@@ -15,8 +15,10 @@ module Proto.Semantic (
         ParseTreeGraphResponse(), ParseTreeRequest(),
         ParseTreeStackGraphResponse(), ParseTreeSymbolResponse(),
         PingRequest(), PingResponse(), Position(), ReplacedTerm(), Span(),
-        StackGraphFile(), StackGraphNode(), StackGraphPath(), Symbol(),
-        TOCSummaryChange(), TOCSummaryError(), TOCSummaryFile(),
+        StackGraphFile(), StackGraphNode(), StackGraphNode'NodeType(..),
+        StackGraphNode'NodeType(),
+        StackGraphNode'NodeType'UnrecognizedValue, StackGraphPath(),
+        Symbol(), TOCSummaryChange(), TOCSummaryError(), TOCSummaryFile(),
         TermEdge(), TermVertex()
     ) where
 import qualified Data.ProtoLens.Runtime.Control.DeepSeq as Control.DeepSeq
@@ -5123,16 +5125,16 @@ instance Control.DeepSeq.NFData StackGraphFile where
          * 'Proto.Semantic_Fields.name' @:: Lens' StackGraphNode Data.Text.Text@
          * 'Proto.Semantic_Fields.line' @:: Lens' StackGraphNode Data.Text.Text@
          * 'Proto.Semantic_Fields.kind' @:: Lens' StackGraphNode Data.Text.Text@
-         * 'Proto.Semantic_Fields.isDefinition' @:: Lens' StackGraphNode Prelude.Bool@
          * 'Proto.Semantic_Fields.span' @:: Lens' StackGraphNode Span@
-         * 'Proto.Semantic_Fields.maybe'span' @:: Lens' StackGraphNode (Prelude.Maybe Span)@ -}
+         * 'Proto.Semantic_Fields.maybe'span' @:: Lens' StackGraphNode (Prelude.Maybe Span)@
+         * 'Proto.Semantic_Fields.nodeType' @:: Lens' StackGraphNode StackGraphNode'NodeType@ -}
 data StackGraphNode
   = StackGraphNode'_constructor {_StackGraphNode'id :: !Data.Int.Int64,
                                  _StackGraphNode'name :: !Data.Text.Text,
                                  _StackGraphNode'line :: !Data.Text.Text,
                                  _StackGraphNode'kind :: !Data.Text.Text,
-                                 _StackGraphNode'isDefinition :: !Prelude.Bool,
                                  _StackGraphNode'span :: !(Prelude.Maybe Span),
+                                 _StackGraphNode'nodeType :: !StackGraphNode'NodeType,
                                  _StackGraphNode'_unknownFields :: !Data.ProtoLens.FieldSet}
   deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphNode where
@@ -5168,13 +5170,6 @@ instance Data.ProtoLens.Field.HasField StackGraphNode "kind" Data.Text.Text wher
            _StackGraphNode'kind
            (\ x__ y__ -> x__ {_StackGraphNode'kind = y__}))
         Prelude.id
-instance Data.ProtoLens.Field.HasField StackGraphNode "isDefinition" Prelude.Bool where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _StackGraphNode'isDefinition
-           (\ x__ y__ -> x__ {_StackGraphNode'isDefinition = y__}))
-        Prelude.id
 instance Data.ProtoLens.Field.HasField StackGraphNode "span" Span where
   fieldOf _
     = (Prelude..)
@@ -5188,6 +5183,13 @@ instance Data.ProtoLens.Field.HasField StackGraphNode "maybe'span" (Prelude.Mayb
         (Lens.Family2.Unchecked.lens
            _StackGraphNode'span
            (\ x__ y__ -> x__ {_StackGraphNode'span = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphNode "nodeType" StackGraphNode'NodeType where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphNode'nodeType
+           (\ x__ y__ -> x__ {_StackGraphNode'nodeType = y__}))
         Prelude.id
 instance Data.ProtoLens.Message StackGraphNode where
   messageName _ = Data.Text.pack "github.semantic.StackGraphNode"
@@ -5225,15 +5227,6 @@ instance Data.ProtoLens.Message StackGraphNode where
               (Data.ProtoLens.PlainField
                  Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"kind")) ::
               Data.ProtoLens.FieldDescriptor StackGraphNode
-        isDefinition__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "is_definition"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.BoolField ::
-                 Data.ProtoLens.FieldTypeDescriptor Prelude.Bool)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"isDefinition")) ::
-              Data.ProtoLens.FieldDescriptor StackGraphNode
         span__field_descriptor
           = Data.ProtoLens.FieldDescriptor
               "span"
@@ -5242,14 +5235,23 @@ instance Data.ProtoLens.Message StackGraphNode where
               (Data.ProtoLens.OptionalField
                  (Data.ProtoLens.Field.field @"maybe'span")) ::
               Data.ProtoLens.FieldDescriptor StackGraphNode
+        nodeType__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "node_type"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.EnumField ::
+                 Data.ProtoLens.FieldTypeDescriptor StackGraphNode'NodeType)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional
+                 (Data.ProtoLens.Field.field @"nodeType")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphNode
       in
         Data.Map.fromList
           [(Data.ProtoLens.Tag 1, id__field_descriptor),
            (Data.ProtoLens.Tag 2, name__field_descriptor),
            (Data.ProtoLens.Tag 3, line__field_descriptor),
            (Data.ProtoLens.Tag 4, kind__field_descriptor),
-           (Data.ProtoLens.Tag 5, isDefinition__field_descriptor),
-           (Data.ProtoLens.Tag 6, span__field_descriptor)]
+           (Data.ProtoLens.Tag 5, span__field_descriptor),
+           (Data.ProtoLens.Tag 6, nodeType__field_descriptor)]
   unknownFields
     = Lens.Family2.Unchecked.lens
         _StackGraphNode'_unknownFields
@@ -5260,8 +5262,8 @@ instance Data.ProtoLens.Message StackGraphNode where
          _StackGraphNode'name = Data.ProtoLens.fieldDefault,
          _StackGraphNode'line = Data.ProtoLens.fieldDefault,
          _StackGraphNode'kind = Data.ProtoLens.fieldDefault,
-         _StackGraphNode'isDefinition = Data.ProtoLens.fieldDefault,
          _StackGraphNode'span = Prelude.Nothing,
+         _StackGraphNode'nodeType = Data.ProtoLens.fieldDefault,
          _StackGraphNode'_unknownFields = []}
   parseMessage
     = let
@@ -5328,21 +5330,23 @@ instance Data.ProtoLens.Message StackGraphNode where
                                                 (Prelude.Right r) -> Prelude.Right r))
                                        "kind"
                                 loop (Lens.Family2.set (Data.ProtoLens.Field.field @"kind") y x)
-                        40
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          ((Prelude./=) 0) Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "is_definition"
-                                loop
-                                  (Lens.Family2.set
-                                     (Data.ProtoLens.Field.field @"isDefinition") y x)
-                        50
+                        42
                           -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
                                            Data.ProtoLens.Encoding.Bytes.isolate
                                              (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
                                        "span"
                                 loop (Lens.Family2.set (Data.ProtoLens.Field.field @"span") y x)
+                        48
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          Prelude.toEnum
+                                          (Prelude.fmap
+                                             Prelude.fromIntegral
+                                             Data.ProtoLens.Encoding.Bytes.getVarInt))
+                                       "node_type"
+                                loop
+                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"nodeType") y x)
                         wire
                           -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
                                         wire
@@ -5413,36 +5417,36 @@ instance Data.ProtoLens.Message StackGraphNode where
                                   Data.Text.Encoding.encodeUtf8
                                   _v))
                       ((Data.Monoid.<>)
-                         (let
-                            _v
-                              = Lens.Family2.view (Data.ProtoLens.Field.field @"isDefinition") _x
-                          in
-                            if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                                Data.Monoid.mempty
-                            else
-                                (Data.Monoid.<>)
-                                  (Data.ProtoLens.Encoding.Bytes.putVarInt 40)
-                                  ((Prelude..)
-                                     Data.ProtoLens.Encoding.Bytes.putVarInt
-                                     (\ b -> if b then 1 else 0)
-                                     _v))
+                         (case
+                              Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'span") _x
+                          of
+                            Prelude.Nothing -> Data.Monoid.mempty
+                            (Prelude.Just _v)
+                              -> (Data.Monoid.<>)
+                                   (Data.ProtoLens.Encoding.Bytes.putVarInt 42)
+                                   ((Prelude..)
+                                      (\ bs
+                                         -> (Data.Monoid.<>)
+                                              (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                                 (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                              (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                      Data.ProtoLens.encodeMessage
+                                      _v))
                          ((Data.Monoid.<>)
-                            (case
-                                 Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'span") _x
-                             of
-                               Prelude.Nothing -> Data.Monoid.mempty
-                               (Prelude.Just _v)
-                                 -> (Data.Monoid.<>)
-                                      (Data.ProtoLens.Encoding.Bytes.putVarInt 50)
-                                      ((Prelude..)
-                                         (\ bs
-                                            -> (Data.Monoid.<>)
-                                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                                    (Prelude.fromIntegral
-                                                       (Data.ByteString.length bs)))
-                                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                         Data.ProtoLens.encodeMessage
-                                         _v))
+                            (let
+                               _v = Lens.Family2.view (Data.ProtoLens.Field.field @"nodeType") _x
+                             in
+                               if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                                   Data.Monoid.mempty
+                               else
+                                   (Data.Monoid.<>)
+                                     (Data.ProtoLens.Encoding.Bytes.putVarInt 48)
+                                     ((Prelude..)
+                                        ((Prelude..)
+                                           Data.ProtoLens.Encoding.Bytes.putVarInt
+                                           Prelude.fromIntegral)
+                                        Prelude.fromEnum
+                                        _v))
                             (Data.ProtoLens.Encoding.Wire.buildFieldSet
                                (Lens.Family2.view Data.ProtoLens.unknownFields _x)))))))
 instance Control.DeepSeq.NFData StackGraphNode where
@@ -5459,8 +5463,98 @@ instance Control.DeepSeq.NFData StackGraphNode where
                       (Control.DeepSeq.deepseq
                          (_StackGraphNode'kind x__)
                          (Control.DeepSeq.deepseq
-                            (_StackGraphNode'isDefinition x__)
-                            (Control.DeepSeq.deepseq (_StackGraphNode'span x__) ()))))))
+                            (_StackGraphNode'span x__)
+                            (Control.DeepSeq.deepseq (_StackGraphNode'nodeType x__) ()))))))
+newtype StackGraphNode'NodeType'UnrecognizedValue
+  = StackGraphNode'NodeType'UnrecognizedValue Data.Int.Int32
+  deriving (Prelude.Eq, Prelude.Ord, Prelude.Show)
+data StackGraphNode'NodeType
+  = StackGraphNode'ROOT_SCOPE |
+    StackGraphNode'JUMP_TO_SCOPE |
+    StackGraphNode'EXPORTED_SCOPE |
+    StackGraphNode'DEFINITION |
+    StackGraphNode'REFERENCE |
+    StackGraphNode'NodeType'Unrecognized !StackGraphNode'NodeType'UnrecognizedValue
+  deriving (Prelude.Show, Prelude.Eq, Prelude.Ord)
+instance Data.ProtoLens.MessageEnum StackGraphNode'NodeType where
+  maybeToEnum 0 = Prelude.Just StackGraphNode'ROOT_SCOPE
+  maybeToEnum 1 = Prelude.Just StackGraphNode'JUMP_TO_SCOPE
+  maybeToEnum 2 = Prelude.Just StackGraphNode'EXPORTED_SCOPE
+  maybeToEnum 3 = Prelude.Just StackGraphNode'DEFINITION
+  maybeToEnum 4 = Prelude.Just StackGraphNode'REFERENCE
+  maybeToEnum k
+    = Prelude.Just
+        (StackGraphNode'NodeType'Unrecognized
+           (StackGraphNode'NodeType'UnrecognizedValue
+              (Prelude.fromIntegral k)))
+  showEnum StackGraphNode'ROOT_SCOPE = "ROOT_SCOPE"
+  showEnum StackGraphNode'JUMP_TO_SCOPE = "JUMP_TO_SCOPE"
+  showEnum StackGraphNode'EXPORTED_SCOPE = "EXPORTED_SCOPE"
+  showEnum StackGraphNode'DEFINITION = "DEFINITION"
+  showEnum StackGraphNode'REFERENCE = "REFERENCE"
+  showEnum
+    (StackGraphNode'NodeType'Unrecognized (StackGraphNode'NodeType'UnrecognizedValue k))
+    = Prelude.show k
+  readEnum k
+    | (Prelude.==) k "ROOT_SCOPE"
+    = Prelude.Just StackGraphNode'ROOT_SCOPE
+    | (Prelude.==) k "JUMP_TO_SCOPE"
+    = Prelude.Just StackGraphNode'JUMP_TO_SCOPE
+    | (Prelude.==) k "EXPORTED_SCOPE"
+    = Prelude.Just StackGraphNode'EXPORTED_SCOPE
+    | (Prelude.==) k "DEFINITION"
+    = Prelude.Just StackGraphNode'DEFINITION
+    | (Prelude.==) k "REFERENCE"
+    = Prelude.Just StackGraphNode'REFERENCE
+    | Prelude.otherwise
+    = (Prelude.>>=) (Text.Read.readMaybe k) Data.ProtoLens.maybeToEnum
+instance Prelude.Bounded StackGraphNode'NodeType where
+  minBound = StackGraphNode'ROOT_SCOPE
+  maxBound = StackGraphNode'REFERENCE
+instance Prelude.Enum StackGraphNode'NodeType where
+  toEnum k__
+    = Prelude.maybe
+        (Prelude.error
+           ((Prelude.++)
+              "toEnum: unknown value for enum NodeType: " (Prelude.show k__)))
+        Prelude.id
+        (Data.ProtoLens.maybeToEnum k__)
+  fromEnum StackGraphNode'ROOT_SCOPE = 0
+  fromEnum StackGraphNode'JUMP_TO_SCOPE = 1
+  fromEnum StackGraphNode'EXPORTED_SCOPE = 2
+  fromEnum StackGraphNode'DEFINITION = 3
+  fromEnum StackGraphNode'REFERENCE = 4
+  fromEnum
+    (StackGraphNode'NodeType'Unrecognized (StackGraphNode'NodeType'UnrecognizedValue k))
+    = Prelude.fromIntegral k
+  succ StackGraphNode'REFERENCE
+    = Prelude.error
+        "StackGraphNode'NodeType.succ: bad argument StackGraphNode'REFERENCE. This value would be out of bounds."
+  succ StackGraphNode'ROOT_SCOPE = StackGraphNode'JUMP_TO_SCOPE
+  succ StackGraphNode'JUMP_TO_SCOPE = StackGraphNode'EXPORTED_SCOPE
+  succ StackGraphNode'EXPORTED_SCOPE = StackGraphNode'DEFINITION
+  succ StackGraphNode'DEFINITION = StackGraphNode'REFERENCE
+  succ (StackGraphNode'NodeType'Unrecognized _)
+    = Prelude.error
+        "StackGraphNode'NodeType.succ: bad argument: unrecognized value"
+  pred StackGraphNode'ROOT_SCOPE
+    = Prelude.error
+        "StackGraphNode'NodeType.pred: bad argument StackGraphNode'ROOT_SCOPE. This value would be out of bounds."
+  pred StackGraphNode'JUMP_TO_SCOPE = StackGraphNode'ROOT_SCOPE
+  pred StackGraphNode'EXPORTED_SCOPE = StackGraphNode'JUMP_TO_SCOPE
+  pred StackGraphNode'DEFINITION = StackGraphNode'EXPORTED_SCOPE
+  pred StackGraphNode'REFERENCE = StackGraphNode'DEFINITION
+  pred (StackGraphNode'NodeType'Unrecognized _)
+    = Prelude.error
+        "StackGraphNode'NodeType.pred: bad argument: unrecognized value"
+  enumFrom = Data.ProtoLens.Message.Enum.messageEnumFrom
+  enumFromTo = Data.ProtoLens.Message.Enum.messageEnumFromTo
+  enumFromThen = Data.ProtoLens.Message.Enum.messageEnumFromThen
+  enumFromThenTo = Data.ProtoLens.Message.Enum.messageEnumFromThenTo
+instance Data.ProtoLens.FieldDefault StackGraphNode'NodeType where
+  fieldDefault = StackGraphNode'ROOT_SCOPE
+instance Control.DeepSeq.NFData StackGraphNode'NodeType where
+  rnf x__ = Prelude.seq x__ ()
 {- | Fields :
      
          * 'Proto.Semantic_Fields.startingSymbolStack' @:: Lens' StackGraphPath [Data.Text.Text]@
