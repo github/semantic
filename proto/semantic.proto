@@ -202,6 +202,6 @@ message StackGraphPath {
   int64 from = 3;
   string edges = 4;
   int64 to = 5;
-  repeated string ending_scope_stack = 6;
+  repeated int64 ending_scope_stack = 6;
   repeated string ending_symbol_stack = 7;
 }
