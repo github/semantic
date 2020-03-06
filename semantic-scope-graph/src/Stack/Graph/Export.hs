@@ -32,8 +32,8 @@ nodeAttributes (node :# idx) = case node of
   PopSymbol s   -> [ "shape" := "diamond", "label" := sym s, "color" := "green", "style" := "dashed"]
   PushScope     -> [ "shape" := "rect", "label" := ("PUSH " <> show idx)]
   Scope s       -> [ "shape" := "circle", "label" := sym s, "style" := "filled"]
-  ExportedScope -> [ "shape" := "circle", "label" := show idx]
-  JumpToScope   -> [ "shape" := "circle", "label" := show idx]
+  ExportedScope s -> [ "shape" := "circle", "label" := sym s]
+  JumpToScope s  -> [ "shape" := "circle", "label" := sym s]
   IgnoreScope   -> [ "shape" := "rect", "label" := "IGNORE", "color" := "purple"]
   Root          -> [ "shape" := "circle", "style" := "filled", "label" := "root", "fillcolor" := "black", "fontcolor" := "white"]
 

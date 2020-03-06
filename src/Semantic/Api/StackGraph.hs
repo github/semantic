@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Semantic.Api.StackGraph
   ( parseStackGraph
   , TempStackGraph(..)
@@ -9,26 +10,33 @@ module Semantic.Api.StackGraph
   ) where
 
 
+import qualified Algebra.Graph as Graph
+import qualified Analysis.Name as Name
+import qualified Control.Carrier.Sketch.ScopeGraph as ScopeGraph
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Exception
 import           Control.Lens
 import           Data.Blob
-import           Data.Int
-import           Data.Map.Strict (Map)
-import           Data.Language
 import           Data.Foldable
+import           Data.Int
+import           Data.Language
+import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
-import           Semantic.Api.Bridge
+import           Data.Semilattice.Lower
+import           Data.Text (Text, pack)
+import qualified Parsing.Parser as Parser
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
-import           Data.Text (Text, pack)
-import           Source.Loc as Loc
+import qualified Scope.Graph.Convert as Graph
+import           Semantic.Api.Bridge
 import           Semantic.Task
-import qualified Parsing.Parser as Parser
+import           Source.Loc as Loc
+import qualified Stack.Graph as Stack
 
 parseStackGraph :: ( Has (Error SomeException) sig m
+                   , Effect sig
                    , Has Distribute sig m
                    , Has Parse sig m
                    , Traversable t
@@ -40,11 +48,12 @@ parseStackGraph blobs = do
   pure $ defMessage & P.files .~ toList terms
   where
     go :: ( Has (Error SomeException) sig m
+          , Effect sig
           , Has Parse sig m
           )
       => Blob
       -> m StackGraphFile
-    go blob = catching $ graphToFile <$> graphForBlob blob
+    go blob = catching $ graphToFile . stackGraphToTempStackGraph <$> graphForBlob blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
@@ -102,19 +111,19 @@ data TempStackGraph
 
 data SGPath
   = SGPath
-  { pathStartingSymbolStack :: [Text]
+  { pathStartingSymbolStack    :: [Text]
   , pathStartingScopeStackSize :: Int64
-  , pathFrom :: Int64
-  , pathEdges :: Text
-  , pathTo :: Int64
-  , pathEndingScopeStack :: [Int64]
-  , pathEndingSymbolStack :: [Text]
+  , pathFrom                   :: Int64
+  , pathEdges                  :: Text
+  , pathTo                     :: Int64
+  , pathEndingScopeStack       :: [Int64]
+  , pathEndingSymbolStack      :: [Text]
   }
   deriving (Eq, Show)
 
 data SGNode
   = SGNode
-  { nodeId :: Int64
+  { nodeId   :: Int64
   , nodeName :: Text
   , nodeLine :: Text
   , nodeKind :: Text
@@ -126,11 +135,28 @@ data SGNode
 data SGNodeType = RootScope | JumpToScope | ExportedScope | Definition | Reference
   deriving (Eq, Show)
 
-graphForBlob :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m TempStackGraph
-graphForBlob blob = parseWith toStackGraphParsers (pure . toStackGraph blob) blob
+graphForBlob :: (Effect sig, Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m (Stack.Graph Stack.Node)
+graphForBlob blob = parseWith toStackGraphParsers (fmap fst . ScopeGraph.runSketch lowerBound . Graph.scopeGraph) blob
   where
-    toStackGraphParsers :: Map Language (Parser.SomeParser ToStackGraph Loc)
+    toStackGraphParsers :: Map Language (Parser.SomeParser Graph.ToScopeGraph Loc)
     toStackGraphParsers = Parser.preciseParsers
+
+stackGraphToTempStackGraph :: Stack.Graph Stack.Node -> TempStackGraph
+stackGraphToTempStackGraph graph = let
+  nodes = toSGNode <$> Graph.vertexList (Stack.unGraph graph)
+  paths = undefined
+  in TempStackGraph { scopeGraphNodes = nodes, scopeGraphPaths = paths }
+
+toSGNode :: Stack.Node -> SGNode
+toSGNode node = case node of
+  Stack.Declaration s -> SGNode {
+      nodeId = 1
+    , nodeName = Name.formatName s
+    , nodeLine = ""
+    , nodeKind = ""
+    , nodeSpan = lowerBound
+    , Semantic.Api.StackGraph.nodeType = Definition
+    }
 
 class ToStackGraph term where
   toStackGraph :: Blob -> term Loc -> TempStackGraph

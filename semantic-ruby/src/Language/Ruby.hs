@@ -13,6 +13,7 @@ import           Data.Text (Text)
 import qualified Language.Ruby.AST as Rb
 import qualified Language.Ruby.Grammar (tree_sitter_ruby)
 import qualified Language.Ruby.Tags as RbTags
+import           Scope.Graph.Convert
 import qualified Tags.Tagging.Precise as Tags
 
 newtype Term a = Term { getTerm :: Rb.Program a }
@@ -26,3 +27,6 @@ instance TS.Unmarshal Term where
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . evalState @[Text] [] . RbTags.tags . getTerm
+
+instance ToScopeGraph Term where
+  scopeGraph = undefined

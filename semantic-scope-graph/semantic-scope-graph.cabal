@@ -33,6 +33,7 @@ library
     Scope.Reference
     Scope.Scope
     Scope.Types
+    Stack.Path
     Stack.Graph
     Stack.Graph.Export
     Data.Hole

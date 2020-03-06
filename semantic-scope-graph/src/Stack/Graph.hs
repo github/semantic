@@ -61,14 +61,14 @@ import qualified Scope.Types as Scope
 type Symbol = Name
 
 data Node = Root
-  | Declaration Symbol
-  | Reference Symbol
-  | PushSymbol Symbol
-  | PopSymbol Symbol
+  | Declaration { symbol :: Symbol }
+  | Reference { symbol :: Symbol }
+  | PushSymbol { symbol :: Symbol }
+  | PopSymbol { symbol :: Symbol }
   | PushScope
-  | Scope Symbol
-  | ExportedScope
-  | JumpToScope
+  | Scope { symbol :: Symbol}
+  | ExportedScope { symbol :: Symbol }
+  | JumpToScope { symbol :: Symbol }
   | IgnoreScope
   deriving (Show, Eq, Ord)
 
