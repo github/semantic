@@ -221,6 +221,7 @@ library
                      , Semantic.Api.Bridge
                      , Semantic.Api.Diffs
                      , Semantic.Api.LegacyTypes
+                     , Semantic.Api.StackGraph
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
                      , Semantic.Api.TOCSummaries
