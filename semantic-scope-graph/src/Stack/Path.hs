@@ -73,8 +73,7 @@ checkEdgeInvariants Path{ startingNode, endingNode, edges }
 
 -- | The starting node of a path must be the root node, an exported
 -- scope node, or a reference node. The ending node of a path must be
--- the root node, a jump to scope node, a resolved jump to scope node,
--- or a definition node.
+-- the root node, a jump to scope node, or a definition node.
 checkNodeInvariants :: Path -> Maybe PathInvariantError
 checkNodeInvariants Path { startingNode, endingNode }
   = getFirst (checkStart <> checkEnd)
@@ -85,7 +84,6 @@ checkNodeInvariants Path { startingNode, endingNode }
         Reference{}     -> mempty
         _other          -> pure (BadStartingNode startingNode)
 
-      -- PT TODO: add the case checking for "resolved" jump to scopes
       checkEnd = case extract endingNode of
         Root          -> mempty
         JumpToScope{} -> mempty
