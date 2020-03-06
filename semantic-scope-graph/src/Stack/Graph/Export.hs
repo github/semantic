@@ -8,18 +8,13 @@ module Stack.Graph.Export
 import           Algebra.Graph.Export.Dot (Attribute (..))
 import qualified Algebra.Graph.Export.Dot as Dot
 import           Analysis.Name
-import           Control.Concurrent
 import           Control.Monad
 import qualified Data.ByteString.Streaming.Char8 as ByteStream
-import qualified Data.Char as Char
-import           Data.String
 import qualified Data.Text as T
 import           Stack.Graph
 import           Streaming
-import qualified Streaming.Prelude as Stream
 import qualified Streaming.Process
 import           System.IO
-import           System.IO.Temp
 import           System.Process (system)
 import qualified System.Process as Process
 

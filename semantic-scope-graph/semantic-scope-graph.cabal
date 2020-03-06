@@ -25,6 +25,7 @@ library
     Control.Effect.ScopeGraph.Properties.Declaration
     Control.Effect.ScopeGraph.Properties.Function
     Control.Effect.ScopeGraph.Properties.Reference
+    Data.Functor.Tagged
     Scope.Graph.AdjacencyList
     Scope.Graph.Convert
     Scope.Info
@@ -42,6 +43,7 @@ library
     , aeson
     , algebraic-graphs    >= 0.3 && < 0.5
     , containers
+    , comonad
     , fused-effects      ^>= 1.0
     , generic-monoid
     , generic-lens
