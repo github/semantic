@@ -159,7 +159,6 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
-                     , Data.Maybe.Exts
                      , Data.Quieterm
                      , Data.Semigroup.App
                      , Data.Scientific.Exts

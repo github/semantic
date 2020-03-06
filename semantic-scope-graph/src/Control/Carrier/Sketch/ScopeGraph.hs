@@ -31,7 +31,6 @@ import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import           Scope.Types
 import qualified Stack.Graph as Stack
-import qualified System.Path as Path
 
 type SketchC addr m
   = StateC (ScopeGraph Name)

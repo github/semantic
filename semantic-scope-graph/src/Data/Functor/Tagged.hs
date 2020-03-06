@@ -6,12 +6,15 @@
 -- | A functor associating an 'Int' tag value with a datum. Useful for describing unique IDs.
 module Data.Functor.Tagged
   ( Tagged (..)
+  , Tag
   -- * Lenses
   , identifier
   , contents
   -- * Monadic creation functions
   , taggedM
   , taggedIO
+  -- * Reexports
+  , extract
   ) where
 
 import Control.Comonad
@@ -23,9 +26,11 @@ import Data.Generics.Product
 import Data.Unique
 import GHC.Generics
 
+type Tag = Int
+
 -- | If creating 'Tagged' values manually, it is your responsibility
--- to ensure that the provided 'Int' is actually unique. Consider using 'taggedM'.
-data Tagged a = a :# !Int
+-- to ensure that the provided 'Tag' is actually unique. Consider using 'taggedM'.
+data Tagged a = a :# !Tag
   deriving (Functor, Foldable, Traversable, Generic)
 
 infixl 7 :#
@@ -35,6 +40,9 @@ contents = position @1
 
 identifier :: Lens' (Tagged a) Int
 identifier = position @2
+
+instance Show a => Show (Tagged a) where
+  showsPrec n (a :# t) = showsPrec n a <> showString " # " <> showsPrec n t
 
 -- | This is marked as overlappable so that custom types can define
 -- their own definitions of equality when wrapped in a Tagged. This
