@@ -17,11 +17,15 @@ module Stack.Path
 
 import Data.Functor.Tagged
 import Data.Monoid
-import Data.Text (Text)
-import Stack.Graph (Node (..), Symbol)
 import Data.Semigroup (sconcat)
 import Data.Sequence (Seq (..))
+import Data.Text (Text)
+import Stack.Graph (Node (..), Symbol)
 
+-- | A partial path through a stack graph. These will be generated
+-- from walks through the stack graph, and can be thought of as
+-- representing a snapshot of the pathfinding algorithm at a given
+-- state.
 data Path = Path
   { startingNode           :: Tagged Node
   , endingNode             :: Tagged Node
@@ -123,7 +127,7 @@ data Completion = Partial | Complete
 -- | A path is complete if its starting node is a reference node and its ending node is a definition node. Otherwise it is partial.
 completion :: Path -> Completion
 completion Path { startingNode = Reference{} :# _, endingNode = Declaration{} :# _} = Complete
-completion _ = Partial
+completion _                                                                        = Partial
 
 -- | A path is incremental if the source node and sink node of every edge in the path belongs to the same file.
 isIncremental :: Path -> Bool
