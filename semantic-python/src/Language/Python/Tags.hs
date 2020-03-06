@@ -14,6 +14,7 @@ import           AST.Token
 import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
+import           Data.Foldable
 import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Maybe (listToMaybe)
 import           Data.Text as Text
@@ -54,8 +55,15 @@ keywordFunctionCall
   => t Loc -> Loc -> Range -> Text -> m ()
 keywordFunctionCall t loc range name = yieldTag name Function loc range Nothing >> gtags t
 
+instance ToTags Py.String where
+  tags Py.String { extraChildren } = for_ extraChildren $ \ x -> case x of
+    Prj t@Py.Interpolation { } -> tags t
+    _                          -> pure ()
+
 instance ToTags Py.Interpolation where
-  tags Py.Interpolation { } = pure ()
+  tags Py.Interpolation { extraChildren } = for_ extraChildren $ \ x -> case x of
+    Prj (Py.Expression expr) -> tags expr
+    _                        -> pure ()
 
 instance ToTags Py.AssertStatement where
   tags t@Py.AssertStatement { ann = loc@Loc { byteRange } } = keywordFunctionCall t loc byteRange "assert"
@@ -211,7 +219,6 @@ instance ToTags Py.Set
 instance ToTags Py.SetComprehension
 instance ToTags Py.SimpleStatement
 instance ToTags Py.Slice
-instance ToTags Py.String
 instance ToTags Py.Subscript
 instance ToTags Py.True
 instance ToTags Py.TryStatement
