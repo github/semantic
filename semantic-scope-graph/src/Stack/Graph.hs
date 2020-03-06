@@ -56,7 +56,6 @@ import qualified Data.Map.Strict as Map
 import           Data.Maybe
 import           Data.Semilattice.Lower
 import           Data.Set (Set)
-import qualified Data.Set as Set
 import qualified Scope.Types as Scope
 
 type Symbol = Name

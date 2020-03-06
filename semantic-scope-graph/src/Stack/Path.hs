@@ -1,8 +1,21 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 module Stack.Path
   ( Path (..)
+  , startingNode_
+  , endingNode_
+  , edges_
+  , endingScopeStack_
+  , startingSymbolStack_
+  , startingScopeStackSize_
+  , endingSymbolStack_
   , Edge (..)
+  , formatEdge
+  , parseEdges
   , StartingSize (..)
   , PathInvariantError (..)
   , checkEdgeInvariants
@@ -15,12 +28,16 @@ module Stack.Path
   ) where
 
 
-import Data.Functor.Tagged
-import Data.Monoid
-import Data.Semigroup (sconcat)
-import Data.Sequence (Seq (..))
-import Data.Text (Text)
-import Stack.Graph (Node (..), Symbol)
+import           Control.Lens.Lens
+import           Data.Functor.Tagged
+import           Data.Generics.Product
+import           Data.Monoid
+import           Data.Semigroup (sconcat)
+import           Data.Sequence (Seq (..))
+import           Data.Text (Text)
+import qualified Data.Text as T
+import           GHC.Generics (Generic)
+import           Stack.Graph (Node (..), Symbol)
 
 -- | A partial path through a stack graph. These will be generated
 -- from walks through the stack graph, and can be thought of as
@@ -33,14 +50,43 @@ data Path = Path
   , startingSymbolStack    :: [Symbol]
   , endingSymbolStack      :: [Symbol]
   , startingScopeStackSize :: StartingSize
-  , endingScopeStack       :: [Tag]
-  } deriving (Eq, Show)
+  , endingScopeStack       :: [Tag] -- Should this be (Seq (Tagged Node))?
+  } deriving (Eq, Show, Generic)
+
+startingNode_ :: Lens' Path (Tagged Node)
+startingNode_ = field @"startingNode"
+
+endingNode_ :: Lens' Path (Tagged Node)
+endingNode_ = field @"endingNode"
+
+edges_ :: Lens' Path (Seq Edge)
+edges_ = field @"edges"
+
+startingSymbolStack_ :: Lens' Path [Symbol]
+startingSymbolStack_ = field @"startingSymbolStack"
+
+startingScopeStackSize_ :: Lens' Path StartingSize
+startingScopeStackSize_ = field @"startingScopeStackSize"
+
+endingSymbolStack_ :: Lens' Path [Symbol]
+endingSymbolStack_ = field @"endingSymbolStack"
+
+endingScopeStack_ :: Lens' Path [Tag]
+endingScopeStack_ = field @"endingScopeStack"
 
 data Edge = Edge
   { sourceNode :: Tagged Node
   , sinkNode   :: Tagged Node
   , label      :: Text
   } deriving (Eq, Show)
+
+parseEdges :: Text -> [Edge]
+parseEdges = const []
+
+formatEdge :: Edge -> Text
+formatEdge (Edge src sink lab) =
+  get src <> ":" <> get sink <> ":" <> lab
+    where get = T.pack . show . extract
 
 data StartingSize
   = Zero

@@ -306,6 +306,7 @@ library
                      , tree-sitter-ruby ^>= 0.5.0.0
                      , tree-sitter-typescript ^>= 0.5.0.0
                      , tree-sitter-tsx ^>= 0.5.0.0
+                     , validation ^>= 1.1
 
 executable semantic
   import:              haskell, dependencies, executable-flags

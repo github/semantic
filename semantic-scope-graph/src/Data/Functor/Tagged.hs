@@ -23,10 +23,14 @@ import Control.Lens.Getter
 import Control.Lens.Lens
 import Data.Function
 import Data.Generics.Product
+import Data.Int
 import Data.Unique
 import GHC.Generics
 
-type Tag = Int
+-- | Most identificatory fields are pinned to protobuf id's, which by convention
+-- are signed 64-bit values, so that we can convert them efficiently between
+-- Int and Int64 (that is, all calls to fromIntegral are eliminated)
+type Tag = Int64
 
 -- | If creating 'Tagged' values manually, it is your responsibility
 -- to ensure that the provided 'Tag' is actually unique. Consider using 'taggedM'.
@@ -38,7 +42,7 @@ infixl 7 :#
 contents :: Lens (Tagged a) (Tagged b) a b
 contents = position @1
 
-identifier :: Lens' (Tagged a) Int
+identifier :: Lens' (Tagged a) Tag
 identifier = position @2
 
 instance Show a => Show (Tagged a) where
@@ -57,9 +61,9 @@ instance Comonad Tagged where
 
 -- | Tag a new value by drawing on a 'Fresh' supply.
 taggedM :: Has Fresh sig m => a -> m (Tagged a)
-taggedM a = (a :#) <$> fresh
+taggedM a = (a :#) . fromIntegral <$> fresh
 
 -- | Tag a new value in 'IO'. The supplied values will not be numerically
 -- ordered, but are guaranteed to be unique throughout the life of the program.
 taggedIO :: a -> IO (Tagged a)
-taggedIO a = (a :#) . hashUnique <$> newUnique
+taggedIO a = (a :#) . fromIntegral . hashUnique <$> newUnique
