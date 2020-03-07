@@ -25,6 +25,7 @@ import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
 import           Data.Text (Text, pack)
+import           Debug.Trace
 import qualified Parsing.Parser as Parser
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
@@ -144,11 +145,11 @@ graphForBlob blob = parseWith toStackGraphParsers (fmap fst . ScopeGraph.runSket
 stackGraphToTempStackGraph :: Stack.Graph Stack.Node -> TempStackGraph
 stackGraphToTempStackGraph graph = let
   nodes = toSGNode <$> Graph.vertexList (Stack.unGraph graph)
-  paths = undefined
+  paths = []
   in TempStackGraph { scopeGraphNodes = nodes, scopeGraphPaths = paths }
 
 toSGNode :: Stack.Node -> SGNode
-toSGNode node = case node of
+toSGNode node = (traceShow node (case node of
   Stack.Declaration s -> SGNode {
       nodeId = 1
     , nodeName = Name.formatName s
@@ -157,6 +158,14 @@ toSGNode node = case node of
     , nodeSpan = lowerBound
     , Semantic.Api.StackGraph.nodeType = Definition
     }
+  _ -> SGNode {
+      nodeId = 1
+    , nodeName = "Unknown"
+    , nodeLine = ""
+    , nodeKind = ""
+    , nodeSpan = lowerBound
+    , Semantic.Api.StackGraph.nodeType = Definition
+    }))
 
 class ToStackGraph term where
   toStackGraph :: Blob -> term Loc -> TempStackGraph
@@ -164,3 +173,8 @@ class ToStackGraph term where
 instance ToStackGraph term where
   -- TODO: Need to produce the graph here
   toStackGraph _ _ = TempStackGraph mempty mempty
+
+
+{-
+Graph {unGraph = Connect (Connect (Vertex (Scope {symbol = "_b"})) (Connect (Connect (Connect (Connect (Vertex (Declaration {symbol = "cheese"})) (Vertex (PopSymbol {symbol = "member"}))) (Vertex (Declaration {symbol = "ints"}))) (Connect (Vertex (Reference {symbol = "ints"})) (Vertex (PushSymbol {symbol = "member"})))) (Vertex (Reference {symbol = "cheese"})))) (Vertex (Scope {symbol = "_a"}))}
+-}

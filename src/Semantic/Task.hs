@@ -99,8 +99,8 @@ data TaskSession
   , isPublic  :: Bool
   , logger    :: LogQueue
   , statter   :: StatQueue
-  }
 
+}
 -- | Execute a 'TaskC' yielding its result value in 'IO'.
 runTask :: TaskSession -> TaskC a -> IO (Either SomeException a)
 runTask taskSession@TaskSession{..} task = do

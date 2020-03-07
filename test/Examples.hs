@@ -6,7 +6,7 @@
 
 {-# OPTIONS_GHC -O1 #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds -Wno-unused-imports #-}
-module Main (main) where
+module Main (main, parseStackGraphFilePath, testStackGraph) where
 
 import qualified Analysis.File as File
 import           Control.Carrier.Parse.Measured
@@ -32,6 +32,7 @@ import qualified Test.Tasty.HUnit as HUnit
 import Data.Flag
 import Proto.Semantic as P hiding (Blob, BlobPair)
 import Proto.Semantic_Fields as P
+import Semantic.Api.StackGraph (parseStackGraph)
 import Semantic.Api.Symbols (parseSymbols)
 import Semantic.Config as Config
 import Semantic.Task
@@ -295,3 +296,19 @@ parseSymbolsFilePath ::
   -> Path.RelFile
   -> m ParseTreeSymbolResponse
 parseSymbolsFilePath languageModes path = readBlob (File.fromPath path) >>= runReader languageModes . parseSymbols . pure @[]
+
+parseStackGraphFilePath ::
+  ( Has (Error SomeException) sig m
+  , Has Distribute sig m
+  , Has Parse sig m
+  , Has Files sig m
+  , Effect sig
+  )
+  => Path.RelFile
+  -> m StackGraphResponse
+parseStackGraphFilePath path = readBlob (File.fromPath path) >>= runReader preciseLanguageModes . parseStackGraph . pure @[]
+
+testStackGraph :: Path.RelFile -> IO (Either SomeException StackGraphResponse)
+testStackGraph path = withOptions testOptions $ \ config logger statter -> do
+  let session = TaskSession config "-" False logger statter
+  runTask session (runParse (parseStackGraphFilePath path))
