@@ -22,6 +22,7 @@ import           Data.Foldable
 import           Data.Int
 import           Data.Language
 import           Data.Map.Strict (Map)
+import qualified Data.Maybe as Maybe
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
 import           Data.Text (Text, pack)
@@ -144,13 +145,13 @@ graphForBlob blob = parseWith toStackGraphParsers (fmap fst . ScopeGraph.runSket
 
 stackGraphToTempStackGraph :: Stack.Graph Stack.Node -> TempStackGraph
 stackGraphToTempStackGraph graph = let
-  nodes = toSGNode <$> Graph.vertexList (Stack.unGraph graph)
+  nodes = Maybe.catMaybes $ toSGNode <$> Graph.vertexList (Stack.unGraph graph)
   paths = []
   in TempStackGraph { scopeGraphNodes = nodes, scopeGraphPaths = paths }
 
-toSGNode :: Stack.Node -> SGNode
+toSGNode :: Stack.Node -> Maybe SGNode
 toSGNode node = (traceShow node (case node of
-  Stack.Declaration s -> SGNode {
+  Stack.Declaration s -> Just $ SGNode {
       nodeId = 1
     , nodeName = Name.formatName s
     , nodeLine = ""
@@ -158,14 +159,15 @@ toSGNode node = (traceShow node (case node of
     , nodeSpan = lowerBound
     , Semantic.Api.StackGraph.nodeType = Definition
     }
-  _ -> SGNode {
+  Stack.Reference s -> Just $ SGNode {
       nodeId = 1
-    , nodeName = "Unknown"
+    , nodeName = Name.formatName s
     , nodeLine = ""
     , nodeKind = ""
     , nodeSpan = lowerBound
-    , Semantic.Api.StackGraph.nodeType = Definition
-    }))
+    , Semantic.Api.StackGraph.nodeType = Reference
+    }
+  node -> traceShow ("Ignoring Node in toSGNode: " <> show node) Nothing))
 
 class ToStackGraph term where
   toStackGraph :: Blob -> term Loc -> TempStackGraph
