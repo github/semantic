@@ -228,7 +228,6 @@ library
                      , Semantic.Api.TOCSummaries
                      , Semantic.CLI
                      , Semantic.Config
-                     , Semantic.Distribute
                      , Semantic.Env
                      , Semantic.Graph
                      , Semantic.IO

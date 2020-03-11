@@ -29,10 +29,6 @@ module Semantic.Task
 , time'
 -- * High-level flow
 , serialize
--- * Concurrency
-, distribute
-, distributeFor
-, distributeFoldMap
 -- * Configuration
 , debugOptions
 , defaultOptions
@@ -64,7 +60,6 @@ import           Control.Monad.IO.Class
 import           Data.ByteString.Builder
 import qualified Data.Flag as Flag
 import           Semantic.Config
-import           Semantic.Distribute
 import           Semantic.Resolution
 import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
@@ -81,8 +76,7 @@ type TaskC
   ( TelemetryC
   ( ErrorC SomeException
   ( TimeoutC
-  ( DistributeC
-  ( LiftC IO)))))))))
+  ( LiftC IO))))))))
 
 serialize :: Has (Reader Config) sig m
           => Format input
@@ -108,7 +102,6 @@ runTask taskSession@TaskSession{..} task = do
     let run :: TaskC a -> IO (Either SomeException a)
         run
           = runM
-          . withDistribute
           . withTimeout
           . runError
           . runTelemetry logger statter

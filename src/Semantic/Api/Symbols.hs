@@ -46,7 +46,7 @@ import           Tags.Tagging
 import qualified Tags.Tagging.Precise as Precise
 
 legacyParseSymbols :: (Has Distribute sig m, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
-legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap go blobs
+legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> foldMap go blobs
   where
     go :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m) => Blob -> m [Legacy.File]
     go blob@Blob{..} = asks toTagsParsers >>= \ p -> parseWith p (pure . renderToSymbols) blob `catchError` (\(SomeException _) -> pure (pure emptyFile))
