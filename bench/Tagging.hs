@@ -59,7 +59,6 @@ runTagging mode dir glob = nfIO . withOptions testOptions $ \ config logger stat
 
 parseSymbolsFilePath ::
   ( Has (Error SomeException) sig m
-  , Has Distribute sig m
   , Has Parse sig m
   , Has Files sig m
   )
