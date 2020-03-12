@@ -1,6 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
-module Semantic.Timeout
+module Control.Effect.Timeout
 ( timeout
 ) where
 
