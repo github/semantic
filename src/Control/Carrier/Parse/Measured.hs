@@ -19,6 +19,7 @@ module Control.Carrier.Parse.Measured
 import qualified Assigning.Assignment as Assignment
 import           Control.Algebra
 import           Control.Effect.Error
+import           Control.Effect.Lift
 import           Control.Effect.Parse
 import           Control.Effect.Reader
 import           Control.Effect.Timeout
@@ -45,6 +46,7 @@ instance ( Has (Error SomeException) sig m
          , Has (Reader TaskSession) sig m
          , Has Telemetry sig m
          , Has Trace sig m
+         , Has (Lift IO) sig m
          , MonadIO m
          )
       => Algebra (Parse :+: sig) (ParseC m) where
@@ -97,6 +99,7 @@ runAssignment
      , Has (Reader TaskSession) sig m
      , Has Telemetry sig m
      , Has Trace sig m
+     , Has (Lift IO) sig m
      , MonadIO m
      )
   => (Source -> assignment (term Assignment.Loc) -> ast -> Either (Error.Error String) (term Assignment.Loc))

@@ -58,7 +58,6 @@ import           Control.Algebra
 import           Control.Carrier.Error.Either
 import           Control.Carrier.Lift
 import           Control.Carrier.Reader
-import           Control.Effect.Timeout
 import           Control.Effect.Trace
 import           Control.Exception
 import           Control.Monad.IO.Class
