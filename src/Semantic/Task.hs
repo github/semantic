@@ -42,7 +42,6 @@ module Semantic.Task
 , TaskSession(..)
 , runTraceInTelemetry
 -- * Re-exports
-, Distribute
 , Error
 , Lift
 , throwError
@@ -100,8 +99,6 @@ runTask taskSession@TaskSession{..} task = do
     let run :: TaskC a -> IO (Either SomeException a)
         run
           = runM
-          . withTimeout
-          . withDistribute
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry

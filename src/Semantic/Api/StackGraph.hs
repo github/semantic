@@ -14,29 +14,28 @@ import           Control.Effect.Parse
 import           Control.Exception
 import           Control.Lens
 import           Data.Blob
-import           Data.Int
-import           Data.Map.Strict (Map)
-import           Data.Language
 import           Data.Foldable
+import           Data.Int
+import           Data.Language
+import           Data.Map.Strict (Map)
 import           Data.ProtoLens (defMessage)
-import           Semantic.Api.Bridge
+import           Data.Text (Text, pack)
+import           Data.Traversable
+import qualified Parsing.Parser as Parser
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
-import           Data.Text (Text, pack)
+import           Semantic.Api.Bridge
 import           Source.Loc as Loc
-import           Semantic.Task
-import qualified Parsing.Parser as Parser
 
 parseStackGraph :: ( Has (Error SomeException) sig m
-                   , Has Distribute sig m
                    , Has Parse sig m
                    , Traversable t
                    )
   => t Blob
   -> m StackGraphResponse
 parseStackGraph blobs = do
-  terms <- distributeFor blobs go
+  terms <- for blobs go
   pure $ defMessage & P.files .~ toList terms
   where
     go :: ( Has (Error SomeException) sig m
@@ -102,19 +101,19 @@ data TempStackGraph
 
 data SGPath
   = SGPath
-  { pathStartingSymbolStack :: [Text]
+  { pathStartingSymbolStack    :: [Text]
   , pathStartingScopeStackSize :: Int64
-  , pathFrom :: Int64
-  , pathEdges :: Text
-  , pathTo :: Int64
-  , pathEndingScopeStack :: [Int64]
-  , pathEndingSymbolStack :: [Text]
+  , pathFrom                   :: Int64
+  , pathEdges                  :: Text
+  , pathTo                     :: Int64
+  , pathEndingScopeStack       :: [Int64]
+  , pathEndingSymbolStack      :: [Text]
   }
   deriving (Eq, Show)
 
 data SGNode
   = SGNode
-  { nodeId :: Int64
+  { nodeId   :: Int64
   , nodeName :: Text
   , nodeLine :: Text
   , nodeKind :: Text

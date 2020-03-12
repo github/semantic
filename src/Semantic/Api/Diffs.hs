@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MonoLocalBinds #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -32,9 +33,11 @@ import           Data.Graph.Algebraic
 import           Data.JSON.Fields (ToJSONFields1)
 import           Data.Language
 import           Data.Map.Strict (Map)
+import           Data.Monoid
 import           Data.ProtoLens (defMessage)
 import           Data.Term (IsTerm (..))
 import qualified Data.Text as T
+import           Data.Traversable
 import           Diffing.Interpreter (DiffTerms (..))
 import           Parsing.Parser
 import           Proto.Semantic as P hiding (Blob, BlobPair)
@@ -59,12 +62,16 @@ data DiffOutputFormat
   | DiffDotGraph
   deriving (Eq, Show)
 
-parseDiffBuilder :: (Traversable t, Has (Error SomeException) sig m, Has (Reader Config) sig m, Has Telemetry sig m, Has Distribute sig m, Has Parse sig m, MonadIO m) => DiffOutputFormat -> t BlobPair -> m Builder
-parseDiffBuilder DiffJSONTree    = distributeFoldMap jsonDiff >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
-parseDiffBuilder DiffJSONGraph   = diffGraph >=> serialize Format.JSON
-parseDiffBuilder DiffSExpression = distributeFoldMap (parsePairWith diffParsers sexprDiff)
-parseDiffBuilder DiffShow        = distributeFoldMap (parsePairWith diffParsers showDiff)
-parseDiffBuilder DiffDotGraph    = distributeFoldMap (parsePairWith diffParsers dotGraphDiff)
+parseDiffBuilder :: (Traversable t, Has (Error SomeException) sig m, Has (Reader Config) sig m, Has Telemetry sig m, Has Parse sig m, MonadIO m) => DiffOutputFormat -> t BlobPair -> m Builder
+-- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blob pairs.
+parseDiffBuilder t = getAp . go t
+  where
+    go = \case
+      DiffJSONTree    -> foldMap (Ap . jsonDiff) >=> serialize Format.JSON
+      DiffJSONGraph   -> Ap . diffGraph >=> serialize Format.JSON
+      DiffSExpression -> foldMap (Ap . parsePairWith diffParsers sexprDiff)
+      DiffShow        -> foldMap (Ap . parsePairWith diffParsers showDiff)
+      DiffDotGraph    -> foldMap (Ap . parsePairWith diffParsers dotGraphDiff)
 
 jsonDiff :: (Has (Error SomeException) sig m, Has Telemetry sig m, Has Parse sig m, MonadIO m) => BlobPair -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonDiff blobPair = parsePairWith diffParsers jsonTreeDiff blobPair `catchError` jsonError blobPair
@@ -72,9 +79,9 @@ jsonDiff blobPair = parsePairWith diffParsers jsonTreeDiff blobPair `catchError`
 jsonError :: Applicative m => BlobPair -> SomeException -> m (Rendering.JSON.JSON "diffs" SomeJSON)
 jsonError blobPair (SomeException e) = pure $ renderJSONDiffError blobPair (show e)
 
-diffGraph :: (Traversable t, Has (Error SomeException) sig m, Has Telemetry sig m, Has Distribute sig m, Has Parse sig m, MonadIO m) => t BlobPair -> m DiffTreeGraphResponse
+diffGraph :: (Traversable t, Has (Error SomeException) sig m, Has Telemetry sig m, Has Parse sig m, MonadIO m) => t BlobPair -> m DiffTreeGraphResponse
 diffGraph blobs = do
-  graph <- distributeFor blobs go
+  graph <- for blobs go
   pure $ defMessage & P.files .~ toList graph
   where
     go :: (Has (Error SomeException) sig m, Has Telemetry sig m, Has Parse sig m, MonadIO m) => BlobPair -> m DiffTreeFileGraph

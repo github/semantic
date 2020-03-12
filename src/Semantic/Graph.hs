@@ -76,6 +76,7 @@ import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Data.Proxy
 import           Data.Text (pack, unpack)
+import           Data.Traversable
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
@@ -124,8 +125,7 @@ analysisParsers = Map.fromList
   , tsxParserALaCarte
   ]
 
-runGraph :: ( Has Distribute sig m
-            , Has Parse sig m
+runGraph :: ( Has Parse sig m
             , Has Resolution sig m
             , Has Trace sig m
             , Effect sig
@@ -267,7 +267,7 @@ runScopeGraph :: Ord address
 runScopeGraph = raiseHandler (runState lowerBound)
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Has Distribute sig m, Has Resolution sig m, Has Parse sig m, Has Trace sig m)
+parsePackage :: (Has Resolution sig m, Has Parse sig m, Has Trace sig m)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
              -> m (Package (Blob, term))
@@ -281,14 +281,13 @@ parsePackage parser project = do
     n = Data.Abstract.Evaluatable.name (projectName project) -- TODO: Confirm this is the right `name`.
 
 -- | Parse all files in a project into 'Module's.
-parseModules :: (Has Distribute sig m, Has Parse sig m) => Parser term -> Project -> m [Module (Blob, term)]
-parseModules parser p = distributeFor (projectBlobs p) (parseModule p parser)
+parseModules :: (Has Parse sig m) => Parser term -> Project -> m [Module (Blob, term)]
+parseModules parser p = for (projectBlobs p) (parseModule p parser)
 
 
 -- | Parse a list of packages from a python project.
 parsePythonPackage :: forall term sig m .
                    ( AnalyzeTerm term
-                   , Has Distribute sig m
                    , Has Parse sig m
                    , Has Resolution sig m
                    , Has Trace sig m

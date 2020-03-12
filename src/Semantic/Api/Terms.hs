@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -32,10 +33,12 @@ import           Data.Functor.Foldable
 import           Data.Graph.Algebraic (Edge (..), edgeList, vertexList)
 import           Data.Language
 import           Data.Map.Strict (Map)
+import           Data.Monoid
 import           Data.ProtoLens (defMessage)
 import           Data.Quieterm
 import           Data.Term
 import qualified Data.Text as T
+import           Data.Traversable
 import           Parsing.Parser
 import           Proto.Semantic as P hiding (Blob)
 import           Proto.Semantic_Fields as P
@@ -62,9 +65,9 @@ import qualified Language.TSX as TSXPrecise
 import qualified Language.TypeScript as TypeScriptPrecise
 
 
-termGraph :: (Traversable t, Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m) => t Blob -> m ParseTreeGraphResponse
+termGraph :: (Traversable t, Has (Error SomeException) sig m, Has Parse sig m) => t Blob -> m ParseTreeGraphResponse
 termGraph blobs = do
-  terms <- distributeFor blobs go
+  terms <- for blobs go
   pure $ defMessage
     & P.files .~ toList terms
   where
@@ -90,14 +93,17 @@ data TermOutputFormat
   | TermQuiet
   deriving (Eq, Show)
 
-parseTermBuilder :: (Traversable t, Has Distribute sig m, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Has (Reader Config) sig m, MonadIO m)
+parseTermBuilder :: (Traversable t, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Has (Reader Config) sig m, MonadIO m)
   => TermOutputFormat -> t Blob -> m Builder
-parseTermBuilder TermJSONTree    = distributeFoldMap jsonTerm >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
-parseTermBuilder TermJSONGraph   = termGraph >=> serialize Format.JSON
-parseTermBuilder TermSExpression = distributeFoldMap (\ blob -> asks sexprTermParsers >>= \ parsers -> parseWith parsers (pure . sexprTerm) blob)
-parseTermBuilder TermDotGraph    = distributeFoldMap (parseWith dotGraphTermParsers dotGraphTerm)
-parseTermBuilder TermShow        = distributeFoldMap (\ blob -> asks showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
-parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
+parseTermBuilder f = getAp . go f
+  where
+    go = \case
+      TermJSONTree    -> foldMap (Ap . jsonTerm) >=> serialize Format.JSON -- NB: Serialize happens at the top level for these two JSON formats to collect results of multiple blobs.
+      TermJSONGraph   -> termGraph >=> serialize Format.JSON
+      TermSExpression -> foldMap (\ blob -> asks sexprTermParsers >>= \ parsers -> parseWith parsers (pure . sexprTerm) blob)
+      TermDotGraph    -> foldMap (parseWith dotGraphTermParsers dotGraphTerm)
+      TermShow        -> foldMap (\ blob -> asks showTermParsers >>= \ parsers -> parseWith parsers showTerm blob)
+      TermQuiet       -> foldMap (Ap . quietTerm)
 
 jsonTerm :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m (Rendering.JSON.JSON "trees" SomeJSON)
 jsonTerm blob = parseWith jsonTreeTermParsers (pure . jsonTreeTerm blob) blob `catchError` jsonError blob

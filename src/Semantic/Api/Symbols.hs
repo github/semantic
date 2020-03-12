@@ -28,10 +28,12 @@ import           Data.Foldable
 import           Data.Functor.Foldable
 import           Data.Language
 import           Data.Map.Strict (Map)
+import           Data.Monoid
 import           Data.ProtoLens (defMessage)
 import           Data.Term (IsTerm (..), TermF)
 import           Data.Text (Text)
 import           Data.Text (pack)
+import           Data.Traversable
 import qualified Parsing.Parser as Parser
 import           Proto.Semantic as P hiding (Blob, BlobPair)
 import           Proto.Semantic_Fields as P
@@ -45,8 +47,8 @@ import           Source.Loc as Loc
 import           Tags.Tagging
 import qualified Tags.Tagging.Precise as Precise
 
-legacyParseSymbols :: (Has Distribute sig m, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
-legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> foldMap go blobs
+legacyParseSymbols :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Traversable t) => t Blob -> m Legacy.ParseTreeSymbolResponse
+legacyParseSymbols = fmap Legacy.ParseTreeSymbolResponse . getAp . foldMap (Ap . go)
   where
     go :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m) => Blob -> m [Legacy.File]
     go blob@Blob{..} = asks toTagsParsers >>= \ p -> parseWith p (pure . renderToSymbols) blob `catchError` (\(SomeException _) -> pure (pure emptyFile))
@@ -72,12 +74,12 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> foldMap go blobs
           , symbolSpan = converting #? Loc.span loc
           }
 
-parseSymbolsBuilder :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Has (Reader PerLanguageModes) sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
+parseSymbolsBuilder :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Has (Reader PerLanguageModes) sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
 parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
-parseSymbols :: (Has Distribute sig m, Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
+parseSymbols :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = do
-  terms <- distributeFor blobs go
+  terms <- for blobs go
   pure $ defMessage & P.files .~ toList terms
   where
     go :: (Has (Error SomeException) sig m, Has (Reader PerLanguageModes) sig m, Has Parse sig m) => Blob -> m File
