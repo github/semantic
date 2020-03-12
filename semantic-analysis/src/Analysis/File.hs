@@ -16,7 +16,7 @@ import qualified System.Path.PartClass as Path.PartClass
 
 data File a = File
   { filePath :: !Path.AbsRelFile
-  , fileSpan :: {-# UNPACK #-} !Span
+  , fileSpan :: Span
   , fileBody :: !a
   }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
