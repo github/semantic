@@ -19,8 +19,10 @@ module Control.Carrier.Parse.Measured
 import qualified Assigning.Assignment as Assignment
 import           Control.Algebra
 import           Control.Effect.Error
+import           Control.Effect.Lift
 import           Control.Effect.Parse
 import           Control.Effect.Reader
+import           Control.Effect.Timeout
 import           Control.Effect.Trace
 import           Control.Exception
 import           Control.Monad
@@ -35,7 +37,6 @@ import           Parsing.TreeSitter
 import           Semantic.Config
 import           Semantic.Task (TaskSession (..))
 import           Semantic.Telemetry
-import           Semantic.Timeout
 import           Source.Source (Source)
 
 newtype ParseC m a = ParseC { runParse :: m a }
@@ -44,8 +45,8 @@ newtype ParseC m a = ParseC { runParse :: m a }
 instance ( Has (Error SomeException) sig m
          , Has (Reader TaskSession) sig m
          , Has Telemetry sig m
-         , Has Timeout sig m
          , Has Trace sig m
+         , Has (Lift IO) sig m
          , MonadIO m
          )
       => Algebra (Parse :+: sig) (ParseC m) where
@@ -53,10 +54,17 @@ instance ( Has (Error SomeException) sig m
   alg (R other)                 = ParseC (alg (handleCoercible other))
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Has (Error SomeException) sig m, Has (Reader TaskSession) sig m, Has Telemetry sig m, Has Timeout sig m, Has Trace sig m, MonadIO m)
-          => Blob
-          -> Parser term
-          -> m term
+runParser ::
+  ( Has (Error SomeException) sig m
+  , Has (Reader TaskSession) sig m
+  , Has Telemetry sig m
+  , Has (Lift IO) sig m
+  , Has Trace sig m
+  , MonadIO m
+  )
+  => Blob
+  -> Parser term
+  -> m term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
@@ -70,7 +78,7 @@ runParser blob@Blob{..} parser = case parser of
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
 
-  where 
+  where
     languageTag = [("language" :: String, show (blobLanguage blob))]
     executeParserAction act = do
       -- Test harnesses can specify that parsing must fail, for testing purposes.
@@ -90,8 +98,8 @@ runAssignment
      , Has (Error SomeException) sig m
      , Has (Reader TaskSession) sig m
      , Has Telemetry sig m
-     , Has Timeout sig m
      , Has Trace sig m
+     , Has (Lift IO) sig m
      , MonadIO m
      )
   => (Source -> assignment (term Assignment.Loc) -> ast -> Either (Error.Error String) (term Assignment.Loc))
