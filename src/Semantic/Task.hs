@@ -80,9 +80,8 @@ type TaskC
   ( TraceInTelemetryC
   ( TelemetryC
   ( ErrorC SomeException
-  ( TimeoutC
   ( DistributeC
-  ( LiftC IO)))))))))
+  ( LiftC IO))))))))
 
 serialize :: Has (Reader Config) sig m
           => Format input
