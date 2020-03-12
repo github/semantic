@@ -13,7 +13,7 @@ import qualified System.Timeout as System
 -- within the specified duration. Uses 'System.Timeout.timeout' so all caveats
 -- about not operating over FFI boundaries apply.
 --
--- Any state changes in the action are discarded iff the timeout fails.
+-- Any state changes in the action are discarded if the timeout fails.
 timeout :: Has (Lift IO) sig m => Duration -> m a -> m (Maybe a)
 timeout n m = liftWith $ \ ctx hdl
   -> maybe
