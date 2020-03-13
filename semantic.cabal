@@ -119,6 +119,7 @@ library
                      , Control.Effect.Parse
                      , Control.Effect.REPL
                      , Control.Effect.Sum.Project
+                     , Control.Effect.Timeout
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
                      , Data.Abstract.Address.Monovariant
@@ -240,7 +241,6 @@ library
                      , Semantic.Telemetry.Error
                      , Semantic.Telemetry.Log
                      , Semantic.Telemetry.Stat
-                     , Semantic.Timeout
                      , Semantic.Util
                      , Semantic.Util.Pretty
                      , Semantic.Version
