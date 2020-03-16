@@ -112,6 +112,19 @@ instance ToTags Tsx.Module where
         _                           -> gtags t
       yield text = yieldTag text Module loc byteRange >> gtags t
 
+instance ToTags Tsx.VariableDeclarator where
+  tags t@Tsx.VariableDeclarator
+    { ann = loc@Loc { byteRange }
+    , name
+    , value = Just (Tsx.Expression expr)
+    } = case (expr, name) of
+          (Prj Tsx.Function{}, Prj Tsx.Identifier { text }) -> yield text
+          (Prj Tsx.ArrowFunction{}, Prj Tsx.Identifier { text }) -> yield text
+          _ -> gtags t
+    where
+      yield text = yieldTag text Function loc byteRange >> gtags t
+  tags t = gtags t
+
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
   tags (R1 r) = tags r
@@ -295,7 +308,7 @@ instance ToTags Tsx.Undefined
 instance ToTags Tsx.UnionType
 instance ToTags Tsx.UpdateExpression
 instance ToTags Tsx.VariableDeclaration
-instance ToTags Tsx.VariableDeclarator
+-- instance ToTags Tsx.VariableDeclarator
 instance ToTags Tsx.WhileStatement
 instance ToTags Tsx.WithStatement
 instance ToTags Tsx.YieldExpression
