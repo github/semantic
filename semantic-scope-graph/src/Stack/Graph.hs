@@ -24,6 +24,7 @@ module Stack.Graph
   , simplify
   , edgeSet
   , removeEdge
+  , addEdge
   -- * Smart constructors
   , scope
   , newScope
@@ -71,6 +72,8 @@ data Node = Root { symbol :: Symbol }
   | ExportedScope { symbol :: Symbol }
   | JumpToScope { symbol :: Symbol }
   | IgnoreScope
+  | BottomScope { symbol :: Symbol }
+  | TopScope { symbol :: Symbol }
   deriving (Show, Eq, Ord)
 
 -- This overlapping instance is problematic but helps us make sure we don't differentiate two root nodes.
@@ -161,6 +164,9 @@ simplify = Graph . Algebraic.simplify . unGraph
 
 removeEdge :: Ord a => a -> a -> Graph a -> Graph a
 removeEdge a b = Graph . Algebraic.removeEdge a b . unGraph
+
+addEdge :: Ord a => a -> a -> Graph a -> Graph a
+addEdge a b = simplify . Graph . Algebraic.overlay (Algebraic.edge a b) . unGraph
 
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure

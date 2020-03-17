@@ -24,6 +24,8 @@ module Control.Effect.ScopeGraph
   , newEdge
   , newReference
   , newScope
+  , addBottomScope
+  , addTopScope
   , withScope
   , declareFunction
   , declareMaybeName
@@ -105,6 +107,18 @@ declare n props = do
   CurrentScope current <- currentScope
   let Props.Declaration kind relation associatedScope span = props
   modify (fst . ScopeGraph.declare (ScopeGraph.Declaration n) (lowerBound @Module.ModuleInfo) relation ScopeGraph.Public span kind associatedScope current)
+
+addBottomScope :: ScopeGraphEff sig m => m Stack.Node
+addBottomScope = do
+  CurrentScope s <- get @(CurrentScope Name)
+  modify (Stack.addEdge (Stack.BottomScope s) (Stack.Scope s))
+  pure (Stack.BottomScope s)
+
+addTopScope :: ScopeGraphEff sig m => m Stack.Node
+addTopScope = do
+  CurrentScope s <- get @(CurrentScope Name)
+  modify (Stack.addEdge (Stack.TopScope s) (Stack.Scope s))
+  pure (Stack.TopScope s)
 
 -- | Establish a reference to a prior declaration.
 reference :: forall sig m . ScopeGraphEff sig m => Text -> Text -> Props.Reference -> m ()

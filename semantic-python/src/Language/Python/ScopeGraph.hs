@@ -314,11 +314,13 @@ instance ToScopeGraph Py.Module where
     let moduleProps = Props.Declaration ScopeGraph.Module ScopeGraph.Default Nothing (ann^.span_ :: Span)
     declare (Name.name "__main__") moduleProps
 
-    ScopeGraph.CurrentScope currentName <- currentScope
-    name <- newScope (Map.singleton ScopeGraph.Lexical [ currentName ])
-    putCurrentScope name
+    bottomScope <- addBottomScope
+    topScope <- addTopScope
+    withScope topScope $ do
+      onChildren term
 
-    onChildren term
+    ScopeGraph.CurrentScope currentName <- currentScope
+    connectScopes bottomScope (Stack.Scope currentName)
 
 instance ToScopeGraph Py.ReturnStatement where
   scopeGraph (Py.ReturnStatement _ mVal) = maybe (pure mempty) scopeGraph mVal
