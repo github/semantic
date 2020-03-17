@@ -44,6 +44,7 @@ import qualified Algebra.Graph as Algebraic
 import qualified Algebra.Graph.Class as Class
 import qualified Algebra.Graph.ToGraph as ToGraph
 import           Analysis.Name (Name)
+import qualified Analysis.Name as Name
 import           Control.Applicative
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.State.Strict
@@ -60,7 +61,7 @@ import qualified Scope.Types as Scope
 
 type Symbol = Name
 
-data Node = Root
+data Node = Root { symbol :: Symbol }
   | Declaration { symbol :: Symbol }
   | Reference { symbol :: Symbol }
   | PushSymbol { symbol :: Symbol }
@@ -75,14 +76,14 @@ data Node = Root
 -- This overlapping instance is problematic but helps us make sure we don't differentiate two root nodes.
 instance {-# OVERLAPS #-} Eq (Tagged Node) where
   x == y = case (view contents y, view contents x) of
-    (Root, Root) -> True
-    _            -> view identifier x == view identifier y
+    (Root a, Root b) -> a == b
+    _                -> view identifier x == view identifier y
 
 instance Ord (Tagged Node) where
   compare = compare `on` view identifier
 
 instance Lower Node where
-  lowerBound = Root
+  lowerBound = Root (Name.nameI 0)
 
 newtype Graph a = Graph { unGraph :: Algebraic.Graph a }
   deriving (Eq, Show)
@@ -118,8 +119,8 @@ reference = Class.vertex . Reference
 popSymbol = Class.vertex . PopSymbol
 pushSymbol = Class.vertex . PushSymbol
 
-root :: Graph Node
-root = Graph (Algebraic.vertex Root)
+root :: Name -> Graph Node
+root name = Graph (Algebraic.vertex (Root name))
 
 edgeSet :: Graph Node -> Set (Node, Node)
 edgeSet graph = Algebraic.edgeSet (unGraph graph)
@@ -173,7 +174,7 @@ testEdgeList =
   , Reference "b"
   , PushSymbol "member"
   , Reference "a"
-  , Root
+  , Root "_a"
   ]
 
 testGraph :: Graph Node
@@ -184,7 +185,7 @@ testGraph = mconcat
   , (declaration "b" >>- reference "b")
   , (reference "b" >>- pushSymbol "member")
   , (pushSymbol "member" >>- reference "a")
-  , (reference "a" >>- root)
+  , (reference "a" >>- root "_a")
   ]
 
 testGraph2 :: Graph Node
@@ -198,5 +199,5 @@ edgeTest = Class.edges
   , (Declaration "b" , Reference "b")
   , (Reference "b" , PushSymbol "member")
   , (PushSymbol "member" , Reference "a")
-  , (Reference "a" , Root)
+  , (Reference "a" , Root "_a")
   ]

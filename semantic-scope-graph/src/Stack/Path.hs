@@ -125,13 +125,13 @@ checkNodeInvariants Path { startingNode, endingNode }
   = getFirst (checkStart <> checkEnd)
     where
       checkStart = case extract startingNode of
-        Root            -> mempty
+        Root{}          -> mempty
         ExportedScope{} -> mempty
         Reference{}     -> mempty
         _other          -> pure (BadStartingNode startingNode)
 
       checkEnd = case extract endingNode of
-        Root          -> mempty
+        Root{}        -> mempty
         JumpToScope{} -> mempty
         Declaration{} -> mempty
         _other        -> pure (BadEndingNode endingNode)

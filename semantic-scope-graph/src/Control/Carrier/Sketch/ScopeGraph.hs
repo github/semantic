@@ -36,9 +36,10 @@ type SketchC addr m
   = StateC (ScopeGraph Name)
   ( StateC (Stack.Graph Stack.Node)
   ( StateC (CurrentScope Name)
+  ( ReaderC Stack.Node
   ( ReaderC ModuleInfo
   ( FreshC m
-  ))))
+  )))))
 
 runSketch ::
   (Functor m)
@@ -48,6 +49,7 @@ runSketch ::
 runSketch minfo go
   = evalFresh 1
   . runReader minfo
+  . runReader (Stack.Root rootname)
   . evalState (CurrentScope rootname)
   . runState @(Stack.Graph Stack.Node) initialStackGraph
   . runState @(ScopeGraph Name) initialGraph
@@ -55,4 +57,4 @@ runSketch minfo go
   where
     rootname = Name.nameI 0
     initialGraph = ScopeGraph.insertScope rootname lowerBound lowerBound
-    initialStackGraph = (Stack.scope rootname)
+    initialStackGraph = Stack.root rootname
