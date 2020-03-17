@@ -8,16 +8,16 @@ module Semantic.Api.Bridge
   ( APIBridge (..)
   , APIConvert (..)
   , (#?)
+  , pathToApiPath
+  , apiPathToPath
   ) where
 
 import           Analysis.File
 import           Analysis.Name
 import           Control.Lens
-import           Data.Bifunctor
 import qualified Data.Blob as Data
 import qualified Data.Edit as Data
 import           Data.Either
-import           Data.Foldable
 import           Data.Functor.Tagged
 import           Data.Int
 import qualified Data.IntMap.Strict as IM
@@ -25,11 +25,10 @@ import qualified Data.Language as Data
 import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Maybe
 import           Data.ProtoLens (defMessage)
-import qualified Data.Sequence as Seq
+import           Data.Sequence (Seq)
 import qualified Data.Text as T
 import           Data.Text.Lens
 import qualified Data.Validation as Validation
-import           Numeric.Lens
 import qualified Proto.Semantic as API
 import qualified Proto.Semantic_Fields as P
 import qualified Semantic.Api.LegacyTypes as Legacy
@@ -129,6 +128,8 @@ data PathConvertError
 
 type NodeCache = IM.IntMap (Tagged SG.Node)
 
+
+
 stackDelimiter :: T.Text
 stackDelimiter = T.pack "\x1E"
 
@@ -141,26 +142,21 @@ pathToApiPath path =
     & P.startingSymbolStack .~ fmap formatName (path^.SG.startingSymbolStack_)
     & P.endingSymbolStack .~ fmap formatName (path^.SG.endingSymbolStack_)
     & P.startingScopeStackSize .~ (if path^.SG.startingScopeStackSize_ == SG.One then 1 else 0)
-    & P.edges .~ formatEdges (path^.SG.edges_)
-      where
-        -- TODO: It's not clear from my reading of the docs how exactly we want to format
-        -- edge strings.
-        formatEdges = T.intercalate stackDelimiter . toList . fmap SG.formatEdge
+    & P.edges .~ (path^.SG.edgeLabels_)
 
-apiPathToPath :: NodeCache -> API.StackGraphPath -> Either (NonEmpty PathConvertError) SG.Path
-apiPathToPath nc path = Validation.toEither validate >>= ensureInvariantsHold
+apiPathToPath :: Seq SG.Edge -> NodeCache -> API.StackGraphPath -> Either (NonEmpty PathConvertError) SG.Path
+apiPathToPath edges nc path = Validation.toEither validate >>= ensureInvariantsHold
   where
     validate = do
       let failing = Validation.Failure . pure @NonEmpty @PathConvertError
           lookupNode n = case IM.lookup (fromIntegral n) nc of
             Just a  -> pure a
             Nothing -> failing (NodeNotFound n)
-          ensureHolds p = Validation.Success p
 
       startingNode <- lookupNode (path^.P.from)
       endingNode <- lookupNode (path^.P.to)
       endingScopeStack <- pure (path^.P.endingScopeStack)
-      edges <- pure . Seq.fromList . SG.parseEdges . view P.edges $ path
+      edgeLabels <- pure . view P.edges $ path
       startingSymbolStack <- pure . fmap name . view P.startingSymbolStack $ path
       endingSymbolStack <- pure . fmap name . view P.startingSymbolStack $ path
       startingScopeStackSize <- case path^.P.startingScopeStackSize of
@@ -169,7 +165,7 @@ apiPathToPath nc path = Validation.toEither validate >>= ensureInvariantsHold
         n -> failing (InvalidStartingSize n)
       pure SG.Path{..}
     ensureInvariantsHold n =
-      let allErrors = fmap InvariantViolated (catMaybes [SG.checkEdgeInvariants n, SG.checkNodeInvariants n])
+      let allErrors = fmap InvariantViolated (catMaybes [SG.checkEdgeInvariants edges n, SG.checkNodeInvariants n])
       in case allErrors of
         []   -> pure n
         x:xs -> Left (x :| xs)

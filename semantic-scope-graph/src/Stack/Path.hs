@@ -8,7 +8,7 @@ module Stack.Path
   ( Path (..)
   , startingNode_
   , endingNode_
-  , edges_
+  , edgeLabels_
   , endingScopeStack_
   , startingSymbolStack_
   , startingScopeStackSize_
@@ -46,7 +46,7 @@ import           Stack.Graph (Node (..), Symbol)
 data Path = Path
   { startingNode           :: Tagged Node
   , endingNode             :: Tagged Node
-  , edges                  :: Seq Edge
+  , edgeLabels             :: Text -- Encoded
   , startingSymbolStack    :: [Symbol]
   , endingSymbolStack      :: [Symbol]
   , startingScopeStackSize :: StartingSize
@@ -59,8 +59,8 @@ startingNode_ = field @"startingNode"
 endingNode_ :: Lens' Path (Tagged Node)
 endingNode_ = field @"endingNode"
 
-edges_ :: Lens' Path (Seq Edge)
-edges_ = field @"edges"
+edgeLabels_ :: Lens' Path Text
+edgeLabels_ = field @"edgeLabels"
 
 startingSymbolStack_ :: Lens' Path [Symbol]
 startingSymbolStack_ = field @"startingSymbolStack"
@@ -74,6 +74,7 @@ endingSymbolStack_ = field @"endingSymbolStack"
 endingScopeStack_ :: Lens' Path [Tag]
 endingScopeStack_ = field @"endingScopeStack"
 
+-- | This is suitable for conversion from (label, node, node) tuples.
 data Edge = Edge
   { sourceNode :: Tagged Node
   , sinkNode   :: Tagged Node
@@ -104,8 +105,8 @@ data PathInvariantError
 -- then the starting node of the path must be the same as the source
 -- node of the first edge in the path, and the ending node of the path
 -- must be the same as the sink node of the last edge in the path.
-checkEdgeInvariants :: Path -> Maybe PathInvariantError
-checkEdgeInvariants Path{ startingNode, endingNode, edges }
+checkEdgeInvariants :: Seq Edge -> Path -> Maybe PathInvariantError
+checkEdgeInvariants edges Path{ startingNode, endingNode }
   = let
       check :: Tagged Node -> Tagged Node -> First PathInvariantError
       check a b = if a /= b then pure (ExpectedEqual a b) else mempty
