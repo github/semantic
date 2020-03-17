@@ -175,8 +175,3 @@ class ToStackGraph term where
 instance ToStackGraph term where
   -- TODO: Need to produce the graph here
   toStackGraph _ _ = TempStackGraph mempty mempty
-
-
-{-
-Graph {unGraph = Connect (Connect (Vertex (Scope {symbol = "_b"})) (Connect (Connect (Connect (Connect (Vertex (Declaration {symbol = "cheese"})) (Vertex (PopSymbol {symbol = "member"}))) (Vertex (Declaration {symbol = "ints"}))) (Connect (Vertex (Reference {symbol = "ints"})) (Vertex (PushSymbol {symbol = "member"})))) (Vertex (Reference {symbol = "cheese"})))) (Vertex (Scope {symbol = "_a"}))}
--}
