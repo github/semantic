@@ -8,6 +8,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE RankNTypes #-}
@@ -309,7 +310,10 @@ instance ToScopeGraph Py.None where scopeGraph = mempty
 instance ToScopeGraph Py.NonlocalStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.Module where
-  scopeGraph term = do
+  scopeGraph term@(Py.Module ann _) = do
+    let moduleProps = Props.Declaration ScopeGraph.Module ScopeGraph.Default Nothing (ann^.span_ :: Span)
+    declare (Name.name "__main__") moduleProps
+
     ScopeGraph.CurrentScope currentName <- currentScope
     name <- newScope (Map.singleton ScopeGraph.Lexical [ currentName ])
     putCurrentScope name
