@@ -47,6 +47,7 @@ import           Scope.Graph.Convert (Result (..), complete, todo)
 import           Scope.Types
 import           Source.Loc (Loc)
 import           Source.Span (Span, span_)
+import qualified Stack.Graph as Stack
 
 -- This typeclass is internal-only, though it shares the same interface
 -- as the one defined in semantic-scope-graph. The somewhat-unconventional
@@ -196,7 +197,7 @@ instance ToScopeGraph Py.FunctionDefinition where
       { Props.kind = ScopeGraph.Function
       , Props.span = ann^.span_
       }
-    withScope (CurrentScope associatedScope) $ do
+    withScope associatedScope $ do
       let declProps = Props.Declaration
             { Props.kind = ScopeGraph.Parameter
             , Props.relation = ScopeGraph.Default
@@ -237,21 +238,28 @@ instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where
   scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier ann name) :| _))) :| [])) = do
+    rootScope' <- rootScope
+    CurrentScope currentScope' <- currentScope
+    name <- Name.gensym
+    modify (Stack.newScope name mempty)
+
     addDeclarations ((\(Py.Identifier ann name) -> (ann, Name.name name)) <$> names)
 
-    let toName (Py.Identifier _ name) = Name.name name
-    newEdge ScopeGraph.Import (toName <$> names)
+    putCurrentScope name
 
-    let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
-    newReference (Name.name name) referenceProps
+    -- let toName (Py.Identifier _ name) = Name.name name
+    -- newEdge ScopeGraph.Import (toName <$> names)
 
-    let pairs = zip (toList names) (tail $ toList names)
-    for_ pairs $ \pair -> do
-      case pair of
-        (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
-          withScope (CurrentScope (toName scopeIdentifier)) $ do
-            let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
-            newReference (toName referenceIdentifier) referenceProps
+    -- let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
+    -- newReference (Name.name name) referenceProps
+
+    -- let pairs = zip (toList names) (tail $ toList names)
+    -- for_ pairs $ \pair -> do
+    --   case pair of
+    --     (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
+    --       withScope (toName scopeIdentifier) $ do
+    --         let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
+    --         newReference (toName referenceIdentifier) referenceProps
 
     complete
   scopeGraph term = todo (show term)
@@ -271,7 +279,7 @@ instance ToScopeGraph Py.ImportFromStatement where
     for_ pairs $ \pair -> do
       case pair of
         (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
-          withScope (CurrentScope (toName scopeIdentifier)) $ do
+          withScope (toName scopeIdentifier) $ do
             let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
             newReference (toName referenceIdentifier) referenceProps
 
@@ -316,11 +324,12 @@ instance ToScopeGraph Py.Module where
 
     bottomScope <- addBottomScope
     topScope <- addTopScope
-    withScope topScope $ do
+    withScope (Stack.symbol topScope) $ do
       onChildren term
 
     ScopeGraph.CurrentScope currentName <- currentScope
     connectScopes bottomScope (Stack.Scope currentName)
+    complete
 
 instance ToScopeGraph Py.ReturnStatement where
   scopeGraph (Py.ReturnStatement _ mVal) = maybe (pure mempty) scopeGraph mVal
