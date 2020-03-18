@@ -63,7 +63,6 @@ import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props.Reference
 import           Control.Effect.State
 
-import qualified Algebra.Graph as Graph
 import qualified Algebra.Graph.Class as Class
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
@@ -141,7 +140,7 @@ addDeclarations names = do
       graph''' = foldr (\(_, name) graph ->
         graph -<< (Stack.pushSymbol "member") -<< (Stack.reference name)) mempty (NonEmpty.init $ NonEmpty.reverse names)
       graph'''' = graph'' >>- graph''' >>- (Stack.reference (snd $ NonEmpty.head names))
-      currentEdges = Set.filter (\(left, right) -> left == Stack.Scope current) (Stack.edgeSet graph)
+      currentEdges = Set.filter (\(left, _right) -> left == Stack.Scope current) (Stack.edgeSet graph)
       rootNodes = Set.map snd currentEdges
       graphh = foldMap (\(left, right) -> Stack.removeEdge left right graph) currentEdges
   put (Stack.simplify (Class.overlay (Stack.scope current >>- graph'''' >>- Class.vertex (Set.elemAt 0 rootNodes)) graphh))

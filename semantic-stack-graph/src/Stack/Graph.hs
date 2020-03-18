@@ -47,9 +47,7 @@ import           Analysis.Name (Name)
 import           Control.Applicative
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.State.Strict
-import           Control.Lens.Getter
 import           Control.Monad
-import           Data.Function
 import           Data.Functor.Tagged
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map

@@ -27,7 +27,6 @@ import           Control.Effect.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
-import           Control.Effect.State
 import           Control.Lens (set, (^.))
 import           Data.Foldable
 import           Data.List.NonEmpty (NonEmpty (..))
@@ -37,7 +36,6 @@ import           Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import           Data.Traversable
-import           Debug.Trace
 import           GHC.Records
 import           GHC.TypeLits
 import qualified Language.Python.AST as Py
@@ -259,7 +257,7 @@ instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
     complete <* newEdge ScopeGraph.Import (toName <$> names)
-  scopeGraph impossibleTerm@(Py.ImportFromStatement _ imports (L1 (Py.DottedName _ names@((Py.Identifier ann scopeName) :| _))) Nothing) = do
+  scopeGraph (Py.ImportFromStatement _ imports (L1 (Py.DottedName _ names@((Py.Identifier ann scopeName) :| _))) Nothing) = do
     let toName (Py.Identifier _ name) = Name.name name
     newEdge ScopeGraph.Import (toName <$> names)
 
@@ -279,16 +277,14 @@ instance ToScopeGraph Py.ImportFromStatement where
         (R1 (Py.DottedName _ (Py.Identifier ann name :| []))) -> do
           let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
           complete <* newReference (Name.name name) referenceProps
-        term@(L1 (Py.AliasedImport _ (Py.Identifier ann name) (Py.DottedName _ (Py.Identifier ann2 ref :| _)))) -> do
+        (L1 (Py.AliasedImport _ (Py.Identifier ann name) (Py.DottedName _ (Py.Identifier ann2 ref :| _)))) -> do
           let declProps = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (ann^.span_ :: Span)
           declare (Name.name name) declProps
-          scopeGraph <- get @(ScopeGraph.ScopeGraph Name.Name)
-
-          scopeGraph <- get @(ScopeGraph.ScopeGraph Name.Name)
           let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
           newReference (Name.name ref) referenceProps
 
           complete
+        other -> todo (other)
 
     pure (mconcat completions)
   scopeGraph term = todo term
