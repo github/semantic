@@ -25,6 +25,9 @@ import GHC.Generics (Generic)
 import Source.Span hiding (line_)
 import Tags.Tag (Kind (..))
 
+-- | This type holds all relevant non-identificatory data about
+-- a given 'Node'. The name and unique identifier are provided
+-- by the 'Named' and 'Tagged' functors.
 data Info = Info
   { line :: Text
   , kind :: Kind
@@ -44,6 +47,7 @@ instance HasSpan Info where
 type_ :: Lens' Info Type
 type_ = field @"typ'"
 
+-- | Nodes in a stack graph are tagged with a unique identifier and name information.
 type Node = Tagged (Named Info)
 
 info_ :: Lens' Node Info
