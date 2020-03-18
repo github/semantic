@@ -1,8 +1,17 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeApplications #-}
 module Stack.Path
   ( Path (..)
-  , Edge (..)
+  , startingSymbolStack_
+  , endingSymbolStack_
+  , startingScopeStackSize_
+  , startingNode_
+  , endingNode_
+  , edgeDescription_
   , StartingSize (..)
   , PathInvariantError (..)
   , checkEdgeInvariants
@@ -17,10 +26,12 @@ module Stack.Path
 
 import Control.Lens.Getter
 import Data.Functor.Tagged
+import Data.Generics.Product
 import Data.Monoid
 import Data.Semigroup (sconcat)
 import Data.Sequence (Seq (..))
 import Data.Text (Text)
+import GHC.Generics (Generic)
 import Stack.Node
 
 -- | A partial path through a stack graph. These will be generated
@@ -30,18 +41,26 @@ import Stack.Node
 data Path = Path
   { startingNode           :: Node
   , endingNode             :: Node
-  , edges                  :: Seq Edge
+  , edgeDescription        :: Text
   , startingSymbolStack    :: [Symbol]
   , endingSymbolStack      :: [Symbol]
   , startingScopeStackSize :: StartingSize
   , endingScopeStack       :: [Tag]
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Generic)
 
-data Edge = Edge
-  { sourceNode :: Node
-  , sinkNode   :: Node
-  , label      :: Text
-  } deriving (Eq, Show)
+startingSymbolStack_, endingSymbolStack_ :: Lens' Path [Symbol]
+startingSymbolStack_ = field @"startingSymbolStack"
+endingSymbolStack_ = field @"endingSymbolStack"
+
+startingNode_, endingNode_ :: Lens' Path Node
+startingNode_ = field @"startingNode"
+endingNode_ = field @"endingNode"
+
+edgeDescription_ :: Lens' Path Text
+edgeDescription_ = field @"edgeDescription"
+
+startingScopeStackSize_ :: Lens' Path StartingSize
+startingScopeStackSize_ = field @"startingScopeStackSize"
 
 data StartingSize
   = Zero
@@ -54,13 +73,19 @@ data PathInvariantError
   | BadEndingNode (Node)
     deriving (Eq, Show)
 
+data Edge = Edge
+  { sourceNode :: Node
+  , sinkNode   :: Node
+  , label      :: Text
+  } deriving (Eq, Show)
+
 -- | If a path's edges list is empty, then its starting node must be
 -- the same as its ending node. If a path's edges list is nonempty,
 -- then the starting node of the path must be the same as the source
 -- node of the first edge in the path, and the ending node of the path
 -- must be the same as the sink node of the last edge in the path.
-checkEdgeInvariants :: Path -> Maybe PathInvariantError
-checkEdgeInvariants Path{ startingNode, endingNode, edges }
+checkEdgeInvariants :: Seq Edge -> Path -> Maybe PathInvariantError
+checkEdgeInvariants edges Path{ startingNode, endingNode }
   = let
       check :: Node -> Node -> First PathInvariantError
       check a b = if a /= b then pure (ExpectedEqual a b) else mempty
@@ -132,3 +157,5 @@ completion p = case (p^.to startingNode.info_.type_, p^.to endingNode.info_.type
 -- | A path is incremental if the source node and sink node of every edge in the path belongs to the same file.
 isIncremental :: Path -> Bool
 isIncremental = error "TODO: need file support to implement this"
+
+type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)

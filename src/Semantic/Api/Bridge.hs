@@ -20,7 +20,6 @@ import qualified Data.Blob as Data
 import qualified Data.Edit as Data
 import           Data.Either
 import           Data.Functor.Tagged
-import           Data.Generics.Product
 import qualified Data.IntMap.Strict as IM
 import qualified Data.Language as Data
 import           Data.ProtoLens (defMessage)
@@ -154,9 +153,6 @@ instance APIBridge API.StackGraphNode Stack.Node where
       & P.span .~ node ^. Stack.info_.Span.span_.re converting
       & P.nodeType .~ node ^. Stack.info_.Stack.type_.re converting
 
-stackDelimiter :: Char
-stackDelimiter = '\x1E'
-
 instance APIConvert API.StackGraphFile Stack.File where
   converting = iso fromApi toApi
    where
@@ -168,24 +164,35 @@ instance APIConvert API.StackGraphFile Stack.File where
        , Stack.paths =
          let
            lookupTable :: IM.IntMap Stack.Node
-           lookupTable = foldMap (\a -> IM.singleton (a^.P.id.to fromIntegral) (a^.bridging)) (s^.P.vec'nodes)
+           lookupTable = foldMap (\a -> IM.singleton (a^.P.id._Cast) (a^.bridging)) (s^.P.vec'nodes)
            conv :: API.StackGraphPath -> Maybe Stack.Path.Path
            conv n = Stack.Path.Path
-             <$> IM.lookup (n^.P.from.to fromIntegral) lookupTable
-             <*> IM.lookup (n^.P.to.to fromIntegral) lookupTable
-             <*> pure mempty
-             <*> fmap (fmap Name.name) (n ^? P.startingSymbolStack)
-             <*> fmap (fmap Name.name) (n ^? P.endingSymbolStack)
-             <*> Just (n ^. P.startingScopeStackSize.to (toEnum . fromIntegral))
+             <$> IM.lookup (n ^. P.from._Cast) lookupTable
+             <*> IM.lookup (n ^. P.to._Cast) lookupTable
+             <*> n ^? P.edges
+             <*> previews P.startingSymbolStack (fmap Name.name) n
+             <*> previews P.endingSymbolStack (fmap Name.name) n
+             <*> n ^? P.startingScopeStackSize._Cast.enum
              <*> Just (fmap fromIntegral (view P.endingScopeStack n))
          in
            Vector.mapMaybe conv (s^.P.vec'paths)
        , Stack.errors = mempty
        }
 
+     convPath :: Stack.Path.Path -> API.StackGraphPath
+     convPath p = defMessage
+       & P.startingSymbolStack .~ fmap Name.formatName (p^.Stack.Path.startingSymbolStack_)
+       & P.endingSymbolStack .~ fmap Name.formatName (p^.Stack.Path.endingSymbolStack_)
+       & P.startingScopeStackSize .~ p^.Stack.Path.startingScopeStackSize_.re enum._Cast
+       & P.from .~ p^.Stack.Path.startingNode_.identifier._Cast
+       & P.to .~ p^.Stack.Path.endingNode_.identifier._Cast
+
      toApi :: Stack.File -> API.StackGraphFile
      toApi f = defMessage
-       & P.path .~ f ^. field @"path".to Path.toString.from _Text
-       & P.language .~ f ^. field @"language"
+       & P.path .~ f ^. Stack.path_.to Path.toString.from _Text
+       & P.language .~ f ^. Stack.language_
+       & P.vec'nodes .~ Vector.map (review bridging) (f^.Stack.nodes_)
+       & P.vec'paths .~ Vector.map convPath (f^.Stack.paths_)
 
-
+_Cast :: (Integral a, Integral b) => Iso' a b
+_Cast = iso fromIntegral fromIntegral
