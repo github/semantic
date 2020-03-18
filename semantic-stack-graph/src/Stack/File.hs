@@ -4,15 +4,17 @@
 {-# LANGUAGE TypeApplications #-}
 module Stack.File
   ( File (..)
+  -- * Lenses
   , path_
   , language_
   , nodes_
   , paths_
+  -- * Utilities
   , edgesInFile
   , partialGraphOfFile
   ) where
 
-import qualified Algebra.Graph.Labelled as Graph
+import qualified Algebra.Graph.Labelled as Labelled
 import           Control.Lens.Getter
 import           Data.Foldable (toList)
 import           Data.Generics.Product
@@ -57,10 +59,11 @@ edgesInFile = foldMap edgesOf . paths
     edgesOf p = Set.singleton (Edge (p ^. startingNode_) (p ^. endingNode_) (T.take 1 (p ^. edgeLabels_)))
 
 -- | Compute an algebraic labelled graph from the edges present in a given file.
-partialGraphOfFile :: File -> Graph.Graph Text Node
-partialGraphOfFile = Graph.edges . toList . Set.map tupled . edgesInFile
-  where
-    tupled (Edge a b c) = (c, a, b)
+partialGraphOfFile :: File -> Labelled.Graph Text Node
+partialGraphOfFile =
+  Labelled.edges . toList . Set.map tupled . edgesInFile
+    where
+      tupled (Edge a b c) = (c, a, b)
 
 type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
 
