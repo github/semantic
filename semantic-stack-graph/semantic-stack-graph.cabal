@@ -36,6 +36,7 @@ library
     Scope.Reference
     Scope.Scope
     Scope.Types
+    Stack.File
     Stack.Graph
     Stack.Graph.Export
     Stack.Node

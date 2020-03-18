@@ -11,8 +11,10 @@ module Stack.Node
   , kind_
   , info_
   , Node
+  , Symbol
   , pattern Node
   , Type (..)
+
   ) where
 
 import Analysis.Functor.Named
@@ -50,6 +52,8 @@ info_ = contents.value_
 pattern Node :: Tag -> Name -> Text -> Kind -> Span -> Type -> Node
 pattern Node ident nam lin kin spa typ' = (Named nam (Info lin kin spa typ')) :# ident
 
+type Symbol = Name
+
 data Type
   = Root
   | JumpToScope
@@ -58,10 +62,10 @@ data Type
   | Definition
   | Reference
   | Unknown
-  -- | PushSymbol
-  -- | PopSymbol
-  -- | PushScope
-  -- | IgnoreScope
+  | PushSymbol
+  | PopSymbol
+  | PushScope
+  | IgnoreScope
   deriving (Show, Eq, Ord, Enum)
 
 type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)

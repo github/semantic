@@ -15,20 +15,21 @@ module Stack.Path
   ) where
 
 
+import Control.Lens.Getter
 import Data.Functor.Tagged
 import Data.Monoid
 import Data.Semigroup (sconcat)
 import Data.Sequence (Seq (..))
 import Data.Text (Text)
-import Stack.Graph (Node (..), Symbol)
+import Stack.Node
 
 -- | A partial path through a stack graph. These will be generated
 -- from walks through the stack graph, and can be thought of as
 -- representing a snapshot of the pathfinding algorithm at a given
 -- state.
 data Path = Path
-  { startingNode           :: Tagged Node
-  , endingNode             :: Tagged Node
+  { startingNode           :: Node
+  , endingNode             :: Node
   , edges                  :: Seq Edge
   , startingSymbolStack    :: [Symbol]
   , endingSymbolStack      :: [Symbol]
@@ -37,20 +38,20 @@ data Path = Path
   } deriving (Eq, Show)
 
 data Edge = Edge
-  { sourceNode :: Tagged Node
-  , sinkNode   :: Tagged Node
+  { sourceNode :: Node
+  , sinkNode   :: Node
   , label      :: Text
   } deriving (Eq, Show)
 
 data StartingSize
   = Zero
   | One
-  deriving (Eq, Show)
+  deriving (Eq, Show, Ord, Enum)
 
 data PathInvariantError
-  = ExpectedEqual (Tagged Node) (Tagged Node)
-  | BadStartingNode (Tagged Node)
-  | BadEndingNode (Tagged Node)
+  = ExpectedEqual (Node) (Node)
+  | BadStartingNode (Node)
+  | BadEndingNode (Node)
     deriving (Eq, Show)
 
 -- | If a path's edges list is empty, then its starting node must be
@@ -61,7 +62,7 @@ data PathInvariantError
 checkEdgeInvariants :: Path -> Maybe PathInvariantError
 checkEdgeInvariants Path{ startingNode, endingNode, edges }
   = let
-      check :: Tagged Node -> Tagged Node -> First PathInvariantError
+      check :: Node -> Node -> First PathInvariantError
       check a b = if a /= b then pure (ExpectedEqual a b) else mempty
     in getFirst $ case edges of
          Empty
@@ -78,16 +79,16 @@ checkNodeInvariants :: Path -> Maybe PathInvariantError
 checkNodeInvariants Path { startingNode, endingNode }
   = getFirst (checkStart <> checkEnd)
     where
-      checkStart = case extract startingNode of
+      checkStart = case startingNode^.info_.type_ of
         Root            -> mempty
         ExportedScope{} -> mempty
         Reference{}     -> mempty
         _other          -> pure (BadStartingNode startingNode)
 
-      checkEnd = case extract endingNode of
+      checkEnd = case endingNode^.info_.type_ of
         Root          -> mempty
         JumpToScope{} -> mempty
-        Declaration{} -> mempty
+        Definition{}  -> mempty
         _other        -> pure (BadEndingNode endingNode)
 
 data Validity = Invalid | Valid
@@ -104,17 +105,17 @@ instance Semigroup Validity where
 validity :: Path -> Validity
 validity p = sconcat [vStart, vEnd, vSize]
   where
-    vStart = case extract (startingNode p) of
+    vStart = case p ^. to startingNode.info_.type_ of
       Reference{} | null (startingSymbolStack p), startingScopeStackSize p == Zero -> Valid
                   | otherwise -> Invalid
       _otherwise -> Valid
 
-    vEnd = case extract (endingNode p) of
-      Declaration{} | null (endingSymbolStack p), null (endingScopeStack p) -> Valid
+    vEnd = case p ^. to endingNode.info_.type_ of
+      Definition{} | null (endingSymbolStack p), null (endingScopeStack p) -> Valid
                     | otherwise -> Invalid
       _otherwise -> Valid
 
-    vSize = case (startingScopeStackSize p, extract (endingNode p)) of
+    vSize = case (startingScopeStackSize p, p ^. to endingNode.info_.type_) of
       (One, JumpToScope{}) -> Valid
       (One, IgnoreScope{}) -> Valid
       (One, _)             -> Invalid
@@ -124,8 +125,9 @@ data Completion = Partial | Complete
 
 -- | A path is complete if its starting node is a reference node and its ending node is a definition node. Otherwise it is partial.
 completion :: Path -> Completion
-completion Path { startingNode = Reference{} :# _, endingNode = Declaration{} :# _} = Complete
-completion _                                                                        = Partial
+completion p = case (p^.to startingNode.info_.type_, p^.to endingNode.info_.type_) of
+  (Reference{}, Definition{}) -> Complete
+  _                           -> Partial
 
 -- | A path is incremental if the source node and sink node of every edge in the path belongs to the same file.
 isIncremental :: Path -> Bool
