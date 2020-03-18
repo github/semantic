@@ -72,15 +72,6 @@ data Node = Root
   | IgnoreScope
   deriving (Show, Eq, Ord)
 
--- This overlapping instance is problematic but helps us make sure we don't differentiate two root nodes.
-instance {-# OVERLAPS #-} Eq (Tagged Node) where
-  x == y = case (view contents y, view contents x) of
-    (Root, Root) -> True
-    _            -> view identifier x == view identifier y
-
-instance Ord (Tagged Node) where
-  compare = compare `on` view identifier
-
 instance Lower Node where
   lowerBound = Root
 
