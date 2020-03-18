@@ -9,7 +9,6 @@ import           Analysis.Name (Name)
 import qualified Analysis.Name as Name
 import qualified AST.Unmarshal as TS
 import           Control.Algebra
-import           Control.Carrier.Lift
 import           Control.Carrier.Sketch.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
@@ -17,7 +16,6 @@ import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import           Control.Monad
 import qualified Data.ByteString as ByteString
 import qualified Data.List.NonEmpty as NonEmpty
-import           Data.Module (ModuleInfo (..))
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
 import qualified Language.Python ()
@@ -28,7 +26,6 @@ import           Scope.Types
 import           Source.Loc
 import qualified Source.Source as Source
 import           Source.Span
-import qualified Stack.Graph as Stack
 import           System.Exit (die)
 import           System.Path ((</>))
 import qualified System.Path as Path
@@ -58,7 +55,7 @@ The graph should be
 
 
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
-runScopeGraph p _src item = snd . run . runSketch minfo $ scopeGraph item
+runScopeGraph _p _src item = snd . run . runSketch minfo $ scopeGraph item
   where minfo = lowerBound
 
 runScopeGraphTest :: Monad m => SketchC Name m Result -> m (ScopeGraph.ScopeGraph Name, Result)
@@ -121,7 +118,6 @@ expectedWildcardImport = do
 assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
   let path = "semantic-python/test/fixtures/5-02-simple-function.py"
-  let info = ModuleInfo path "Python" mempty
   (graph, _) <- graphFile path
   (expecto, Complete) <- runScopeGraphTest expectedLexicalScope
   HUnit.assertEqual "Should work for simple case" expecto graph
