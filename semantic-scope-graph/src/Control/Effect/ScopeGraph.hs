@@ -20,12 +20,14 @@ module Control.Effect.ScopeGraph
   , addDeclarations
   -- Scope Manipulation
   , currentScope
+  , rootScope
   , putCurrentScope
   , newEdge
   , newReference
   , newScope
   , addBottomScope
   , addTopScope
+  , connectScopes
   , withScope
   , declareFunction
   , declareMaybeName
@@ -77,6 +79,7 @@ type ScopeGraphEff sig m
   = ( Has (State (ScopeGraph Name)) sig m
     , Has (State (Stack.Graph Stack.Node)) sig m
     , Has (State (CurrentScope Name)) sig m
+    , Has (Reader Stack.Node) sig m
     , Has (Reader Module.ModuleInfo) sig m
     , Has Fresh sig m
     )
@@ -88,16 +91,19 @@ graphInProgress = get
 currentScope :: ScopeGraphEff sig m => m (CurrentScope Name)
 currentScope = get @(CurrentScope Name)
 
+rootScope :: ScopeGraphEff sig m => m Stack.Node
+rootScope = ask @Stack.Node
+
 putCurrentScope :: ScopeGraphEff sig m => Name -> m ()
 putCurrentScope = put . CurrentScope
 
 withScope :: ScopeGraphEff sig m
-          => CurrentScope Name
+          => Name
           -> m a
           -> m a
 withScope scope action = do
   CurrentScope s <- get @(CurrentScope Name)
-  put scope
+  put (CurrentScope scope)
   x <- action
   put (CurrentScope s)
   pure x
@@ -119,6 +125,10 @@ addTopScope = do
   CurrentScope s <- get @(CurrentScope Name)
   modify (Stack.addEdge (Stack.TopScope s) (Stack.Scope s))
   pure (Stack.TopScope s)
+
+connectScopes :: ScopeGraphEff sig m => Stack.Node -> Stack.Node -> m ()
+connectScopes scopeA existingScope = do
+  modify(Stack.addEdge scopeA existingScope)
 
 -- | Establish a reference to a prior declaration.
 reference :: forall sig m . ScopeGraphEff sig m => Text -> Text -> Props.Reference -> m ()
@@ -147,6 +157,7 @@ newScope edges = do
 addDeclarations :: ScopeGraphEff sig m => NonEmpty (Loc, Name) -> m ()
 addDeclarations names = do
   graph <- get @(Stack.Graph Stack.Node)
+  rootScope' <- rootScope
   CurrentScope current <- currentScope
 
   let graph' = foldr (\(_, name) graph ->
@@ -155,10 +166,9 @@ addDeclarations names = do
       graph''' = foldr (\(_, name) graph ->
         graph -<< (Stack.pushSymbol "member") -<< (Stack.reference name)) mempty (NonEmpty.init $ NonEmpty.reverse names)
       graph'''' = graph'' >>- graph''' >>- (Stack.reference (snd $ NonEmpty.head names))
-      currentEdges = Set.filter (\(left, right) -> left == Stack.Scope current) (Stack.edgeSet graph)
-      rootNodes = Set.map snd currentEdges
+      currentEdges = Set.filter (\(left, _) -> left == Stack.Scope current) (Stack.edgeSet graph)
       graphh = foldMap (\(left, right) -> Stack.removeEdge left right graph) currentEdges
-  put (Stack.simplify (Class.overlay (Stack.scope current >>- graph'''' >>- Class.vertex (Set.elemAt 0 rootNodes)) graphh))
+  put (Stack.simplify (Class.overlay (Stack.scope current >>- graph'''' >>- Class.vertex rootScope') graphh))
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
 newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
