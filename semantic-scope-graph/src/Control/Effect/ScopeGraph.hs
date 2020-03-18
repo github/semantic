@@ -128,7 +128,7 @@ addTopScope = do
 
 connectScopes :: ScopeGraphEff sig m => Stack.Node -> Stack.Node -> m ()
 connectScopes scopeA existingScope = do
-  modify(Stack.addEdge scopeA existingScope)
+  modify (Stack.addEdge scopeA existingScope)
 
 -- | Establish a reference to a prior declaration.
 reference :: forall sig m . ScopeGraphEff sig m => Text -> Text -> Props.Reference -> m ()
@@ -154,21 +154,18 @@ newScope edges = do
   name <$ modify (ScopeGraph.newScope name edges)
 
 
-addDeclarations :: ScopeGraphEff sig m => NonEmpty (Loc, Name) -> m ()
+addDeclarations :: ScopeGraphEff sig m => NonEmpty (Loc, Name) -> m (Stack.Graph Stack.Node)
 addDeclarations names = do
-  graph <- get @(Stack.Graph Stack.Node)
-  rootScope' <- rootScope
-  CurrentScope current <- currentScope
-
   let graph' = foldr (\(_, name) graph ->
         graph -<< (Stack.popSymbol "member") -<< (Stack.declaration name)) mempty (NonEmpty.init names)
       graph'' = graph' >>- (Stack.declaration (snd $ NonEmpty.last names))
       graph''' = foldr (\(_, name) graph ->
         graph -<< (Stack.pushSymbol "member") -<< (Stack.reference name)) mempty (NonEmpty.init $ NonEmpty.reverse names)
       graph'''' = graph'' >>- graph''' >>- (Stack.reference (snd $ NonEmpty.head names))
-      currentEdges = Set.filter (\(left, _) -> left == Stack.Scope current) (Stack.edgeSet graph)
-      graphh = foldMap (\(left, right) -> Stack.removeEdge left right graph) currentEdges
-  put (Stack.simplify (Class.overlay (Stack.scope current >>- graph'''' >>- Class.vertex rootScope') graphh))
+      -- currentEdges = Set.filter (\(left, _) -> left == Stack.Scope current) (Stack.edgeSet graph)
+      -- graphh = foldMap (\(left, right) -> Stack.removeEdge left right graph) currentEdges
+  pure graph''''
+  -- put (Stack.simplify (Class.overlay (Stack.scope current >>- graph'''' >>- Class.vertex rootScope') graphh))
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
 newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
