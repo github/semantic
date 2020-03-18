@@ -38,6 +38,7 @@ library
     Scope.Types
     Stack.Graph
     Stack.Graph.Export
+    Stack.Node
   build-depends:
       base                >= 4.13 && < 5
     , aeson
@@ -53,6 +54,7 @@ library
     , process
     , semantic-analysis
     , semantic-source    ^>= 0.0.2
+    , semantic-tags
     , semilattices
     , streaming
     , streaming-bytestring

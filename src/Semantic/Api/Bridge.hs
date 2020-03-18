@@ -1,6 +1,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 module Semantic.Api.Bridge
   ( APIBridge (..)
@@ -9,10 +11,13 @@ module Semantic.Api.Bridge
   ) where
 
 import           Analysis.File
+import           Analysis.Functor.Named (name_)
+import qualified Analysis.Name as Name
 import           Control.Lens
 import qualified Data.Blob as Data
 import qualified Data.Edit as Data
 import           Data.Either
+import           Data.Functor.Tagged (contents, identifier)
 import qualified Data.Language as Data
 import           Data.ProtoLens (defMessage)
 import qualified Data.Text as T
@@ -21,8 +26,11 @@ import qualified Proto.Semantic as API
 import           Proto.Semantic_Fields as P hiding (to)
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Source.Source as Source (fromText, toText, totalSpan)
+import qualified Source.Span as Span
 import qualified Source.Span as Source
+import qualified Stack.Node as Stack
 import qualified System.Path as Path
+import qualified Tags.Tag as Tag
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
 -- This is suitable for types such as 'Pos' which are representationally equivalent
@@ -76,6 +84,20 @@ instance APIConvert Legacy.Span Source.Span where
 instance APIBridge T.Text Data.Language where
   bridging = iso Data.textToLanguage Data.languageToText
 
+instance APIConvert T.Text Tag.Kind where
+  converting = prism' toAPI fromAPI where
+    toAPI = T.pack . show
+    fromAPI = \case
+      "Function" -> Just Tag.Function
+      "Method"   -> Just Tag.Method
+      "Class" -> Just Tag.Class
+      "Module" -> Just Tag.Module
+      _ -> Nothing
+
+instance APIConvert API.StackGraphNode'NodeType Stack.Type where
+  converting = Control.Lens.from enum.enum
+
+
 instance APIBridge API.Blob Data.Blob where
   bridging = iso apiBlobToBlob blobToApiBlob where
     blobToApiBlob b
@@ -104,3 +126,27 @@ instance APIConvert API.BlobPair Data.BlobPair where
     blobPairToApiBlobPair (Data.Compare before after) = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ (bridging #? after)
     blobPairToApiBlobPair (Data.Insert after)         = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
     blobPairToApiBlobPair (Data.Delete before)        = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing
+
+instance APIBridge API.StackGraphNode Stack.Node where
+  bridging = iso apiNodeToNode nodeToApiNode where
+    apiNodeToNode :: API.StackGraphNode -> Stack.Node
+    apiNodeToNode s = Stack.Node
+      (s ^. P.id.to fromIntegral)
+      (s ^. P.name.to Name.name)
+      (s ^. P.line)
+      (s ^? P.kind.converting^.non Tag.Method)
+      (s ^? P.span.converting^.non (Span.point (Span.Pos 0 0)))
+      (s ^? P.nodeType.converting^.non Stack.Unknown)
+
+    nodeToApiNode :: Stack.Node -> API.StackGraphNode
+    nodeToApiNode node = defMessage
+      & P.id .~ node ^. identifier.enum
+      & P.name .~ node ^. contents.name_.to Name.formatName
+      & P.line .~ node ^. Stack.info_.Stack.line_
+      & P.kind .~ node ^. Stack.info_.Stack.kind_.re converting
+      & P.span .~ node ^. Stack.info_.Span.span_.re converting
+      & P.nodeType .~ node ^. Stack.info_.Stack.type_.re converting
+
+
+
+
