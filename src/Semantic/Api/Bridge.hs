@@ -10,24 +10,19 @@ module Semantic.Api.Bridge
   ( APIBridge (..)
   , APIConvert (..)
   , (#?)
-  , pathToApiPath
-  , apiPathToPath
   ) where
 
 import           Analysis.File
-import           Analysis.Functor.Named (name_)
+import           Analysis.Functor.Named (formatName, name_)
 import qualified Analysis.Name as Name
 import           Control.Lens
 import qualified Data.Blob as Data
 import qualified Data.Edit as Data
 import           Data.Either
-import           Data.Functor.Tagged
+import           Data.Functor.Tagged as Tagged
 import qualified Data.IntMap.Strict as IM
 import qualified Data.Language as Data
-import           Data.List.NonEmpty (NonEmpty (..))
-import           Data.Maybe
 import           Data.ProtoLens (defMessage)
-import           Data.Sequence (Seq)
 import qualified Data.Text as T
 import           Data.Text.Lens
 import qualified Data.Vector as Vector
@@ -137,20 +132,20 @@ instance APIConvert API.BlobPair Data.BlobPair where
     blobPairToApiBlobPair (Data.Insert after)         = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
     blobPairToApiBlobPair (Data.Delete before)        = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing
 
-instance APIBridge API.StackGraphNode Stack.Node where
-  bridging = iso apiNodeToNode nodeToApiNode where
-    apiNodeToNode :: API.StackGraphNode -> Stack.Node
+instance APIConvert API.StackGraphNode Stack.Node where
+  converting = prism' nodeToApiNode apiNodeToNode where
+    apiNodeToNode :: API.StackGraphNode -> Maybe Stack.Node
     apiNodeToNode s = Stack.Node
-      (s ^. P.id._Cast)
-      (s ^. P.name.to Name.name)
-      (s ^. P.line)
-      (s ^? P.kind.converting^.non Tag.Method)
-      (s ^? P.span.converting^.non (Span.point (Span.Pos 0 0)))
-      (s ^? P.nodeType.converting^.non Stack.Unknown)
+      <$> (s ^? P.id._Cast)
+      <*> (s ^? P.name.to Name.name)
+      <*> (s ^? P.line)
+      <*> (s ^? P.kind.converting)
+      <*> (s ^? P.span.converting)
+      <*> (s ^? P.nodeType.converting)
 
     nodeToApiNode :: Stack.Node -> API.StackGraphNode
     nodeToApiNode node = defMessage
-      & P.id .~ node ^. identifier.enum
+      & P.id .~ node ^. identifier._Cast
       & P.name .~ node ^. contents.name_.to Name.formatName
       & P.line .~ node ^. Stack.info_.Stack.line_
       & P.kind .~ node ^. Stack.info_.Stack.kind_.re converting
@@ -164,12 +159,12 @@ instance APIConvert API.StackGraphFile Stack.File where
      fromApi s = Stack.File
        { Stack.path = fromRight (Path.toAbsRel Path.emptyFile) (Path.parse (s ^. P.path.to T.unpack))
        , Stack.language = s^.P.language
-       , Stack.nodes = Vector.map (view bridging) ((s^.P.vec'nodes) :: Vector.Vector API.StackGraphNode)
+       , Stack.nodes = Vector.mapMaybe (preview converting) ((s^.P.vec'nodes) :: Vector.Vector API.StackGraphNode)
        , Stack.errors = mempty
        , Stack.paths =
          let
            lookupTable :: IM.IntMap Stack.Node
-           lookupTable = Tagged.buildLookupTable (view bridging) (s ^. P.vec'nodes)
+           lookupTable = Tagged.buildLookupTable extract (Vector.mapMaybe (preview converting) (s ^. P.vec'nodes))
 
            conv :: API.StackGraphPath -> Maybe Stack.Path.Path
            conv n = Stack.Path.Path
@@ -179,15 +174,15 @@ instance APIConvert API.StackGraphFile Stack.File where
              <*> previews P.startingSymbolStack (fmap Name.name) n
              <*> previews P.endingSymbolStack (fmap Name.name) n
              <*> n ^? P.startingScopeStackSize._Cast.enum
-             <*> Just (fmap fromIntegral (view P.endingScopeStack n))
+             <*> n ^? P.endingScopeStack
          in
            Vector.mapMaybe conv (s^.P.vec'paths)
        }
 
      convPath :: Stack.Path.Path -> API.StackGraphPath
      convPath p = defMessage
-       & P.startingSymbolStack .~ p^.Stack.Path.startingSymbolStack_
-       & P.endingSymbolStack.mapped formatName .~ p^.Stack.Path.endingSymbolStack_
+       & P.startingSymbolStack .~ views Stack.Path.startingSymbolStack_ (fmap formatName) p
+       & P.endingSymbolStack .~ views Stack.Path.endingSymbolStack_ (fmap formatName) p
        & P.startingScopeStackSize .~ p^.Stack.Path.startingScopeStackSize_.re enum._Cast
        & P.from .~ p^.Stack.Path.startingNode_.identifier._Cast
        & P.to .~ p^.Stack.Path.endingNode_.identifier._Cast
@@ -196,10 +191,8 @@ instance APIConvert API.StackGraphFile Stack.File where
      toApi f = defMessage
        & P.path .~ f ^. Stack.path_.to Path.toString.from _Text
        & P.language .~ f ^. Stack.language_
-       & P.vec'nodes .~ Vector.map (review bridging) (f^.Stack.nodes_)
+       & P.vec'nodes .~ Vector.map (review converting) (f^.Stack.nodes_)
        & P.vec'paths .~ Vector.map convPath (f^.Stack.paths_)
 
 _Cast :: (Integral a, Integral b) => Iso' a b
 _Cast = iso fromIntegral fromIntegral
-
-_
