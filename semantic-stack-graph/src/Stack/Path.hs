@@ -3,6 +3,7 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeApplications #-}
 module Stack.Path
   ( Path (..)
@@ -28,15 +29,16 @@ module Stack.Path
   ) where
 
 
-import Control.Lens.Getter
-import Data.Functor.Tagged
-import Data.Generics.Product
-import Data.Monoid
-import Data.Semigroup (sconcat)
-import Data.Sequence (Seq (..))
-import Data.Text (Text)
-import GHC.Generics (Generic)
-import Stack.Node
+import           Control.Lens.Getter
+import           Data.Functor.Tagged
+import           Data.Generics.Product
+import           Data.Monoid
+import           Data.Semigroup (sconcat)
+import           Data.Sequence (Seq (..))
+import           Data.Text (Text)
+import qualified Data.Text as T
+import           GHC.Generics (Generic)
+import           Stack.Node
 
 -- | A partial path through a stack graph. These will be generated
 -- from walks through the stack graph, and can be thought of as
@@ -75,8 +77,8 @@ endingScopeStack_ = field @"endingScopeStack"
 
 -- | This is suitable for conversion from (label, node, node) tuples.
 data Edge = Edge
-  { sourceNode :: Tagged Node
-  , sinkNode   :: Tagged Node
+  { sourceNode :: Node
+  , sinkNode   :: Node
   , label      :: Text
   } deriving (Eq, Show)
 
@@ -98,12 +100,6 @@ data PathInvariantError
   | BadStartingNode (Node)
   | BadEndingNode (Node)
     deriving (Eq, Show)
-
-data Edge = Edge
-  { sourceNode :: Node
-  , sinkNode   :: Node
-  , label      :: Text
-  } deriving (Eq, Show)
 
 -- | If a path's edges list is empty, then its starting node must be
 -- the same as its ending node. If a path's edges list is nonempty,
