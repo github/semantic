@@ -14,9 +14,6 @@ module Stack.Path
   , startingSymbolStack_
   , startingScopeStackSize_
   , endingSymbolStack_
-  , Edge (..)
-  , formatEdge
-  , parseEdges
   , StartingSize (..)
   , PathInvariantError (..)
   , checkEdgeInvariants
@@ -29,16 +26,16 @@ module Stack.Path
   ) where
 
 
-import           Control.Lens.Getter
-import           Data.Functor.Tagged
-import           Data.Generics.Product
-import           Data.Monoid
-import           Data.Semigroup (sconcat)
-import           Data.Sequence (Seq (..))
-import           Data.Text (Text)
-import qualified Data.Text as T
-import           GHC.Generics (Generic)
-import           Stack.Node
+import Control.Lens.Getter
+import Data.Functor.Tagged
+import Data.Generics.Product
+import Data.Monoid
+import Data.Semigroup (sconcat)
+import Data.Sequence (Seq (..))
+import Data.Text (Text)
+import GHC.Generics (Generic)
+import Stack.Edge
+import Stack.Node
 
 -- | A partial path through a stack graph. These will be generated
 -- from walks through the stack graph, and can be thought of as
@@ -74,21 +71,6 @@ endingSymbolStack_ = field @"endingSymbolStack"
 
 endingScopeStack_ :: Lens' Path [Tag]
 endingScopeStack_ = field @"endingScopeStack"
-
--- | This is suitable for conversion from (label, node, node) tuples.
-data Edge = Edge
-  { sourceNode :: Node
-  , sinkNode   :: Node
-  , label      :: Text
-  } deriving (Eq, Show)
-
-parseEdges :: Text -> [Edge]
-parseEdges = const []
-
-formatEdge :: Edge -> Text
-formatEdge (Edge src sink lab) =
-  get src <> ":" <> get sink <> ":" <> lab
-    where get = T.pack . show . extract
 
 data StartingSize
   = Zero

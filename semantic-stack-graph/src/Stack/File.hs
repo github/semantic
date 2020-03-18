@@ -40,4 +40,6 @@ nodes_ = field @"nodes"
 paths_ :: Lens' File (Vector Path)
 paths_ = field @"paths"
 
+computeEdgeInformation :: File -> (IM.IntMap Node, )
+
 type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
