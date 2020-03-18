@@ -48,7 +48,7 @@ import           Source.Loc (Loc)
 import           Source.Span (Span, span_)
 
 -- This typeclass is internal-only, though it shares the same interface
--- as the one defined in semantic-scope-graph. The somewhat-unconventional
+-- as the one defined in semantic-stack-graph. The somewhat-unconventional
 -- quantified constraint is to avoid having to define Show1 instances for
 -- every single Python AST type.
 class (forall a . Show a => Show (t a)) => ToScopeGraph t where

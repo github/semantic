@@ -285,7 +285,7 @@ library
                      , semantic-php ^>= 0
                      , semantic-python ^>= 0
                      , semantic-ruby ^>= 0
-                     , semantic-scope-graph ^>= 0
+                     , semantic-stack-graph ^>= 0
                      , semantic-tags ^>= 0
                      , semantic-tsx ^>= 0
                      , semantic-typescript ^>= 0

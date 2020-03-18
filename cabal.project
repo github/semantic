@@ -12,7 +12,7 @@ packages: .
           semantic-php
           semantic-python
           semantic-ruby
-          semantic-scope-graph
+          semantic-stack-graph
           semantic-tsx
           semantic-typescript
           semantic-tags

@@ -29,7 +29,7 @@ common haskell
                      , semantic-core ^>= 0.0
                      , semantic-source ^>= 0.0.2
                      , semantic-tags ^>= 0.0
-                     , semantic-scope-graph ^>= 0.0
+                     , semantic-stack-graph ^>= 0.0
                      , semilattices ^>= 0
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
@@ -105,7 +105,7 @@ test-suite graphing
 
   build-depends: base
                , semantic-python
-               , semantic-scope-graph
+               , semantic-stack-graph
                , bytestring
                , pathtype
                , tasty
@@ -120,7 +120,7 @@ test-suite stack-graph
 
   build-depends: base
                , semantic-python
-               , semantic-scope-graph
+               , semantic-stack-graph
                , bytestring
                , pathtype
                , tasty

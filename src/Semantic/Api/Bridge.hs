@@ -1,7 +1,9 @@
-{-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 module Semantic.Api.Bridge
@@ -13,13 +15,13 @@ module Semantic.Api.Bridge
   ) where
 
 import           Analysis.File
-import           Analysis.Name
+import           Analysis.Functor.Named (name_)
+import qualified Analysis.Name as Name
 import           Control.Lens
 import qualified Data.Blob as Data
 import qualified Data.Edit as Data
 import           Data.Either
 import           Data.Functor.Tagged
-import           Data.Int
 import qualified Data.IntMap.Strict as IM
 import qualified Data.Language as Data
 import           Data.List.NonEmpty (NonEmpty (..))
@@ -28,15 +30,18 @@ import           Data.ProtoLens (defMessage)
 import           Data.Sequence (Seq)
 import qualified Data.Text as T
 import           Data.Text.Lens
-import qualified Data.Validation as Validation
+import qualified Data.Vector as Vector
 import qualified Proto.Semantic as API
 import qualified Proto.Semantic_Fields as P
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Source.Source as Source (fromText, toText, totalSpan)
+import qualified Source.Span as Span
 import qualified Source.Span as Source
-import qualified Stack.Graph as SG
-import qualified Stack.Path as SG
+import qualified Stack.File as Stack
+import qualified Stack.Node as Stack
+import qualified Stack.Path
 import qualified System.Path as Path
+import qualified Tags.Tag as Tag
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
 -- This is suitable for types such as 'Pos' which are representationally equivalent
@@ -90,6 +95,20 @@ instance APIConvert Legacy.Span Source.Span where
 instance APIBridge T.Text Data.Language where
   bridging = iso Data.textToLanguage Data.languageToText
 
+instance APIConvert T.Text Tag.Kind where
+  converting = prism' toAPI fromAPI where
+    toAPI = T.pack . show
+    fromAPI = \case
+      "Function" -> Just Tag.Function
+      "Method"   -> Just Tag.Method
+      "Class" -> Just Tag.Class
+      "Module" -> Just Tag.Module
+      _ -> Nothing
+
+instance APIConvert API.StackGraphNode'NodeType Stack.Type where
+  converting = Control.Lens.from enum.enum
+
+
 instance APIBridge API.Blob Data.Blob where
   bridging = iso apiBlobToBlob blobToApiBlob where
     blobToApiBlob b
@@ -118,54 +137,66 @@ instance APIConvert API.BlobPair Data.BlobPair where
     blobPairToApiBlobPair (Data.Insert after)         = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
     blobPairToApiBlobPair (Data.Delete before)        = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing
 
--- * Stack graph stuff. This doesn't fit into the optics formulation because it relies on
--- contextual information
+instance APIBridge API.StackGraphNode Stack.Node where
+  bridging = iso apiNodeToNode nodeToApiNode where
+    apiNodeToNode :: API.StackGraphNode -> Stack.Node
+    apiNodeToNode s = Stack.Node
+      (s ^. P.id.to fromIntegral)
+      (s ^. P.name.to Name.name)
+      (s ^. P.line)
+      (s ^? P.kind.converting^.non Tag.Method)
+      (s ^? P.span.converting^.non (Span.point (Span.Pos 0 0)))
+      (s ^? P.nodeType.converting^.non Stack.Unknown)
 
-data PathConvertError
-  = NodeNotFound Tag
-  | InvalidStartingSize Int64
-  | InvariantViolated SG.PathInvariantError
+    nodeToApiNode :: Stack.Node -> API.StackGraphNode
+    nodeToApiNode node = defMessage
+      & P.id .~ node ^. identifier.enum
+      & P.name .~ node ^. contents.name_.to Name.formatName
+      & P.line .~ node ^. Stack.info_.Stack.line_
+      & P.kind .~ node ^. Stack.info_.Stack.kind_.re converting
+      & P.span .~ node ^. Stack.info_.Span.span_.re converting
+      & P.nodeType .~ node ^. Stack.info_.Stack.type_.re converting
 
-type NodeCache = IM.IntMap (Tagged SG.Node)
+instance APIConvert API.StackGraphFile Stack.File where
+  converting = iso fromApi toApi
+   where
+     fromApi :: API.StackGraphFile -> Stack.File
+     fromApi s = Stack.File
+       { Stack.path = fromRight (Path.toAbsRel Path.emptyFile) (Path.parse (s ^. P.path.to T.unpack))
+       , Stack.language = s^.P.language
+       , Stack.nodes = Vector.map (view bridging) ((s^.P.vec'nodes) :: Vector.Vector API.StackGraphNode)
+       , Stack.paths =
+         let
+           lookupTable :: IM.IntMap Stack.Node
+           lookupTable = foldMap (\a -> IM.singleton (a^.P.id._Cast) (a^.bridging)) (s^.P.vec'nodes)
+           conv :: API.StackGraphPath -> Maybe Stack.Path.Path
+           conv n = Stack.Path.Path
+             <$> IM.lookup (n ^. P.from._Cast) lookupTable
+             <*> IM.lookup (n ^. P.to._Cast) lookupTable
+             <*> n ^? P.edges
+             <*> previews P.startingSymbolStack (fmap Name.name) n
+             <*> previews P.endingSymbolStack (fmap Name.name) n
+             <*> n ^? P.startingScopeStackSize._Cast.enum
+             <*> Just (fmap fromIntegral (view P.endingScopeStack n))
+         in
+           Vector.mapMaybe conv (s^.P.vec'paths)
+       , Stack.errors = mempty
+       }
 
+     convPath :: Stack.Path.Path -> API.StackGraphPath
+     convPath p = defMessage
+       & P.startingSymbolStack .~ fmap Name.formatName (p^.Stack.Path.startingSymbolStack_)
+       & P.endingSymbolStack .~ fmap Name.formatName (p^.Stack.Path.endingSymbolStack_)
+       & P.startingScopeStackSize .~ p^.Stack.Path.startingScopeStackSize_.re enum._Cast
+       & P.from .~ p^.Stack.Path.startingNode_.identifier._Cast
+       & P.to .~ p^.Stack.Path.endingNode_.identifier._Cast
 
+     toApi :: Stack.File -> API.StackGraphFile
+     toApi f = defMessage
+       & P.path .~ f ^. Stack.path_.to Path.toString.from _Text
+       & P.language .~ f ^. Stack.language_
+       & P.vec'nodes .~ Vector.map (review bridging) (f^.Stack.nodes_)
+       & P.vec'paths .~ Vector.map convPath (f^.Stack.paths_)
 
-stackDelimiter :: T.Text
-stackDelimiter = T.pack "\x1E"
-
-pathToApiPath :: SG.Path -> API.StackGraphPath
-pathToApiPath path =
-  defMessage
-    & P.from .~ path^.SG.startingNode_.identifier
-    & P.to .~ path^.SG.endingNode_.identifier
-    & P.endingScopeStack .~ path^.SG.endingScopeStack_
-    & P.startingSymbolStack .~ fmap formatName (path^.SG.startingSymbolStack_)
-    & P.endingSymbolStack .~ fmap formatName (path^.SG.endingSymbolStack_)
-    & P.startingScopeStackSize .~ (if path^.SG.startingScopeStackSize_ == SG.One then 1 else 0)
-    & P.edges .~ (path^.SG.edgeLabels_)
-
-apiPathToPath :: Seq SG.Edge -> NodeCache -> API.StackGraphPath -> Either (NonEmpty PathConvertError) SG.Path
-apiPathToPath edges nc path = Validation.toEither validate >>= ensureInvariantsHold
-  where
-    validate = do
-      let failing = Validation.Failure . pure @NonEmpty @PathConvertError
-          lookupNode n = case IM.lookup (fromIntegral n) nc of
-            Just a  -> pure a
-            Nothing -> failing (NodeNotFound n)
-
-      startingNode <- lookupNode (path^.P.from)
-      endingNode <- lookupNode (path^.P.to)
-      endingScopeStack <- pure (path^.P.endingScopeStack)
-      edgeLabels <- pure . view P.edges $ path
-      startingSymbolStack <- pure . fmap name . view P.startingSymbolStack $ path
-      endingSymbolStack <- pure . fmap name . view P.startingSymbolStack $ path
-      startingScopeStackSize <- case path^.P.startingScopeStackSize of
-        0 -> pure SG.Zero
-        1 -> pure SG.One
-        n -> failing (InvalidStartingSize n)
-      pure SG.Path{..}
-    ensureInvariantsHold n =
-      let allErrors = fmap InvariantViolated (catMaybes [SG.checkEdgeInvariants edges n, SG.checkNodeInvariants n])
-      in case allErrors of
-        []   -> pure n
-        x:xs -> Left (x :| xs)
+_Cast :: (Integral a, Integral b) => Iso' a b
+_Cast = iso fromIntegral fromIntegral

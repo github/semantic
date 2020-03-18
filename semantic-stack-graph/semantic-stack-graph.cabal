@@ -1,6 +1,6 @@
 cabal-version:       2.4
 
-name:                semantic-scope-graph
+name:                semantic-stack-graph
 version:             0.0.0.0
 synopsis:            Scope Graph computation
 description:         Scope Graph computation for ASTs derived from tree-sitter grammars.
@@ -26,6 +26,9 @@ library
     Control.Effect.ScopeGraph.Properties.Function
     Control.Effect.ScopeGraph.Properties.Reference
     Data.Functor.Tagged
+    Data.Hole
+    Data.Module
+    Data.ScopeGraph
     Scope.Graph.AdjacencyList
     Scope.Graph.Convert
     Scope.Info
@@ -33,11 +36,10 @@ library
     Scope.Reference
     Scope.Scope
     Scope.Types
+    Stack.File
     Stack.Graph
     Stack.Graph.Export
-    Data.Hole
-    Data.Module
-    Data.ScopeGraph
+    Stack.Node
   build-depends:
       base                >= 4.13 && < 5
     , aeson
@@ -53,6 +55,7 @@ library
     , process
     , semantic-analysis
     , semantic-source    ^>= 0.0.2
+    , semantic-tags
     , semilattices
     , streaming
     , streaming-bytestring
