@@ -16,7 +16,7 @@ data Edge = Edge
   { sourceNode :: Node
   , sinkNode   :: Node
   , label      :: Text
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Ord)
 
 parseEdges :: Text -> [Edge]
 parseEdges = const []

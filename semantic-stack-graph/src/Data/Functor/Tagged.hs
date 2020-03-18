@@ -40,6 +40,20 @@ type Tag = Int64
 data Tagged a = a :# !Tag
   deriving (Functor, Foldable, Traversable, Generic)
 
+instance Show a => Show (Tagged a) where
+  showsPrec n (a :# t) = showsPrec n a <> showString " # " <> showsPrec n t
+
+-- | Tagged values are equal iff they have the same tag.
+instance Eq (Tagged a) where
+  (==) = (==) `on` tag
+
+-- | Tagged values are ordered by their tags.
+instance Ord (Tagged a) where
+  compare = compare `on` tag
+
+tag :: Tagged a -> Tag
+tag (_ :# t) = t
+
 infixl 7 :#
 
 contents :: Lens (Tagged a) (Tagged b) a b
@@ -47,15 +61,6 @@ contents = position @1
 
 identifier :: Lens' (Tagged a) Tag
 identifier = position @2
-
-instance Show a => Show (Tagged a) where
-  showsPrec n (a :# t) = showsPrec n a <> showString " # " <> showsPrec n t
-
--- | This is marked as overlappable so that custom types can define
--- their own definitions of equality when wrapped in a Tagged. This
--- may come back to bite us later.
-instance {-# OVERLAPPABLE #-} Eq (Tagged a) where
-  (==) = (==) `on` view identifier
 
 -- | 'extract' is a handy shortcut for 'view' 'contents'
 instance Comonad Tagged where

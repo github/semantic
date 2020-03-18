@@ -8,14 +8,23 @@ module Stack.File
   , language_
   , nodes_
   , paths_
+  , edgesInFile
+  , partialGraphOfFile
   ) where
 
+import qualified Algebra.Graph.Labelled as Graph
+import           Control.Lens.Getter
+import           Data.Foldable (toList)
 import           Data.Generics.Product
+import           Data.Set (Set)
+import qualified Data.Set as Set
 import           Data.Text (Text)
+import qualified Data.Text as T
 import           Data.Vector (Vector)
 import           GHC.Generics (Generic)
+import           Stack.Edge
 import           Stack.Node (Node)
-import           Stack.Path (Path)
+import           Stack.Path (Path, edgeLabels_, endingNode_, startingNode_)
 import qualified System.Path as Path
 
 type ParseError = Text
@@ -40,6 +49,18 @@ nodes_ = field @"nodes"
 paths_ :: Lens' File (Vector Path)
 paths_ = field @"paths"
 
-computeEdgeInformation :: File -> (IM.IntMap Node, )
+-- | Compute the set of all edges in a file, as computed by walking all the paths.
+edgesInFile :: File -> Set Edge
+edgesInFile = foldMap edgesOf . paths
+  where
+    edgesOf :: Path -> Set Edge
+    edgesOf p = Set.singleton (Edge (p ^. startingNode_) (p ^. endingNode_) (T.take 1 (p ^. edgeLabels_)))
+
+-- | Compute an algebraic labelled graph from the edges present in a given file.
+partialGraphOfFile :: File -> Graph.Graph Text Node
+partialGraphOfFile = Graph.edges . toList . Set.map tupled . edgesInFile
+  where
+    tupled (Edge a b c) = (c, a, b)
 
 type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
+
