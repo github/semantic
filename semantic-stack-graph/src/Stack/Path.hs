@@ -134,17 +134,17 @@ instance Semigroup Validity where
 validity :: Path -> Validity
 validity p = sconcat [vStart, vEnd, vSize]
   where
-    vStart = case p ^. to startingNode.info_.type_ of
+    vStart = case p ^. startingNode_.info_.type_ of
       Reference{} | null (startingSymbolStack p), startingScopeStackSize p == Zero -> Valid
                   | otherwise -> Invalid
       _otherwise -> Valid
 
-    vEnd = case p ^. to endingNode.info_.type_ of
+    vEnd = case p ^. endingNode_.info_.type_ of
       Definition{} | null (endingSymbolStack p), null (endingScopeStack p) -> Valid
                     | otherwise -> Invalid
       _otherwise -> Valid
 
-    vSize = case (startingScopeStackSize p, p ^. to endingNode.info_.type_) of
+    vSize = case (startingScopeStackSize p, p ^. endingNode_.info_.type_) of
       (One, JumpToScope{}) -> Valid
       (One, IgnoreScope{}) -> Valid
       (One, _)             -> Invalid
@@ -154,7 +154,7 @@ data Completion = Partial | Complete
 
 -- | A path is complete if its starting node is a reference node and its ending node is a definition node. Otherwise it is partial.
 completion :: Path -> Completion
-completion p = case (p^.to startingNode.info_.type_, p^.to endingNode.info_.type_) of
+completion p = case (p^.startingNode_.info_.type_, p^.endingNode_.info_.type_) of
   (Reference{}, Definition{}) -> Complete
   _                           -> Partial
 
