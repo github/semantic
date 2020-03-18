@@ -33,6 +33,8 @@ module Stack.Graph
   , popSymbol
   , pushSymbol
   , root
+  , topScope
+  , bottomScope
   -- * Miscellany
   , tagGraphUniquely
   -- * Testing stuff
@@ -115,12 +117,14 @@ instance Lower a => Lower (Graph a) where
 fromLinearNodes :: [a] -> Graph a
 fromLinearNodes n = Class.edges $ zip (init n) (drop 1 n)
 
-scope, declaration, popSymbol, reference, pushSymbol :: Symbol -> Graph Node
+scope, declaration, popSymbol, reference, pushSymbol, topScope, bottomScope :: Symbol -> Graph Node
 scope = Class.vertex . Scope
 declaration = Class.vertex . Declaration
 reference = Class.vertex . Reference
 popSymbol = Class.vertex . PopSymbol
 pushSymbol = Class.vertex . PushSymbol
+topScope = Class.vertex . TopScope
+bottomScope = Class.vertex . BottomScope
 
 root :: Name -> Graph Node
 root name = Graph (Algebraic.vertex (Root name))
