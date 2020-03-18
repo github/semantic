@@ -141,7 +141,7 @@ instance APIBridge API.StackGraphNode Stack.Node where
   bridging = iso apiNodeToNode nodeToApiNode where
     apiNodeToNode :: API.StackGraphNode -> Stack.Node
     apiNodeToNode s = Stack.Node
-      (s ^. P.id.to fromIntegral)
+      (s ^. P.id._Cast)
       (s ^. P.name.to Name.name)
       (s ^. P.line)
       (s ^? P.kind.converting^.non Tag.Method)
@@ -165,10 +165,12 @@ instance APIConvert API.StackGraphFile Stack.File where
        { Stack.path = fromRight (Path.toAbsRel Path.emptyFile) (Path.parse (s ^. P.path.to T.unpack))
        , Stack.language = s^.P.language
        , Stack.nodes = Vector.map (view bridging) ((s^.P.vec'nodes) :: Vector.Vector API.StackGraphNode)
+       , Stack.errors = mempty
        , Stack.paths =
          let
            lookupTable :: IM.IntMap Stack.Node
-           lookupTable = foldMap (\a -> IM.singleton (a^.P.id._Cast) (a^.bridging)) (s^.P.vec'nodes)
+           lookupTable = Tagged.buildLookupTable (view bridging) (s ^. P.vec'nodes)
+
            conv :: API.StackGraphPath -> Maybe Stack.Path.Path
            conv n = Stack.Path.Path
              <$> IM.lookup (n ^. P.from._Cast) lookupTable
@@ -180,13 +182,12 @@ instance APIConvert API.StackGraphFile Stack.File where
              <*> Just (fmap fromIntegral (view P.endingScopeStack n))
          in
            Vector.mapMaybe conv (s^.P.vec'paths)
-       , Stack.errors = mempty
        }
 
      convPath :: Stack.Path.Path -> API.StackGraphPath
      convPath p = defMessage
-       & P.startingSymbolStack .~ fmap Name.formatName (p^.Stack.Path.startingSymbolStack_)
-       & P.endingSymbolStack .~ fmap Name.formatName (p^.Stack.Path.endingSymbolStack_)
+       & P.startingSymbolStack .~ p^.Stack.Path.startingSymbolStack_
+       & P.endingSymbolStack.mapped formatName .~ p^.Stack.Path.endingSymbolStack_
        & P.startingScopeStackSize .~ p^.Stack.Path.startingScopeStackSize_.re enum._Cast
        & P.from .~ p^.Stack.Path.startingNode_.identifier._Cast
        & P.to .~ p^.Stack.Path.endingNode_.identifier._Cast
@@ -200,3 +201,5 @@ instance APIConvert API.StackGraphFile Stack.File where
 
 _Cast :: (Integral a, Integral b) => Iso' a b
 _Cast = iso fromIntegral fromIntegral
+
+_

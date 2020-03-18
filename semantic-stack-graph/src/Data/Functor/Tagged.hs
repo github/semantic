@@ -10,6 +10,8 @@ module Data.Functor.Tagged
   -- * Lenses
   , identifier
   , contents
+  -- * Utilities
+  , buildLookupTable
   -- * Monadic creation functions
   , taggedM
   , taggedIO
@@ -17,15 +19,16 @@ module Data.Functor.Tagged
   , extract
   ) where
 
-import Control.Comonad
-import Control.Effect.Fresh
-import Control.Lens.Getter
-import Control.Lens.Lens
-import Data.Function
-import Data.Generics.Product
-import Data.Int
-import Data.Unique
-import GHC.Generics
+import           Control.Comonad
+import           Control.Effect.Fresh
+import           Control.Lens.Getter
+import           Control.Lens.Lens
+import           Data.Function
+import           Data.Generics.Product
+import           Data.Int
+import qualified Data.IntMap as IM
+import           Data.Unique
+import           GHC.Generics
 
 -- | Most identificatory fields are pinned to protobuf id's, which by convention
 -- are signed 64-bit values, so that we can convert them efficiently between
@@ -67,3 +70,8 @@ taggedM a = (a :#) . fromIntegral <$> fresh
 -- ordered, but are guaranteed to be unique throughout the life of the program.
 taggedIO :: a -> IO (Tagged a)
 taggedIO a = (a :#) . fromIntegral . hashUnique <$> newUnique
+
+-- | Given a container of Tagged items and a mapping function, build a lazy 'IntMap'
+-- that maps the tag of an item to the item itself.
+buildLookupTable :: Foldable f => (Tagged a -> b) -> f (Tagged a) -> IM.IntMap (Tagged b)
+buildLookupTable f = foldMap (\x@(_ :# tag) -> IM.singleton (fromIntegral tag) (f x :# tag))
