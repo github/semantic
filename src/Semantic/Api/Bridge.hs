@@ -136,7 +136,7 @@ instance APIConvert API.StackGraphNode Stack.Node where
   converting = prism' nodeToApiNode apiNodeToNode where
     apiNodeToNode :: API.StackGraphNode -> Maybe Stack.Node
     apiNodeToNode s = Stack.Node
-      <$> (s ^? P.id._Cast)
+      <$> (s ^? P.id)
       <*> (s ^? P.name.to Name.name)
       <*> (s ^? P.line)
       <*> (s ^? P.kind.converting)
@@ -145,7 +145,7 @@ instance APIConvert API.StackGraphNode Stack.Node where
 
     nodeToApiNode :: Stack.Node -> API.StackGraphNode
     nodeToApiNode node = defMessage
-      & P.id .~ node ^. identifier._Cast
+      & P.id .~ node ^. identifier
       & P.name .~ node ^. contents.name_.to Name.formatName
       & P.line .~ node ^. Stack.info_.Stack.line_
       & P.kind .~ node ^. Stack.info_.Stack.kind_.re converting
@@ -184,8 +184,8 @@ instance APIConvert API.StackGraphFile Stack.File where
        & P.startingSymbolStack .~ views Stack.Path.startingSymbolStack_ (fmap formatName) p
        & P.endingSymbolStack .~ views Stack.Path.endingSymbolStack_ (fmap formatName) p
        & P.startingScopeStackSize .~ p^.Stack.Path.startingScopeStackSize_.re enum._Cast
-       & P.from .~ p^.Stack.Path.startingNode_.identifier._Cast
-       & P.to .~ p^.Stack.Path.endingNode_.identifier._Cast
+       & P.from .~ p^.Stack.Path.startingNode_.identifier
+       & P.to .~ p^.Stack.Path.endingNode_.identifier
 
      toApi :: Stack.File -> API.StackGraphFile
      toApi f = defMessage
