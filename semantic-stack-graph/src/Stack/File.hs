@@ -27,14 +27,14 @@ import           Stack.Node (Node)
 import           Stack.Path (Path, edgeLabels_, endingNode_, startingNode_)
 import qualified System.Path as Path
 
-type ParseError = Text
-
+-- | A native representation of the stack-graph file type, bridged to
+-- the StackGraphFile type defined in the protobufs.
 data File = File
   { path     :: Path.AbsRelFile
   , language :: Text
   , nodes    :: Vector Node
   , paths    :: Vector Path
-  , errors   :: Vector ParseError
+  , errors   :: Vector Text
   } deriving (Eq, Show, Generic)
 
 path_ :: Lens' File Path.AbsRelFile
