@@ -136,12 +136,12 @@ instance APIConvert API.StackGraphNode Stack.Node where
   converting = prism' nodeToApiNode apiNodeToNode where
     apiNodeToNode :: API.StackGraphNode -> Maybe Stack.Node
     apiNodeToNode s = Stack.Node
-      <$> (s ^? P.id)
-      <*> (s ^? P.name.to Name.name)
-      <*> (s ^? P.line)
-      <*> (s ^? P.kind.converting)
-      <*> (s ^? P.span.converting)
-      <*> (s ^? P.nodeType.converting)
+      <$> s ^? P.id
+      <*> s ^? P.name.to Name.name
+      <*> s ^? P.line
+      <*> s ^? P.kind.converting
+      <*> s ^? P.span.converting
+      <*> s ^? P.nodeType.converting
 
     nodeToApiNode :: Stack.Node -> API.StackGraphNode
     nodeToApiNode node = defMessage

@@ -18,13 +18,12 @@ module Analysis.Functor.Named
 
 
 import Analysis.Name
-import Data.Function (on)
 import Data.Generics.Product
 import GHC.Generics (Generic)
 
 -- | Annotates an @a@ with a 'Name'-provided name, which is ignored for '==' and 'compare'.
 data Named a = Named Name a
-  deriving (Foldable, Functor, Show, Traversable, Generic)
+  deriving (Eq, Ord, Foldable, Functor, Show, Traversable, Generic)
 
 named :: Name -> a -> Named a
 named = Named
@@ -43,11 +42,5 @@ value_ = position @2
 
 name_ :: Lens' (Named a) Name
 name_ = position @1
-
-instance Eq a => Eq (Named a) where
-  (==) = (==) `on` namedValue
-
-instance Ord a => Ord (Named a) where
-  compare = compare `on` namedValue
 
 type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
