@@ -47,6 +47,7 @@ import           Scope.Graph.Convert (Result (..), complete, todo)
 import           Scope.Types
 import           Source.Loc (Loc)
 import           Source.Span (Span, span_)
+import           Stack.Graph ((>>-))
 import qualified Stack.Graph as Stack
 
 -- This typeclass is internal-only, though it shares the same interface
@@ -243,9 +244,13 @@ instance ToScopeGraph Py.ImportStatement where
     name <- Name.gensym
     modify (Stack.newScope name mempty)
 
-    addDeclarations ((\(Py.Identifier ann name) -> (ann, Name.name name)) <$> names)
+    childGraph <- addDeclarations ((\(Py.Identifier ann name) -> (ann, Name.name name)) <$> names)
+
+    put (Stack.scope currentScope' >>- Stack.scope name >>- childGraph >>- Stack.vertex rootScope')
 
     putCurrentScope name
+
+
 
     -- let toName (Py.Identifier _ name) = Name.name name
     -- newEdge ScopeGraph.Import (toName <$> names)
@@ -260,6 +265,19 @@ instance ToScopeGraph Py.ImportStatement where
     --       withScope (toName scopeIdentifier) $ do
     --         let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
     --         newReference (toName referenceIdentifier) referenceProps
+
+    {-
+    Graph {unGraph = Overlay (Connect (Vertex (BottomScope {symbol = "_a"})) (Vertex (Scope {symbol = "_a"}))) (Connect (Connect (Vertex (Scope {symbol = "_a"})) (Connect (Connect (Connect (Connect (Vertex (Declaration {symbol = "cheese"})) (Vertex (PopSymbol {symbol = "member"}))) (Vertex (Declaration {symbol = "ints"}))) (Connect (Vertex (Reference {symbol = "ints"})) (Vertex (PushSymbol {symbol = "member"})))) (Vertex (Reference {symbol = "cheese"})))) (Vertex (Root {symbol = "_a"})))}
+    -}
+
+    {-
+   Graph {
+    unGraph = Overlay (
+      Connect (Vertex (TopScope {symbol = "_a"}))
+      (Vertex (Scope {symbol = "_a"})))
+      (Overlay (Connect (Vertex (BottomScope {symbol = "_a"}))
+       (Vertex (Scope {symbol = "_a"}))) (Connect (Connect (Vertex (Scope {symbol = "_b"})) (Connect (Connect (Connect (Connect (Vertex (Declaration {symbol = "cheese"})) (Vertex (PopSymbol {symbol = "member"}))) (Vertex (Declaration {symbol = "ints"}))) (Connect (Vertex (Reference {symbol = "ints"})) (Vertex (PushSymbol {symbol = "member"})))) (Vertex (Reference {symbol = "cheese"})))) (Vertex (Root {symbol = "_a"}))))}
+    -}
 
     complete
   scopeGraph term = todo (show term)
@@ -321,14 +339,18 @@ instance ToScopeGraph Py.Module where
   scopeGraph term@(Py.Module ann _) = do
     let moduleProps = Props.Declaration ScopeGraph.Module ScopeGraph.Default Nothing (ann^.span_ :: Span)
     declare (Name.name "__main__") moduleProps
+    ScopeGraph.CurrentScope currentName <- currentScope
+    connectScopes (Stack.Declaration "__main__") (Stack.Root currentName)
 
-    bottomScope <- addBottomScope
-    topScope <- addTopScope
-    withScope (Stack.symbol topScope) $ do
+    name <- Name.gensym
+    modify ((Stack.bottomScope name) >>-)
+    withScope name $ do
       onChildren term
 
     ScopeGraph.CurrentScope currentName <- currentScope
-    connectScopes bottomScope (Stack.Scope currentName)
+    connectScopes (Stack.BottomScope name) (Stack.Scope currentName)
+    modify ((Stack.topScope name) >>-)
+
     complete
 
 instance ToScopeGraph Py.ReturnStatement where
