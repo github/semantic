@@ -72,6 +72,7 @@ function flags {
 
   # disable automatic selection of packages
   echo "-hide-all-packages"
+  echo "-package proto-lens-jsonpb"
 
   # run cabal and emit package flags from the environment file, removing comments & prefixing with -
   cabal v2-exec -v0 bash -- -c 'cat "$GHC_ENVIRONMENT"' | grep -v '^--' | sed -e 's/^/-/'
