@@ -1,10 +1,10 @@
 cabal-version:       2.4
 
-name:                semantic-ql
+name:                semantic-codeql
 version:             0.0.0.0
-synopsis:            Semantic support for QL.
-description:         Semantic support for QL using the semantic-core intermediate language.
-homepage:            https://github.com/github/semantic/tree/master/semantic-ql#readme
+synopsis:            Semantic support for CodeQL.
+description:         Semantic support for CodeQL using the semantic-core intermediate language.
+homepage:            https://github.com/github/semantic/tree/master/semantic-codeql#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
 license-file:        LICENSE
@@ -51,10 +51,10 @@ common haskell
 library
   import: haskell
   exposed-modules:
-    Language.QL
-    Language.QL.AST
-    Language.QL.Grammar
-    Language.QL.Tags
+    Language.CodeQL
+    Language.CodeQL.AST
+    Language.CodeQL.Grammar
+    Language.CodeQL.Tags
   hs-source-dirs: src
 
 test-suite test
@@ -67,7 +67,7 @@ test-suite test
                   , hedgehog >= 0.6 && <2
                   , pathtype ^>= 0.8.1
                   , semantic-ast
-                  , semantic-ql
+                  , semantic-codeql
                   , tasty
                   , tasty-hedgehog
                   , tasty-hunit

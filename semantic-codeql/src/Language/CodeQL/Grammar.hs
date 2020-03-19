@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Language.QL.Grammar
+module Language.CodeQL.Grammar
 ( tree_sitter_ql
 , Grammar(..)
 ) where

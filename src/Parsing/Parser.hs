@@ -23,7 +23,7 @@ module Parsing.Parser
 , pythonParserALaCarte
 , pythonParserPrecise
 , pythonParser
-, qlParserPrecise
+, codeQLParserPrecise
 , rubyParserALaCarte
 , rubyParserPrecise
 , rubyParser
@@ -58,7 +58,7 @@ import qualified Language.PHP as PHPPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Python.Assignment as PythonALaCarte
 import           Language.Python.Grammar
-import qualified Language.QL as QLPrecise
+import qualified Language.CodeQL as CodeQLPrecise
 import qualified Language.Ruby as RubyPrecise
 import qualified Language.Ruby.Assignment as RubyALaCarte
 import           Language.Ruby.Grammar (tree_sitter_ruby)
@@ -168,8 +168,8 @@ pythonParser modes = case pythonMode modes of
   ALaCarte -> pythonParserALaCarte
   Precise  -> pythonParserPrecise
 
-qlParserPrecise :: c QLPrecise.Term => (Language, SomeParser c Loc)
-qlParserPrecise = (QL, SomeParser (UnmarshalParser @QLPrecise.Term QLPrecise.tree_sitter_ql))
+codeQLParserPrecise :: c CodeQLPrecise.Term => (Language, SomeParser c Loc)
+codeQLParserPrecise = (CodeQL, SomeParser (UnmarshalParser @CodeQLPrecise.Term CodeQLPrecise.tree_sitter_ql))
 
 rubyParserALaCarte :: c RubyALaCarte.Term => (Language, SomeParser c Loc)
 rubyParserALaCarte = (Ruby, SomeParser (AssignmentParser (ASTParser tree_sitter_ruby) RubyALaCarte.assignment))
@@ -212,7 +212,7 @@ type family TermMode term where
   TermMode JSON.Term              = 'Precise
   TermMode PHPPrecise.Term        = 'Precise
   TermMode PythonPrecise.Term     = 'Precise
-  TermMode QLPrecise.Term         = 'Precise
+  TermMode CodeQLPrecise.Term     = 'Precise
   TermMode RubyPrecise.Term       = 'Precise
   TermMode TypeScriptPrecise.Term = 'Precise
   TermMode TSXPrecise.Term        = 'Precise
@@ -242,7 +242,7 @@ preciseParsers
   :: ( c Java.Term
      , c JSON.Term
      , c PythonPrecise.Term
-     , c QLPrecise.Term
+     , c CodeQLPrecise.Term
      , c RubyPrecise.Term
      , c GoPrecise.Term
      , c PHPPrecise.Term
@@ -257,7 +257,7 @@ preciseParsers = Map.fromList
   , jsxParserPrecise
   , pythonParserPrecise
   , phpParserPrecise
-  , qlParserPrecise
+  , codeQLParserPrecise
   , rubyParserPrecise
   , tsxParserPrecise
   , typescriptParserPrecise
@@ -273,7 +273,7 @@ allParsers
      , c PHPPrecise.Term
      , c PythonALaCarte.Term
      , c PythonPrecise.Term
-     , c QLPrecise.Term
+     , c CodeQLPrecise.Term
      , c RubyALaCarte.Term
      , c RubyPrecise.Term
      , c TSXALaCarte.Term
@@ -291,7 +291,7 @@ allParsers modes = Map.fromList
   , jsxParser modes
   , phpParserPrecise
   , pythonParser modes
-  , qlParserPrecise
+  , codeQLParserPrecise
   , rubyParser modes
   , tsxParser modes
   , typescriptParser modes

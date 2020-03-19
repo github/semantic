@@ -284,7 +284,7 @@ library
                      , semantic-json ^>= 0
                      , semantic-php ^>= 0
                      , semantic-python ^>= 0
-                     , semantic-ql ^>= 0
+                     , semantic-codeql ^>= 0
                      , semantic-ruby ^>= 0
                      , semantic-scope-graph ^>= 0
                      , semantic-tags ^>= 0

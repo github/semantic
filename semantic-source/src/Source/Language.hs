@@ -37,7 +37,7 @@ data Language
     | Ruby
     | TypeScript
     | PHP
-    | QL
+    | CodeQL
     | TSX
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum)
 
@@ -75,8 +75,8 @@ instance SLanguage 'PHP where
 instance SLanguage 'Python where
   reflect _ = Python
 
-instance SLanguage 'QL where
-  reflect _ = QL
+instance SLanguage 'CodeQL where
+  reflect _ = CodeQL
 
 instance SLanguage 'Ruby where
   reflect _ = Ruby
@@ -122,7 +122,7 @@ languageToText = \case
   TypeScript -> "TypeScript"
   TSX -> "TSX"
   PHP -> "PHP"
-  QL -> "QL"
+  CodeQL -> "CodeQL"
 
 textToLanguage :: T.Text -> Language
 textToLanguage = \case
@@ -138,5 +138,5 @@ textToLanguage = \case
   "TypeScript" -> TypeScript
   "TSX" -> TSX
   "PHP" -> PHP
-  "QL" -> QL
+  "CodeQL" -> CodeQL
   _ -> Unknown

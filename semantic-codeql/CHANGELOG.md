@@ -1,4 +1,4 @@
-# Revision history for semantic-ql
+# Revision history for semantic-codeql
 
 ## 0.1.0.0 -- YYYY-mm-dd
 

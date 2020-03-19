@@ -56,7 +56,7 @@ import qualified Language.Go as GoPrecise
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.PHP as PHPPrecise
-import qualified Language.QL as QLPrecise
+import qualified Language.CodeQL as CodeQLPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Ruby as RubyPrecise
 import qualified Language.TSX as TSXPrecise
@@ -142,8 +142,8 @@ instance ShowTermBy 'Precise PHPPrecise.Term where
 instance ShowTermBy 'Precise PythonPrecise.Term where
   showTermBy = serialize Show . void . PythonPrecise.getTerm
 
-instance ShowTermBy 'Precise QLPrecise.Term where
-  showTermBy = serialize Show . void . QLPrecise.getTerm
+instance ShowTermBy 'Precise CodeQLPrecise.Term where
+  showTermBy = serialize Show . void . CodeQLPrecise.getTerm
 
 instance ShowTermBy 'Precise RubyPrecise.Term where
   showTermBy = serialize Show . void . RubyPrecise.getTerm
@@ -185,8 +185,8 @@ instance SExprTermBy 'Precise PHPPrecise.Term where
 instance SExprTermBy 'Precise PythonPrecise.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
 
-instance SExprTermBy 'Precise QLPrecise.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . QLPrecise.getTerm
+instance SExprTermBy 'Precise CodeQLPrecise.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . CodeQLPrecise.getTerm
 
 instance SExprTermBy 'Precise RubyPrecise.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . RubyPrecise.getTerm
