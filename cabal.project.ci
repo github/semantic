@@ -4,6 +4,7 @@
 packages: .
           semantic-analysis
           semantic-ast
+          semantic-codeql
           semantic-core
           semantic-go
           semantic-java
@@ -11,10 +12,8 @@ packages: .
           semantic-parse
           semantic-php
           semantic-python
-          semantic-codeql
           semantic-ruby
           semantic-scope-graph
-          semantic-source
           semantic-tsx
           semantic-typescript
           semantic-tags
@@ -47,6 +46,9 @@ package semantic-analysis
 package semantic-ast
   ghc-options: -Werror
 
+package semantic-codeql
+  ghc-options: -Werror
+
 package semantic-core
   ghc-options: -Werror
 
@@ -65,16 +67,10 @@ package semantic-parse
 package semantic-python
   ghc-options: -Werror
 
-package semantic-codeql
-  ghc-options: -Werror
-
 package semantic-ruby
   ghc-options: -Werror
 
 package semantic-scope-graph
-  ghc-options: -Werror
-
-package semantic-source
   ghc-options: -Werror
 
 package semantic-tags

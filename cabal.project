@@ -4,6 +4,7 @@
 packages: .
           semantic-analysis
           semantic-ast
+          semantic-codeql
           semantic-core
           semantic-go
           semantic-java
@@ -11,13 +12,11 @@ packages: .
           semantic-parse
           semantic-php
           semantic-python
-          semantic-codeql
           semantic-ruby
           semantic-scope-graph
           semantic-tsx
           semantic-typescript
           semantic-tags
-          semantic-source
 
 -- Packages brought in from other repos instead of hackage
 -- ATTENTION: remember to update cabal.project.ci when bumping SHAs here!
