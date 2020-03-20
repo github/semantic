@@ -14,6 +14,7 @@ packages: .
           semantic-codeql
           semantic-ruby
           semantic-scope-graph
+          semantic-source
           semantic-tsx
           semantic-typescript
           semantic-tags
@@ -71,6 +72,9 @@ package semantic-ruby
   ghc-options: -Werror
 
 package semantic-scope-graph
+  ghc-options: -Werror
+
+package semantic-source
   ghc-options: -Werror
 
 package semantic-tags
