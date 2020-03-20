@@ -27,7 +27,7 @@ import qualified Data.Map.Strict as Map
 import           Data.Sum
 import           SpecHelpers hiding (reassociate)
 import           System.IO.Unsafe (unsafePerformIO)
-
+import qualified System.Path as Path
 spec :: Spec
 spec = do
   it "constructs integers" $ do
@@ -57,7 +57,7 @@ evaluate
   . fmap snd
   . runFresh 0
   . runReader (PackageInfo (SpecHelpers.name "test") mempty)
-  . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs" "Haskell" mempty)
+  . runReader (ModuleInfo (Path.absRel "test/Control/Abstract/Evaluator/Spec.hs") "Haskell" mempty)
   . evalState (lowerBound @Span)
   . runReader (lowerBound @Span)
   . runEvaluator

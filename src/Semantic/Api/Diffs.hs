@@ -50,6 +50,7 @@ import           Semantic.Telemetry as Stat
 import           Serializing.Format hiding (JSON)
 import qualified Serializing.Format as Format
 import           Source.Loc
+import qualified System.Path as Path
 
 data DiffOutputFormat
   = DiffJSONTree
@@ -87,7 +88,7 @@ diffGraph blobs = do
           & P.edges .~ mempty
           & P.errors .~ [defMessage & P.error .~ T.pack (show e)]
       where
-        path = T.pack $ pathForBlobPair blobPair
+        path = T.pack . Path.toString $ pathForBlobPair blobPair
         lang = bridging # languageForBlobPair blobPair
 
 
@@ -107,7 +108,7 @@ instance (DiffTerms term, ConstructorName (Syntax term), Foldable (Syntax term),
     let blobPair = bimap fst fst terms
         graph = renderTreeGraph diff
         toEdge (Edge (a, b)) = defMessage & P.source .~ a^.diffVertexId & P.target .~ b^.diffVertexId
-        path = T.pack $ pathForBlobPair blobPair
+        path = T.pack . Path.toString $ pathForBlobPair blobPair
         lang = bridging # languageForBlobPair blobPair
     pure $! defMessage
       & P.path     .~ path

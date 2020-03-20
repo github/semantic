@@ -21,6 +21,7 @@ import           Data.Abstract.Package
 import           Data.Abstract.Path
 import           Data.ImportPath
 import qualified Data.Language as Language
+import qualified System.Path   as Path
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 --
@@ -58,7 +59,8 @@ resolveRelativePath :: ( Has (Modules address value) sig m
                     -> Evaluator term address value m M.ModulePath
 resolveRelativePath relImportPath exts = do
   M.ModuleInfo{..} <- currentModule
-  let relRootDir = takeDirectory modulePath
+  -- JZ:TODO: shall refactor it later.
+  let relRootDir = takeDirectory (Path.toString modulePath)
   let path = joinPaths relRootDir relImportPath
   trace ("attempting to resolve (relative) require/import " <> show relImportPath)
   resolveModule path exts >>= either notFound (\x -> x <$ traceResolve relImportPath path)
@@ -87,7 +89,8 @@ resolveNonRelativePath :: ( Has (Modules address value) sig m
                        -> Evaluator term address value m M.ModulePath
 resolveNonRelativePath name exts = do
   M.ModuleInfo{..} <- currentModule
-  go "." modulePath mempty
+  -- JZ:TODO: Fix the go with pathtype
+  go "." (Path.toString modulePath) mempty
   where
     nodeModulesPath dir = takeDirectory dir </> "node_modules" </> name
     -- Recursively search in a 'node_modules' directory, stepping up a directory each time.

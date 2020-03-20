@@ -27,6 +27,7 @@ import           Data.Blob
 import           Data.Flag as Flag
 import qualified Source.Source as Source
 import           Source.Span
+import qualified System.Path as Path
 
 data LogPrintSource = LogPrintSource
 data Colourize = Colourize
@@ -59,7 +60,7 @@ formatError includeSource colourize blob@Blob{..} Error{..}
   . (if Flag.toBool LogPrintSource includeSource then showExcerpt colourize errorSpan blob else id)
   . showCallStack colourize callStack . showChar '\n'
   where
-    path = Just $ if Flag.toBool LogPrintSource includeSource then blobPath blob else "<filtered>"
+    path = Just $ if Flag.toBool LogPrintSource includeSource then Path.toString $ blobPath blob else "<filtered>"
 
 showExcerpt :: Flag Colourize -> Span -> Blob -> ShowS
 showExcerpt colourize Span{..} Blob{..}

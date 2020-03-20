@@ -80,7 +80,7 @@ evaluateProject' session proxy parser paths = do
   let lang = Language.reflect proxy
   res <- runTask session $ asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout $ do
     blobs <- catMaybes <$> traverse readBlobFromFile (fileForPath <$> paths)
-    package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
+    package <- fmap snd <$> parsePackage parser (Project (Path.absRel $ takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
     modules <- topologicalSort <$> runImportGraphToModules proxy package
     trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
     pure (package, modules)

@@ -48,7 +48,8 @@ parseStackGraph blobs = do
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
-        blobPath' = pack $ blobPath blob
+        -- JZ:TODO: Shall refactor here
+        blobPath' = pack $ blobFilePath blob
         errorFile e = defMessage
           & P.path .~ blobPath'
           & P.language .~ (bridging # blobLanguage')

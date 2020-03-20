@@ -78,7 +78,7 @@ termGraph blobs = do
           & P.edges .~ mempty
           & P.errors .~ [defMessage & P.error .~ T.pack (show e)]
       where
-        path = T.pack $ blobPath blob
+        path = T.pack $ blobFilePath blob
         lang = bridging # blobLanguage blob
 
 data TermOutputFormat
@@ -111,7 +111,7 @@ quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers 
     timingError (SomeException e) = pure (Left (show e))
     showTiming Blob{..} (res, duration) =
       let status = if isLeft res then "ERR" else "OK"
-      in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobPath blob <> "\t" <> show duration <> " ms\n")
+      in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobFilePath blob <> "\t" <> show duration <> " ms\n")
 
 
 showTermParsers :: PerLanguageModes -> Map Language (SomeParser ShowTerm Loc)
@@ -224,7 +224,7 @@ instance (Recursive (term Loc), ToTreeGraph TermVertex (Base (term Loc))) => JSO
   jsonGraphTerm blob t
     = let graph = renderTreeGraph t
           toEdge (Edge (a, b)) = defMessage & P.source .~ a^.vertexId & P.target .~ b^.vertexId
-          path = T.pack $ blobPath blob
+          path = T.pack $ blobFilePath blob
           lang = bridging # blobLanguage blob
       in defMessage
           & P.path     .~ path

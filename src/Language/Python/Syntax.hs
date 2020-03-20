@@ -34,6 +34,7 @@ import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Source.Span
+import qualified System.Path as Path
 
 data QualifiedName
   = QualifiedName (NonEmpty FilePath)
@@ -84,7 +85,8 @@ resolvePythonModules q = do
     x <$ traceResolve relPath x
   where
     rootDir (QualifiedName _) ModuleInfo{..}           = mempty -- overall rootDir of the Package.
-    rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (takeDirectory modulePath)
+    -- JZ:TODO: Shall refunctor it later.
+    rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (Path.toString $ Path.takeDirectory modulePath)
       where numDots = pred (length n)
             upDir n dir | n <= 0 = dir
                         | otherwise = takeDirectory (upDir (pred n) dir)

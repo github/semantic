@@ -38,6 +38,7 @@ import           Data.Module
 import           GHC.Generics (Generic)
 import           Source.Language as Language
 import qualified System.FilePath as FP
+import qualified System.Path     as Path
 
 
 newtype Blobs a = Blobs { blobs :: [a] }
@@ -47,10 +48,10 @@ decodeBlobs :: BL.ByteString -> Either String [Blob]
 decodeBlobs = fmap blobs <$> eitherDecode
 
 -- | An exception indicating that we’ve tried to diff or parse a blob of unknown language.
-newtype NoLanguageForBlob = NoLanguageForBlob FilePath
+newtype NoLanguageForBlob = NoLanguageForBlob Path.AbsRelFile
   deriving (Eq, Exception, Ord, Show)
 
-noLanguageForBlob :: Has (Error SomeException) sig m => FilePath -> m a
+noLanguageForBlob :: Has (Error SomeException) sig m => Path.AbsRelFile -> m a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
 
 -- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
@@ -59,8 +60,9 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> term             -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir b = Module info
-  where root = fromMaybe (FP.takeDirectory (blobPath b)) rootDir
-        info = ModuleInfo (FP.makeRelative root (blobPath b)) (languageToText (blobLanguage b)) mempty
+  -- JZ:TODO: Fix to strings before merging
+  where root = fromMaybe (FP.takeDirectory (Path.toString $ blobPath b)) rootDir
+        info = ModuleInfo (Path.absRel $ FP.makeRelative root (Path.toString $ blobPath b)) (languageToText (blobLanguage b)) mempty
 
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
@@ -80,20 +82,22 @@ languageForBlobPair = mergeEdit combine . bimap blobLanguage blobLanguage where
     | a == Unknown || b == Unknown = Unknown
     | otherwise                    = b
 
-pathForBlobPair :: BlobPair -> FilePath
+pathForBlobPair :: BlobPair -> Path.AbsRelFile
 pathForBlobPair = blobPath . mergeEdit (const id)
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
   where showLanguage = pure . (,) "language" . show
 
+-- JZ:TODO: I need to ask about what does this do.
 pathKeyForBlobPair :: BlobPair -> FilePath
-pathKeyForBlobPair = mergeEdit combine . bimap blobPath blobPath where
+pathKeyForBlobPair = mergeEdit combine . bimap blobFpath blobFpath where
    combine before after | before == after = after
                         | otherwise       = before <> " -> " <> after
+   blobFpath = Path.toString . blobPath
 
 instance ToJSONFields Blob where
-  toJSONFields p = [ "path" .= blobPath p, "language" .= blobLanguage p]
+  toJSONFields p = [ "path" .=  blobFilePath p, "language" .= blobLanguage p]
 
 decodeBlobPairs :: BL.ByteString -> Either String [BlobPair]
 decodeBlobPairs = fmap blobs <$> eitherDecode
