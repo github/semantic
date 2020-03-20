@@ -23,6 +23,7 @@ module Stack.Graph
   , Class.edges
   , simplify
   , edgeSet
+  , vertexSet
   , removeEdge
   , addEdge
   , transpose
@@ -132,6 +133,9 @@ root name = Graph (Algebraic.vertex (Root name))
 
 edgeSet :: Graph Node -> Set (Node, Node)
 edgeSet graph = Algebraic.edgeSet (unGraph graph)
+
+vertexSet :: Ord a => Graph a -> Set a
+vertexSet graph = Algebraic.vertexSet (unGraph graph)
 
 tagGraphUniquely :: Graph Node -> Graph (Tagged Node)
 tagGraphUniquely

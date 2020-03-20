@@ -25,7 +25,10 @@ import           Data.Map.Strict (Map)
 import qualified Data.Maybe as Maybe
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
+import qualified Data.Sequence as Seq
+import qualified Data.Set as Set
 import           Data.Text (Text, pack)
+import           Data.Traversable
 import           Debug.Trace
 import qualified Parsing.Parser as Parser
 import           Proto.Semantic as P hiding (Blob, BlobPair)
@@ -36,6 +39,7 @@ import           Semantic.Api.Bridge
 import           Semantic.Task
 import           Source.Loc as Loc
 import qualified Stack.Graph as Stack
+import qualified Stack.Path as Path
 
 parseStackGraph :: ( Has (Error SomeException) sig m
                    , Effect sig
@@ -146,7 +150,7 @@ graphForBlob blob = parseWith toStackGraphParsers (fmap fst . ScopeGraph.runSket
 stackGraphToTempStackGraph :: Stack.Graph Stack.Node -> TempStackGraph
 stackGraphToTempStackGraph graph = let
   nodes = Maybe.catMaybes $ toSGNode <$> Graph.vertexList (Stack.unGraph graph)
-  paths = []
+  paths = toPaths graph
   in TempStackGraph { scopeGraphNodes = nodes, scopeGraphPaths = paths }
 
 toSGNode :: Stack.Node -> Maybe SGNode
@@ -168,6 +172,54 @@ toSGNode node = (traceShow node (case node of
     , Semantic.Api.StackGraph.nodeType = Reference
     }
   node -> traceShow ("Ignoring Node in toSGNode: " <> show node) Nothing))
+
+toPaths :: Stack.Graph Stack.Node -> [SGPath]
+toPaths graph = let
+  mainNodes = flip Set.filter (Stack.vertexSet (Stack.tagGraphUniquely graph)) $ isMainNode
+  currentPaths = for_ mainNodes $ \node ->
+    let
+      path = Path.Path { Path.startingNode = node, Path.endingNode = node, Path.edges = mempty, Path.startingSymbolStack = mempty, Path.endingSymbolStack = mempty, Path.startingScopeStackSize = 0, Path.endingScopeStack = mempty}
+    in
+      if isReferenceNode node then path { Path.endingSymbolStack = symbol node : (Path.endingSymbolStack path) } else path
+  in
+    reducePaths currentPaths
+
+reducePaths :: Stack.Graph Stack.Node -> [Path.Path] -> [Path.Path]
+reducePaths graph paths =
+  foldr (\path newPaths ->
+    let
+      newPaths' = if isCompleteOrPartial path
+                  then path : newPaths
+                  else newPaths
+    in
+      if isCompleteOrPartial path
+      then path : newPaths
+      else
+        let
+          nextEdges = Set.filter  (\(a, _) -> a == Path.endingNode path) (Stack.edgeSet (Stack.tagGraphUniquely graph))
+        in
+          for nextEdges $ \(source, sink) ->
+            if Maybe.isJust (Seq.elemIndexL (Path.Edge source sink "") (Path.edges path))
+            then newPaths
+            else
+              let newPath = path { Path.edges = (Path.Edge source sink "") Seq.<| (Path.edges path) }
+              in
+                if Path.validity newPath == Path.Valid
+                then newPath : newPaths
+                else newPaths
+        ) mempty paths
+
+isMainNode :: Stack.Tagged Stack.Node -> Bool
+isMainNode (node Stack.:# _) = case node of
+  Stack.Root{}          -> True
+  Stack.ExportedScope{} -> True
+  Stack.Reference{}     -> True
+  _                     -> False
+
+isReferenceNode :: Stack.Tagged Stack.Node -> Bool
+isReferenceNode (node Stack.:# _) = case node of
+  Stack.Reference{} -> True
+  _                 -> False
 
 class ToStackGraph term where
   toStackGraph :: Blob -> term Loc -> TempStackGraph
