@@ -75,7 +75,7 @@ totalRange = Range 0 . B.length . bytes
 
 -- | Return a 'Span' that covers the entire text.
 totalSpan :: Source -> Span
-totalSpan source = Span lowerBound (Pos (Prelude.length ranges) (succ (end lastRange - start lastRange))) where
+totalSpan source = Span (Pos 1 1) (Pos (Prelude.length ranges) (succ (end lastRange - start lastRange))) where
   ranges = lineRanges source
   lastRange = fromMaybe lowerBound (getLast (foldMap (Last . Just) ranges))
 
