@@ -250,35 +250,6 @@ instance ToScopeGraph Py.ImportStatement where
 
     putCurrentScope name
 
-
-
-    -- let toName (Py.Identifier _ name) = Name.name name
-    -- newEdge ScopeGraph.Import (toName <$> names)
-
-    -- let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
-    -- newReference (Name.name name) referenceProps
-
-    -- let pairs = zip (toList names) (tail $ toList names)
-    -- for_ pairs $ \pair -> do
-    --   case pair of
-    --     (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
-    --       withScope (toName scopeIdentifier) $ do
-    --         let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
-    --         newReference (toName referenceIdentifier) referenceProps
-
-    {-
-    Graph {unGraph = Overlay (Connect (Vertex (BottomScope {symbol = "_a"})) (Vertex (Scope {symbol = "_a"}))) (Connect (Connect (Vertex (Scope {symbol = "_a"})) (Connect (Connect (Connect (Connect (Vertex (Declaration {symbol = "cheese"})) (Vertex (PopSymbol {symbol = "member"}))) (Vertex (Declaration {symbol = "ints"}))) (Connect (Vertex (Reference {symbol = "ints"})) (Vertex (PushSymbol {symbol = "member"})))) (Vertex (Reference {symbol = "cheese"})))) (Vertex (Root {symbol = "_a"})))}
-    -}
-
-    {-
-   Graph {
-    unGraph = Overlay (
-      Connect (Vertex (TopScope {symbol = "_a"}))
-      (Vertex (Scope {symbol = "_a"})))
-      (Overlay (Connect (Vertex (BottomScope {symbol = "_a"}))
-       (Vertex (Scope {symbol = "_a"}))) (Connect (Connect (Vertex (Scope {symbol = "_b"})) (Connect (Connect (Connect (Connect (Vertex (Declaration {symbol = "cheese"})) (Vertex (PopSymbol {symbol = "member"}))) (Vertex (Declaration {symbol = "ints"}))) (Connect (Vertex (Reference {symbol = "ints"})) (Vertex (PushSymbol {symbol = "member"})))) (Vertex (Reference {symbol = "cheese"})))) (Vertex (Root {symbol = "_a"}))))}
-    -}
-
     complete
   scopeGraph term = todo (show term)
 
