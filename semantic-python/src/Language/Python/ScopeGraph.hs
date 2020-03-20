@@ -246,7 +246,10 @@ instance ToScopeGraph Py.ImportStatement where
 
     childGraph <- addDeclarations ((\(Py.Identifier ann name) -> (ann, Name.name name)) <$> names)
 
-    put (Stack.scope currentScope' >>- Stack.scope name >>- childGraph >>- Stack.vertex rootScope')
+    currentGraph <- get @(Stack.Graph Stack.Node)
+    let graph' = (Stack.connect (Stack.transpose (Stack.scope name >>- childGraph)) currentGraph)
+
+    put (Stack.simplify (Stack.overlay (Stack.reference "cheese" >>- Stack.scope "_a") graph'))
 
     putCurrentScope name
 
@@ -311,16 +314,13 @@ instance ToScopeGraph Py.Module where
     let moduleProps = Props.Declaration ScopeGraph.Module ScopeGraph.Default Nothing (ann^.span_ :: Span)
     declare (Name.name "__main__") moduleProps
     ScopeGraph.CurrentScope currentName <- currentScope
-    connectScopes (Stack.Declaration "__main__") (Stack.Root currentName)
 
-    name <- Name.gensym
-    modify ((Stack.bottomScope name) >>-)
-    withScope name $ do
-      onChildren term
+    modify ((Stack.declaration "__main__") >>-)
+    modify ((Stack.bottomScope currentName) >>-)
 
-    ScopeGraph.CurrentScope currentName <- currentScope
-    connectScopes (Stack.BottomScope name) (Stack.Scope currentName)
-    modify ((Stack.topScope name) >>-)
+    onChildren term
+
+    modify ((Stack.topScope currentName) >>-)
 
     complete
 

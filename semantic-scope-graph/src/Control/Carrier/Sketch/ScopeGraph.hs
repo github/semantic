@@ -49,7 +49,7 @@ runSketch ::
 runSketch minfo go
   = evalFresh 1
   . runReader minfo
-  . runReader (Stack.Root rootname)
+  . runReader (Stack.Scope rootname)
   . evalState (CurrentScope rootname)
   . runState @(Stack.Graph Stack.Node) initialStackGraph
   . runState @(ScopeGraph Name) initialGraph
@@ -57,4 +57,4 @@ runSketch minfo go
   where
     rootname = Name.nameI 0
     initialGraph = ScopeGraph.insertScope rootname lowerBound lowerBound
-    initialStackGraph = Stack.root rootname
+    initialStackGraph = Stack.scope rootname

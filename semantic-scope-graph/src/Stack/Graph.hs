@@ -25,6 +25,7 @@ module Stack.Graph
   , edgeSet
   , removeEdge
   , addEdge
+  , transpose
   -- * Smart constructors
   , scope
   , newScope
@@ -168,6 +169,9 @@ simplify = Graph . Algebraic.simplify . unGraph
 
 removeEdge :: Ord a => a -> a -> Graph a -> Graph a
 removeEdge a b = Graph . Algebraic.removeEdge a b . unGraph
+
+transpose :: Graph a -> Graph a
+transpose = Graph . Algebraic.transpose . unGraph
 
 addEdge :: Ord a => a -> a -> Graph a -> Graph a
 addEdge a b = simplify . Graph . Algebraic.overlay (Algebraic.edge a b) . unGraph
