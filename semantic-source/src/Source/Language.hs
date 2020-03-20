@@ -26,6 +26,7 @@ import qualified System.Path.PartClass as Path.PartClass
 -- | The various languages we support.
 data Language
     = Unknown
+    | CodeQL
     | Go
     | Haskell
     | Java
@@ -33,10 +34,10 @@ data Language
     | JSON
     | JSX
     | Markdown
+    | PHP
     | Python
     | Ruby
     | TypeScript
-    | PHP
     | TSX
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum)
 
@@ -46,6 +47,9 @@ class SLanguage (lang :: Language) where
 
 instance SLanguage 'Unknown where
   reflect _ = Unknown
+
+instance SLanguage 'CodeQL where
+  reflect _ = CodeQL
 
 instance SLanguage 'Go where
   reflect _ = Go
@@ -68,6 +72,9 @@ instance SLanguage 'JSX where
 instance SLanguage 'Markdown where
   reflect _ = Markdown
 
+instance SLanguage 'PHP where
+  reflect _ = PHP
+
 instance SLanguage 'Python where
   reflect _ = Python
 
@@ -76,9 +83,6 @@ instance SLanguage 'Ruby where
 
 instance SLanguage 'TypeScript where
   reflect _ = TypeScript
-
-instance SLanguage 'PHP where
-  reflect _ = PHP
 
 instance FromJSON Language where
   parseJSON = withText "Language" $ \l ->
@@ -106,6 +110,7 @@ forPath path =
 languageToText :: Language -> T.Text
 languageToText = \case
   Unknown -> "Unknown"
+  CodeQL -> "CodeQL"
   Go -> "Go"
   Haskell -> "Haskell"
   Java -> "Java"
@@ -113,14 +118,15 @@ languageToText = \case
   JSON -> "JSON"
   JSX -> "JSX"
   Markdown -> "Markdown"
+  PHP -> "PHP"
   Python -> "Python"
   Ruby -> "Ruby"
   TypeScript -> "TypeScript"
   TSX -> "TSX"
-  PHP -> "PHP"
 
 textToLanguage :: T.Text -> Language
 textToLanguage = \case
+  "CodeQL" -> CodeQL
   "Go" -> Go
   "Haskell" -> Haskell
   "Java" -> Java
@@ -128,9 +134,9 @@ textToLanguage = \case
   "JSON" -> JSON
   "JSX" -> JSX
   "Markdown" -> Markdown
+  "PHP" -> PHP
   "Python" -> Python
   "Ruby" -> Ruby
   "TypeScript" -> TypeScript
   "TSX" -> TSX
-  "PHP" -> PHP
   _ -> Unknown
