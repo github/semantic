@@ -315,8 +315,7 @@ instance ToScopeGraph Py.Module where
     declare (Name.name "__main__") moduleProps
     ScopeGraph.CurrentScope currentName <- currentScope
 
-    modify ((Stack.declaration "__main__") >>-)
-    modify ((Stack.bottomScope currentName) >>-)
+    modify ((Stack.bottomScope currentName) >>- (Stack.declaration "__main__") >>-)
 
     onChildren term
 

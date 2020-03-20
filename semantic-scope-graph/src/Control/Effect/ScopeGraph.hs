@@ -162,10 +162,7 @@ addDeclarations names = do
       graph''' = foldr (\(_, name) graph ->
         graph -<< (Stack.pushSymbol "member") -<< (Stack.reference name)) mempty (NonEmpty.init $ NonEmpty.reverse names)
       graph'''' = graph'' >>- graph''' >>- (Stack.reference (snd $ NonEmpty.head names))
-      -- currentEdges = Set.filter (\(left, _) -> left == Stack.Scope current) (Stack.edgeSet graph)
-      -- graphh = foldMap (\(left, right) -> Stack.removeEdge left right graph) currentEdges
   pure graph''''
-  -- put (Stack.simplify (Class.overlay (Stack.scope current >>- graph'''' >>- Class.vertex rootScope') graphh))
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
 newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
