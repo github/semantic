@@ -89,16 +89,15 @@ resolveNonRelativePath :: ( Has (Modules address value) sig m
                        -> Evaluator term address value m M.ModulePath
 resolveNonRelativePath name exts = do
   M.ModuleInfo{..} <- currentModule
-  -- JZ:TODO: Fix the go with pathtype
-  go "." (Path.toString modulePath) mempty
+  go (Path.toAbsRel Path.currentDir) (Path.takeDirectory modulePath) mempty
   where
-    nodeModulesPath dir = takeDirectory dir </> "node_modules" </> name
+    nodeModulesPath dir = dir Path.</> Path.relDir "node_modules" Path.</> Path.relDir name
     -- Recursively search in a 'node_modules' directory, stepping up a directory each time.
     go root path searched = do
       trace ("attempting to resolve (non-relative) require/import " <> show name)
-      res <- resolveModule (nodeModulesPath path) exts
+      res <- resolveModule (Path.toString $ nodeModulesPath path) exts
       case res of
-        Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
+        Left xs | Just parentDir <- Path.takeSuperDirectory path , root /= path -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
         Right m -> m <$ traceResolve name m
     notFound xs = throwResolutionError $ NotFoundError name xs Language.TypeScript
