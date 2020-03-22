@@ -116,9 +116,7 @@ instance ( Has (Reader (ModuleTable (Module (ModuleResult address value)))) sig 
     case op of
       Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap moduleBody . ModuleTable.lookup name >>= k
       Lookup  path  k -> askModuleTable >>= k . fmap moduleBody . ModuleTable.lookup path
-      -- JZ:TODO: Refactor it later.
       Resolve names k -> k (find (`Set.member` paths) (map Path.absRel names))
-      -- JZ:TODO: Refactor it later.
       List    dir   k -> k (filter ((Path.absRel dir ==) . Path.takeDirectory) (toList paths))
   alg (R other) = ModulesC (alg (R (handleCoercible other)))
 
