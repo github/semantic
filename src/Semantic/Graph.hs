@@ -337,7 +337,6 @@ parsePythonPackage parser project = do
       packageFromProject project [ blob | dir <- dirs
                                         , blob <- projectBlobs project
                                         , packageDir <- [projectRootDir project Path.</> Path.relDir (unpack dir) ]
-                                        -- JZ:TODO: Shall refactor
                                         , packageDir `isPathPrefixOf` blobPath blob
                                         ]
     PythonPackage.FindPackages excludeDirs -> do

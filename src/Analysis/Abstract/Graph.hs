@@ -132,7 +132,6 @@ graphingModules recur m = do
       _             -> pure ()
   where
     -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
-    -- JZ:TODO: Shall we use Maybe File here?
     includeModule path
       = let path' = if Prelude.null (Path.toString path) then Path.absRel "unknown, concrete semantics required" else path
             info = moduleInfo m
