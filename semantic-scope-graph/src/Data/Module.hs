@@ -29,7 +29,7 @@ data ModuleInfo = ModuleInfo { modulePath :: ModulePath, moduleLanguage :: Text,
   deriving (Eq, Ord)
 
 instance Lower ModuleInfo where
-  lowerBound = ModuleInfo (Path.absRel "") "Unknown" mempty
+  lowerBound = ModuleInfo (Path.toAbsRel Path.emptyFile) "Unknown" mempty
 
 instance Show ModuleInfo where
   showsPrec d = showsUnaryWith showsPrec "ModuleInfo" d . modulePath
