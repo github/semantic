@@ -158,8 +158,7 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       blobs <- traverse readBlobFromPath paths
       case paths of
         (x:_) -> pure $! Project (Path.takeDirectory x) blobs (Language.forPath x) mempty
-        -- JZ:TODO: Shall refactor later to use AbsPath for Module, Project and Blob
-        _     -> pure $! Project (Path.absRel "/") mempty Language.Unknown mempty
+        _     -> pure $! Project (Path.toAbsRel Path.rootDir) mempty Language.Unknown mempty
 
     allLanguages = intercalate "|" . fmap show $ [Language.Go .. maxBound]
     readProjectRecursively = makeReadProjectRecursivelyTask
