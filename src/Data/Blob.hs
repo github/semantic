@@ -32,12 +32,11 @@ import           Data.Bifunctor
 import qualified Data.ByteString.Lazy as BL
 import           Data.Edit
 import           Data.JSON.Fields
-import           Data.Maybe
 import           Data.Maybe.Exts
 import           Data.Module
+import           Data.List  (stripPrefix)
 import           GHC.Generics (Generic)
 import           Source.Language as Language
-import qualified System.FilePath as FP
 import qualified System.Path     as Path
 
 
@@ -61,8 +60,16 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir b = Module info
   -- JZ:TODO: Fix to strings before merging
-  where root = fromMaybe (FP.takeDirectory (Path.toString $ blobPath b)) rootDir
-        info = ModuleInfo (Path.absRel $ FP.makeRelative root (Path.toString $ blobPath b)) (languageToText (blobLanguage b)) mempty
+  where root = maybe (Path.takeDirectory $ blobPath b) Path.absRel rootDir
+        info = ModuleInfo (dropRelative root (blobPath b)) (languageToText (blobLanguage b)) mempty
+
+dropRelative :: Path.AbsRelDir -> Path.AbsRelFile -> Path.AbsRelFile
+dropRelative a' b' = case as `stripPrefix` bs of
+     Just rs | ra == rb -> Path.toAbsRel $ (foldl (Path.</>) Path.currentDir rs) Path.</> bf
+     _ -> b'
+  where (ra, as, _) = Path.splitPath $ Path.normalise a'
+        (rb, bs, _) = Path.splitPath $ Path.normalise $ Path.takeDirectory b'
+        bf = Path.takeFileName b'
 
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
