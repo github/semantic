@@ -59,7 +59,6 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> term             -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir b = Module info
-  -- JZ:TODO: Fix to strings before merging
   where root = maybe (Path.takeDirectory $ blobPath b) Path.absRel rootDir
         info = ModuleInfo (dropRelative root (blobPath b)) (languageToText (blobLanguage b)) mempty
 
@@ -96,12 +95,10 @@ languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
   where showLanguage = pure . (,) "language" . show
 
--- JZ:TODO: I need to ask about what does this do.
 pathKeyForBlobPair :: BlobPair -> FilePath
-pathKeyForBlobPair = mergeEdit combine . bimap blobFpath blobFpath where
+pathKeyForBlobPair = mergeEdit combine . bimap blobFilePath blobFilePath where
    combine before after | before == after = after
                         | otherwise       = before <> " -> " <> after
-   blobFpath = Path.toString . blobPath
 
 instance ToJSONFields Blob where
   toJSONFields p = [ "path" .=  blobFilePath p, "language" .= blobLanguage p]

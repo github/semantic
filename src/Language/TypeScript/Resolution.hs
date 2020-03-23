@@ -59,7 +59,6 @@ resolveRelativePath :: ( Has (Modules address value) sig m
                     -> Evaluator term address value m M.ModulePath
 resolveRelativePath relImportPath exts = do
   M.ModuleInfo{..} <- currentModule
-  -- JZ:TODO: shall refactor it later.
   let relRootDir = takeDirectory (Path.toString modulePath)
   let path = joinPaths relRootDir relImportPath
   trace ("attempting to resolve (relative) require/import " <> show relImportPath)

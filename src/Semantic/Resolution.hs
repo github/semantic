@@ -38,7 +38,6 @@ import qualified Source.Source as Source
 import           System.FilePath.Posix
 import qualified System.Path as Path
 
--- JZ:TODO: Return path shall be refactored
 nodeJSResolutionMap :: Has Files sig m => Path.AbsRelDir -> Text -> [Path.AbsRelDir] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles rootDir [".json"] excludeDirs
@@ -51,7 +50,6 @@ nodeJSResolutionMap rootDir prop excludeDirs = do
 
     lookupProp :: FilePath -> Text -> Object -> Maybe (Map FilePath FilePath)
     lookupProp path k res = flip parseMaybe res $ \obj -> Map.singleton relPkgDotJSONPath . relEntryPath <$> obj .: k
-      -- JZ:TODO: shall be refactored
       where relPkgDotJSONPath = makeRelative (Path.toString rootDir) path
             relEntryPath x = takeDirectory relPkgDotJSONPath </> x
 

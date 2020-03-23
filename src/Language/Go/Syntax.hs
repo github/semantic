@@ -43,7 +43,6 @@ resolveGoImport :: ( Has (Modules address value) sig m
 resolveGoImport (ImportPath path Data.ImportPath.Unknown) = throwResolutionError $ GoImportError path
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
-  -- JZ:TODO: Shall refactor listModulesInDir later
   paths <- listModulesInDir $  (joinPaths (takeDirectory . Path.toString $ modulePath) path)
   case paths of
     [] -> throwResolutionError $ GoImportError path
