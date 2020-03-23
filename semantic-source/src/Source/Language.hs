@@ -26,7 +26,6 @@ import qualified System.Path.PartClass as Path.PartClass
 -- | The various languages we support.
 data Language
     = Unknown
-    | CodeQL
     | Go
     | Haskell
     | Java
@@ -39,6 +38,7 @@ data Language
     | Ruby
     | TypeScript
     | TSX
+    | CodeQL
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum)
 
 -- | Reifies a proxied type-level 'Language' to a value.
