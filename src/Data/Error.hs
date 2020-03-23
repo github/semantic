@@ -27,7 +27,6 @@ import           Data.Blob
 import           Data.Flag as Flag
 import qualified Source.Source as Source
 import           Source.Span
-import qualified System.Path as Path
 
 data LogPrintSource = LogPrintSource
 data Colourize = Colourize
