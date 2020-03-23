@@ -60,7 +60,7 @@ formatError includeSource colourize blob@Blob{..} Error{..}
   . (if Flag.toBool LogPrintSource includeSource then showExcerpt colourize errorSpan blob else id)
   . showCallStack colourize callStack . showChar '\n'
   where
-    path = Just $ if Flag.toBool LogPrintSource includeSource then Path.toString $ blobPath blob else "<filtered>"
+    path = Just $ if Flag.toBool LogPrintSource includeSource then blobFilePath blob else "<filtered>"
 
 showExcerpt :: Flag Colourize -> Span -> Blob -> ShowS
 showExcerpt colourize Span{..} Blob{..}
