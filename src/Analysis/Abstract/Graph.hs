@@ -40,7 +40,6 @@ import           Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Source.Loc
-import qualified System.Path as Path
 
 style :: Style ControlFlowVertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
@@ -133,9 +132,8 @@ graphingModules recur m = do
   where
     -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
     includeModule path
-      = let path' = if Prelude.null (Path.toString path) then Path.absRel "unknown, concrete semantics required" else path
-            info = moduleInfo m
-      in moduleInclusion (moduleVertex (ModuleInfo path' (moduleLanguage info) (moduleOid info)))
+      = let info = moduleInfo m
+      in moduleInclusion (moduleVertex (ModuleInfo path (moduleLanguage info) (moduleOid info)))
 
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: ( Has (Reader ModuleInfo) sig m
