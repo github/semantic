@@ -46,7 +46,7 @@ import qualified Data.Text.Encoding as T
 import           Data.Text.Encoding.Error (lenientDecode)
 import           GHC.Generics (Generic)
 import           Source.Range
-import           Source.Span (Pos(..), Span(Span))
+import           Source.Span (Pos (..), Span (Span))
 
 
 -- | The contents of a source file. This is represented as a UTF-8
