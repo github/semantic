@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveGeneric, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-|
 'Source' models source code, represented as a thin wrapper around a 'B.ByteString' with conveniences for splitting by line, slicing, etc.
 
@@ -37,7 +38,7 @@ import           Data.Aeson (FromJSON (..), withText)
 import qualified Data.ByteString as B
 import           Data.Char (ord)
 import           Data.Maybe (fromMaybe)
-import           Data.Monoid (Last(..))
+import           Data.Monoid (Last (..))
 import           Data.Semilattice.Lower
 import           Data.String (IsString (..))
 import qualified Data.Text as T
@@ -45,7 +46,7 @@ import qualified Data.Text.Encoding as T
 import           Data.Text.Encoding.Error (lenientDecode)
 import           GHC.Generics (Generic)
 import           Source.Range
-import           Source.Span (Span(Span), Pos(..))
+import           Source.Span (Pos(..), Span(Span))
 
 
 -- | The contents of a source file. This is represented as a UTF-8
