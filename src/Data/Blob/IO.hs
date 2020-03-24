@@ -5,7 +5,6 @@ module Data.Blob.IO
   ( readBlobFromFile
   , readBlobFromFile'
   , readBlobFromPath
-  , readBlobsFromDir
   , readFilePair
   , readProjectFromPaths
   ) where
@@ -13,7 +12,6 @@ module Data.Blob.IO
 import           Analysis.Blob
 import           Analysis.File as File
 import           Analysis.Project
-import qualified Control.Concurrent.Async as Async
 import           Control.Monad.IO.Class
 import           Data.Blob
 import qualified Data.ByteString as B
@@ -67,11 +65,6 @@ readBlobFromFile' file = do
 -- | Read a blob from the provided absolute or relative path , failing if it can't be found.
 readBlobFromPath :: (MonadFail m, MonadIO m) => Path.AbsRelFile -> m Blob
 readBlobFromPath = readBlobFromFile' . File.fromPath
-
--- | Read all blobs in the directory with Language.supportedExts.
-readBlobsFromDir :: MonadIO m => Path.AbsRelDir -> m [Blob]
-readBlobsFromDir path = liftIO . fmap catMaybes $
-  findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . File.fromPath)
 
 readFilePair :: MonadIO m => File Language -> File Language -> m BlobPair
 readFilePair a b = do
