@@ -7,6 +7,7 @@ module Analysis.File
 ) where
 
 import           Data.Maybe (fromJust, listToMaybe)
+import           Data.Semilattice.Lower
 import           GHC.Stack
 import           Source.Language as Language
 import           Source.Span
