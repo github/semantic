@@ -5,26 +5,12 @@ module Data.Language
   , defaultLanguageModes
   , preciseLanguageModes
   , aLaCarteLanguageModes
-  , codeNavLanguages
-  , supportedExts
   ) where
 
 import qualified Data.Languages as Lingo
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import           Source.Language
-
-codeNavLanguages :: [Language]
-codeNavLanguages = [Go, Java, Ruby, Python, JavaScript, TypeScript, PHP]
-
-supportedExts :: [String]
-supportedExts = foldr append mempty supportedLanguages
-  where
-    append (Just l) b = fmap T.unpack (Lingo.languageExtensions l) <> b
-    append Nothing  b = b
-    supportedLanguages = fmap lookup (languageToText <$> codeNavLanguages)
-    lookup k = Map.lookup k Lingo.languages
-
 
 data PerLanguageModes = PerLanguageModes
   { pythonMode     :: LanguageMode
