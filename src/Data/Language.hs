@@ -7,10 +7,7 @@ module Data.Language
   , aLaCarteLanguageModes
   ) where
 
-import qualified Data.Languages as Lingo
-import qualified Data.Map.Strict as Map
-import qualified Data.Text as T
-import           Source.Language
+import Source.Language
 
 data PerLanguageModes = PerLanguageModes
   { pythonMode     :: LanguageMode

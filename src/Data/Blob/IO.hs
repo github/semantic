@@ -12,7 +12,6 @@ module Data.Blob.IO
 import           Analysis.Blob
 import           Analysis.File as File
 import           Analysis.Project
-import qualified Control.Concurrent.Async as Async
 import           Control.Monad.IO.Class
 import           Data.Blob
 import qualified Data.ByteString as B
