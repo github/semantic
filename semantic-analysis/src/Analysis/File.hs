@@ -30,4 +30,4 @@ fileLanguage :: File a -> Language
 fileLanguage = Language.forPath . filePath
 
 fromPath :: Path.PartClass.AbsRel ar => Path.File ar -> File Language
-fromPath p = File (Path.toAbsRel p) lowerBound (Language.forPath p)
+fromPath p = File (Path.toAbsRel p) (point (Pos 0 0)) (Language.forPath p)
