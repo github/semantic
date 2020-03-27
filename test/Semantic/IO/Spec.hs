@@ -15,7 +15,7 @@ spec = do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
       Just blob <- readBlobFromFile (File (Path.absRel "semantic.cabal") lowerBound Unknown)
-      blobPath blob `shouldBe` "semantic.cabal"
+      blobFilePath blob `shouldBe` "semantic.cabal"
 
     it "throws for absent files" $ do
       readBlobFromFile (File (Path.absRel "/dev/doesnotexist") lowerBound Unknown) `shouldThrow` anyIOException

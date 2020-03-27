@@ -12,13 +12,15 @@ import           Control.Abstract.Evaluator
 import qualified Data.Abstract.Module as M
 import           Data.Functor.Classes
 import qualified Source.Span as S
+import qualified System.Path as Path
 
 data BaseError (exc :: * -> *) resume = BaseError { baseErrorModuleInfo :: ModuleInfo, baseErrorSpan :: Span, baseErrorException :: exc resume }
 
 instance (Show (exc resume)) => Show (BaseError exc resume) where
   showsPrec _ BaseError{..} = shows baseErrorException <> showString " " <> showString errorLocation
-    where errorLocation | startErrorLine == endErrorLine = M.modulePath baseErrorModuleInfo <> " " <> startErrorLine <> ":" <> startErrorCol <> "-" <> endErrorCol
-                        | otherwise = M.modulePath baseErrorModuleInfo <> " " <> startErrorLine <> ":" <> startErrorCol <> "-" <> endErrorLine <> ":" <> endErrorCol
+    where errorLocation | startErrorLine == endErrorLine = baseModuleFilePath <> " " <> startErrorLine <> ":" <> startErrorCol <> "-" <> endErrorCol
+                        | otherwise = baseModuleFilePath <> " " <> startErrorLine <> ":" <> startErrorCol <> "-" <> endErrorLine <> ":" <> endErrorCol
+          baseModuleFilePath = Path.toString $ M.modulePath baseErrorModuleInfo
           startErrorLine = show $ S.line   (S.start baseErrorSpan)
           endErrorLine   = show $ S.line   (S.end   baseErrorSpan)
           startErrorCol  = show $ S.column (S.start baseErrorSpan)

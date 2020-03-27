@@ -45,7 +45,7 @@ import           Data.Set (Set)
 import qualified Data.Set as Set
 import           GHC.Generics (Generic1)
 import           Source.Span
-import           System.FilePath.Posix (takeDirectory)
+import qualified System.Path as Path
 
 import Control.Abstract.Evaluator
 import Data.Abstract.BaseError
@@ -116,8 +116,8 @@ instance ( Has (Reader (ModuleTable (Module (ModuleResult address value)))) sig 
     case op of
       Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap moduleBody . ModuleTable.lookup name >>= k
       Lookup  path  k -> askModuleTable >>= k . fmap moduleBody . ModuleTable.lookup path
-      Resolve names k -> k (find (`Set.member` paths) names)
-      List    dir   k -> k (filter ((dir ==) . takeDirectory) (toList paths))
+      Resolve names k -> k (find (`Set.member` paths) (map Path.absRel names))
+      List    dir   k -> k (filter ((dir ==) . Path.toString  . Path.takeDirectory) (toList paths))
   alg (R other) = ModulesC (alg (R (handleCoercible other)))
 
 askModuleTable :: Has (Reader (ModuleTable (Module (ModuleResult address value)))) sig m => m (ModuleTable (Module (ModuleResult address value)))

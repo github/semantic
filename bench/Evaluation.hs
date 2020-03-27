@@ -38,7 +38,7 @@ callGraphProject' :: ( Language.SLanguage lang
 callGraphProject' session proxy path
   | Just (SomeParser parser) <- parserForLanguage analysisParsers lang = fmap (bimap show (const ())) . runTask session $ do
   blob <- readBlobFromPath (Path.toAbsRel path)
-  package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang []))
+  package <- fmap snd <$> runParse (Duration.fromSeconds 10) (parsePackage parser (Project (Path.toAbsRel (Path.takeDirectory path)) [blob] lang []))
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package
   | otherwise = error $ "Analysis not supported for: " <> show lang
