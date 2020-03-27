@@ -78,9 +78,6 @@ instance SLanguage 'PHP where
 instance SLanguage 'Python where
   reflect _ = Python
 
-instance SLanguage 'CodeQL where
-  reflect _ = CodeQL
-
 instance SLanguage 'Ruby where
   reflect _ = Ruby
 
