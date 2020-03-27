@@ -87,6 +87,10 @@ import           System.FilePath.Posix (takeDirectory, (</>))
 import qualified System.Path as Path
 import           Text.Show.Pretty (ppShow)
 
+-- TODO: this should be zero-indexed (https://github.com/github/semantic/issues/263)
+initialSpan :: Span
+initialSpan = point (Pos 1 1)
+
 data GraphType = ImportGraph | CallGraph
 
 -- | Constraints required to analyze a term.
@@ -188,8 +192,8 @@ runCallGraph lang includePackages modules package
   . resumingResolutionError
   . resumingAddressError
   . raiseHandler (runReader (packageInfo package))
-  . raiseHandler (runReader (lowerBound @Span))
-  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader initialSpan)
+  . raiseHandler (runState initialSpan)
   . raiseHandler (runReader (lowerBound @ControlFlowVertex))
   . providingLiveSet
   . runModuleTable
@@ -251,8 +255,8 @@ runImportGraph lang package f
   . runModuleTable
   . runModules (ModuleTable.modulePaths (packageModules package))
   . raiseHandler (runReader (packageInfo package))
-  . raiseHandler (runState (lowerBound @Span))
-  . raiseHandler (runReader (lowerBound @Span))
+  . raiseHandler (runState initialSpan)
+  . raiseHandler (runReader initialSpan)
   . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) Precise))))
   . runAllocator
   $ evaluate lang (graphingModuleInfo (runDomainEffects (evalTerm id))) (snd <$> ModuleTable.toPairs (packageModules package))
@@ -314,8 +318,8 @@ parsePythonPackage parser project = do
         . runModuleTable
         . runModules lowerBound
         . raiseHandler (runReader (PackageInfo (Data.Abstract.Evaluatable.name "setup") lowerBound))
-        . raiseHandler (runState (lowerBound @Span))
-        . raiseHandler (runReader (lowerBound @Span))
+        . raiseHandler (runState initialSpan)
+        . raiseHandler (runReader initialSpan)
         . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) Precise))))
         . runAllocator
 

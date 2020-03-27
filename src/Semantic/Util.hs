@@ -41,14 +41,13 @@ import           Data.Graph.Algebraic (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Maybe
-import           Data.Semilattice.Lower
 import           Data.Sum
 import           Parsing.Parser
 import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
-import           Source.Span (HasSpan (..))
+import           Source.Span (HasSpan (..), Pos (..), point)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import qualified System.Path as Path
@@ -85,11 +84,12 @@ evaluateProject' session proxy parser paths = do
     trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
     pure (package, modules)
   (package, modules) <- either (die . displayException) pure res
+  let initialSpan = point (Pos 1 1)
   pure (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (evalState (lowerBound @Span))
-       (raiseHandler (runReader (lowerBound @Span))
+       (raiseHandler (evalState initialSpan)
+       (raiseHandler (runReader initialSpan)
        (evaluate proxy (runDomainEffects (evalTerm (withTermSpans (^. span_)))) modules))))))
 
 parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
@@ -97,7 +97,7 @@ parseFile      parser = runTask'     . (parse parser <=< readBlob . fileForPath)
 parseFileQuiet parser = runTaskQuiet . (parse parser <=< readBlob . fileForPath)
 
 fileForPath :: FilePath -> File Language.Language
-fileForPath (Path.absRel -> p) = File p lowerBound (Language.forPath p)
+fileForPath (Path.absRel -> p) = File p (point (Pos 1 1)) (Language.forPath p)
 
 runTask', runTaskQuiet :: ParseC TaskC a -> IO a
 runTask'     task = runTaskWithOptions debugOptions   (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure

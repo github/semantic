@@ -1,4 +1,15 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, LambdaCase, MultiParamTypeClasses, RecordWildCards, ScopedTypeVariables, TupleSections, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Api.TOCSummaries
 ( diffSummary
 , legacyDiffSummary
@@ -8,7 +19,7 @@ module Semantic.Api.TOCSummaries
 ) where
 
 import           Analysis.Decorator (decoratorWithAlgebra)
-import           Analysis.TOCSummary (Declaration(..), HasDeclaration, Kind(..), declarationAlgebra, formatKind)
+import           Analysis.TOCSummary (Declaration (..), HasDeclaration, Kind (..), declarationAlgebra, formatKind)
 import           Control.Applicative (liftA2)
 import           Control.Effect.Error
 import           Control.Effect.Parse
@@ -22,13 +33,13 @@ import           Data.Edit
 import           Data.Either (partitionEithers)
 import           Data.Function (on)
 import           Data.Functor.Foldable (Base, Recursive)
-import           Data.Language (Language, LanguageMode(..), PerLanguageModes)
+import           Data.Language (Language, LanguageMode (..), PerLanguageModes)
 import           Data.Map (Map)
 import qualified Data.Map.Monoidal as Map
 import           Data.Maybe (mapMaybe)
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
-import           Data.Term (IsTerm(..), TermF)
+import           Data.Term (IsTerm (..), TermF)
 import qualified Data.Text as T
 import qualified Diffing.Algorithm.SES as SES
 import           Diffing.Interpreter (DiffTerms)
@@ -43,6 +54,7 @@ import           Semantic.Task as Task
 import           Serializing.Format
 import           Source.Loc as Loc
 import           Source.Source as Source
+import           Source.Span
 import qualified Tags.Tag as Tag
 import qualified Tags.Tagging.Precise as Tagging
 
@@ -55,7 +67,7 @@ legacyDiffSummary = distributeFoldMap go
     go :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m, Has Telemetry sig m, MonadIO m) => BlobPair -> m Summaries
     go blobPair = asks summarizeTermParsers >>= \ p -> parsePairWith p (fmap (uncurry (flip Summaries) . bimap toMap toMap . partitionEithers) . summarizeTerms) blobPair
       `catchError` \(SomeException e) ->
-        pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) lowerBound lang])
+        pure $ Summaries mempty (toMap [ErrorSummary (T.pack (show e)) (point (Pos 1 1)) lang])
       where path = T.pack $ pathKeyForBlobPair blobPair
             lang = languageForBlobPair blobPair
 
