@@ -157,8 +157,8 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       let paths = rights (Path.parse <$> strPaths)
       blobs <- traverse readBlobFromPath paths
       case paths of
-        (x:_) -> pure $! Project (Path.toString (Path.takeDirectory x)) blobs (Language.forPath x) mempty
-        _     -> pure $! Project "/" mempty Language.Unknown mempty
+        (x:_) -> pure $! Project (Path.takeDirectory x) blobs (Language.forPath x) mempty
+        _     -> pure $! Project (Path.toAbsRel Path.rootDir) mempty Language.Unknown mempty
 
     allLanguages = intercalate "|" . fmap show $ [Language.Go .. maxBound]
     readProjectRecursively = makeReadProjectRecursivelyTask

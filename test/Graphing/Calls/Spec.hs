@@ -24,7 +24,7 @@ callGraphPythonProject path = runTaskOrDie $ do
       lang = Language.Python
   SomeParser parser <- pure . fromJust $! parserForLanguage analysisParsers Language.Python
   blob <- readBlobFromFile' (File.fromPath path)
-  package <- fmap snd <$> parsePackage parser (Project (Path.toString (Path.takeDirectory path)) [blob] lang [])
+  package <- fmap snd <$> parsePackage parser (Project (Path.toAbsRel (Path.takeDirectory path)) [blob] lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package
 

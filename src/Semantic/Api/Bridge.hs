@@ -81,7 +81,7 @@ instance APIBridge API.Blob Data.Blob where
     blobToApiBlob b
       = defMessage
       & P.content .~ Source.toText (Data.blobSource b)
-      & P.path .~ T.pack (Data.blobPath b)
+      & P.path .~ T.pack (Data.blobFilePath b)
       & P.language .~ (bridging # Data.blobLanguage b)
     apiBlobToBlob blob =
       let src = blob^.content.to Source.fromText

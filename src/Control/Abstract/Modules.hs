@@ -40,12 +40,11 @@ import           Control.Monad.IO.Class
 import           Data.Foldable
 import           Data.Functor.Classes
 import           Data.Maybe.Exts
-import           Data.Semilattice.Lower
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           GHC.Generics (Generic1)
 import           Source.Span
-import           System.FilePath.Posix (takeDirectory)
+import qualified System.Path as Path
 
 import Control.Abstract.Evaluator
 import Data.Abstract.BaseError
@@ -116,8 +115,8 @@ instance ( Has (Reader (ModuleTable (Module (ModuleResult address value)))) sig 
     case op of
       Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap moduleBody . ModuleTable.lookup name >>= k
       Lookup  path  k -> askModuleTable >>= k . fmap moduleBody . ModuleTable.lookup path
-      Resolve names k -> k (find (`Set.member` paths) names)
-      List    dir   k -> k (filter ((dir ==) . takeDirectory) (toList paths))
+      Resolve names k -> k (find (`Set.member` paths) (map Path.absRel names))
+      List    dir   k -> k (filter ((dir ==) . Path.toString  . Path.takeDirectory) (toList paths))
   alg (R other) = ModulesC (alg (R (handleCoercible other)))
 
 askModuleTable :: Has (Reader (ModuleTable (Module (ModuleResult address value)))) sig m => m (ModuleTable (Module (ModuleResult address value)))
@@ -147,7 +146,7 @@ runLoadErrorWith f = raiseHandler $ With.runResumable (runEvaluator . f)
 throwLoadError :: Has (Resumable (BaseError (LoadError address value))) sig m
                => LoadError address value resume
                -> m resume
-throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name "Unknown" mempty) lowerBound err
+throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name "Unknown" mempty) (point (Pos 1 1)) err
 -- TODO: Might be able to get rest of ModuleInfo from the env ^.
 
 

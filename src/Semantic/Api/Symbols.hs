@@ -61,7 +61,7 @@ legacyParseSymbols blobs = Legacy.ParseTreeSymbolResponse <$> distributeFoldMap 
         renderToSymbols = pure . tagsToFile . tags symbolsToSummarize blob
 
         tagsToFile :: [Tag] -> Legacy.File
-        tagsToFile tags = Legacy.File (pack (blobPath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
+        tagsToFile tags = Legacy.File (pack (blobFilePath blob)) (pack (show (blobLanguage blob))) (fmap tagToSymbol tags)
 
         tagToSymbol :: Tag -> Legacy.Symbol
         tagToSymbol Tag{..}
@@ -85,7 +85,7 @@ parseSymbols blobs = do
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
-        blobPath' = pack $ blobPath blob
+        blobPath' = pack $ blobFilePath blob
         errorFile e = defMessage
           & P.path .~ blobPath'
           & P.language .~ (bridging # blobLanguage')

@@ -33,12 +33,12 @@ data Language
     | JSON
     | JSX
     | Markdown
+    | PHP
     | Python
     | Ruby
     | TypeScript
-    | PHP
-    | CodeQL
     | TSX
+    | CodeQL
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum)
 
 -- | Reifies a proxied type-level 'Language' to a value.
@@ -47,6 +47,9 @@ class SLanguage (lang :: Language) where
 
 instance SLanguage 'Unknown where
   reflect _ = Unknown
+
+instance SLanguage 'CodeQL where
+  reflect _ = CodeQL
 
 instance SLanguage 'Go where
   reflect _ = Go
@@ -110,6 +113,7 @@ forPath path =
 languageToText :: Language -> T.Text
 languageToText = \case
   Unknown -> "Unknown"
+  CodeQL -> "CodeQL"
   Go -> "Go"
   Haskell -> "Haskell"
   Java -> "Java"
@@ -117,15 +121,15 @@ languageToText = \case
   JSON -> "JSON"
   JSX -> "JSX"
   Markdown -> "Markdown"
+  PHP -> "PHP"
   Python -> "Python"
   Ruby -> "Ruby"
   TypeScript -> "TypeScript"
   TSX -> "TSX"
-  PHP -> "PHP"
-  CodeQL -> "CodeQL"
 
 textToLanguage :: T.Text -> Language
 textToLanguage = \case
+  "CodeQL" -> CodeQL
   "Go" -> Go
   "Haskell" -> Haskell
   "Java" -> Java
@@ -133,10 +137,9 @@ textToLanguage = \case
   "JSON" -> JSON
   "JSX" -> JSX
   "Markdown" -> Markdown
+  "PHP" -> PHP
   "Python" -> Python
   "Ruby" -> Ruby
   "TypeScript" -> TypeScript
   "TSX" -> TSX
-  "PHP" -> PHP
-  "CodeQL" -> CodeQL
   _ -> Unknown
