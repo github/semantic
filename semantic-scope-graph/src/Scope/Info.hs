@@ -37,7 +37,7 @@ instance HasSpan (Info scopeAddress) where
   {-# INLINE span_ #-}
 
 instance Lower (Info scopeAddress) where
-  lowerBound = Info lowerBound lowerBound lowerBound Public lowerBound lowerBound Nothing
+  lowerBound = Info lowerBound lowerBound lowerBound Public (point (Pos 0 0)) lowerBound Nothing
 
 instance AbstractHole (Info address) where
   hole = lowerBound

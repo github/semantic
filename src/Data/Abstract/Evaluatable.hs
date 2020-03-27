@@ -35,11 +35,10 @@ import           Data.Functor.Classes
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Scientific (Scientific)
 import           Data.Semigroup.Foldable
-import           Data.Semilattice.Lower
 import           Data.Sum
 import           Data.Text
 import           GHC.Stack
-import           Source.Span (HasSpan (..))
+import           Source.Span (HasSpan (..), Pos (..), point)
 
 import           Analysis.Name as X
 import           Control.Abstract hiding (Load, String)
@@ -229,7 +228,7 @@ defineSelf :: ( Has (State (ScopeGraph address)) sig m
            => Evaluator term address value m ()
 defineSelf = do
   let self = Declaration __self
-  declare self ScopeGraph.Prelude Public lowerBound ScopeGraph.Unknown Nothing
+  declare self ScopeGraph.Prelude Public (point (Pos 1 1)) ScopeGraph.Unknown Nothing
   slot <- lookupSlot self
   assign slot =<< object =<< currentFrame
 

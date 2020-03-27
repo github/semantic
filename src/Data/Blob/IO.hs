@@ -17,9 +17,9 @@ import           Data.Blob
 import qualified Data.ByteString as B
 import           Data.Language
 import           Data.Maybe.Exts
-import           Data.Semilattice.Lower
 import           Semantic.IO
 import qualified Source.Source as Source
+import           Source.Span
 import qualified System.Path as Path
 
 -- | Deprecated: this has very weird semantics.
@@ -44,7 +44,7 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
   pure $ Project rootDir blobs lang excludeDirs
   where
-    toFile path = File path lowerBound lang
+    toFile path = File path (point (Pos 1 1)) lang
     exts = extensionsForLanguage lang
 
 

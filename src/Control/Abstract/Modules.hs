@@ -40,7 +40,6 @@ import           Control.Monad.IO.Class
 import           Data.Foldable
 import           Data.Functor.Classes
 import           Data.Maybe.Exts
-import           Data.Semilattice.Lower
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           GHC.Generics (Generic1)
@@ -147,7 +146,7 @@ runLoadErrorWith f = raiseHandler $ With.runResumable (runEvaluator . f)
 throwLoadError :: Has (Resumable (BaseError (LoadError address value))) sig m
                => LoadError address value resume
                -> m resume
-throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name "Unknown" mempty) lowerBound err
+throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name "Unknown" mempty) (point (Pos 1 1)) err
 -- TODO: Might be able to get rest of ModuleInfo from the env ^.
 
 
