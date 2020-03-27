@@ -38,7 +38,6 @@ import           Data.Map (Map)
 import qualified Data.Map.Monoidal as Map
 import           Data.Maybe (mapMaybe)
 import           Data.ProtoLens (defMessage)
-import           Data.Semilattice.Lower
 import           Data.Term (IsTerm (..), TermF)
 import qualified Data.Text as T
 import qualified Diffing.Algorithm.SES as SES
