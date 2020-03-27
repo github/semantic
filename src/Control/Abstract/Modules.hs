@@ -117,7 +117,7 @@ instance ( Has (Reader (ModuleTable (Module (ModuleResult address value)))) sig 
       Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap moduleBody . ModuleTable.lookup name >>= k
       Lookup  path  k -> askModuleTable >>= k . fmap moduleBody . ModuleTable.lookup path
       Resolve names k -> k (find (`Set.member` paths) (map Path.absRel names))
-      List    dir   k -> k (filter ((Path.absRel dir ==) . Path.takeDirectory) (toList paths))
+      List    dir   k -> k (filter ((dir ==) . Path.toString  . Path.takeDirectory) (toList paths))
   alg (R other) = ModulesC (alg (R (handleCoercible other)))
 
 askModuleTable :: Has (Reader (ModuleTable (Module (ModuleResult address value)))) sig m => m (ModuleTable (Module (ModuleResult address value)))
