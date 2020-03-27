@@ -14,7 +14,7 @@ main
   >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
-  where parse = parseByteString @CodeQL.CodeQl @() tree_sitter_ql
+  where parse = parseByteString @CodeQL.Ql @() tree_sitter_ql
 
 tests :: [TestTree] -> TestTree
 tests = testGroup "tree-sitter-ql corpus tests"
