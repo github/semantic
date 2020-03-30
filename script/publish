@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #/ Usage: script/publish
 #/
 #/ Build a docker image of the semantic CLI and publish to the GitHub Package Registry
