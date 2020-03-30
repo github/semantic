@@ -131,7 +131,7 @@ bottomScope = Class.vertex . BottomScope
 root :: Name -> Graph Node
 root name = Graph (Algebraic.vertex (Root name))
 
-edgeSet :: Graph Node -> Set (Node, Node)
+edgeSet :: Ord a => Graph a -> Set (a, a)
 edgeSet graph = Algebraic.edgeSet (unGraph graph)
 
 vertexSet :: Ord a => Graph a -> Set a

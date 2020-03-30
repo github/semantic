@@ -22,6 +22,7 @@ module Stack.Path
   , checkNodeInvariants
   , Validity (..)
   , validity
+  , isIncomplete
   , Completion (..)
   , completion
   , isIncremental
@@ -51,7 +52,7 @@ data Path = Path
   , endingSymbolStack      :: [Symbol]
   , startingScopeStackSize :: StartingSize
   , endingScopeStack       :: [Tag] -- Should this be (Seq (Tagged Node))?
-  } deriving (Eq, Show, Generic)
+  } deriving (Eq, Show, Generic, Ord)
 
 startingNode_ :: Lens' Path (Tagged Node)
 startingNode_ = field @"startingNode"
@@ -78,7 +79,7 @@ data Edge = Edge
   { sourceNode :: Tagged Node
   , sinkNode   :: Tagged Node
   , label      :: Text
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Ord)
 
 parseEdges :: Text -> [Edge]
 parseEdges = const []
@@ -91,7 +92,7 @@ formatEdge (Edge src sink lab) =
 data StartingSize
   = Zero
   | One
-  deriving (Eq, Show)
+  deriving (Eq, Show, Ord, Enum)
 
 data PathInvariantError
   = ExpectedEqual (Tagged Node) (Tagged Node)
@@ -137,6 +138,7 @@ checkNodeInvariants Path { startingNode, endingNode }
         _other        -> pure (BadEndingNode endingNode)
 
 data Validity = Invalid | Valid
+  deriving (Eq, Show)
 
 instance Semigroup Validity where
   Valid <> Valid = Valid
@@ -167,11 +169,27 @@ validity p = sconcat [vStart, vEnd, vSize]
       _otherwise           -> Valid
 
 data Completion = Partial | Complete
+  deriving Eq
 
 -- | A path is complete if its starting node is a reference node and its ending node is a definition node. Otherwise it is partial.
 completion :: Path -> Completion
 completion Path { startingNode = Reference{} :# _, endingNode = Declaration{} :# _} = Complete
 completion _                                                                        = Partial
+
+isPartial :: Path -> Bool
+isPartial path = (case startingNode path of
+  (Root _ :# _) -> True
+  (ExportedScope _ :# _) -> True
+  (Reference _ :# _) -> True
+  _ -> False)
+  && (case endingNode path of
+    (Root _ :# _) -> True
+    (ExportedScope _ :# _) -> True
+    (JumpToScope _ :# _) -> True
+    (Declaration _ :# _) -> True)
+
+isIncomplete :: Path -> Bool
+isIncomplete path = completion path == Partial || isPartial path
 
 -- | A path is incremental if the source node and sink node of every edge in the path belongs to the same file.
 isIncremental :: Path -> Bool

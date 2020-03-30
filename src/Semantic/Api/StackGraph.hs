@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 module Semantic.Api.StackGraph
   ( parseStackGraph
   , TempStackGraph(..)
@@ -40,6 +41,7 @@ import           Semantic.Task
 import           Source.Loc as Loc
 import qualified Stack.Graph as Stack
 import qualified Stack.Path as Path
+import Data.Functor.Tagged
 
 parseStackGraph :: ( Has (Error SomeException) sig m
                    , Effect sig
@@ -176,29 +178,30 @@ toSGNode node = (traceShow node (case node of
 toPaths :: Stack.Graph Stack.Node -> [SGPath]
 toPaths graph = let
   mainNodes = flip Set.filter (Stack.vertexSet (Stack.tagGraphUniquely graph)) $ isMainNode
-  currentPaths = for_ mainNodes $ \node ->
+  currentPaths = flip Set.map mainNodes $ \taggedNode@(node Stack.:# _) ->
     let
-      path = Path.Path { Path.startingNode = node, Path.endingNode = node, Path.edges = mempty, Path.startingSymbolStack = mempty, Path.endingSymbolStack = mempty, Path.startingScopeStackSize = 0, Path.endingScopeStack = mempty}
+      path = Path.Path { Path.startingNode = taggedNode, Path.endingNode = taggedNode, Path.edges = mempty, Path.startingSymbolStack = mempty, Path.endingSymbolStack = mempty, Path.startingScopeStackSize = Path.Zero, Path.endingScopeStack = mempty}
+      referenceNodePath = path { Path.endingSymbolStack = ((Stack.symbol node :: Stack.Symbol) : (Path.endingSymbolStack path)) }
     in
-      if isReferenceNode node then path { Path.endingSymbolStack = symbol node : (Path.endingSymbolStack path) } else path
+      if isReferenceNode taggedNode then referenceNodePath else path
   in
-    reducePaths currentPaths
+    toSGPath <$> reducePaths graph (toList currentPaths)
 
-reducePaths :: Stack.Graph Stack.Node -> [Path.Path] -> [Path.Path]
+reducePaths :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
 reducePaths graph paths =
   foldr (\path newPaths ->
     let
-      newPaths' = if isCompleteOrPartial path
+      newPaths' = if Path.isIncomplete path
                   then path : newPaths
                   else newPaths
     in
-      if isCompleteOrPartial path
+      if Path.isIncomplete path
       then path : newPaths
       else
         let
-          nextEdges = Set.filter  (\(a, _) -> a == Path.endingNode path) (Stack.edgeSet (Stack.tagGraphUniquely graph))
+          nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode path) (Stack.edgeSet (Stack.tagGraphUniquely graph))
         in
-          for nextEdges $ \(source, sink) ->
+          flip foldMap nextEdges $ \(source, sink) ->
             if Maybe.isJust (Seq.elemIndexL (Path.Edge source sink "") (Path.edges path))
             then newPaths
             else
@@ -220,6 +223,17 @@ isReferenceNode :: Stack.Tagged Stack.Node -> Bool
 isReferenceNode (node Stack.:# _) = case node of
   Stack.Reference{} -> True
   _                 -> False
+
+toSGPath :: Path.Path -> SGPath
+toSGPath Path.Path{..} = SGPath {
+    pathStartingSymbolStack = Name.formatName <$> startingSymbolStack
+  , pathStartingScopeStackSize = fromIntegral (fromEnum startingScopeStackSize)
+  , pathFrom = fromIntegral (startingNode ^. identifier)
+  , pathEdges = foldMap Path.label edges
+  , pathTo = fromIntegral (endingNode ^. identifier)
+  , pathEndingScopeStack = fromIntegral <$> endingScopeStack
+  , pathEndingSymbolStack = Name.formatName <$> endingSymbolStack
+}
 
 class ToStackGraph term where
   toStackGraph :: Blob -> term Loc -> TempStackGraph
