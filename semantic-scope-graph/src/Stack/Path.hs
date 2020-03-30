@@ -23,6 +23,7 @@ module Stack.Path
   , Validity (..)
   , validity
   , isIncomplete
+  , isPartial
   , Completion (..)
   , completion
   , isIncremental
@@ -186,7 +187,8 @@ isPartial path = (case startingNode path of
     (Root _ :# _) -> True
     (ExportedScope _ :# _) -> True
     (JumpToScope _ :# _) -> True
-    (Declaration _ :# _) -> True)
+    (Declaration _ :# _) -> True
+    _ -> False)
 
 isIncomplete :: Path -> Bool
 isIncomplete path = completion path == Partial || isPartial path

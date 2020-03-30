@@ -42,6 +42,9 @@ import           Source.Loc as Loc
 import qualified Stack.Graph as Stack
 import qualified Stack.Path as Path
 import Data.Functor.Tagged
+import Control.Monad.ST
+import Data.STRef
+import Control.Monad (when)
 
 parseStackGraph :: ( Has (Error SomeException) sig m
                    , Effect sig
@@ -185,32 +188,62 @@ toPaths graph = let
     in
       if isReferenceNode taggedNode then referenceNodePath else path
   in
-    toSGPath <$> reducePaths graph (toList currentPaths)
+    toSGPath <$> reducePaths' graph (toList currentPaths)
 
-reducePaths :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
-reducePaths graph paths =
-  foldr (\path newPaths ->
-    let
-      newPaths' = if Path.isIncomplete path
-                  then path : newPaths
-                  else newPaths
-    in
-      if Path.isIncomplete path
-      then path : newPaths
-      else
-        let
-          nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode path) (Stack.edgeSet (Stack.tagGraphUniquely graph))
-        in
-          flip foldMap nextEdges $ \(source, sink) ->
-            if Maybe.isJust (Seq.elemIndexL (Path.Edge source sink "") (Path.edges path))
-            then newPaths
-            else
-              let newPath = path { Path.edges = (Path.Edge source sink "") Seq.<| (Path.edges path) }
-              in
-                if Path.validity newPath == Path.Valid
-                then newPath : newPaths
-                else newPaths
-        ) mempty paths
+-- reducePaths :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
+-- reducePaths graph paths =
+--   foldr (\path newPaths ->
+--     let
+--       newPaths' = if
+--                   then path : newPaths
+--                   else newPaths
+--     in
+--       if Path.completion path == Path.Complete || Path.isPartial path
+--       then path : newPaths
+--       else
+--         let
+--           nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode path) (Stack.edgeSet (Stack.tagGraphUniquely graph))
+--         in
+--           flip foldMap nextEdges $ \(source, sink) ->
+--             if Maybe.isJust (Seq.elemIndexL (Path.Edge source sink "") (Path.edges path))
+--             then newPaths
+--             else
+--               let newPath = path { Path.edges = (Path.Edge source sink "") Seq.<| (Path.edges path) }
+--               in
+--                 if Path.validity newPath == Path.Valid
+--                 then newPath : newPaths
+--                 else newPaths
+--         ) mempty paths
+
+reducePaths' :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
+reducePaths' graph initialPaths = runST $ do
+  currentPathsRef <- newSTRef (toList initialPaths)
+  pathsRef <- newSTRef []
+  go currentPathsRef pathsRef
+  readSTRef pathsRef
+  where
+    go currentPathsRef pathsRef = do
+      currentPaths <- readSTRef currentPathsRef
+      case currentPaths of
+        [] -> do
+          modifySTRef' currentPathsRef (const [])
+          pure ()
+        (currentPath : rest) -> do
+          modifySTRef' currentPathsRef (const rest)
+
+          if (Path.completion currentPath == Path.Complete || Path.isPartial currentPath)
+          then modifySTRef' pathsRef (currentPath :)
+          else do
+            let nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode currentPath) (Stack.edgeSet (Stack.tagGraphUniquely graph))
+
+            for_ nextEdges $ \(a, b) -> do
+              if (Path.Edge a b "") `elem` (Path.edges currentPath)
+              then pure ()
+              else do
+                let newPath = currentPath { Path.edges = (Path.edges currentPath) Seq.|> (Path.Edge a b "") }
+                when (Path.validity newPath == Path.Valid) $ do
+                  modifySTRef' currentPathsRef (newPath :)
+          go currentPathsRef pathsRef
 
 isMainNode :: Stack.Tagged Stack.Node -> Bool
 isMainNode (node Stack.:# _) = case node of
@@ -228,10 +261,10 @@ toSGPath :: Path.Path -> SGPath
 toSGPath Path.Path{..} = SGPath {
     pathStartingSymbolStack = Name.formatName <$> startingSymbolStack
   , pathStartingScopeStackSize = fromIntegral (fromEnum startingScopeStackSize)
-  , pathFrom = fromIntegral (startingNode ^. identifier)
+  , pathFrom = startingNode ^. identifier
   , pathEdges = foldMap Path.label edges
-  , pathTo = fromIntegral (endingNode ^. identifier)
-  , pathEndingScopeStack = fromIntegral <$> endingScopeStack
+  , pathTo = endingNode ^. identifier
+  , pathEndingScopeStack = endingScopeStack
   , pathEndingSymbolStack = Name.formatName <$> endingSymbolStack
 }
 
