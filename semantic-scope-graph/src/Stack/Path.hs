@@ -164,6 +164,7 @@ compatibility left right
       -- The ending node of 'left' and the starting node of 'right' are both scope references, and both refer to the same scope
           bothSameScope = case (endingNode left, startingNode right) of
             -- TODO: determining "same scope" by symbol comparison is rough
+            -- should we be comparing tags as well?
             (Scope s1 :# _, Scope s2 :# _) -> s1 == s2
             _ -> False
        in bothRootNode || bothSameScope
