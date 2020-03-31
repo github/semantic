@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Usage: script/repl [ARGS...]
 # Run a repl session capable of loading all of the packages and their individual components. Any passed arguments, e.g. module names or flags, will be passed to ghci.
 
