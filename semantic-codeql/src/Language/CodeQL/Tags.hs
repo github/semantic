@@ -13,6 +13,7 @@ import           AST.Token
 import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
+import           Data.Foldable (for_)
 import           Data.Text (Text)
 import qualified Language.CodeQL.AST as CodeQL
 import           Source.Loc
@@ -104,6 +105,13 @@ instance ToTags CodeQL.HigherOrderTerm where
     { ann = loc@Loc { byteRange }
     , name = CodeQL.LiteralId { text }
     } = yieldTag text Call loc byteRange >> gtags t
+
+instance ToTags CodeQL.ClasslessPredicateCall where
+  tags CodeQL.ClasslessPredicateCall
+    { extraChildren
+    } = for_ extraChildren $ \x -> case x of
+          Prj t@CodeQL.AritylessPredicateExpr {} -> tags t
+          _                                      -> pure ()
 
 instance ToTags CodeQL.AddExpr
 instance ToTags CodeQL.Any
@@ -222,5 +230,4 @@ instance ToTags CodeQL.SpecialId
 instance ToTags CodeQL.Exists
 instance ToTags CodeQL.ModuleMember
 instance ToTags CodeQL.Star
-instance ToTags CodeQL.ClasslessPredicateCall
 instance ToTags CodeQL.QualifiedRhs
