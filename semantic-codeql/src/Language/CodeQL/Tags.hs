@@ -2,11 +2,11 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-
-module Language.CodeQL.Tags (ToTags(..)) where
+module Language.CodeQL.Tags
+( ToTags(..)
+) where
 
 import           AST.Element
 import           AST.Token
@@ -14,7 +14,6 @@ import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
 import           Data.Text (Text)
-import           Data.List.NonEmpty(NonEmpty(..))
 import qualified Language.CodeQL.AST as CodeQL
 import           Source.Loc
 import           Source.Source as Source
@@ -59,46 +58,52 @@ yieldTag name kind loc range = do
 
 
 instance ToTags CodeQL.Module where
-  tags t@(CodeQL.Module loc@Loc { byteRange } term) =
-    case term of
-      Prj (CodeQL.ModuleName { extraChildren = Prj (CodeQL.SimpleId { text })}) :| _ -> yieldTag text Module loc byteRange >> gtags t
-      _                                                                      -> gtags t
+  tags t@CodeQL.Module
+    { ann = loc@Loc { byteRange }
+    , name = CodeQL.ModuleName { extraChildren = CodeQL.SimpleId { text } }
+    } = yieldTag text Module loc byteRange >> gtags t
 
 instance ToTags CodeQL.ClasslessPredicate where
-    tags t@(CodeQL.ClasslessPredicate loc@Loc {byteRange } term) =
-      case term of
-        Prj (CodeQL.PredicateName { text } ) :| _ -> yieldTag text Function loc byteRange >> gtags t
-        _                                     -> gtags t
+  tags t@CodeQL.ClasslessPredicate
+    { ann = loc@Loc { byteRange }
+    , name = CodeQL.PredicateName { text }
+    } = yieldTag text Function loc byteRange >> gtags t
 
 instance ToTags CodeQL.AritylessPredicateExpr where
-    tags t@(CodeQL.AritylessPredicateExpr loc@Loc { byteRange } term) =
-      case term of
-        Prj (CodeQL.LiteralId { text }) :| _ -> yieldTag text Call loc byteRange >> gtags t
-        _                                -> gtags t
+  tags t@CodeQL.AritylessPredicateExpr
+    { ann = loc@Loc { byteRange }
+    , name = CodeQL.LiteralId { text }
+    } = yieldTag text Call loc byteRange >> gtags t
 
 instance ToTags CodeQL.Dataclass where
-    tags t@(CodeQL.Dataclass loc@Loc { byteRange } term) =
-      case term of
-        Prj (CodeQL.ClassName { text }) :| _ -> yieldTag text Class loc byteRange >> gtags t
-        _                                -> gtags t
+  tags t@CodeQL.Dataclass
+    { ann = loc@Loc { byteRange }
+    , name = CodeQL.ClassName { text }
+    } = yieldTag text Class loc byteRange >> gtags t
 
 instance ToTags CodeQL.MemberPredicate where
-    tags t@(CodeQL.MemberPredicate loc@Loc { byteRange } term) =
-      case term of
-        Prj (CodeQL.PredicateName { text }) :| _ -> yieldTag text Method loc byteRange >> gtags t
-        _                                    -> gtags t
+  tags t@CodeQL.MemberPredicate
+    { ann = loc@Loc { byteRange }
+    , name = CodeQL.PredicateName { text }
+    } = yieldTag text Method loc byteRange >> gtags t
 
 instance ToTags CodeQL.Datatype where
-    tags t@(CodeQL.Datatype loc@Loc { byteRange } term) =
-      case term of
-        Prj (CodeQL.ClassName { text }) :| _ -> yieldTag text Class loc byteRange >> gtags t
-        _                                    -> gtags t
+  tags t@CodeQL.Datatype
+    { ann = loc@Loc { byteRange }
+    , name = CodeQL.ClassName { text }
+    } = yieldTag text Class loc byteRange >> gtags t
 
 instance ToTags CodeQL.DatatypeBranch where
-    tags t@(CodeQL.DatatypeBranch loc@Loc { byteRange } term) =
-      case term of
-        Prj (CodeQL.ClassName { text }) :| _ -> yieldTag text Class loc byteRange >> gtags t
-        _                                    -> gtags t
+  tags t@CodeQL.DatatypeBranch
+    { ann = loc@Loc { byteRange }
+    , name = CodeQL.ClassName { text }
+    } = yieldTag text Class loc byteRange >> gtags t
+
+instance ToTags CodeQL.HigherOrderTerm where
+  tags t@CodeQL.HigherOrderTerm
+    { ann = loc@Loc { byteRange }
+    , name = CodeQL.LiteralId { text }
+    } = yieldTag text Call loc byteRange >> gtags t
 
 instance ToTags CodeQL.AddExpr
 instance ToTags CodeQL.Any
@@ -147,7 +152,6 @@ instance ToTags CodeQL.Gt
 instance ToTags CodeQL.OrderBys
 instance ToTags CodeQL.TypeAliasBody
 instance ToTags CodeQL.Charpred
-instance ToTags CodeQL.HigherOrderTerm
 instance ToTags CodeQL.ParExpr
 instance ToTags CodeQL.TypeExpr
 instance ToTags CodeQL.IfTerm
@@ -184,7 +188,6 @@ instance ToTags CodeQL.QualModuleExpr
 instance ToTags CodeQL.Conjunction
 instance ToTags CodeQL.Integer
 instance ToTags CodeQL.QualifiedExpr
-instance ToTags CodeQL.QualifiedRhs
 instance ToTags CodeQL.Count
 instance ToTags CodeQL.Le
 instance ToTags CodeQL.Class
@@ -220,3 +223,4 @@ instance ToTags CodeQL.Exists
 instance ToTags CodeQL.ModuleMember
 instance ToTags CodeQL.Star
 instance ToTags CodeQL.ClasslessPredicateCall
+instance ToTags CodeQL.QualifiedRhs
