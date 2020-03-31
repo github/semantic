@@ -45,6 +45,8 @@ import Data.Functor.Tagged
 import Control.Monad.ST
 import Data.STRef
 import Control.Monad (when)
+import Debug.Trace
+
 
 parseStackGraph :: ( Has (Error SomeException) sig m
                    , Effect sig
@@ -190,51 +192,31 @@ toPaths graph = let
   in
     toSGPath <$> reducePaths' graph (toList currentPaths)
 
--- reducePaths :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
--- reducePaths graph paths =
---   foldr (\path newPaths ->
---     let
---       newPaths' = if
---                   then path : newPaths
---                   else newPaths
---     in
---       if Path.completion path == Path.Complete || Path.isPartial path
---       then path : newPaths
---       else
---         let
---           nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode path) (Stack.edgeSet (Stack.tagGraphUniquely graph))
---         in
---           flip foldMap nextEdges $ \(source, sink) ->
---             if Maybe.isJust (Seq.elemIndexL (Path.Edge source sink "") (Path.edges path))
---             then newPaths
---             else
---               let newPath = path { Path.edges = (Path.Edge source sink "") Seq.<| (Path.edges path) }
---               in
---                 if Path.validity newPath == Path.Valid
---                 then newPath : newPaths
---                 else newPaths
---         ) mempty paths
-
 reducePaths' :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
 reducePaths' graph initialPaths = runST $ do
+  traceM "Initializing Refs"
   currentPathsRef <- newSTRef (toList initialPaths)
   pathsRef <- newSTRef []
-  go currentPathsRef pathsRef
+  graphRef <- newSTRef (Stack.tagGraphUniquely graph)
+  go currentPathsRef pathsRef graphRef
   readSTRef pathsRef
   where
-    go currentPathsRef pathsRef = do
+    go currentPathsRef pathsRef graphRef = do
       currentPaths <- readSTRef currentPathsRef
       case currentPaths of
         [] -> do
           modifySTRef' currentPathsRef (const [])
           pure ()
         (currentPath : rest) -> do
+          traceM ("Popping off current path")
           modifySTRef' currentPathsRef (const rest)
 
           if (Path.completion currentPath == Path.Complete || Path.isPartial currentPath)
-          then modifySTRef' pathsRef (currentPath :)
+          then traceM ("Current Path is complete:" <> show (Path.completion currentPath == Path.Complete) <> "partial:" <> show (Path.isPartial currentPath)) >> modifySTRef' pathsRef (currentPath :)
           else do
-            let nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode currentPath) (Stack.edgeSet (Stack.tagGraphUniquely graph))
+            traceM "Current Path is not complete or partial"
+            graph <- readSTRef graphRef
+            let nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode currentPath) (Stack.edgeSet graph)
 
             for_ nextEdges $ \(a, b) -> do
               if (Path.Edge a b "") `elem` (Path.edges currentPath)
@@ -243,7 +225,8 @@ reducePaths' graph initialPaths = runST $ do
                 let newPath = currentPath { Path.edges = (Path.edges currentPath) Seq.|> (Path.Edge a b "") }
                 when (Path.validity newPath == Path.Valid) $ do
                   modifySTRef' currentPathsRef (newPath :)
-          go currentPathsRef pathsRef
+              modifySTRef' graphRef (Stack.removeEdge a b)
+          go currentPathsRef pathsRef graphRef
 
 isMainNode :: Stack.Tagged Stack.Node -> Bool
 isMainNode (node Stack.:# _) = case node of
