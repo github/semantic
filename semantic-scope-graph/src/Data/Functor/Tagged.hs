@@ -69,3 +69,4 @@ taggedIO a = (a :#) . hashUnique <$> newUnique
 -- This is bad. Don't use it.
 unsafeTagged :: a -> Tagged a
 unsafeTagged = unsafePerformIO . taggedIO
+{-# NOINLINE unsafeTagged #-}
