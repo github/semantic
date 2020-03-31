@@ -30,7 +30,7 @@ import Data.Sequence (Seq (..), (|>))
 import Data.Text (Text)
 import Stack.Graph (Node (..), Symbol)
 import Data.Generics.Product
-import Control.Lens ((^.), Lens')
+import Control.Lens.Getter ((^.))
 import GHC.Generics
 import Data.List (isPrefixOf)
 
@@ -47,14 +47,6 @@ data Path = Path
   , startingScopeStackSize :: StartingSize
   , endingScopeStack       :: [Tag]
   } deriving (Eq, Show, Generic)
-
-startingNode_, endingNode_ :: Lens' Path (Tagged Node)
-startingNode_ = field @"startingNode"
-endingNode_ = field @"endingNode"
-
-startingSymbolStack_, endingSymbolStack_ :: Lens' Path [Symbol]
-startingSymbolStack_ = field @"startingSymbolStack"
-endingSymbolStack_ = field @"endingSymbolStack"
 
 data Edge = Edge
   { sourceNode :: Tagged Node
@@ -168,15 +160,15 @@ compatibility left right
     -- Any of the following are true:
     nodesCompatible =
       -- The ending node of 'left' and the starting node of 'right' are both the root node.
-      let bothRootNode = left ^. endingNode_.contents == Root && right ^. startingNode_.contents == Root
+      let bothRootNode = left ^. field @"endingNode".contents == Root && right ^. field @"startingNode".contents == Root
       -- The ending node of 'left' and the starting node of 'right' are both scope references, and both refer to the same scope
-          bothSameScope = case (left ^. endingNode_, right ^. startingNode_) of
+          bothSameScope = case (endingNode left, startingNode right) of
             -- TODO: determining "same scope" by symbol comparison is rough
             (Scope s1 :# _, Scope s2 :# _) -> s1 == s2
             _ -> False
        in bothRootNode || bothSameScope
     -- The starting symbol stack of 'right' is a prefix of the ending symbol stack of 'left'.
-    stackPrefix = (right ^. startingSymbolStack_) `isPrefixOf` (left ^. endingSymbolStack_)
+    stackPrefix = (startingSymbolStack right) `isPrefixOf` (endingSymbolStack left)
     -- The ending scope stack of 'left' has at least as many elements as the starting scope stack size of 'right'.
     hasElements = (length (endingScopeStack left)) >= fromEnum (startingScopeStackSize right)
 
