@@ -208,8 +208,12 @@ concatenate left right
             let jumpEdge =
                   Edge
                     { sourceNode = newEndingNode, -- source node is node
-                        -- sink node is an exported scope node whose scope identifier is resolved scope identifier
+
                         -- PT TODO: we don't appear to have scope identifiers attached to exported scope nodes
+                        -- Also: calling unsafeTagged here is a sin, but this function should be pure, so whatever.
+                        -- If anyone haa a better idea, hit me up.
+
+                      -- sink node is an exported scope node whose scope identifier is resolved scope identifier
                       sinkNode = unsafeTagged ExportedScope,
                       -- label is `jump``
                       label = "jump"
