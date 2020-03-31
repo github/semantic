@@ -169,9 +169,9 @@ compatibility left right
             _ -> False
        in bothRootNode || bothSameScope
     -- The starting symbol stack of 'right' is a prefix of the ending symbol stack of 'left'.
-    stackPrefix = (startingSymbolStack right) `isPrefixOf` (endingSymbolStack left)
+    stackPrefix = startingSymbolStack right `isPrefixOf` endingSymbolStack left
     -- The ending scope stack of 'left' has at least as many elements as the starting scope stack size of 'right'.
-    hasElements = (length (endingScopeStack left)) >= fromEnum (startingScopeStackSize right)
+    hasElements = length (endingScopeStack left) >= fromEnum (startingScopeStackSize right)
 
 concatenate :: Path -> Path -> Maybe Path
 concatenate left right
@@ -218,7 +218,7 @@ concatenate left right
                 (allEdges |> jumpEdge)
           -- Otherwise, do nothing
           _ -> allEdges
-     in pure
+     in Just
           Path
             { startingNode = newStartingNode,
               endingNode = newEndingNode,
