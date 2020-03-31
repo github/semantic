@@ -38,7 +38,6 @@ library
     Data.Hole
     Data.Module
     Data.ScopeGraph
-    Data.Functor.Tagged
   build-depends:
       base                >= 4.13 && < 5
     , aeson
