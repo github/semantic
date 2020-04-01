@@ -70,7 +70,7 @@ library
     , hashable
     , haskeline                   ^>= 0.7.5
     , hashable
-    , lingo                       ^>= 0.3
+    , lingo                       ^>= 0.3.2.0
     , pathtype                    ^>= 0.8.1
     , prettyprinter                >= 1.2 && < 2
     , prettyprinter-ansi-terminal ^>= 1.1.1
