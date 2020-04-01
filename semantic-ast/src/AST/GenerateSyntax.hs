@@ -67,7 +67,7 @@ syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
   let extraTypeParameterName = mkName "f"
   let typeParameterName      = mkName "a"
-  let traversalInstances = makeTraversalInstances (varT extraTypeParameterName) (conT name)
+  let traversalInstances = makeTraversalInstances (conT name)
       glue a b c = a : b <> c
       name = mkName nameStr
       generatedDatatype cons = dataD (cxt []) name [PlainTV extraTypeParameterName, PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
@@ -102,8 +102,8 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
 
 
-makeTraversalInstances :: TypeQ -> TypeQ -> Q [Dec]
-makeTraversalInstances ty _unused =
+makeTraversalInstances :: TypeQ -> Q [Dec]
+makeTraversalInstances ty =
   [d|
   instance Foldable ($ty f) where
     foldMap = foldMapDefault1
