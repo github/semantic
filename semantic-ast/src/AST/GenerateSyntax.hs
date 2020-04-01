@@ -79,7 +79,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       let types' = fieldTypesToNestedSum extraTypeParameterName subtypes
           fieldName = mkName ("get" <> nameStr)
           con = recC name [varBangType fieldName (bangType strictness (types' `appT` varT typeParameterName))]
-          hasFieldInstance = makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
+          hasFieldInstance = makeHasFieldInstance (conT name) (varE fieldName)
           newType = newtypeD (cxt []) name [plainTV extraTypeParameterName, plainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
       in glue <$> newType <*> hasFieldInstance <*> traversalInstances
     ProductType datatypeName named children fields ->
@@ -149,7 +149,7 @@ ctorForProductType constructorName typeParameterName extraTypeParameterName chil
     in case (required, mult) of
       (Required, Multiple) -> appT (conT ''NonEmpty) ftypes
       (Required, Single)   -> ftypes
-      (Optional, Multiple) -> appT (conT ''[]) ftypes
+      (Optional, Multiple) -> appT listT ftypes
       (Optional, Single)   -> appT (conT ''Maybe) ftypes
   toTypeChild (MkChildren field) = ("extra_children", toType field)
 
