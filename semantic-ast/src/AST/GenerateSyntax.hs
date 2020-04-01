@@ -65,12 +65,13 @@ getAllSymbols language = do
 -- Auto-generate Haskell datatypes for sums, products and leaf types
 syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
+  shapeFunctorKind <- [t| * -> * |]
   let extraTypeParameterName = mkName "f"
   let typeParameterName      = mkName "a"
   let traversalInstances = makeTraversalInstances (conT name)
       glue a b c = a : b <> c
       name = mkName nameStr
-      generatedDatatype cons = dataD (cxt []) name [PlainTV extraTypeParameterName, PlainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
+      generatedDatatype cons = dataD (cxt []) name [kindedTV extraTypeParameterName shapeFunctorKind, plainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
       deriveStockClause = derivClause (Just StockStrategy) [ conT ''Eq, conT ''Ord, conT ''Show, conT ''Generic, conT ''Generic1]
       deriveAnyClassClause = derivClause (Just AnyclassStrategy) [conT ''TS.Unmarshal, conT ''Traversable1 `appT` varT (mkName "someConstraint")]
       deriveGN = derivClause (Just NewtypeStrategy) [conT ''TS.SymbolMatching]
@@ -171,7 +172,7 @@ ctorForTypes (DatatypeName constructorName) types = recC (toName Named construct
 fieldTypesToNestedSum :: Name -> NonEmpty AST.Deserialize.Type -> Q TH.Type
 fieldTypesToNestedSum extraTypeParameterName xs = go (toList xs)
   where
-    combine lhs rhs = (conT ''(:+:) `appT` lhs) `appT` rhs -- (((((a :+: b) :+: c) :+: d)) :+: e)   ((a :+: b) :+: (c :+: d))
+    combine lhs rhs = infixT lhs ''(:+:) rhs -- (((((a :+: b) :+: c) :+: d)) :+: e)   ((a :+: b) :+: (c :+: d))
     convertToQType (MkType (DatatypeName n) named) = conT (toName named n) `appT` (varT extraTypeParameterName)
     go [x] = convertToQType x
     go xs  = let (l,r) = splitAt (length xs `div` 2) xs in combine (go l) (go r)
