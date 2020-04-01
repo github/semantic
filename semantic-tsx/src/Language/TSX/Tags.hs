@@ -68,6 +68,18 @@ instance ToTags Tsx.MethodDefinition where
       where
         yield name = yieldTag name Method loc byteRange >> gtags t
 
+instance ToTags Tsx.Pair where
+  tags t@Tsx.Pair
+    { ann = loc@Loc { byteRange }
+    , key
+    , value = Tsx.Expression expr
+    } =  case (key, expr) of
+      (Prj Tsx.PropertyIdentifier { text }, Prj Tsx.Function{}) -> yield text
+      (Prj Tsx.PropertyIdentifier { text }, Prj Tsx.ArrowFunction{}) -> yield text
+      _ -> gtags t
+    where
+      yield text = yieldTag text Function loc byteRange >> gtags t
+
 instance ToTags Tsx.ClassDeclaration where
   tags t@Tsx.ClassDeclaration
     { ann = loc@Loc { byteRange }
@@ -125,6 +137,21 @@ instance ToTags Tsx.VariableDeclarator where
       yield text = yieldTag text Function loc byteRange >> gtags t
   tags t = gtags t
 
+instance ToTags Tsx.AssignmentExpression where
+  tags t@Tsx.AssignmentExpression
+    { ann = loc@Loc { byteRange }
+    , left
+    , right = (Tsx.Expression expr)
+    } = case (left, expr) of
+          (Prj Tsx.Identifier { text }, Prj Tsx.Function{}) -> yield text
+          (Prj Tsx.Identifier { text }, Prj Tsx.ArrowFunction{}) -> yield text
+          (Prj Tsx.MemberExpression { property = Tsx.PropertyIdentifier { text } }, Prj Tsx.Function{}) -> yield text
+          (Prj Tsx.MemberExpression { property = Tsx.PropertyIdentifier { text } }, Prj Tsx.ArrowFunction{}) -> yield text
+          _ -> gtags t
+    where
+      yield text = yieldTag text Function loc byteRange >> gtags t
+
+
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
   tags (R1 r) = tags r
@@ -164,7 +191,7 @@ instance ToTags Tsx.ArrayPattern
 instance ToTags Tsx.ArrayType
 instance ToTags Tsx.ArrowFunction
 instance ToTags Tsx.AsExpression
-instance ToTags Tsx.AssignmentExpression
+-- instance ToTags Tsx.AssignmentExpression
 instance ToTags Tsx.AssignmentPattern
 instance ToTags Tsx.AugmentedAssignmentExpression
 instance ToTags Tsx.AwaitExpression
@@ -259,7 +286,7 @@ instance ToTags Tsx.Object
 instance ToTags Tsx.ObjectPattern
 instance ToTags Tsx.ObjectType
 instance ToTags Tsx.OptionalParameter
-instance ToTags Tsx.Pair
+-- instance ToTags Tsx.Pair
 instance ToTags Tsx.ParenthesizedExpression
 instance ToTags Tsx.ParenthesizedType
 instance ToTags Tsx.PredefinedType
