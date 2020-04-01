@@ -80,7 +80,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
           fieldName = mkName ("get" <> nameStr)
           con = recC name [varBangType fieldName (bangType strictness (types' `appT` varT typeParameterName))]
           hasFieldInstance = makeHasFieldInstance (conT name) (varT typeParameterName) (varE fieldName)
-          newType = newtypeD (cxt []) name [plainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
+          newType = newtypeD (cxt []) name [plainTV extraTypeParameterName, plainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
       in glue <$> newType <*> hasFieldInstance <*> traversalInstances
     ProductType datatypeName named children fields ->
       let con = ctorForProductType datatypeName typeParameterName extraTypeParameterName children fields
