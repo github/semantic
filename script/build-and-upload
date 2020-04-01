@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+# Usage: script/build-and-upload PROJECT_NAME
+# where PROJECT_NAME is one of the packages present in this repo:
+# semantic-source, etc.
+
+set -e
+
+PROJECT="$1"
+ROOT_DIR="$(dirname "$0")/.."
+CABAL_PATH="$ROOT_DIR/$PROJECT/$PROJECT.cabal"
+
+if [ -z "$PROJECT" ]
+then echo "USAGE: build_and_upload PROJECT_NAME"; exit 1
+fi
+
+if [ ! -f "$CABAL_PATH" ]
+then echo "Couldn't find .cabal file at $CABAL_PATH; is $PROJECT a valid package?"; exit 1
+fi
+
+set -x
+
+cabal v2-build "$PROJECT"
+TGZ_LOC="$(cabal v2-sdist "$PROJECT" | tail -n 1)"
+DOCS_LOC="$(cabal v2-haddock --haddock-for-hackage "$PROJECT" | tail -n 1)"
+PACKAGE_VERSION="$(basename "$TGZ_LOC" .tar.gz)"
+
+if [ ! -f "$TGZ_LOC" ]
+then echo "Bug in build_and_upload: $PACKAGE_FN doesn't point to a valid path"; exit 1
+fi
+
+set +x
+
+echo "You are planning to upload '$PACKAGE_VERSION'."
+read -rp "Is this correct? [y/n] " choice
+if [ "$choice" != "y" ]
+   then echo "Aborting."; exit 1
+fi
+
+echo "Attempting to build $PACKAGE_VERSION from source"
+TEMP_PATH=$(mktemp -d)
+tar -xvf "$TGZ_LOC" -C "$TEMP_PATH"
+
+set -x
+(
+    cd "$TEMP_PATH/$PACKAGE_VERSION"
+    pwd
+
+    cabal v2-update
+    cabal v2-build --disable-optimization
+)
+set +x
+
+if wget -q --spider "https://hackage.haskell.org/package/$PACKAGE_VERSION"
+then
+    echo "The package $PACKAGE_VERSION already exists on Hackage."
+    echo "If you need to upload code changes, then bump the version number in $PROJECT/$PROJECT.cabal, make a PR, and run this script again."
+    echo "Otherwise, if you need _only_ to loosen existing constraints in $PROJECT.cabal file, then you can create a new revision of this package on Hackage."
+    echo "You'll need to make your changes by hand. Be sure to click the 'Review changes' button to check your work."
+    read -rp "Do you want to open a browser so as to do this? [y/N]" choice
+    if [ "$choice" == "y" ]
+    then
+        echo "Opening…"
+        sleep 1
+        open "https://hackage.haskell.org/package/$PACKAGE_VERSION/$PROJECT.cabal/edit"
+        exit 0
+    else
+        echo "Aborting"
+        exit 1
+    fi
+fi
+
+echo "******************"
+echo "Uploading packages"
+echo "******************"
+
+echo -n "Hackage username: "
+read HACKAGE_USER
+echo
+echo -n "Hackage password: "
+read -s HACKAGE_PASS
+
+cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASS" "$TGZ_LOC"
+cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASS" --documentation "$DOCS_LOC"
+
+URL="https://hackage.haskell.org/package/$PACKAGE_VERSION/candidate"
+
+echo "Opening candidate URL in browser…"
+sleep 1
+open "$URL"
+
+echo "About to upload final version. Do you want to proceed?"
+echo "Full-fledged package uploads cannot be undone!"
+read -rp "Type 'yes' to continue. " choice
+if [ "$choice" != "yes" ]
+   then echo "Aborting."; exit 1
+fi
+
+set -x
+
+cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASS" --publish "$TGZ_LOC"
+cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASS" --publish --documentation "$DOCS_LOC"
+
+echo "Tagging $PACKAGE_VERSION"
+git tag "$PACKAGE_VERSION"
+git push --tags

@@ -22,6 +22,7 @@ module SpecHelpers
 , TestEvaluatingResult
 , TestEvaluatingState
 , evaluateProject
+, moduleLookup
 ) where
 
 import qualified Analysis.File as File
@@ -43,6 +44,7 @@ import           Data.Abstract.FreeVariables as X
 import qualified Data.Abstract.Heap as Heap
 import           Data.Abstract.Module as X
 import           Data.Abstract.ModuleTable as X hiding (lookup)
+import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Concrete (Value (..), ValueError, runValueError)
 import           Data.Blob as X
@@ -74,6 +76,7 @@ import           Semantic.Util as X
 import           Source.Range as X hiding (end, point, start)
 import           Source.Source as X (Source)
 import           Source.Span as X hiding (HasSpan (..), end, point, start)
+import qualified Source.Span
 import           System.Exit (die)
 import qualified System.Path as Path
 import           Test.Hspec as X (Spec, SpecWith, around, context, describe, it, parallel, pendingWith, runIO, xit)
@@ -81,6 +84,9 @@ import           Test.Hspec.Expectations as X
 import           Test.Hspec.LeanCheck as X
 import           Test.LeanCheck as X
 import           Unsafe.Coerce (unsafeCoerce)
+
+instance Lower X.Span where
+  lowerBound = Source.Span.point (Pos 1 1)
 
 runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
@@ -198,3 +204,6 @@ lookupDeclaration name (currentScope, currentFrame) heap scopeGraph = do
   path <- ScopeGraph.lookupScopePath name currentScope scopeGraph
   frameAddress <- Heap.lookupFrameAddress path currentFrame heap
   toList <$> Heap.getSlotValue (Slot frameAddress (Heap.pathPosition path)) heap
+
+moduleLookup :: FilePath -> ModuleTable a -> Maybe a
+moduleLookup = ModuleTable.lookup . Path.absRel

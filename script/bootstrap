@@ -1,4 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-git submodule sync --recursive && git submodule update --init --recursive --force
 cabal v2-update

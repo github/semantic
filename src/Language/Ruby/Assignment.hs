@@ -40,11 +40,11 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Text as Text
+import           Language.Ruby.Grammar as Grammar
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import           Language.Ruby.Term as Ruby
-import           Language.Ruby.Grammar as Grammar
 
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment (Term Loc)

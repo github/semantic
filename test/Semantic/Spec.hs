@@ -21,12 +21,12 @@ spec = do
 
     it "returns error if given an unknown language (json)" $ do
       output <- fmap runBuilder . runTaskOrDie . runReader defaultLanguageModes $ parseTermBuilder TermJSONTree [ setBlobLanguage Unknown methodsBlob ]
-      output `shouldBe` "{\"trees\":[{\"path\":\"methods.rb\",\"error\":\"NoLanguageForBlob \\\"methods.rb\\\"\",\"language\":\"Unknown\"}]}\n"
+      output `shouldBe` "{\"trees\":[{\"path\":\"methods.rb\",\"error\":\"NoLanguageForBlob (currentDir </> relPath \\\"methods.rb\\\")\",\"language\":\"Unknown\"}]}\n"
 
     it "throws if given an unknown language for sexpression output" $ do
       res <- runTaskWithOptions defaultOptions (runReader defaultLanguageModes (runParseWithConfig (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob])))
       case res of
-        Left exc   -> fromException exc `shouldBe` Just (NoLanguageForBlob "methods.rb")
+        Left exc   -> fromException exc `shouldBe` Just (NoLanguageForBlob $ Path.absRel "methods.rb")
         Right _bad -> fail "Expected parseTermBuilder to fail for an unknown language"
 
     it "renders with the specified renderer" $ do

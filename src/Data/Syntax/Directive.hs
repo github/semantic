@@ -15,6 +15,7 @@ import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics (Generic1)
 import           Source.Span
+import qualified System.Path as Path
 
 -- A file directive like the Ruby constant `__FILE__`.
 data File a = File
@@ -25,7 +26,7 @@ instance Ord1 File where liftCompare = genericLiftCompare
 instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable File where
-  eval _ _ File = currentModule >>= string . T.pack . modulePath
+  eval _ _ File = currentModule >>= string . T.pack . Path.toString . modulePath
 
 
 -- A line directive like the Ruby constant `__LINE__`.

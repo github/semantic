@@ -18,9 +18,9 @@ import           Data.Abstract.BaseError
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Map.Strict as Map
 import           Data.Maybe
-import           Data.Semilattice.Lower
 import           Data.Traversable
 import           GHC.Stack
+import           Source.Span (Pos (..), point)
 
 defineBuiltIn :: ( HasCallStack
                  , Has (Deref value) sig m
@@ -47,11 +47,11 @@ defineBuiltIn declaration rel accessControl value = withCurrentCallStack callSta
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
   associatedScope <- newPreludeScope lexicalEdges
   -- TODO: This span is still wrong.
-  declare declaration rel accessControl lowerBound ScopeGraph.Unknown (Just associatedScope)
+  declare declaration rel accessControl (point (Pos 1 1)) ScopeGraph.Unknown (Just associatedScope)
 
   withScope associatedScope $ do
     param <- gensym
-    declare (Declaration param) ScopeGraph.Gensym accessControl lowerBound ScopeGraph.Unknown Nothing
+    declare (Declaration param) ScopeGraph.Gensym accessControl (point (Pos 1 1)) ScopeGraph.Unknown Nothing
 
   slot <- lookupSlot declaration
   value <- builtIn associatedScope value

@@ -5,7 +5,6 @@ module Data.Blob.IO
   ( readBlobFromFile
   , readBlobFromFile'
   , readBlobFromPath
-  , readBlobsFromDir
   , readFilePair
   , readProjectFromPaths
   ) where
@@ -13,15 +12,14 @@ module Data.Blob.IO
 import           Analysis.Blob
 import           Analysis.File as File
 import           Analysis.Project
-import qualified Control.Concurrent.Async as Async
 import           Control.Monad.IO.Class
 import           Data.Blob
 import qualified Data.ByteString as B
 import           Data.Language
 import           Data.Maybe.Exts
-import           Data.Semilattice.Lower
 import           Semantic.IO
 import qualified Source.Source as Source
+import           Source.Span
 import qualified System.Path as Path
 
 -- | Deprecated: this has very weird semantics.
@@ -44,9 +42,9 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
 
   paths <- liftIO $ findFilesInDir rootDir exts excludeDirs
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
-  pure $ Project (Path.toString rootDir) blobs lang (fmap Path.toString excludeDirs)
+  pure $ Project rootDir blobs lang excludeDirs
   where
-    toFile path = File path lowerBound lang
+    toFile path = File path (point (Pos 1 1)) lang
     exts = extensionsForLanguage lang
 
 
@@ -67,11 +65,6 @@ readBlobFromFile' file = do
 -- | Read a blob from the provided absolute or relative path , failing if it can't be found.
 readBlobFromPath :: (MonadFail m, MonadIO m) => Path.AbsRelFile -> m Blob
 readBlobFromPath = readBlobFromFile' . File.fromPath
-
--- | Read all blobs in the directory with Language.supportedExts.
-readBlobsFromDir :: MonadIO m => Path.AbsRelDir -> m [Blob]
-readBlobsFromDir path = liftIO . fmap catMaybes $
-  findFilesInDir path supportedExts mempty >>= Async.mapConcurrently (readBlobFromFile . File.fromPath)
 
 readFilePair :: MonadIO m => File Language -> File Language -> m BlobPair
 readFilePair a b = do

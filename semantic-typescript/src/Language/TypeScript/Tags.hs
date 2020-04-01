@@ -68,6 +68,18 @@ instance ToTags Ts.MethodDefinition where
       where
         yield name = yieldTag name Method loc byteRange >> gtags t
 
+instance ToTags Ts.Pair where
+  tags t@Ts.Pair
+    { ann = loc@Loc { byteRange }
+    , key
+    , value = Ts.Expression expr
+    } =  case (key, expr) of
+      (Prj Ts.PropertyIdentifier { text }, Prj Ts.Function{}) -> yield text
+      (Prj Ts.PropertyIdentifier { text }, Prj Ts.ArrowFunction{}) -> yield text
+      _ -> gtags t
+    where
+      yield text = yieldTag text Function loc byteRange >> gtags t
+
 instance ToTags Ts.ClassDeclaration where
   tags t@Ts.ClassDeclaration
     { ann = loc@Loc { byteRange }
@@ -101,9 +113,37 @@ instance ToTags Ts.Module where
       match expr = case expr of
         Prj Ts.Identifier { text } -> yield text
         -- TODO: Handle NestedIdentifiers and Strings
-        -- Prj Tsx.NestedIdentifier { extraChildren } -> match
+        -- Prj Ts.NestedIdentifier { extraChildren } -> match
         _                          -> gtags t
       yield text = yieldTag text Module loc byteRange >> gtags t
+
+instance ToTags Ts.VariableDeclarator where
+  tags t@Ts.VariableDeclarator
+    { ann = loc@Loc { byteRange }
+    , name
+    , value = Just (Ts.Expression expr)
+    } = case (expr, name) of
+          (Prj Ts.Function{}, Prj Ts.Identifier { text }) -> yield text
+          (Prj Ts.ArrowFunction{}, Prj Ts.Identifier { text }) -> yield text
+          _ -> gtags t
+    where
+      yield text = yieldTag text Function loc byteRange >> gtags t
+  tags t = gtags t
+
+instance ToTags Ts.AssignmentExpression where
+  tags t@Ts.AssignmentExpression
+    { ann = loc@Loc { byteRange }
+    , left
+    , right = (Ts.Expression expr)
+    } = case (left, expr) of
+          (Prj Ts.Identifier { text }, Prj Ts.Function{}) -> yield text
+          (Prj Ts.Identifier { text }, Prj Ts.ArrowFunction{}) -> yield text
+          (Prj Ts.MemberExpression { property = Ts.PropertyIdentifier { text } }, Prj Ts.Function{}) -> yield text
+          (Prj Ts.MemberExpression { property = Ts.PropertyIdentifier { text } }, Prj Ts.ArrowFunction{}) -> yield text
+          _ -> gtags t
+    where
+      yield text = yieldTag text Function loc byteRange >> gtags t
+
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
@@ -144,7 +184,7 @@ instance ToTags Ts.ArrayPattern
 instance ToTags Ts.ArrayType
 instance ToTags Ts.ArrowFunction
 instance ToTags Ts.AsExpression
-instance ToTags Ts.AssignmentExpression
+-- instance ToTags Ts.AssignmentExpression
 instance ToTags Ts.AssignmentPattern
 instance ToTags Ts.AugmentedAssignmentExpression
 instance ToTags Ts.AwaitExpression
@@ -239,7 +279,7 @@ instance ToTags Ts.Object
 instance ToTags Ts.ObjectPattern
 instance ToTags Ts.ObjectType
 instance ToTags Ts.OptionalParameter
-instance ToTags Ts.Pair
+-- instance ToTags Ts.Pair
 instance ToTags Ts.ParenthesizedExpression
 instance ToTags Ts.ParenthesizedType
 instance ToTags Ts.PredefinedType
@@ -289,7 +329,7 @@ instance ToTags Ts.Undefined
 instance ToTags Ts.UnionType
 instance ToTags Ts.UpdateExpression
 instance ToTags Ts.VariableDeclaration
-instance ToTags Ts.VariableDeclarator
+-- instance ToTags Ts.VariableDeclarator
 instance ToTags Ts.WhileStatement
 instance ToTags Ts.WithStatement
 instance ToTags Ts.YieldExpression

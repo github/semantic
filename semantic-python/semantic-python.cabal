@@ -27,14 +27,14 @@ common haskell
                      , semantic-analysis ^>= 0
                      , semantic-ast
                      , semantic-core ^>= 0.0
-                     , semantic-source ^>= 0.0.2
+                     , semantic-source ^>= 0.1.0
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
                      , semilattices ^>= 0
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.9
-                     , tree-sitter-python ^>= 0.9.0.1
+                     , tree-sitter-python ^>= 0.9.0.2
                      , containers
   ghc-options:
     -Weverything
@@ -116,18 +116,17 @@ test-suite test
   import: haskell
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test
-  main-is:          Test.hs
+  main-is:          PreciseTest.hs
   build-depends:    base
-                  , tree-sitter
-                  , tree-sitter-python
-                  , semantic-ast
                   , bytestring ^>= 0.10.8.2
                   , hedgehog >= 0.6 && <2
                   , pathtype ^>= 0.8.1
-                  , text
+                  , semantic-ast
+                  , semantic-python
                   , tasty
                   , tasty-hedgehog
                   , tasty-hunit
+                  , text
 
 executable benchmark
   import: haskell
@@ -138,5 +137,4 @@ executable benchmark
       base
     , gauge ^>= 0.2.5
     , bytestring
-    , tree-sitter
-    , tree-sitter-python
+    , semantic-python

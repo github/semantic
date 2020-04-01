@@ -38,20 +38,19 @@ import qualified Source.Source as Source
 import           System.FilePath.Posix
 import qualified System.Path as Path
 
-
-nodeJSResolutionMap :: Has Files sig m => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
+nodeJSResolutionMap :: Has Files sig m => Path.AbsRelDir -> Text -> [Path.AbsRelDir] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
-  files <- findFiles (Path.absRel rootDir) [".json"] (fmap Path.absRel excludeDirs)
+  files <- findFiles rootDir [".json"] excludeDirs
   let packageFiles = File.fromPath <$> filter ((==) (Path.relFile "package.json") . Path.takeFileName) files
   blobs <- readBlobs (FilesFromPaths packageFiles)
   pure $ fold (mapMaybe (lookup prop) blobs)
   where
     lookup :: Text -> Blob -> Maybe (Map FilePath FilePath)
-    lookup k b@Blob{..} = decodeStrict (Source.bytes blobSource) >>= lookupProp (blobPath b) k
+    lookup k b@Blob{..} = decodeStrict (Source.bytes blobSource) >>= lookupProp (blobFilePath b) k
 
     lookupProp :: FilePath -> Text -> Object -> Maybe (Map FilePath FilePath)
     lookupProp path k res = flip parseMaybe res $ \obj -> Map.singleton relPkgDotJSONPath . relEntryPath <$> obj .: k
-      where relPkgDotJSONPath = makeRelative rootDir path
+      where relPkgDotJSONPath = makeRelative (Path.toString rootDir) path
             relEntryPath x = takeDirectory relPkgDotJSONPath </> x
 
 resolutionMap :: Has Resolution sig m => Project -> m (Map FilePath FilePath)
@@ -61,7 +60,7 @@ resolutionMap Project{..} = case projectLanguage of
   _          -> send (NoResolution pure)
 
 data Resolution (m :: * -> *) k
-  = NodeJSResolution FilePath Text [FilePath] (Map FilePath FilePath -> m k)
+  = NodeJSResolution Path.AbsRelDir Text [Path.AbsRelDir] (Map FilePath FilePath -> m k)
   | NoResolution                              (Map FilePath FilePath -> m k)
   deriving (Functor, Generic1)
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #/ Usage: script/clone-example-repos
 #/
 #/ Clone some example repositories for smoke testing parsing, assignment, and precise ASTs.

@@ -59,7 +59,7 @@ common dependencies
                      , fused-effects-exceptions ^>= 1
                      , fused-effects-resumable ^>= 0.1
                      , hashable >= 1.2.7 && < 1.4
-                     , tree-sitter ^>= 0.9.0.0
+                     , tree-sitter ^>= 0.9.0.1
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
@@ -69,7 +69,7 @@ common dependencies
                      , safe-exceptions ^>= 0.1.7.0
                      , semantic-analysis ^>= 0
                      , semantic-ast
-                     , semantic-source ^>= 0.0.2
+                     , semantic-source ^>= 0.1.0
                      , semilattices ^>= 0.0.0.3
                      , streaming ^>= 0.2.2.0
                      , text ^>= 1.2.3.1
@@ -119,6 +119,7 @@ library
                      , Control.Effect.Parse
                      , Control.Effect.REPL
                      , Control.Effect.Sum.Project
+                     , Control.Effect.Timeout
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
                      , Data.Abstract.Address.Monovariant
@@ -180,9 +181,6 @@ library
                      , Diffing.Algorithm.SES
                      , Diffing.Interpreter
                      -- Language-specific grammar/syntax types, & assignments
-                     , Language.Markdown.Assignment
-                     , Language.Markdown.Syntax
-                     , Language.Markdown.Term
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Term
@@ -209,7 +207,6 @@ library
                      , Language.Python.Term
                      , Numeric.Exts
                      -- Parser glue
-                     , Parsing.CMark
                      , Parsing.Parser
                      , Parsing.TreeSitter
                      -- Rendering formats
@@ -226,6 +223,7 @@ library
                      , Semantic.Api.Bridge
                      , Semantic.Api.Diffs
                      , Semantic.Api.LegacyTypes
+                     , Semantic.Api.StackGraph
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
                      , Semantic.Api.TOCSummaries
@@ -243,7 +241,6 @@ library
                      , Semantic.Telemetry.Error
                      , Semantic.Telemetry.Log
                      , Semantic.Telemetry.Stat
-                     , Semantic.Timeout
                      , Semantic.Util
                      , Semantic.Util.Pretty
                      , Semantic.Version
@@ -260,7 +257,6 @@ library
                      , ansi-terminal >= 0.8.2 && <1
                      , array ^>= 0.5.3.0
                      , attoparsec ^>= 0.13.2.2
-                     , cmark-gfm == 0.1.8
                      , deepseq ^>= 1.4.4.0
                      , directory-tree ^>= 0.12.1
                      , filepath ^>= 1.4.2.1

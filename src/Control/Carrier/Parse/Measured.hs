@@ -11,7 +11,7 @@ module Control.Carrier.Parse.Measured
 ( -- * Parse carrier
   ParseC(..)
   -- * Exceptions
-, ParserCancelled(..)
+, AssignmentTimedOut(..)
   -- * Parse effect
 , module Control.Effect.Parse
 ) where
@@ -19,8 +19,10 @@ module Control.Carrier.Parse.Measured
 import qualified Assigning.Assignment as Assignment
 import           Control.Algebra
 import           Control.Effect.Error
+import           Control.Effect.Lift
 import           Control.Effect.Parse
 import           Control.Effect.Reader
+import           Control.Effect.Timeout
 import           Control.Effect.Trace
 import           Control.Exception
 import           Control.Monad
@@ -30,13 +32,11 @@ import qualified Data.Error as Error
 import qualified Data.Flag as Flag
 import           Data.Foldable
 import qualified Data.Syntax as Syntax
-import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Semantic.Config
 import           Semantic.Task (TaskSession (..))
 import           Semantic.Telemetry
-import           Semantic.Timeout
 import           Source.Source (Source)
 
 newtype ParseC m a = ParseC { runParse :: m a }
@@ -45,8 +45,8 @@ newtype ParseC m a = ParseC { runParse :: m a }
 instance ( Has (Error SomeException) sig m
          , Has (Reader TaskSession) sig m
          , Has Telemetry sig m
-         , Has Timeout sig m
          , Has Trace sig m
+         , Has (Lift IO) sig m
          , MonadIO m
          )
       => Algebra (Parse :+: sig) (ParseC m) where
@@ -54,10 +54,17 @@ instance ( Has (Error SomeException) sig m
   alg (R other)                 = ParseC (alg (handleCoercible other))
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Has (Error SomeException) sig m, Has (Reader TaskSession) sig m, Has Telemetry sig m, Has Timeout sig m, Has Trace sig m, MonadIO m)
-          => Blob
-          -> Parser term
-          -> m term
+runParser ::
+  ( Has (Error SomeException) sig m
+  , Has (Reader TaskSession) sig m
+  , Has Telemetry sig m
+  , Has (Lift IO) sig m
+  , Has Trace sig m
+  , MonadIO m
+  )
+  => Blob
+  -> Parser term
+  -> m term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
@@ -71,10 +78,6 @@ runParser blob@Blob{..} parser = case parser of
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
 
-  MarkdownParser ->
-    time "parse.cmark_parse" languageTag $
-      let term = cmarkParser blobSource
-      in length term `seq` pure term
   where
     languageTag = [("language" :: String, show (blobLanguage blob))]
     executeParserAction act = do
@@ -83,10 +86,10 @@ runParser blob@Blob{..} parser = case parser of
       when shouldFailFlag (throwError (SomeException AssignmentTimedOut))
       act >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
-data ParserCancelled = ParserTimedOut | AssignmentTimedOut
-  deriving (Show)
+data AssignmentTimedOut = AssignmentTimedOut deriving (Show)
 
-instance Exception ParserCancelled
+instance Exception AssignmentTimedOut
+
 
 
 runAssignment
@@ -95,8 +98,8 @@ runAssignment
      , Has (Error SomeException) sig m
      , Has (Reader TaskSession) sig m
      , Has Telemetry sig m
-     , Has Timeout sig m
      , Has Trace sig m
+     , Has (Lift IO) sig m
      , MonadIO m
      )
   => (Source -> assignment (term Assignment.Loc) -> ast -> Either (Error.Error String) (term Assignment.Loc))
@@ -109,7 +112,7 @@ runAssignment assign parser blob@Blob{..} assignment = do
   let requestID' = ("github_request_id", requestID taskSession)
   let isPublic'  = ("github_is_public", show (isPublic taskSession))
   let logPrintFlag = configLogPrintSource . config $ taskSession
-  let blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobPath blob else "<filtered>")
+  let blobFields = ("path", if isPublic taskSession || Flag.toBool LogPrintSource logPrintFlag then blobFilePath blob else "<filtered>")
   let logFields = requestID' : isPublic' : blobFields : languageTag
   let shouldFailForTesting = configFailParsingForTesting $ config taskSession
   let shouldFailOnParsing = optionsFailOnParseError . configOptions $ config taskSession

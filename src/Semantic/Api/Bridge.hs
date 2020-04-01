@@ -18,7 +18,7 @@ import           Data.ProtoLens (defMessage)
 import qualified Data.Text as T
 import           Data.Text.Lens
 import qualified Proto.Semantic as API
-import           Proto.Semantic_Fields as P
+import           Proto.Semantic_Fields as P hiding (to)
 import qualified Semantic.Api.LegacyTypes as Legacy
 import qualified Source.Source as Source (fromText, toText, totalSpan)
 import qualified Source.Span as Source
@@ -81,7 +81,7 @@ instance APIBridge API.Blob Data.Blob where
     blobToApiBlob b
       = defMessage
       & P.content .~ Source.toText (Data.blobSource b)
-      & P.path .~ T.pack (Data.blobPath b)
+      & P.path .~ T.pack (Data.blobFilePath b)
       & P.language .~ (bridging # Data.blobLanguage b)
     apiBlobToBlob blob =
       let src = blob^.content.to Source.fromText

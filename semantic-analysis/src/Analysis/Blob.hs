@@ -4,6 +4,7 @@ module Analysis.Blob
   , fromSource
   , blobLanguage
   , blobPath
+  , blobFilePath
   , nullBlob
   ) where
 
@@ -38,8 +39,12 @@ fromSource filepath language source
 blobLanguage :: Blob -> Language
 blobLanguage = Analysis.File.fileBody . blobFile
 
-blobPath :: Blob -> FilePath
-blobPath = Path.toString . Analysis.File.filePath . blobFile
+blobPath :: Blob -> Path.AbsRelFile
+blobPath = Analysis.File.filePath . blobFile
+
+-- | Show FilePath for error or json outputs.
+blobFilePath :: Blob -> String
+blobFilePath = Path.toString . blobPath
 
 nullBlob :: Blob -> Bool
 nullBlob = Source.null . blobSource

@@ -33,7 +33,6 @@ import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Maybe
 import           Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
-import           Data.Semilattice.Lower
 import           Data.Traversable
 import           GHC.Records
 import           GHC.TypeLits
@@ -42,7 +41,7 @@ import           Language.Python.Patterns
 import           Scope.Graph.Convert (Result (..), complete, todo)
 import           Scope.Types
 import           Source.Loc (Loc)
-import           Source.Span (Span, span_)
+import           Source.Span (Span, Pos (..), span_, point)
 
 -- This typeclass is internal-only, though it shares the same interface
 -- as the one defined in semantic-scope-graph. The somewhat-unconventional
@@ -197,7 +196,7 @@ instance ToScopeGraph Py.FunctionDefinition where
             { Props.kind = ScopeGraph.Parameter
             , Props.relation = ScopeGraph.Default
             , Props.associatedScope = Nothing
-            , Props.span = lowerBound
+            , Props.span = point (Pos 0 0)
             }
       let param (Py.Parameter (Prj (Py.Identifier pann pname))) = Just (pann, Name.name pname)
           param _                                               = Nothing

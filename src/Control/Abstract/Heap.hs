@@ -77,7 +77,7 @@ import           Data.Semilattice.Lower
 import           Data.Set (Set)
 import           GHC.Generics (Generic1)
 import           GHC.Stack
-import           Source.Span (Span)
+import           Source.Span (Pos (..), Span, point)
 
 
 -- | Evaluates an action locally the scope and frame of the given frame address.
@@ -191,7 +191,7 @@ define :: ( HasCallStack
        -> Evaluator term address value m ()
 define declaration rel accessControl def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  declare declaration rel accessControl lowerBound Unknown Nothing
+  declare declaration rel accessControl (point (Pos 1 1)) Unknown Nothing
   slot <- lookupSlot declaration
   value <- def
   assign slot value

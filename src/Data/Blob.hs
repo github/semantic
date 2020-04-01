@@ -32,12 +32,12 @@ import           Data.Bifunctor
 import qualified Data.ByteString.Lazy as BL
 import           Data.Edit
 import           Data.JSON.Fields
-import           Data.Maybe
 import           Data.Maybe.Exts
 import           Data.Module
+import           Data.List  (stripPrefix)
 import           GHC.Generics (Generic)
 import           Source.Language as Language
-import qualified System.FilePath as FP
+import qualified System.Path     as Path
 
 
 newtype Blobs a = Blobs { blobs :: [a] }
@@ -47,10 +47,10 @@ decodeBlobs :: BL.ByteString -> Either String [Blob]
 decodeBlobs = fmap blobs <$> eitherDecode
 
 -- | An exception indicating that we’ve tried to diff or parse a blob of unknown language.
-newtype NoLanguageForBlob = NoLanguageForBlob FilePath
+newtype NoLanguageForBlob = NoLanguageForBlob Path.AbsRelFile
   deriving (Eq, Exception, Ord, Show)
 
-noLanguageForBlob :: Has (Error SomeException) sig m => FilePath -> m a
+noLanguageForBlob :: Has (Error SomeException) sig m => Path.AbsRelFile -> m a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
 
 -- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
@@ -59,8 +59,16 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> term             -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir b = Module info
-  where root = fromMaybe (FP.takeDirectory (blobPath b)) rootDir
-        info = ModuleInfo (FP.makeRelative root (blobPath b)) (languageToText (blobLanguage b)) mempty
+  where root = maybe (Path.takeDirectory $ blobPath b) Path.absRel rootDir
+        info = ModuleInfo (dropRelative root (blobPath b)) (languageToText (blobLanguage b)) mempty
+
+dropRelative :: Path.AbsRelDir -> Path.AbsRelFile -> Path.AbsRelFile
+dropRelative a' b' = case as `stripPrefix` bs of
+     Just rs | ra == rb -> Path.toAbsRel $ (foldl (Path.</>) Path.currentDir rs) Path.</> bf
+     _ -> b'
+  where (ra, as, _) = Path.splitPath $ Path.normalise a'
+        (rb, bs, _) = Path.splitPath $ Path.normalise $ Path.takeDirectory b'
+        bf = Path.takeFileName b'
 
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
@@ -80,7 +88,7 @@ languageForBlobPair = mergeEdit combine . bimap blobLanguage blobLanguage where
     | a == Unknown || b == Unknown = Unknown
     | otherwise                    = b
 
-pathForBlobPair :: BlobPair -> FilePath
+pathForBlobPair :: BlobPair -> Path.AbsRelFile
 pathForBlobPair = blobPath . mergeEdit (const id)
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
@@ -88,12 +96,12 @@ languageTagForBlobPair pair = showLanguage (languageForBlobPair pair)
   where showLanguage = pure . (,) "language" . show
 
 pathKeyForBlobPair :: BlobPair -> FilePath
-pathKeyForBlobPair = mergeEdit combine . bimap blobPath blobPath where
+pathKeyForBlobPair = mergeEdit combine . bimap blobFilePath blobFilePath where
    combine before after | before == after = after
                         | otherwise       = before <> " -> " <> after
 
 instance ToJSONFields Blob where
-  toJSONFields p = [ "path" .= blobPath p, "language" .= blobLanguage p]
+  toJSONFields p = [ "path" .=  blobFilePath p, "language" .= blobLanguage p]
 
 decodeBlobPairs :: BL.ByteString -> Either String [BlobPair]
 decodeBlobPairs = fmap blobs <$> eitherDecode

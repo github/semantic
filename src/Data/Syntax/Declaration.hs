@@ -18,7 +18,6 @@ import           Data.Functor.Classes.Generic
 import           Data.Hashable.Lifted
 import qualified Data.Map.Strict as Map
 import           Data.Maybe.Exts
-import           Data.Semilattice.Lower
 import qualified Data.Set as Set
 import           Data.Traversable
 import           GHC.Generics (Generic1)
@@ -106,7 +105,7 @@ instance Evaluatable Method where
 
     params <- withScope associatedScope $ do
       -- TODO: Should we give `self` a special Relation?
-      declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public lowerBound ScopeGraph.Unknown Nothing
+      declare (Declaration __self) ScopeGraph.Prelude ScopeGraph.Public (point (Pos 1 1)) ScopeGraph.Unknown Nothing
       for methodParameters $ \paramNode -> declareMaybeName (declaredName paramNode) Default ScopeGraph.Public (paramNode^.span_) ScopeGraph.Parameter Nothing
 
     addr <- lookupSlot (Declaration name)

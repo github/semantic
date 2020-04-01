@@ -38,11 +38,11 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
+import           Language.Python.Grammar as Grammar
 import           Language.Python.Syntax as Python.Syntax
 import           Language.Python.Term as Python
-import           Language.Python.Grammar as Grammar
 
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = Assignment.Assignment Grammar
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment (Term Loc)
