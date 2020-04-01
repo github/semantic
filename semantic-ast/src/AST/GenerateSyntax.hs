@@ -139,7 +139,7 @@ debugPrefix (name, Anonymous) = "_" <> name
 
 -- | Build Q Constructor for product types (nodes with fields)
 ctorForProductType :: DatatypeName -> Name -> Name -> Maybe Children -> [(String, Field)] -> Q Con
-ctorForProductType constructorName extraTypeParameterName typeParameterName children fields = ctorForTypes constructorName lists where
+ctorForProductType constructorName typeParameterName extraTypeParameterName children fields = ctorForTypes constructorName lists where
   lists = annotation : fieldList <> childList
   annotation = ("ann", varT typeParameterName)
   fieldList = map (fmap toType) fields
