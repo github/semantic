@@ -113,8 +113,8 @@ makeTraversalInstances ty =
     traverse = traverseDefault1
   |]
 
-makeHasFieldInstance :: TypeQ -> TypeQ -> ExpQ -> Q [Dec]
-makeHasFieldInstance ty param elim =
+makeHasFieldInstance :: TypeQ -> ExpQ -> Q [Dec]
+makeHasFieldInstance ty elim =
   [d|instance HasField "ann" ($ty f a) a where
       getField = TS.gann . $elim |]
 
