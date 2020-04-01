@@ -115,7 +115,7 @@ makeTraversalInstances ty _unused =
 
 makeHasFieldInstance :: TypeQ -> TypeQ -> ExpQ -> Q [Dec]
 makeHasFieldInstance ty param elim =
-  [d|instance HasField "ann" $(ty `appT` param) $param where
+  [d|instance HasField "ann" ($ty f a) a where
       getField = TS.gann . $elim |]
 
 -- | Create TH-generated SymbolMatching instances for sums, products, leaves
