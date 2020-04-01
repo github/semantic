@@ -172,7 +172,7 @@ ctorForTypes (DatatypeName constructorName) types = recC (toName Named construct
 fieldTypesToNestedSum :: Name -> NonEmpty AST.Deserialize.Type -> Q TH.Type
 fieldTypesToNestedSum shapeParameterName xs = go (toList xs)
   where
-    combine lhs rhs = infixT lhs ''(:+:) rhs -- (((((a :+: b) :+: c) :+: d)) :+: e)   ((a :+: b) :+: (c :+: d))
+    combine lhs rhs = uInfixT lhs ''(:+:) rhs -- (((((a :+: b) :+: c) :+: d)) :+: e)   ((a :+: b) :+: (c :+: d))
     convertToQType (MkType (DatatypeName n) named) = conT (toName named n) `appT` (varT shapeParameterName)
     go [x] = convertToQType x
     go xs  = let (l,r) = splitAt (length xs `div` 2) xs in combine (go l) (go r)
