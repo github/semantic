@@ -66,34 +66,34 @@ getAllSymbols language = do
 syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
   shapeFunctorKind <- [t| * -> * |]
-  let extraTypeParameterName = mkName "f"
-  let typeParameterName      = mkName "a"
+  let shapeParameterName = mkName "f"
+  let annParameterName   = mkName "a"
   let traversalInstances = makeTraversalInstances (conT name)
       glue a b c = a : b <> c
       name = mkName nameStr
-      generatedDatatype cons = dataD (cxt []) name [kindedTV extraTypeParameterName shapeFunctorKind, plainTV typeParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
+      generatedDatatype cons = dataD (cxt []) name [kindedTV shapeParameterName shapeFunctorKind, plainTV annParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
       deriveStockClause = derivClause (Just StockStrategy) [ conT ''Eq, conT ''Ord, conT ''Show, conT ''Generic, conT ''Generic1]
       deriveAnyClassClause = derivClause (Just AnyclassStrategy) [conT ''TS.Unmarshal, conT ''Traversable1 `appT` varT (mkName "someConstraint")]
       deriveGN = derivClause (Just NewtypeStrategy) [conT ''TS.SymbolMatching]
   case datatype of
     SumType (DatatypeName _) _ subtypes ->
-      let types' = fieldTypesToNestedSum extraTypeParameterName subtypes
+      let types' = fieldTypesToNestedSum shapeParameterName subtypes
           fieldName = mkName ("get" <> nameStr)
-          con = recC name [varBangType fieldName (bangType strictness (types' `appT` varT typeParameterName))]
+          con = recC name [varBangType fieldName (bangType strictness (types' `appT` varT annParameterName))]
           hasFieldInstance = makeHasFieldInstance (conT name) (varE fieldName)
-          newType = newtypeD (cxt []) name [plainTV extraTypeParameterName, plainTV typeParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
+          newType = newtypeD (cxt []) name [plainTV shapeParameterName, plainTV annParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
       in glue <$> newType <*> hasFieldInstance <*> traversalInstances
     ProductType datatypeName named children fields ->
-      let con = ctorForProductType datatypeName typeParameterName extraTypeParameterName children fields
-          symbols = symbolMatchingInstance allSymbols extraTypeParameterName name named datatypeName
+      let con = ctorForProductType datatypeName annParameterName shapeParameterName children fields
+          symbols = symbolMatchingInstance allSymbols shapeParameterName name named datatypeName
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
       let tsSymbol = runIO $ withCStringLen datatypeName (\(s, len) -> TS.ts_language_symbol_for_name language s len False)
       fmap (pure @[]) (tySynD name [] (conT ''Token `appT` litT (strTyLit datatypeName) `appT` litT (tsSymbol >>= numTyLit . fromIntegral)))
     LeafType datatypeName Named ->
-      let con = ctorForLeafType datatypeName typeParameterName
-          symbols = symbolMatchingInstance allSymbols extraTypeParameterName name Named datatypeName
+      let con = ctorForLeafType datatypeName annParameterName
+          symbols = symbolMatchingInstance allSymbols shapeParameterName name Named datatypeName
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
@@ -121,10 +121,10 @@ makeHasFieldInstance ty elim =
 
 -- | Create TH-generated SymbolMatching instances for sums, products, leaves
 symbolMatchingInstance :: [(String, Named)] -> Name -> Name -> Named -> DatatypeName -> Q [Dec]
-symbolMatchingInstance allSymbols extraTypeParameterName name named (DatatypeName str) = do
+symbolMatchingInstance allSymbols shapeParameterName name named (DatatypeName str) = do
   let tsSymbols = elemIndices (str, named) allSymbols
       names = intercalate ", " $ fmap (debugPrefix . (!!) allSymbols) tsSymbols
-  [d|instance TS.SymbolMatching ($(conT name) $(varT extraTypeParameterName)) where
+  [d|instance TS.SymbolMatching ($(conT name) $(varT shapeParameterName)) where
       matchedSymbols _   = tsSymbols
       showFailure _ node = "expected " <> $(litE (stringL names))
                         <> " but got " <> if nodeSymbol node == 65535 then "ERROR" else genericIndex debugSymbolNames (nodeSymbol node)
@@ -140,13 +140,13 @@ debugPrefix (name, Anonymous) = "_" <> name
 
 -- | Build Q Constructor for product types (nodes with fields)
 ctorForProductType :: DatatypeName -> Name -> Name -> Maybe Children -> [(String, Field)] -> Q Con
-ctorForProductType constructorName typeParameterName extraTypeParameterName children fields = ctorForTypes constructorName lists where
+ctorForProductType constructorName annParameterName shapeParameterName children fields = ctorForTypes constructorName lists where
   lists = annotation : fieldList <> childList
-  annotation = ("ann", varT typeParameterName)
+  annotation = ("ann", varT annParameterName)
   fieldList = map (fmap toType) fields
   childList = toList $ fmap toTypeChild children
   toType (MkField required fieldTypes mult) =
-    let ftypes = fieldTypesToNestedSum extraTypeParameterName fieldTypes `appT` varT typeParameterName
+    let ftypes = fieldTypesToNestedSum shapeParameterName fieldTypes `appT` varT annParameterName
     in case (required, mult) of
       (Required, Multiple) -> appT (conT ''NonEmpty) ftypes
       (Required, Single)   -> ftypes
@@ -156,8 +156,8 @@ ctorForProductType constructorName typeParameterName extraTypeParameterName chil
 
 -- | Build Q Constructor for leaf types (nodes with no fields or subtypes)
 ctorForLeafType :: DatatypeName -> Name -> Q Con
-ctorForLeafType name typeParameterName = ctorForTypes name
-  [ ("ann",  varT typeParameterName) -- ann :: a
+ctorForLeafType name annParameterName = ctorForTypes name
+  [ ("ann",  varT annParameterName) -- ann :: a
   , ("text", conT ''Text)            -- text :: Text
   ]
 
@@ -170,10 +170,10 @@ ctorForTypes (DatatypeName constructorName) types = recC (toName Named construct
 
 -- | Convert field types to Q types
 fieldTypesToNestedSum :: Name -> NonEmpty AST.Deserialize.Type -> Q TH.Type
-fieldTypesToNestedSum extraTypeParameterName xs = go (toList xs)
+fieldTypesToNestedSum shapeParameterName xs = go (toList xs)
   where
     combine lhs rhs = infixT lhs ''(:+:) rhs -- (((((a :+: b) :+: c) :+: d)) :+: e)   ((a :+: b) :+: (c :+: d))
-    convertToQType (MkType (DatatypeName n) named) = conT (toName named n) `appT` (varT extraTypeParameterName)
+    convertToQType (MkType (DatatypeName n) named) = conT (toName named n) `appT` (varT shapeParameterName)
     go [x] = convertToQType x
     go xs  = let (l,r) = splitAt (length xs `div` 2) xs in combine (go l) (go r)
 
