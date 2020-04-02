@@ -111,10 +111,9 @@ makeStandaloneDerivings :: TypeQ -> Q [Dec]
 makeStandaloneDerivings ty =
   [d|
    deriving instance ((forall x . Eq x => Eq (f x)), Eq a) => Eq ($ty f a)
-   -- Why does this cause type errors? Is this a GHC bug?
-   -- deriving instance ((forall x . Ord x => Ord (f x)), Ord a) => Ord ($ty f a)
+   deriving instance ((forall x . Ord x => Ord (f x)), (forall x . Eq x => Eq (f x)), Ord a) => Ord ($ty f a)
    deriving instance ((forall x . Show x => Show (f x)), Show a) => Show ($ty f a)
-   deriving instance TS.Unmarshal f => TS.Unmarshal ($ty f)
+   --deriving instance TS.Unmarshal f => TS.Unmarshal ($ty f)
 
    |]
 
@@ -139,7 +138,7 @@ symbolMatchingInstance :: [(String, Named)] -> Name -> Named -> DatatypeName -> 
 symbolMatchingInstance allSymbols name named (DatatypeName str) = do
   let tsSymbols = elemIndices (str, named) allSymbols
       names = intercalate ", " $ fmap (debugPrefix . (!!) allSymbols) tsSymbols
-  [d|instance TS.Unmarshal $(varT shapeParameterName) => TS.SymbolMatching ($(conT name) $(varT shapeParameterName)) where
+  [d|instance TS.SymbolMatching ($(conT name) $(varT shapeParameterName)) where
       matchedSymbols _   = tsSymbols
       showFailure _ node = "expected " <> $(litE (stringL names))
                         <> " but got " <> if nodeSymbol node == 65535 then "ERROR" else genericIndex debugSymbolNames (nodeSymbol node)
