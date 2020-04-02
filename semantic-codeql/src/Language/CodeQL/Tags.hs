@@ -112,7 +112,7 @@ instance ToTags CodeQL.QualifiedRhs where
     { ann = loc@Loc { byteRange }
     , name = expr
     } = case expr of
-          Just (Prj t@CodeQL.PredicateName { text }) -> yieldTag text Call loc byteRange >> gtags t
+          Just (Prj CodeQL.PredicateName { text }) -> yieldTag text Call loc byteRange >> gtags t
           _                                          -> gtags t
 
 instance ToTags CodeQL.HigherOrderTerm
