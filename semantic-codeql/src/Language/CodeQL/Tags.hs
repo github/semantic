@@ -100,12 +100,6 @@ instance ToTags CodeQL.DatatypeBranch where
     , name = CodeQL.ClassName { text }
     } = yieldTag text Class loc byteRange >> gtags t
 
-instance ToTags CodeQL.HigherOrderTerm where
-  tags t@CodeQL.HigherOrderTerm
-    { ann = loc@Loc { byteRange }
-    , name = CodeQL.LiteralId { text }
-    } = yieldTag text Call loc byteRange >> gtags t
-
 instance ToTags CodeQL.ClasslessPredicateCall where
   tags CodeQL.ClasslessPredicateCall
     { extraChildren
@@ -113,6 +107,7 @@ instance ToTags CodeQL.ClasslessPredicateCall where
           Prj t@CodeQL.AritylessPredicateExpr {} -> tags t
           _                                      -> pure ()
 
+instance ToTags CodeQL.HigherOrderTerm
 instance ToTags CodeQL.AddExpr
 instance ToTags CodeQL.Any
 instance ToTags CodeQL.ExprAggregateBody
