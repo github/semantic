@@ -78,7 +78,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       name = mkName nameStr
       generatedDatatype cons = dataD (cxt []) name [kindedTV shapeParameterName shapeFunctorKind, plainTV annParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
       deriveStockClause = derivClause (Just StockStrategy) [conT ''Generic, conT ''Generic1]
-      deriveAnyClassClause = derivClause (Just AnyclassStrategy) [conT ''TS.Unmarshal, conT ''Traversable1 `appT` varT (mkName "someConstraint")]
+      deriveAnyClassClause = derivClause (Just AnyclassStrategy) [conT ''Traversable1 `appT` varT (mkName "someConstraint")]
       deriveGN = derivClause (Just NewtypeStrategy) [conT ''TS.SymbolMatching]
   case datatype of
     SumType (DatatypeName _) _ subtypes ->
@@ -114,6 +114,7 @@ makeStandaloneDerivings ty =
    -- Why does this cause type errors? Is this a GHC bug?
    -- deriving instance ((forall x . Ord x => Ord (f x)), Ord a) => Ord ($ty f a)
    deriving instance ((forall x . Show x => Show (f x)), Show a) => Show ($ty f a)
+   deriving instance TS.Unmarshal f => TS.Unmarshal ($ty f)
 
    |]
 
