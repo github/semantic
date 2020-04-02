@@ -115,6 +115,14 @@ instance ToTags CodeQL.QualifiedRhs where
           Just (Prj t@CodeQL.PredicateName { text }) -> yieldTag text Call loc byteRange >> gtags t
           _                                          -> gtags t
 
+instance ToTags CodeQL.TypeExpr where
+  tags t@CodeQL.TypeExpr
+    { ann = loc@Loc { byteRange }
+    , name = expr
+    } = case expr of
+          Just (Prj CodeQL.ClassName { text }) -> yieldTag text Type loc byteRange >> gtags t
+          _                                    -> gtags t
+
 instance ToTags CodeQL.HigherOrderTerm
 instance ToTags CodeQL.AddExpr
 instance ToTags CodeQL.Any
@@ -164,7 +172,6 @@ instance ToTags CodeQL.OrderBys
 instance ToTags CodeQL.TypeAliasBody
 instance ToTags CodeQL.Charpred
 instance ToTags CodeQL.ParExpr
-instance ToTags CodeQL.TypeExpr
 instance ToTags CodeQL.IfTerm
 instance ToTags CodeQL.Plus
 instance ToTags CodeQL.TypeLiteral
