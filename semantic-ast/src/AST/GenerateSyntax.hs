@@ -1,3 +1,5 @@
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
@@ -9,7 +11,8 @@ module AST.GenerateSyntax
 , astDeclarationsForLanguage
 ) where
 
-import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
+import           AST.Deserialize
+    (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
 import           AST.Token
 import           AST.Traversable1.Class
 import qualified AST.Unmarshal as TS
@@ -62,17 +65,19 @@ getAllSymbols language = do
       let named = if t == 0 then Named else Anonymous
       pure (n, named)
 
+shapeParameterName, annParameterName :: Name
+shapeParameterName = mkName "f"
+annParameterName = mkName "a"
+
 -- Auto-generate Haskell datatypes for sums, products and leaf types
 syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
 syntaxDatatype language allSymbols datatype = skipDefined $ do
   shapeFunctorKind <- [t| * -> * |]
-  let shapeParameterName = mkName "f"
-  let annParameterName   = mkName "a"
-  let traversalInstances = makeTraversalInstances (conT name)
+  let traversalInstances = mappend <$> makeStandaloneDerivings (conT name) <*> makeTraversalInstances (conT name)
       glue a b c = a : b <> c
       name = mkName nameStr
       generatedDatatype cons = dataD (cxt []) name [kindedTV shapeParameterName shapeFunctorKind, plainTV annParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
-      deriveStockClause = derivClause (Just StockStrategy) [ conT ''Eq, conT ''Ord, conT ''Show, conT ''Generic, conT ''Generic1]
+      deriveStockClause = derivClause (Just StockStrategy) [conT ''Generic, conT ''Generic1]
       deriveAnyClassClause = derivClause (Just AnyclassStrategy) [conT ''TS.Unmarshal, conT ''Traversable1 `appT` varT (mkName "someConstraint")]
       deriveGN = derivClause (Just NewtypeStrategy) [conT ''TS.SymbolMatching]
   case datatype of
@@ -84,8 +89,8 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
           newType = newtypeD (cxt []) name [plainTV shapeParameterName, plainTV annParameterName] Nothing con [deriveGN, deriveStockClause, deriveAnyClassClause]
       in glue <$> newType <*> hasFieldInstance <*> traversalInstances
     ProductType datatypeName named children fields ->
-      let con = ctorForProductType datatypeName annParameterName shapeParameterName children fields
-          symbols = symbolMatchingInstance allSymbols shapeParameterName name named datatypeName
+      let con = ctorForProductType datatypeName children fields
+          symbols = symbolMatchingInstance allSymbols name named datatypeName
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
       -- Anonymous leaf types are defined as synonyms for the `Token` datatype
     LeafType (DatatypeName datatypeName) Anonymous -> do
@@ -93,7 +98,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       fmap (pure @[]) (tySynD name [] (conT ''Token `appT` litT (strTyLit datatypeName) `appT` litT (tsSymbol >>= numTyLit . fromIntegral)))
     LeafType datatypeName Named ->
       let con = ctorForLeafType datatypeName annParameterName
-          symbols = symbolMatchingInstance allSymbols shapeParameterName name Named datatypeName
+          symbols = symbolMatchingInstance allSymbols name Named datatypeName
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
@@ -102,15 +107,24 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       if isLocal then pure [] else m
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
 
+makeStandaloneDerivings :: TypeQ -> Q [Dec]
+makeStandaloneDerivings ty =
+  [d|
+   deriving instance ((forall x . Eq x => Eq (f x)), Eq a) => Eq ($ty f a)
+   -- Why does this cause type errors? Is this a GHC bug?
+   -- deriving instance ((forall x . Ord x => Ord (f x)), Ord a) => Ord ($ty f a)
+   deriving instance ((forall x . Show x => Show (f x)), Show a) => Show ($ty f a)
+
+   |]
 
 makeTraversalInstances :: TypeQ -> Q [Dec]
 makeTraversalInstances ty =
   [d|
-  instance Foldable ($ty f) where
+  instance Traversable f => Foldable ($ty f) where
     foldMap = foldMapDefault1
-  instance Functor ($ty f) where
+  instance Traversable f => Functor ($ty f) where
     fmap = fmapDefault1
-  instance Traversable ($ty f) where
+  instance Traversable f => Traversable ($ty f) where
     traverse = traverseDefault1
   |]
 
@@ -120,11 +134,11 @@ makeHasFieldInstance ty elim =
       getField = TS.gann . $elim |]
 
 -- | Create TH-generated SymbolMatching instances for sums, products, leaves
-symbolMatchingInstance :: [(String, Named)] -> Name -> Name -> Named -> DatatypeName -> Q [Dec]
-symbolMatchingInstance allSymbols shapeParameterName name named (DatatypeName str) = do
+symbolMatchingInstance :: [(String, Named)] -> Name -> Named -> DatatypeName -> Q [Dec]
+symbolMatchingInstance allSymbols name named (DatatypeName str) = do
   let tsSymbols = elemIndices (str, named) allSymbols
       names = intercalate ", " $ fmap (debugPrefix . (!!) allSymbols) tsSymbols
-  [d|instance TS.SymbolMatching ($(conT name) $(varT shapeParameterName)) where
+  [d|instance TS.Unmarshal $(varT shapeParameterName) => TS.SymbolMatching ($(conT name) $(varT shapeParameterName)) where
       matchedSymbols _   = tsSymbols
       showFailure _ node = "expected " <> $(litE (stringL names))
                         <> " but got " <> if nodeSymbol node == 65535 then "ERROR" else genericIndex debugSymbolNames (nodeSymbol node)
@@ -139,19 +153,24 @@ debugPrefix (name, Named)     = name
 debugPrefix (name, Anonymous) = "_" <> name
 
 -- | Build Q Constructor for product types (nodes with fields)
-ctorForProductType :: DatatypeName -> Name -> Name -> Maybe Children -> [(String, Field)] -> Q Con
-ctorForProductType constructorName annParameterName shapeParameterName children fields = ctorForTypes constructorName lists where
+ctorForProductType :: DatatypeName -> Maybe Children -> [(String, Field)] -> Q Con
+ctorForProductType constructorName children fields = ctorForTypes constructorName lists where
   lists = annotation : fieldList <> childList
   annotation = ("ann", varT annParameterName)
-  fieldList = map (fmap toType) fields
+  fieldList = map (fmap (toType)) fields
   childList = toList $ fmap toTypeChild children
+
+  inject t = varT shapeParameterName `appT` t
+
+  toType :: Field -> TypeQ
   toType (MkField required fieldTypes mult) =
-    let ftypes = fieldTypesToNestedSum shapeParameterName fieldTypes `appT` varT annParameterName
+    let ftypes = inject (fieldTypesToNestedSum shapeParameterName fieldTypes `appT` varT annParameterName)
     in case (required, mult) of
       (Required, Multiple) -> appT (conT ''NonEmpty) ftypes
       (Required, Single)   -> ftypes
       (Optional, Multiple) -> appT listT ftypes
       (Optional, Single)   -> appT (conT ''Maybe) ftypes
+
   toTypeChild (MkChildren field) = ("extra_children", toType field)
 
 -- | Build Q Constructor for leaf types (nodes with no fields or subtypes)
@@ -161,11 +180,16 @@ ctorForLeafType name annParameterName = ctorForTypes name
   , ("text", conT ''Text)            -- text :: Text
   ]
 
+-- TODO: clarify the paths in ctorForProductType, ctorForLeafType, and ctorForTypes,
+-- inserting an appropriate (''f `appT`) thing
+
 -- | Build Q Constructor for records
 ctorForTypes :: DatatypeName -> [(String, Q TH.Type)] -> Q Con
-ctorForTypes (DatatypeName constructorName) types = recC (toName Named constructorName) recordFields where
-  recordFields = map (uncurry toVarBangType) types
-  toVarBangType str type' = TH.varBangType (mkName . toHaskellCamelCaseIdentifier $ str) (TH.bangType strictness type')
+ctorForTypes (DatatypeName constructorName) types = recC (toName Named constructorName) recordFields
+  where
+    recordFields = map (uncurry toVarBangType) types
+    toVarBangType str type' = TH.varBangType (mkName . toHaskellCamelCaseIdentifier $ str) (TH.bangType strictness type')
+
 
 
 -- | Convert field types to Q types
