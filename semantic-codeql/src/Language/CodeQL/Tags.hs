@@ -107,6 +107,14 @@ instance ToTags CodeQL.ClasslessPredicateCall where
           Prj t@CodeQL.AritylessPredicateExpr {} -> tags t
           _                                      -> pure ()
 
+instance ToTags CodeQL.QualifiedRhs where
+  tags t@CodeQL.QualifiedRhs
+    { ann = loc@Loc { byteRange }
+    , name = expr
+    } = case expr of
+          Just (Prj t@CodeQL.PredicateName { text }) -> yieldTag text Call loc byteRange >> gtags t
+          _                                          -> gtags t
+
 instance ToTags CodeQL.HigherOrderTerm
 instance ToTags CodeQL.AddExpr
 instance ToTags CodeQL.Any
@@ -225,4 +233,3 @@ instance ToTags CodeQL.SpecialId
 instance ToTags CodeQL.Exists
 instance ToTags CodeQL.ModuleMember
 instance ToTags CodeQL.Star
-instance ToTags CodeQL.QualifiedRhs
