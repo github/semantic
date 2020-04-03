@@ -67,7 +67,7 @@ import           Data.Term as X
 import           Data.Traversable as X (for)
 import           Debug.Trace as X (traceM, traceShowM)
 import           Parsing.Parser as X
-import           Semantic.Api hiding (Blob, BlobPair, File)
+import           Semantic.Api hiding (Blob, File)
 import           Semantic.Config (Config (..), optionsLogLevel)
 import           Semantic.Graph (analysisParsers, runHeap, runScopeGraph)
 import           Semantic.Task as X

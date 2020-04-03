@@ -28,11 +28,6 @@ import qualified Data.ProtoLens.Runtime.Data.Vector as Data.Vector
 import qualified Data.ProtoLens.Runtime.Data.Vector.Generic as Data.Vector.Generic
 import qualified Data.ProtoLens.Runtime.Data.Vector.Unboxed as Data.Vector.Unboxed
 import qualified Data.ProtoLens.Runtime.Text.Read as Text.Read
-after ::
-  forall f s a.
-  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "after" a) =>
-  Lens.Family2.LensLike' f s a
-after = Data.ProtoLens.Field.field @"after"
 afterSpan ::
   forall f s a.
   (Prelude.Functor f,
@@ -45,11 +40,6 @@ afterTerm ::
    Data.ProtoLens.Field.HasField s "afterTerm" a) =>
   Lens.Family2.LensLike' f s a
 afterTerm = Data.ProtoLens.Field.field @"afterTerm"
-before ::
-  forall f s a.
-  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "before" a) =>
-  Lens.Family2.LensLike' f s a
-before = Data.ProtoLens.Field.field @"before"
 beforeSpan ::
   forall f s a.
   (Prelude.Functor f,
@@ -72,23 +62,6 @@ blobs ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "blobs" a) =>
   Lens.Family2.LensLike' f s a
 blobs = Data.ProtoLens.Field.field @"blobs"
-category ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "category" a) =>
-  Lens.Family2.LensLike' f s a
-category = Data.ProtoLens.Field.field @"category"
-changeType ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "changeType" a) =>
-  Lens.Family2.LensLike' f s a
-changeType = Data.ProtoLens.Field.field @"changeType"
-changes ::
-  forall f s a.
-  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "changes" a) =>
-  Lens.Family2.LensLike' f s a
-changes = Data.ProtoLens.Field.field @"changes"
 column ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "column" a) =>
@@ -196,24 +169,12 @@ line ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "line" a) =>
   Lens.Family2.LensLike' f s a
 line = Data.ProtoLens.Field.field @"line"
-maybe'after ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "maybe'after" a) =>
-  Lens.Family2.LensLike' f s a
-maybe'after = Data.ProtoLens.Field.field @"maybe'after"
 maybe'afterSpan ::
   forall f s a.
   (Prelude.Functor f,
    Data.ProtoLens.Field.HasField s "maybe'afterSpan" a) =>
   Lens.Family2.LensLike' f s a
 maybe'afterSpan = Data.ProtoLens.Field.field @"maybe'afterSpan"
-maybe'before ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "maybe'before" a) =>
-  Lens.Family2.LensLike' f s a
-maybe'before = Data.ProtoLens.Field.field @"maybe'before"
 maybe'beforeSpan ::
   forall f s a.
   (Prelude.Functor f,
@@ -392,12 +353,6 @@ vec'blobs ::
    Data.ProtoLens.Field.HasField s "vec'blobs" a) =>
   Lens.Family2.LensLike' f s a
 vec'blobs = Data.ProtoLens.Field.field @"vec'blobs"
-vec'changes ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "vec'changes" a) =>
-  Lens.Family2.LensLike' f s a
-vec'changes = Data.ProtoLens.Field.field @"vec'changes"
 vec'edges ::
   forall f s a.
   (Prelude.Functor f,

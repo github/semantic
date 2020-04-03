@@ -5,7 +5,7 @@ import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Reader
 import           Data.ByteString.Builder
 import           Data.Language
-import           Semantic.Api hiding (Blob, BlobPair, File)
+import           Semantic.Api hiding (Blob, File)
 import           Semantic.Task
 import           Serializing.Format
 import           System.IO.Unsafe
