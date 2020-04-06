@@ -80,7 +80,10 @@ data Edge = Edge
   { sourceNode :: Tagged Node
   , sinkNode   :: Tagged Node
   , label      :: Text
-  } deriving (Eq, Show, Ord)
+  } deriving (Show, Ord)
+
+instance Eq Edge where
+  Edge (a :# _) (b :# _) "" == Edge (c :# _) (d :# _) "" = a == c && b == d
 
 parseEdges :: Text -> [Edge]
 parseEdges = const []
@@ -179,16 +182,16 @@ completion _                                                                    
 
 isPartial :: Path -> Bool
 isPartial path = (case startingNode path of
-  (Root _ :# _) -> True
+  (Root _ :# _)          -> True
   (ExportedScope _ :# _) -> True
-  (Reference _ :# _) -> True
-  _ -> False)
+  (Reference _ :# _)     -> True
+  _                      -> False)
   && (case endingNode path of
-    (Root _ :# _) -> True
+    (Root _ :# _)          -> True
     (ExportedScope _ :# _) -> True
-    (JumpToScope _ :# _) -> True
-    (Declaration _ :# _) -> True
-    _ -> False)
+    (JumpToScope _ :# _)   -> True
+    (Declaration _ :# _)   -> True
+    _                      -> False)
 
 isIncomplete :: Path -> Bool
 isIncomplete path = completion path == Partial || isPartial path

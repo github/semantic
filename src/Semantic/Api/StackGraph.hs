@@ -17,19 +17,25 @@ import qualified Control.Carrier.Sketch.ScopeGraph as ScopeGraph
 import           Control.Effect.Error
 import           Control.Effect.Parse
 import           Control.Exception
-import           Control.Lens
+import           Control.Lens hiding ((|>))
+import           Control.Monad (when)
+import           Control.Monad.ST
 import           Data.Blob
 import           Data.Foldable
+import           Data.Functor.Tagged
 import           Data.Int
 import           Data.Language
 import           Data.Map.Strict (Map)
 import qualified Data.Maybe as Maybe
 import           Data.ProtoLens (defMessage)
 import           Data.Semilattice.Lower
+import           Data.Sequence ((|>))
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
+import           Data.STRef
 import           Data.Text (Text, pack)
 import           Data.Traversable
+import           Debug.Trace
 import           Debug.Trace
 import qualified Parsing.Parser as Parser
 import           Proto.Semantic as P hiding (Blob, BlobPair)
@@ -41,11 +47,6 @@ import           Semantic.Task
 import           Source.Loc as Loc
 import qualified Stack.Graph as Stack
 import qualified Stack.Path as Path
-import Data.Functor.Tagged
-import Control.Monad.ST
-import Data.STRef
-import Control.Monad (when)
-import Debug.Trace
 
 
 parseStackGraph :: ( Has (Error SomeException) sig m
@@ -157,11 +158,11 @@ graphForBlob blob = parseWith toStackGraphParsers (fmap fst . ScopeGraph.runSket
 stackGraphToTempStackGraph :: Stack.Graph Stack.Node -> TempStackGraph
 stackGraphToTempStackGraph graph = let
   nodes = Maybe.catMaybes $ toSGNode <$> Graph.vertexList (Stack.unGraph graph)
-  paths = toPaths graph
+  paths = traceShowId (toPaths graph)
   in TempStackGraph { scopeGraphNodes = nodes, scopeGraphPaths = paths }
 
 toSGNode :: Stack.Node -> Maybe SGNode
-toSGNode node = (traceShow node (case node of
+toSGNode node = (case node of
   Stack.Declaration s -> Just $ SGNode {
       nodeId = 1
     , nodeName = Name.formatName s
@@ -178,7 +179,7 @@ toSGNode node = (traceShow node (case node of
     , nodeSpan = lowerBound
     , Semantic.Api.StackGraph.nodeType = Reference
     }
-  node -> traceShow ("Ignoring Node in toSGNode: " <> show node) Nothing))
+  node -> Nothing)
 
 toPaths :: Stack.Graph Stack.Node -> [SGPath]
 toPaths graph = let
@@ -194,7 +195,6 @@ toPaths graph = let
 
 reducePaths' :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
 reducePaths' graph initialPaths = runST $ do
-  traceM "Initializing Refs"
   currentPathsRef <- newSTRef (toList initialPaths)
   pathsRef <- newSTRef []
   graphRef <- newSTRef (Stack.tagGraphUniquely graph)
@@ -203,30 +203,157 @@ reducePaths' graph initialPaths = runST $ do
   where
     go currentPathsRef pathsRef graphRef = do
       currentPaths <- readSTRef currentPathsRef
+      traceM ("currentPaths length:" <> show (length currentPaths))
       case currentPaths of
         [] -> do
           modifySTRef' currentPathsRef (const [])
           pure ()
         (currentPath : rest) -> do
-          traceM ("Popping off current path")
           modifySTRef' currentPathsRef (const rest)
 
           if (Path.completion currentPath == Path.Complete || Path.isPartial currentPath)
-          then traceM ("Current Path is complete:" <> show (Path.completion currentPath == Path.Complete) <> "partial:" <> show (Path.isPartial currentPath)) >> modifySTRef' pathsRef (currentPath :)
-          else do
-            traceM "Current Path is not complete or partial"
+          then do
+            traceM ("Current Path is complete:" <> show (Path.completion currentPath == Path.Complete) <> "partial:" <> show (Path.isPartial currentPath))
+            modifySTRef' pathsRef (currentPath :)
+          else
+            pure ()
+
+          do
+            traceM "Path is not complete and is not partial"
             graph <- readSTRef graphRef
             let nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode currentPath) (Stack.edgeSet graph)
+            traceM ("nextEdges length:" <> show (length nextEdges))
 
             for_ nextEdges $ \(a, b) -> do
-              if (Path.Edge a b "") `elem` (Path.edges currentPath)
-              then pure ()
+              if Maybe.isJust ((Path.Edge a b "") `Seq.elemIndexL` (Path.edges currentPath))
+              then do
+                traceM ("Ignoring edge:" <> show a <> show b)
+                pure ()
               else do
-                let newPath = currentPath { Path.edges = (Path.edges currentPath) Seq.|> (Path.Edge a b "") }
-                when (Path.validity newPath == Path.Valid) $ do
-                  modifySTRef' currentPathsRef (newPath :)
-              modifySTRef' graphRef (Stack.removeEdge a b)
+                let newPath = appendEdge currentPath (Path.Edge a b "")
+                case newPath of
+                  Just newPath -> do
+                    when (Path.validity newPath == Path.Valid) $ do
+                      modifySTRef' currentPathsRef (newPath :)
+                  Nothing -> pure ()
+
           go currentPathsRef pathsRef graphRef
+
+appendEdge :: Path.Path -> Path.Edge -> Maybe Path.Path
+appendEdge path edge = runST $ do
+  currentPathRef <- newSTRef path
+  newPathRef <- newSTRef Nothing
+  let node = Path.sinkNode edge
+  -- FIXME: Append the new edge to the currentPath
+  modifySTRef' currentPathRef $ \path -> path { Path.edges = ((Path.edges path) |> edge), Path.endingNode = (Path.sinkNode edge) }
+
+  -- 2.
+  if isReferenceOrPushSymbol node
+    then do
+      let (node' :# _) = node
+      modifySTRef' currentPathRef $ \path -> path { Path.endingSymbolStack = (Stack.symbol node') : (Path.endingSymbolStack path) }
+      currentPath <- readSTRef currentPathRef
+      writeSTRef newPathRef (Just currentPath)
+      readSTRef newPathRef
+  -- 3.
+  else if isDefinitionOrPopSymbol node then do
+      let (node' :# _) = node
+      -- 3.i.
+      if null (Path.endingSymbolStack path) then do
+        modifySTRef' currentPathRef $ \path -> path { Path.startingSymbolStack = (Stack.symbol node') : (Path.startingSymbolStack path) }
+        currentPath <- readSTRef currentPathRef
+        writeSTRef newPathRef (Just currentPath)
+        readSTRef newPathRef
+      else if (Maybe.listToMaybe $ Path.endingSymbolStack path) /= Just (Stack.symbol node') then do
+          -- 3.ii.
+          traceM "Partial Path is not valid: abort"
+          readSTRef newPathRef
+        else do
+          -- 3.iii.
+          modifySTRef' currentPathRef $ \path -> path { Path.endingSymbolStack = drop 1 (Path.endingSymbolStack path) }
+          currentPath <- readSTRef currentPathRef
+          writeSTRef newPathRef (Just currentPath)
+          readSTRef newPathRef
+  else if isPushScope node
+    then do
+      let (_ :# tag) = node
+      modifySTRef' currentPathRef $ \path -> path { Path.endingScopeStack = tag : (Path.endingScopeStack path)}
+      currentPath <- readSTRef currentPathRef
+      writeSTRef newPathRef (Just currentPath)
+      readSTRef newPathRef
+    else if isJumpToScope node then do
+      -- 5.i.a.
+      if null (Path.endingScopeStack path) then
+        if (Path.startingScopeStackSize path == Path.One) then
+          -- 5.i.a.
+          readSTRef newPathRef
+        else do
+          -- 5.i.b.
+          modifySTRef' currentPathRef $ \path -> path { Path.startingScopeStackSize = Path.One }
+          currentPath <- readSTRef currentPathRef
+          writeSTRef newPathRef (Just currentPath)
+          readSTRef newPathRef
+      else do
+        -- 5.ii.a
+        path <- readSTRef currentPathRef
+        let scopeTag = head (Path.endingScopeStack path)
+            scopeIdentifier = head (Path.endingSymbolStack path)
+        modifySTRef' currentPathRef $ \path -> path { Path.endingScopeStack = drop 1 (Path.endingScopeStack path) }
+
+        -- 5.ii.b
+        let jumpEdge = Path.Edge node ((Stack.ExportedScope scopeIdentifier) :# scopeTag) "jump"
+        -- 5.ii.c
+        modifySTRef' currentPathRef $ \path -> path { Path.edges = ((Path.edges path) |> jumpEdge), Path.endingNode = (Path.sinkNode jumpEdge) }
+        currentPath <- readSTRef currentPathRef
+        writeSTRef newPathRef (Just currentPath)
+        readSTRef newPathRef
+  else
+    if isIgnoreScope node then
+    -- 6
+      if null (Path.endingScopeStack path) then
+        if (Path.startingScopeStackSize path == Path.One) then
+          -- 5.i.a.
+          readSTRef newPathRef
+        else do
+          -- 5.i.b.
+          modifySTRef' currentPathRef $ \path -> path { Path.startingScopeStackSize = Path.One }
+          currentPath <- readSTRef currentPathRef
+          writeSTRef newPathRef (Just currentPath)
+          readSTRef newPathRef
+      else do
+          modifySTRef' currentPathRef $ \path -> path { Path.endingScopeStack = drop 1 (Path.endingScopeStack path) }
+          currentPath <- readSTRef currentPathRef
+          writeSTRef newPathRef (Just currentPath)
+          readSTRef newPathRef
+    else
+      readSTRef newPathRef
+
+isReferenceOrPushSymbol :: Stack.Tagged Stack.Node -> Bool
+isReferenceOrPushSymbol (node Stack.:# _) = case node of
+  Stack.Reference{}  -> True
+  Stack.PushSymbol{} -> True
+  _                  -> False
+
+isPushScope :: Stack.Tagged Stack.Node -> Bool
+isPushScope (node Stack.:# _) = case node of
+  Stack.PushScope{} -> True
+  _                 -> False
+
+isJumpToScope :: Stack.Tagged Stack.Node -> Bool
+isJumpToScope (node Stack.:# _) = case node of
+  Stack.JumpToScope{} -> True
+  _                   -> False
+
+isIgnoreScope :: Stack.Tagged Stack.Node -> Bool
+isIgnoreScope (node Stack.:# _) = case node of
+  Stack.IgnoreScope{} -> True
+  _                   -> False
+
+isDefinitionOrPopSymbol :: Stack.Tagged Stack.Node -> Bool
+isDefinitionOrPopSymbol (node Stack.:# _) = case node of
+  Stack.Declaration{} -> True
+  Stack.PopSymbol{}   -> True
+  _                   -> False
 
 isMainNode :: Stack.Tagged Stack.Node -> Bool
 isMainNode (node Stack.:# _) = case node of
