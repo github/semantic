@@ -71,10 +71,14 @@ runParser blob@Blob{..} parser = case parser of
       config <- asks config
       executeParserAction (parseToAST (configTreeSitterParseTimeout config) language blob)
 
-  UnmarshalParser language ->
-    time "parse.tree_sitter_precise_ast_parse" languageTag $ do
+  UnmarshalParser language -> do
+    (time "parse.tree_sitter_precise_ast_parse" languageTag $ do
       config <- asks config
-      executeParserAction (parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob)
+      executeParserAction (parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob))
+    `catchError` (\(SomeException e) -> do
+      writeStat (increment "parse.precise_ast_parse_failures" languageTag)
+      writeLog Error "precise parsing failed" (("task", "parse") : ("exception", "\"" <> displayException e <> "\"") : languageTag)
+      throwError (SomeException e))
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser blob assignment
 
