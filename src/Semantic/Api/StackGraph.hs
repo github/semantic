@@ -256,7 +256,7 @@ reducePaths' graph initialPaths = runST $ do
             pure ()
           do
             graph <- readSTRef graphRef
-            let nextEdges = toList $ Set.filter  (\(_, a) -> a == Path.endingNode currentPath) (Stack.edgeSet graph)
+            let nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode currentPath) (Stack.edgeSet graph)
 
             for_ nextEdges $ \(a, b) -> do
               if Maybe.isJust ((Path.Edge a b "") `Seq.elemIndexL` (Path.edges currentPath))
