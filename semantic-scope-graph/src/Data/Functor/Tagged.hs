@@ -13,6 +13,7 @@ module Data.Functor.Tagged
   -- * Monadic creation functions
   , taggedM
   , taggedIO
+  , unsafeTagged
   -- * Reexports
   , extract
   ) where
@@ -21,6 +22,7 @@ import Control.Comonad
 import Control.Effect.Fresh
 import Control.Lens.Getter
 import Control.Lens.Lens
+import System.IO.Unsafe
 import Data.Function
 import Data.Generics.Product
 import Data.Unique
@@ -63,3 +65,8 @@ taggedM a = (a :#) <$> fresh
 -- ordered, but are guaranteed to be unique throughout the life of the program.
 taggedIO :: a -> IO (Tagged a)
 taggedIO a = (a :#) . hashUnique <$> newUnique
+
+-- This is bad. Don't use it.
+unsafeTagged :: a -> Tagged a
+unsafeTagged = unsafePerformIO . taggedIO
+{-# NOINLINE unsafeTagged #-}
