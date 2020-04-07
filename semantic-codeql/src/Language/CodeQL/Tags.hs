@@ -233,7 +233,6 @@ instance ToTags CodeQL.SuperRef
 instance ToTags CodeQL.This
 instance ToTags CodeQL.True
 instance ToTags CodeQL.TypeAliasBody
-instance ToTags CodeQL.TypeExpr
 instance ToTags CodeQL.TypeLiteral
 instance ToTags CodeQL.UnaryExpr
 instance ToTags CodeQL.Underscore
