@@ -34,6 +34,7 @@ module Stack.Path
   ) where
 
 
+import qualified Analysis.Name as Name
 import           Control.Lens.Getter ((^.))
 import           Control.Lens.Lens
 import           Data.Functor.Tagged
@@ -190,16 +191,18 @@ completion _                                                                    
 
 isPartial :: Path -> Bool
 isPartial path = (case startingNode path of
-  (Root _ :# _)          -> True
-  (ExportedScope _ :# _) -> True
-  (Reference{} :# _)     -> True
-  _                      -> False)
+  (Root _ :# _)           -> True
+  (ExportedScope _ :# _)  -> True
+  (Reference{} :# _)      -> True
+  (Scope (Name.I 0) :# _) -> True
+  _                       -> False)
   && (case endingNode path of
-    (Root _ :# _)          -> True
-    (ExportedScope _ :# _) -> True
-    (JumpToScope _ :# _)   -> True
-    (Declaration{} :# _)   -> True
-    _                      -> False)
+    (Root _ :# _)           -> True
+    (Scope (Name.I 0) :# _) -> True
+    (ExportedScope _ :# _)  -> True
+    (JumpToScope _ :# _)    -> True
+    (Declaration{} :# _)    -> True
+    _                       -> False)
 
 isIncomplete :: Path -> Bool
 isIncomplete path = completion path == Partial || isPartial path
