@@ -171,7 +171,7 @@ toSGNode (node :# tag) = (case node of
     , nodeName = Name.formatName symbol
     , nodeLine = ""
     , nodeKind = Text.pack $ show kind
-    , nodeSpan = traceShowId (Loc.span loc)
+    , nodeSpan = Loc.span loc
     , Semantic.Api.StackGraph.nodeType = Definition
     }
   Stack.Reference symbol kind loc -> Just $ SGNode {
