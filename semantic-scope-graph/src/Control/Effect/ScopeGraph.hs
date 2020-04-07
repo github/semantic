@@ -157,10 +157,10 @@ newScope edges = do
 addDeclarations :: ScopeGraphEff sig m => NonEmpty (Name, Kind, Loc) -> m (Stack.Graph Stack.Node)
 addDeclarations names = do
   let graph' = foldr (\(name, kind, loc) graph ->
-        graph -<< (Stack.popSymbol "member") -<< (Stack.declaration name kind loc)) mempty (NonEmpty.init names)
+        graph -<< (Stack.popSymbol ".") -<< (Stack.declaration name kind loc)) mempty (NonEmpty.init names)
       graph'' = graph' >>- (\(name, kind, loc) -> (Stack.declaration name kind loc)) (NonEmpty.last names)
       graph''' = foldr (\(name, kind, loc) graph ->
-        graph -<< (Stack.pushSymbol "member") -<< (Stack.reference name kind loc)) mempty (NonEmpty.init $ NonEmpty.reverse names)
+        graph -<< (Stack.pushSymbol ".") -<< (Stack.reference name kind loc)) mempty (NonEmpty.init $ NonEmpty.reverse names)
       graph'''' = graph'' >>- graph''' >>- (\(name, kind, loc) -> (Stack.reference name kind loc)) (NonEmpty.head names)
   pure graph''''
 
