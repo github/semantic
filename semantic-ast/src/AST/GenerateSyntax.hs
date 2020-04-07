@@ -29,6 +29,7 @@ import           Language.Haskell.TH as TH
 import           Language.Haskell.TH.Syntax as TH
 import           System.Directory
 import           System.FilePath.Posix
+import Data.Functor.Identity
 import qualified TreeSitter.Language as TS
 import           TreeSitter.Node
 import           TreeSitter.Symbol (TSSymbol, toHaskellCamelCaseIdentifier, toHaskellPascalCaseIdentifier)
@@ -113,7 +114,7 @@ makeStandaloneDerivings ty =
    deriving instance ((forall x . Eq x => Eq (f x)), Eq a) => Eq ($ty f a)
    deriving instance ((forall x . Ord x => Ord (f x)), (forall x . Eq x => Eq (f x)), Ord a) => Ord ($ty f a)
    deriving instance ((forall x . Show x => Show (f x)), Show a) => Show ($ty f a)
-   --deriving instance TS.Unmarshal f => TS.Unmarshal ($ty f)
+   instance TS.Unmarshal ($ty Identity)
 
    |]
 
