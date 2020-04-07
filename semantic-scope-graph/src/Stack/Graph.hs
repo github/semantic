@@ -37,6 +37,8 @@ module Stack.Graph
   , root
   , topScope
   , bottomScope
+  -- * Predicates
+  , isRoot
   -- * Miscellany
   , tagGraphUniquely
   -- * Testing stuff
@@ -145,7 +147,7 @@ tagGraphUniquely
   . evalState @(Map Node (Tagged Node)) mempty
   . foldg (pure Class.empty) go (liftA2 Class.overlay) (liftA2 Class.connect)
     where
-      go Root = pure (Class.vertex (Root :# 0))
+      go root@Root{} = pure (Class.vertex (root :# 0))
       go n = do
         mSeen <- gets (Map.lookup n)
         vert  <- maybeM (taggedM n) mSeen
@@ -183,6 +185,11 @@ addEdge a b = simplify . Graph . Algebraic.overlay (Algebraic.edge a b) . unGrap
 
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
+
+isRoot :: Tagged Node -> Bool
+isRoot (node :# _) = case node of
+  Root{} -> True
+  _      -> False
 
 testEdgeList :: [Node]
 testEdgeList =
