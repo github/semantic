@@ -238,7 +238,7 @@ instance ToScopeGraph Py.GlobalStatement where scopeGraph = todo
 instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where
-  scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier ann name) :| _))) :| [])) = do
+  scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier _ _) :| _))) :| [])) = do
     rootScope' <- rootScope
     name <- Name.gensym
 
@@ -309,29 +309,20 @@ instance ToScopeGraph Py.NonlocalStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.Module where
   scopeGraph term@(Py.Module ann _) = do
-    rootScope' <- rootScope
+    currentGraph <- get @(Stack.Graph Stack.Node)
 
     putCurrentScope "__main__"
 
-    currentGraph <- get @(Stack.Graph Stack.Node)
-    put (Stack.topScope "__main__")
+    put (Stack.scope "__main__")
 
     onChildren term
 
     newGraph <- get @(Stack.Graph Stack.Node)
 
     ScopeGraph.CurrentScope currentName <- currentScope
-    --             __main__ <- Scope _a <- root
-    --              |
-    --             \/
-    -- topScope <- _b -> cheese -> member -> ints -> ints -> member -> cheese
     let overlayedGraph = Stack.overlay (Stack.scope currentName -<< Stack.declaration "__main__" Identifier ann -<< currentGraph) newGraph
 
-    --             __main__                                       <- Scope _a
-    --              |                                                   ^
-    --             \/                                                   |
-    -- topScope <- _b -> cheese -> member -> ints -> ints -> member -> cheese
-    put overlayedGraph
+    put (Stack.simplify overlayedGraph)
 
     complete
 

@@ -257,7 +257,6 @@ reducePaths' graph initialPaths = runST $ do
           do
             graph <- readSTRef graphRef
             let nextEdges = toList $ Set.filter  (\(_, a) -> a == Path.endingNode currentPath) (Stack.edgeSet graph)
-            traceM ("nextEdges length: " <> show nextEdges)
 
             for_ nextEdges $ \(a, b) -> do
               if Maybe.isJust ((Path.Edge a b "") `Seq.elemIndexL` (Path.edges currentPath))
@@ -393,12 +392,12 @@ isDefinitionOrPopSymbol (node Stack.:# _) = case node of
   _                   -> False
 
 isMainNode :: Stack.Tagged Stack.Node -> Bool
-isMainNode (node Stack.:# _) = (case node of
-  Stack.Root{}          -> True
-  Stack.ExportedScope{} -> True
-  Stack.Reference{}     -> True
-  Stack.Scope "_a"      -> True
-  _                     -> False)
+isMainNode (node Stack.:# tag) = case node of
+  Stack.Root _           -> True
+  Stack.ExportedScope{}  -> True
+  Stack.Reference{}      -> True
+  Stack.Scope (Name.I 0) -> True
+  _                      -> False
 
 isReferenceNode :: Stack.Tagged Stack.Node -> Bool
 isReferenceNode (node Stack.:# _) = case node of
