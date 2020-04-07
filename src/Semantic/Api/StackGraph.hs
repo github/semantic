@@ -378,6 +378,11 @@ isPushScope (node Stack.:# _) = case node of
   Stack.PushScope{} -> True
   _                 -> False
 
+isScope :: Stack.Tagged Stack.Node -> Bool
+isScope (node Stack.:# _) = case node of
+  Stack.Scope{} -> True
+  _             -> False
+
 isJumpToScope :: Stack.Tagged Stack.Node -> Bool
 isJumpToScope (node Stack.:# _) = case node of
   Stack.JumpToScope{} -> True
