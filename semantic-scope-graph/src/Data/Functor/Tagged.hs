@@ -13,6 +13,7 @@ module Data.Functor.Tagged
   -- * Monadic creation functions
   , taggedM
   , taggedIO
+  , unsafeTagged
   -- * Reexports
   , extract
   ) where
@@ -26,6 +27,7 @@ import Data.Generics.Product
 import Data.Int
 import Data.Unique
 import GHC.Generics
+import System.IO.Unsafe
 
 -- | Most identificatory fields are pinned to protobuf id's, which by convention
 -- are signed 64-bit values, so that we can convert them efficiently between
@@ -67,3 +69,8 @@ taggedM a = (a :#) . fromIntegral <$> fresh
 -- ordered, but are guaranteed to be unique throughout the life of the program.
 taggedIO :: a -> IO (Tagged a)
 taggedIO a = (a :#) . fromIntegral . hashUnique <$> newUnique
+
+-- This is bad. Don't use it.
+unsafeTagged :: a -> Tagged a
+unsafeTagged = unsafePerformIO . taggedIO
+{-# NOINLINE unsafeTagged #-}

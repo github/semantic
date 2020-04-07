@@ -141,10 +141,11 @@ tagGraphUniquely :: Graph Node -> Graph (Tagged Node)
 tagGraphUniquely
   = simplify
   . run
-  . evalFresh 0
+  . evalFresh 1
   . evalState @(Map Node (Tagged Node)) mempty
   . foldg (pure Class.empty) go (liftA2 Class.overlay) (liftA2 Class.connect)
     where
+      go Root = pure (Class.vertex (Root :# 0))
       go n = do
         mSeen <- gets (Map.lookup n)
         vert  <- maybeM (taggedM n) mSeen
