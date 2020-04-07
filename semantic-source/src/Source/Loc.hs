@@ -1,4 +1,8 @@
-{-# LANGUAGE DeriveGeneric, DerivingVia, RankNTypes, NamedFieldPuns, OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
 module Source.Loc
 ( Loc(..)
 , byteRange_
@@ -7,9 +11,10 @@ module Source.Loc
 ) where
 
 import Control.DeepSeq (NFData)
-import Data.Aeson (ToJSON(..), object, (.=))
+import Data.Aeson (ToJSON (..), object, (.=))
 import Data.Hashable (Hashable)
 import Data.Monoid.Generic
+import Data.Semilattice.Lower
 import GHC.Generics (Generic)
 import Prelude hiding (span)
 import Source.Range
@@ -42,4 +47,3 @@ type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
 lens :: (s -> a) -> (s -> a -> s) -> Lens' s a
 lens get put afa s = fmap (put s) (afa (get s))
 {-# INLINE lens #-}
-

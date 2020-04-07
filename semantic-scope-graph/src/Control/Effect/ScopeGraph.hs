@@ -154,14 +154,14 @@ newScope edges = do
   name <$ modify (ScopeGraph.newScope name edges)
 
 
-addDeclarations :: ScopeGraphEff sig m => NonEmpty (Loc, Name) -> m (Stack.Graph Stack.Node)
+addDeclarations :: ScopeGraphEff sig m => NonEmpty (Name, Kind, Loc) -> m (Stack.Graph Stack.Node)
 addDeclarations names = do
-  let graph' = foldr (\(_, name) graph ->
-        graph -<< (Stack.popSymbol "member") -<< (Stack.declaration name)) mempty (NonEmpty.init names)
-      graph'' = graph' >>- (Stack.declaration (snd $ NonEmpty.last names))
-      graph''' = foldr (\(_, name) graph ->
-        graph -<< (Stack.pushSymbol "member") -<< (Stack.reference name)) mempty (NonEmpty.init $ NonEmpty.reverse names)
-      graph'''' = graph'' >>- graph''' >>- (Stack.reference (snd $ NonEmpty.head names))
+  let graph' = foldr (\(name, kind, loc) graph ->
+        graph -<< (Stack.popSymbol "member") -<< (Stack.declaration name kind loc)) mempty (NonEmpty.init names)
+      graph'' = graph' >>- (\(name, kind, loc) -> (Stack.declaration name kind loc)) (NonEmpty.last names)
+      graph''' = foldr (\(name, kind, loc) graph ->
+        graph -<< (Stack.pushSymbol "member") -<< (Stack.reference name kind loc)) mempty (NonEmpty.init $ NonEmpty.reverse names)
+      graph'''' = graph'' >>- graph''' >>- (\(name, kind, loc) -> (Stack.reference name kind loc)) (NonEmpty.head names)
   pure graph''''
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.

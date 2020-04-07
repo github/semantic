@@ -244,12 +244,12 @@ instance ToScopeGraph Py.ImportStatement where
     name <- Name.gensym
     modify (Stack.newScope name mempty)
 
-    childGraph <- addDeclarations ((\(Py.Identifier ann name) -> (ann, Name.name name)) <$> names)
+    childGraph <- addDeclarations ((\(Py.Identifier ann name) -> (Name.name name, Identifier, ann)) <$> names)
 
     currentGraph <- get @(Stack.Graph Stack.Node)
     let graph' = (Stack.connect (Stack.transpose (Stack.scope name >>- childGraph)) currentGraph)
 
-    put (Stack.simplify (Stack.overlay (Stack.reference "cheese" >>- Stack.scope "_a") graph'))
+    put (Stack.simplify (Stack.overlay ((Stack.reference name Identifier ann) >>- Stack.scope "_a") graph'))
 
     putCurrentScope name
 
@@ -315,7 +315,7 @@ instance ToScopeGraph Py.Module where
     declare (Name.name "__main__") moduleProps
     ScopeGraph.CurrentScope currentName <- currentScope
 
-    modify ((Stack.bottomScope currentName) >>- (Stack.declaration "__main__") >>-)
+    modify ((Stack.bottomScope currentName) >>- (Stack.declaration "__main__" ScopeGraph.Module ann) >>-)
 
     onChildren term
 

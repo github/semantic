@@ -65,12 +65,14 @@ import           Data.Maybe
 import           Data.Semilattice.Lower
 import           Data.Set (Set)
 import qualified Scope.Types as Scope
+import           Source.Loc
+import           Source.Span
 
 type Symbol = Name
 
 data Node = Root { symbol :: Symbol }
-  | Declaration { symbol :: Symbol }
-  | Reference { symbol :: Symbol }
+  | Declaration { symbol :: Symbol, kind :: Scope.Kind, location :: Loc }
+  | Reference { symbol :: Symbol, kind :: Scope.Kind, location :: Loc }
   | PushSymbol { symbol :: Symbol }
   | PopSymbol { symbol :: Symbol }
   | PushScope
@@ -121,14 +123,18 @@ instance Lower a => Lower (Graph a) where
 fromLinearNodes :: [a] -> Graph a
 fromLinearNodes n = Class.edges $ zip (init n) (drop 1 n)
 
-scope, declaration, popSymbol, reference, pushSymbol, topScope, bottomScope :: Symbol -> Graph Node
+scope, popSymbol, pushSymbol, topScope, bottomScope :: Symbol -> Graph Node
 scope = Class.vertex . Scope
-declaration = Class.vertex . Declaration
-reference = Class.vertex . Reference
 popSymbol = Class.vertex . PopSymbol
 pushSymbol = Class.vertex . PushSymbol
 topScope = Class.vertex . TopScope
 bottomScope = Class.vertex . BottomScope
+
+declaration :: Symbol -> Scope.Kind -> Loc -> Graph Node
+declaration symbol kind = Class.vertex . Declaration symbol kind
+
+reference :: Symbol -> Scope.Kind -> Loc -> Graph Node
+reference symbol kind = Class.vertex . Reference symbol kind
 
 root :: Name -> Graph Node
 root name = Graph (Algebraic.vertex (Root name))
@@ -194,24 +200,24 @@ isRoot (node :# _) = case node of
 testEdgeList :: [Node]
 testEdgeList =
   [ Scope "current"
-  , Declaration "a"
+  , Declaration "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1)))
   , PopSymbol "member"
-  , Declaration "b"
-  , Reference "b"
+  , Declaration "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1)))
+  , Reference "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1)))
   , PushSymbol "member"
-  , Reference "a"
+  , Reference "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1)))
   , Root "_a"
   ]
 
 testGraph :: Graph Node
 testGraph = mconcat
-  [ (scope "current" >>- declaration "a")
-  , (declaration "a" >>- popSymbol "member")
-  , (popSymbol "member" >>- declaration "b")
-  , (declaration "b" >>- reference "b")
-  , (reference "b" >>- pushSymbol "member")
-  , (pushSymbol "member" >>- reference "a")
-  , (reference "a" >>- root "_a")
+  [ (scope "current" >>- declaration "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1))))
+  , (declaration "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1))) >>- popSymbol "member")
+  , (popSymbol "member" >>- declaration "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1))))
+  , (declaration "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1))) >>- reference "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1))))
+  , (reference "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1))) >>- pushSymbol "member")
+  , (pushSymbol "member" >>- reference "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1))))
+  , (reference "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1))) >>- root "_a")
   ]
 
 testGraph2 :: Graph Node
@@ -219,11 +225,11 @@ testGraph2 = fromLinearNodes testEdgeList
 
 edgeTest :: Graph Node
 edgeTest = Class.edges
-  [ (Scope "current" , Declaration "a")
-  , (Declaration "a" , PopSymbol "member")
-  , (PopSymbol "member" , Declaration "b")
-  , (Declaration "b" , Reference "b")
-  , (Reference "b" , PushSymbol "member")
-  , (PushSymbol "member" , Reference "a")
-  , (Reference "a" , Root "_a")
+  [ (Scope "current" , Declaration "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1))))
+  , (Declaration "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1))), PopSymbol "member")
+  , (PopSymbol "member" , Declaration "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1))))
+  , (Declaration "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1))), Reference "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1))))
+  , (Reference "b" Scope.Identifier (Loc lowerBound (point (Pos 1 1))), PushSymbol "member")
+  , (PushSymbol "member" , Reference "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1))))
+  , (Reference "a" Scope.Identifier (Loc lowerBound (point (Pos 1 1))), Root "_a")
   ]

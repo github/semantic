@@ -33,7 +33,8 @@ import           Data.Sequence ((|>))
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import           Data.STRef
-import           Data.Text (Text, pack)
+import           Data.Text (Text)
+import qualified Data.Text as Text
 import           Data.Traversable
 import           Debug.Trace
 import           Debug.Trace
@@ -71,13 +72,13 @@ parseStackGraph blobs = do
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
-        blobPath' = pack $ blobPath blob
+        blobPath' = Text.pack $ blobPath blob
         errorFile e = defMessage
           & P.path .~ blobPath'
           & P.language .~ (bridging # blobLanguage')
           & P.nodes .~ mempty
           & P.paths .~ mempty
-          & P.errors .~ [defMessage & P.error .~ pack e]
+          & P.errors .~ [defMessage & P.error .~ Text.pack e]
 
         graphToFile :: TempStackGraph -> StackGraphFile
         graphToFile graph
@@ -164,20 +165,20 @@ stackGraphToTempStackGraph graph = let
 
 toSGNode :: Tagged Stack.Node -> Maybe SGNode
 toSGNode (node :# tag) = (case node of
-  Stack.Declaration s -> Just $ SGNode {
+  Stack.Declaration symbol kind loc -> Just $ SGNode {
       nodeId = tag
-    , nodeName = Name.formatName s
+    , nodeName = Name.formatName symbol
     , nodeLine = ""
-    , nodeKind = ""
-    , nodeSpan = lowerBound
+    , nodeKind = Text.pack $ show kind
+    , nodeSpan = Loc.span loc
     , Semantic.Api.StackGraph.nodeType = Definition
     }
-  Stack.Reference s -> Just $ SGNode {
+  Stack.Reference symbol kind loc -> Just $ SGNode {
       nodeId = tag
-    , nodeName = Name.formatName s
+    , nodeName = Name.formatName symbol
     , nodeLine = ""
-    , nodeKind = ""
-    , nodeSpan = lowerBound
+    , nodeKind = Text.pack $ show kind
+    , nodeSpan = Loc.span loc
     , Semantic.Api.StackGraph.nodeType = Reference
     }
   node -> Nothing)

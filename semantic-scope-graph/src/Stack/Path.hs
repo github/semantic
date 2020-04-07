@@ -192,13 +192,13 @@ isPartial :: Path -> Bool
 isPartial path = (case startingNode path of
   (Root _ :# _)          -> True
   (ExportedScope _ :# _) -> True
-  (Reference _ :# _)     -> True
+  (Reference{} :# _)     -> True
   _                      -> False)
   && (case endingNode path of
     (Root _ :# _)          -> True
     (ExportedScope _ :# _) -> True
     (JumpToScope _ :# _)   -> True
-    (Declaration _ :# _)   -> True
+    (Declaration{} :# _)   -> True
     _                      -> False)
 
 isIncomplete :: Path -> Bool
