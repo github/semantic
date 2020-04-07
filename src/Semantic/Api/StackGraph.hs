@@ -157,14 +157,15 @@ graphForBlob blob = parseWith toStackGraphParsers (fmap fst . ScopeGraph.runSket
 
 stackGraphToTempStackGraph :: Stack.Graph Stack.Node -> TempStackGraph
 stackGraphToTempStackGraph graph = let
-  nodes = Maybe.catMaybes $ toSGNode <$> Graph.vertexList (Stack.unGraph graph)
+  graph' = Stack.tagGraphUniquely graph
+  nodes = Maybe.catMaybes $ toSGNode <$> Graph.vertexList (Stack.unGraph graph')
   paths = traceShowId (toPaths graph)
   in TempStackGraph { scopeGraphNodes = nodes, scopeGraphPaths = paths }
 
-toSGNode :: Stack.Node -> Maybe SGNode
-toSGNode node = (case node of
+toSGNode :: Tagged Stack.Node -> Maybe SGNode
+toSGNode (node :# tag) = (case node of
   Stack.Declaration s -> Just $ SGNode {
-      nodeId = 1
+      nodeId = tag
     , nodeName = Name.formatName s
     , nodeLine = ""
     , nodeKind = ""
@@ -172,7 +173,7 @@ toSGNode node = (case node of
     , Semantic.Api.StackGraph.nodeType = Definition
     }
   Stack.Reference s -> Just $ SGNode {
-      nodeId = 1
+      nodeId = tag
     , nodeName = Name.formatName s
     , nodeLine = ""
     , nodeKind = ""
