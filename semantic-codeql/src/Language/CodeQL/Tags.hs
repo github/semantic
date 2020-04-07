@@ -100,12 +100,6 @@ instance ToTags CodeQL.DatatypeBranch where
     , name = CodeQL.ClassName { text }
     } = yieldTag text Class loc byteRange >> gtags t
 
-instance ToTags CodeQL.HigherOrderTerm where
-  tags t@CodeQL.HigherOrderTerm
-    { ann = loc@Loc { byteRange }
-    , name = CodeQL.LiteralId { text }
-    } = yieldTag text Call loc byteRange >> gtags t
-
 instance ToTags CodeQL.ClasslessPredicateCall where
   tags CodeQL.ClasslessPredicateCall
     { extraChildren
@@ -113,121 +107,136 @@ instance ToTags CodeQL.ClasslessPredicateCall where
           Prj t@CodeQL.AritylessPredicateExpr {} -> tags t
           _                                      -> pure ()
 
+instance ToTags CodeQL.QualifiedRhs where
+  tags t@CodeQL.QualifiedRhs
+    { ann = loc@Loc { byteRange }
+    , name = expr
+    } = case expr of
+          Just (Prj CodeQL.PredicateName { text }) -> yieldTag text Call loc byteRange >> gtags t
+          _                                          -> gtags t
+
+instance ToTags CodeQL.TypeExpr where
+  tags t@CodeQL.TypeExpr
+    { ann = loc@Loc { byteRange }
+    , name = expr
+    } = case expr of
+          Just (Prj CodeQL.ClassName { text }) -> yieldTag text Type loc byteRange >> gtags t
+          _                                    -> gtags t
+
 instance ToTags CodeQL.AddExpr
-instance ToTags CodeQL.Any
-instance ToTags CodeQL.ExprAggregateBody
-instance ToTags CodeQL.ModuleName
-instance ToTags CodeQL.Strictconcat
 instance ToTags CodeQL.Addop
-instance ToTags CodeQL.Extends
-instance ToTags CodeQL.MulExpr
-instance ToTags CodeQL.Strictcount
 instance ToTags CodeQL.AggId
-instance ToTags CodeQL.As
-instance ToTags CodeQL.False
-instance ToTags CodeQL.Mulop
-instance ToTags CodeQL.Strictsum
 instance ToTags CodeQL.Aggregate
-instance ToTags CodeQL.AsExpr
-instance ToTags CodeQL.Field
-instance ToTags CodeQL.Ne
-instance ToTags CodeQL.String
 instance ToTags CodeQL.AnnotArg
-instance ToTags CodeQL.AsExprs
-instance ToTags CodeQL.Float
-instance ToTags CodeQL.Negation
-instance ToTags CodeQL.Sum
-instance ToTags CodeQL.AnnotName
-instance ToTags CodeQL.Asc
-instance ToTags CodeQL.Forall
-instance ToTags CodeQL.Newtype
-instance ToTags CodeQL.Super
 instance ToTags CodeQL.Annotation
+instance ToTags CodeQL.AnnotName
+instance ToTags CodeQL.Any
+instance ToTags CodeQL.As
+instance ToTags CodeQL.Asc
+instance ToTags CodeQL.AsExpr
+instance ToTags CodeQL.AsExprs
 instance ToTags CodeQL.Avg
-instance ToTags CodeQL.Forex
-instance ToTags CodeQL.None
-instance ToTags CodeQL.SuperRef
 instance ToTags CodeQL.Body
-instance ToTags CodeQL.FullAggregateBody
-instance ToTags CodeQL.Not
-instance ToTags CodeQL.This
 instance ToTags CodeQL.Bool
-instance ToTags CodeQL.Ge
-instance ToTags CodeQL.OrderBy
-instance ToTags CodeQL.True
 instance ToTags CodeQL.Boolean
-instance ToTags CodeQL.Gt
-instance ToTags CodeQL.OrderBys
-instance ToTags CodeQL.TypeAliasBody
 instance ToTags CodeQL.Charpred
-instance ToTags CodeQL.ParExpr
-instance ToTags CodeQL.TypeExpr
-instance ToTags CodeQL.IfTerm
-instance ToTags CodeQL.Plus
-instance ToTags CodeQL.TypeLiteral
 instance ToTags CodeQL.ClassMember
-instance ToTags CodeQL.Implication
-instance ToTags CodeQL.UnaryExpr
 instance ToTags CodeQL.ClassName
-instance ToTags CodeQL.Import
-instance ToTags CodeQL.PredicateAliasBody
-instance ToTags CodeQL.Underscore
-instance ToTags CodeQL.Predicate
-instance ToTags CodeQL.ImportModuleExpr
-instance ToTags CodeQL.PredicateExpr
-instance ToTags CodeQL.Unop
-instance ToTags CodeQL.Imprt
-instance ToTags CodeQL.PredicateName
-instance ToTags CodeQL.VarDecl
 instance ToTags CodeQL.Closure
-instance ToTags CodeQL.In
-instance ToTags CodeQL.PrefixCast
-instance ToTags CodeQL.VarName
-instance ToTags CodeQL.CompTerm
-instance ToTags CodeQL.InExpr
-instance ToTags CodeQL.Ql
-instance ToTags CodeQL.Variable
 instance ToTags CodeQL.Compop
-instance ToTags CodeQL.InstanceOf
-instance ToTags CodeQL.Qldoc
+instance ToTags CodeQL.CompTerm
 instance ToTags CodeQL.Concat
-instance ToTags CodeQL.Instanceof
-instance ToTags CodeQL.QualModuleExpr
 instance ToTags CodeQL.Conjunction
-instance ToTags CodeQL.Integer
-instance ToTags CodeQL.QualifiedExpr
 instance ToTags CodeQL.Count
-instance ToTags CodeQL.Le
 instance ToTags CodeQL.Class
-instance ToTags CodeQL.Literal
-instance ToTags CodeQL.Quantified
-instance ToTags CodeQL.LiteralId
-instance ToTags CodeQL.Quantifier
-instance ToTags CodeQL.Lt
-instance ToTags CodeQL.Range
 instance ToTags CodeQL.DatatypeBranches
-instance ToTags CodeQL.Max
-instance ToTags CodeQL.Rank
 instance ToTags CodeQL.Date
-instance ToTags CodeQL.Result
 instance ToTags CodeQL.Dbtype
-instance ToTags CodeQL.Min
-instance ToTags CodeQL.ReturnType
 instance ToTags CodeQL.Desc
-instance ToTags CodeQL.Minus
-instance ToTags CodeQL.Select
 instance ToTags CodeQL.Direction
-instance ToTags CodeQL.Mod
-instance ToTags CodeQL.SimpleId
 instance ToTags CodeQL.Disjunction
-instance ToTags CodeQL.Slash
 instance ToTags CodeQL.Empty
-instance ToTags CodeQL.ModuleAliasBody
-instance ToTags CodeQL.SpecialCall
 instance ToTags CodeQL.Eq
-instance ToTags CodeQL.ModuleExpr
-instance ToTags CodeQL.SpecialId
 instance ToTags CodeQL.Exists
+instance ToTags CodeQL.ExprAggregateBody
+instance ToTags CodeQL.Extends
+instance ToTags CodeQL.False
+instance ToTags CodeQL.Field
+instance ToTags CodeQL.Float
+instance ToTags CodeQL.Forall
+instance ToTags CodeQL.Forex
+instance ToTags CodeQL.FullAggregateBody
+instance ToTags CodeQL.Ge
+instance ToTags CodeQL.Gt
+instance ToTags CodeQL.HigherOrderTerm
+instance ToTags CodeQL.IfTerm
+instance ToTags CodeQL.Implication
+instance ToTags CodeQL.Import
+instance ToTags CodeQL.ImportModuleExpr
+instance ToTags CodeQL.Imprt
+instance ToTags CodeQL.In
+instance ToTags CodeQL.InExpr
+instance ToTags CodeQL.InstanceOf
+instance ToTags CodeQL.Instanceof
+instance ToTags CodeQL.Integer
+instance ToTags CodeQL.Le
+instance ToTags CodeQL.Literal
+instance ToTags CodeQL.LiteralId
+instance ToTags CodeQL.Lt
+instance ToTags CodeQL.Max
+instance ToTags CodeQL.Mod
+instance ToTags CodeQL.ModuleAliasBody
+instance ToTags CodeQL.ModuleExpr
 instance ToTags CodeQL.ModuleMember
+instance ToTags CodeQL.ModuleName
+instance ToTags CodeQL.Min
+instance ToTags CodeQL.Minus
+instance ToTags CodeQL.MulExpr
+instance ToTags CodeQL.Mulop
+instance ToTags CodeQL.Ne
+instance ToTags CodeQL.Negation
+instance ToTags CodeQL.Newtype
+instance ToTags CodeQL.None
+instance ToTags CodeQL.Not
+instance ToTags CodeQL.OrderBy
+instance ToTags CodeQL.OrderBys
+instance ToTags CodeQL.ParExpr
+instance ToTags CodeQL.Plus
+instance ToTags CodeQL.Predicate
+instance ToTags CodeQL.PredicateAliasBody
+instance ToTags CodeQL.PredicateExpr
+instance ToTags CodeQL.PredicateName
+instance ToTags CodeQL.PrefixCast
+instance ToTags CodeQL.Ql
+instance ToTags CodeQL.Qldoc
+instance ToTags CodeQL.QualifiedExpr
+instance ToTags CodeQL.QualModuleExpr
+instance ToTags CodeQL.Quantified
+instance ToTags CodeQL.Quantifier
+instance ToTags CodeQL.Range
+instance ToTags CodeQL.Rank
+instance ToTags CodeQL.Result
+instance ToTags CodeQL.ReturnType
+instance ToTags CodeQL.Select
+instance ToTags CodeQL.SimpleId
+instance ToTags CodeQL.Slash
+instance ToTags CodeQL.SpecialCall
+instance ToTags CodeQL.SpecialId
 instance ToTags CodeQL.Star
-instance ToTags CodeQL.QualifiedRhs
+instance ToTags CodeQL.Strictconcat
+instance ToTags CodeQL.Strictcount
+instance ToTags CodeQL.Strictsum
+instance ToTags CodeQL.String
+instance ToTags CodeQL.Sum
+instance ToTags CodeQL.Super
+instance ToTags CodeQL.SuperRef
+instance ToTags CodeQL.This
+instance ToTags CodeQL.True
+instance ToTags CodeQL.TypeAliasBody
+instance ToTags CodeQL.TypeLiteral
+instance ToTags CodeQL.UnaryExpr
+instance ToTags CodeQL.Underscore
+instance ToTags CodeQL.Unop
+instance ToTags CodeQL.VarDecl
+instance ToTags CodeQL.Variable
+instance ToTags CodeQL.VarName
