@@ -364,8 +364,13 @@ appendEdge path edge = runST $ do
           currentPath <- readSTRef currentPathRef
           writeSTRef newPathRef (Just currentPath)
           readSTRef newPathRef
-    else
+    else if isScope node then do
+      currentPath <- readSTRef currentPathRef
+      writeSTRef newPathRef (Just currentPath)
       readSTRef newPathRef
+  else
+    readSTRef newPathRef
+
 
 isReferenceOrPushSymbol :: Stack.Tagged Stack.Node -> Bool
 isReferenceOrPushSymbol (node Stack.:# _) = case node of
