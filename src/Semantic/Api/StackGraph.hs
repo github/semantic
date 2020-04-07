@@ -116,6 +116,7 @@ parseStackGraph blobs = do
           ExportedScope -> P.StackGraphNode'EXPORTED_SCOPE
           Definition    -> P.StackGraphNode'DEFINITION
           Reference     -> P.StackGraphNode'REFERENCE
+          Scope         -> P.StackGraphNode'EXPORTED_SCOPE
 
 -- TODO: These are temporary, will replace with proper datatypes from the scope graph work.
 data TempStackGraph
@@ -147,7 +148,7 @@ data SGNode
   }
   deriving (Eq, Show)
 
-data SGNodeType = RootScope | JumpToScope | ExportedScope | Definition | Reference
+data SGNodeType = Scope | RootScope | JumpToScope | ExportedScope | Definition | Reference
   deriving (Eq, Show)
 
 graphForBlob :: (Effect sig, Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m (Stack.Graph Stack.Node)
@@ -170,7 +171,7 @@ toSGNode (node :# tag) = (case node of
     , nodeName = Name.formatName symbol
     , nodeLine = ""
     , nodeKind = Text.pack $ show kind
-    , nodeSpan = Loc.span loc
+    , nodeSpan = traceShowId (Loc.span loc)
     , Semantic.Api.StackGraph.nodeType = Definition
     }
   Stack.Reference symbol kind loc -> Just $ SGNode {
@@ -181,11 +182,43 @@ toSGNode (node :# tag) = (case node of
     , nodeSpan = Loc.span loc
     , Semantic.Api.StackGraph.nodeType = Reference
     }
+  Stack.JumpToScope symbol -> Just $ SGNode {
+      nodeId = tag
+    , nodeName = Name.formatName symbol
+    , nodeLine = ""
+    , nodeKind = ""
+    , nodeSpan = lowerBound
+    , Semantic.Api.StackGraph.nodeType = JumpToScope
+    }
+  Stack.ExportedScope symbol -> Just $ SGNode {
+      nodeId = tag
+    , nodeName = Name.formatName symbol
+    , nodeLine = ""
+    , nodeKind = ""
+    , nodeSpan = lowerBound
+    , Semantic.Api.StackGraph.nodeType = ExportedScope
+    }
+  Stack.Root symbol -> Just $ SGNode {
+      nodeId = tag
+    , nodeName = Name.formatName symbol
+    , nodeLine = ""
+    , nodeKind = ""
+    , nodeSpan = lowerBound
+    , Semantic.Api.StackGraph.nodeType = RootScope
+    }
+  Stack.Scope symbol -> Just $ SGNode {
+      nodeId = tag
+    , nodeName = Name.formatName symbol
+    , nodeLine = ""
+    , nodeKind = ""
+    , nodeSpan = lowerBound
+    , Semantic.Api.StackGraph.nodeType = Scope
+    }
   node -> Nothing)
 
 toPaths :: Stack.Graph Stack.Node -> [SGPath]
 toPaths graph = let
-  mainNodes = flip Set.filter (Stack.vertexSet (Stack.tagGraphUniquely graph)) $ isMainNode
+  mainNodes = flip Set.filter (Stack.vertexSet (Stack.tagGraphUniquely (traceShowId graph))) $ isMainNode
   currentPaths = flip Set.map mainNodes $ \taggedNode@(node Stack.:# _) ->
     let
       path = Path.Path { Path.startingNode = taggedNode, Path.endingNode = taggedNode, Path.edges = mempty, Path.startingSymbolStack = mempty, Path.endingSymbolStack = mempty, Path.startingScopeStackSize = Path.Zero, Path.endingScopeStack = mempty}
@@ -193,7 +226,7 @@ toPaths graph = let
     in
       if isReferenceNode taggedNode then referenceNodePath else path
   in
-    toSGPath <$> reducePaths' graph (toList currentPaths)
+    toSGPath <$> reducePaths' graph (toList (traceShow (toSGPath <$> toList currentPaths) currentPaths))
 
 reducePaths' :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
 reducePaths' graph initialPaths = runST $ do
@@ -205,7 +238,6 @@ reducePaths' graph initialPaths = runST $ do
   where
     go currentPathsRef pathsRef graphRef = do
       currentPaths <- readSTRef currentPathsRef
-      traceM ("currentPaths length:" <> show (length currentPaths))
       case currentPaths of
         [] -> do
           modifySTRef' currentPathsRef (const [])
@@ -215,16 +247,17 @@ reducePaths' graph initialPaths = runST $ do
 
           if (Path.completion currentPath == Path.Complete || Path.isPartial currentPath)
           then do
-            traceM ("Current Path is complete:" <> show (Path.completion currentPath == Path.Complete) <> "partial:" <> show (Path.isPartial currentPath))
+            traceM ("Current Path is complete: " <> show (Path.completion currentPath == Path.Complete) <> "partial: " <> show (Path.isPartial currentPath))
+            traceM (show (toSGPath currentPath))
             modifySTRef' pathsRef (currentPath :)
-          else
+          else do
+            traceM "Current Path not complete or partial"
+            traceM (show (toSGPath currentPath))
             pure ()
-
           do
-            traceM "Path is not complete and is not partial"
             graph <- readSTRef graphRef
-            let nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode currentPath) (Stack.edgeSet graph)
-            traceM ("nextEdges length:" <> show (length nextEdges))
+            let nextEdges = toList $ Set.filter  (\(_, a) -> a == Path.endingNode currentPath) (Stack.edgeSet graph)
+            traceM ("nextEdges length: " <> show nextEdges)
 
             for_ nextEdges $ \(a, b) -> do
               if Maybe.isJust ((Path.Edge a b "") `Seq.elemIndexL` (Path.edges currentPath))
@@ -236,6 +269,8 @@ reducePaths' graph initialPaths = runST $ do
                 case newPath of
                   Just newPath -> do
                     when (Path.validity newPath == Path.Valid) $ do
+                      traceM "newPath is valid"
+                      traceM (show (toSGPath newPath))
                       modifySTRef' currentPathsRef (newPath :)
                   Nothing -> pure ()
 
@@ -358,11 +393,12 @@ isDefinitionOrPopSymbol (node Stack.:# _) = case node of
   _                   -> False
 
 isMainNode :: Stack.Tagged Stack.Node -> Bool
-isMainNode (node Stack.:# _) = case node of
+isMainNode (node Stack.:# _) = (case node of
   Stack.Root{}          -> True
   Stack.ExportedScope{} -> True
   Stack.Reference{}     -> True
-  _                     -> False
+  Stack.Scope "_a"      -> True
+  _                     -> False)
 
 isReferenceNode :: Stack.Tagged Stack.Node -> Bool
 isReferenceNode (node Stack.:# _) = case node of

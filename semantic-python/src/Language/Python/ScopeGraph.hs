@@ -47,7 +47,7 @@ import           Scope.Graph.Convert (Result (..), complete, todo)
 import           Scope.Types
 import           Source.Loc (Loc)
 import           Source.Span (Span, span_)
-import           Stack.Graph ((>>-))
+import           Stack.Graph ((-<<), (>>-))
 import qualified Stack.Graph as Stack
 
 -- This typeclass is internal-only, though it shares the same interface
@@ -240,20 +240,18 @@ instance ToScopeGraph Py.Integer where scopeGraph = mempty
 instance ToScopeGraph Py.ImportStatement where
   scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier ann name) :| _))) :| [])) = do
     rootScope' <- rootScope
-    CurrentScope currentScope' <- currentScope
     name <- Name.gensym
-    modify (Stack.newScope name mempty)
 
     childGraph <- addDeclarations ((\(Py.Identifier ann name) -> (Name.name name, Identifier, ann)) <$> names)
+    let childGraph' = (Stack.scope name >>- childGraph >>- Stack.vertex rootScope')
 
-    currentGraph <- get @(Stack.Graph Stack.Node)
-    let graph' = (Stack.connect (Stack.transpose (Stack.scope name >>- childGraph)) currentGraph)
-
-    put (Stack.simplify (Stack.overlay ((Stack.reference name Identifier ann) >>- Stack.scope "_a") graph'))
+    -- _b -> ...
+    modify (Stack.transpose . (Stack.transpose childGraph' -<<))
 
     putCurrentScope name
 
     complete
+
   scopeGraph term = todo (show term)
 
 instance ToScopeGraph Py.ImportFromStatement where
@@ -311,15 +309,29 @@ instance ToScopeGraph Py.NonlocalStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.Module where
   scopeGraph term@(Py.Module ann _) = do
-    let moduleProps = Props.Declaration ScopeGraph.Module ScopeGraph.Default Nothing (ann^.span_ :: Span)
-    declare (Name.name "__main__") moduleProps
-    ScopeGraph.CurrentScope currentName <- currentScope
+    rootScope' <- rootScope
 
-    modify ((Stack.bottomScope currentName) >>- (Stack.declaration "__main__" ScopeGraph.Module ann) >>-)
+    putCurrentScope "__main__"
+
+    currentGraph <- get @(Stack.Graph Stack.Node)
+    put (Stack.topScope "__main__")
 
     onChildren term
 
-    modify ((Stack.topScope currentName) >>-)
+    newGraph <- get @(Stack.Graph Stack.Node)
+
+    ScopeGraph.CurrentScope currentName <- currentScope
+    --             __main__ <- Scope _a <- root
+    --              |
+    --             \/
+    -- topScope <- _b -> cheese -> member -> ints -> ints -> member -> cheese
+    let overlayedGraph = Stack.overlay (Stack.scope currentName -<< Stack.declaration "__main__" Identifier ann -<< currentGraph) newGraph
+
+    --             __main__                                       <- Scope _a
+    --              |                                                   ^
+    --             \/                                                   |
+    -- topScope <- _b -> cheese -> member -> ints -> ints -> member -> cheese
+    put overlayedGraph
 
     complete
 
