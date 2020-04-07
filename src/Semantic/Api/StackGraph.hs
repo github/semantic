@@ -245,7 +245,7 @@ reducePaths' graph initialPaths = runST $ do
         (currentPath : rest) -> do
           modifySTRef' currentPathsRef (const rest)
 
-          if (Path.completion currentPath == Path.Complete || Path.isPartial currentPath)
+          if (Path.completion currentPath == Path.Complete || Path.isPartial currentPath) && Path.validity currentPath == Path.Valid
           then do
             traceM ("Current Path is complete: " <> show (Path.completion currentPath == Path.Complete) <> "partial: " <> show (Path.isPartial currentPath))
             traceM (show (toSGPath currentPath))
@@ -267,11 +267,14 @@ reducePaths' graph initialPaths = runST $ do
                 let newPath = appendEdge currentPath (Path.Edge a b "")
                 case newPath of
                   Just newPath -> do
-                    when (Path.validity newPath == Path.Valid) $ do
-                      traceM "newPath is valid"
-                      traceM (show (toSGPath newPath))
-                      modifySTRef' currentPathsRef (newPath :)
-                  Nothing -> pure ()
+                    traceM "Appending succeeded"
+                    traceM (show (toSGPath newPath))
+                    modifySTRef' currentPathsRef (newPath :)
+                  Nothing -> do
+                    traceM "Failed to append edge to currentPath"
+                    traceM (show (extract a))
+                    traceM (show (extract b))
+                    pure ()
 
           go currentPathsRef pathsRef graphRef
 
