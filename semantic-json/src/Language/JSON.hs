@@ -4,17 +4,18 @@ module Language.JSON
 , TreeSitter.JSON.tree_sitter_json
 ) where
 
+import qualified AST.Unmarshal as TS
+import           Data.Functor.Identity
 import           Data.Proxy
 import qualified Language.JSON.AST as JSON
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.JSON (tree_sitter_json)
-import qualified AST.Unmarshal as TS
 
-newtype Term a = Term { getTerm :: JSON.Document a }
+newtype Term a = Term { getTerm :: JSON.Document Identity a }
 
 instance TS.SymbolMatching Term where
-  matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy JSON.Document)
-  showFailure _ = TS.showFailure (Proxy :: Proxy JSON.Document)
+  matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy (JSON.Document Identity))
+  showFailure _ = TS.showFailure (Proxy :: Proxy (JSON.Document Identity))
 
 instance TS.Unmarshal Term where
   matchers = fmap (fmap (TS.hoist Term)) TS.matchers

@@ -27,6 +27,7 @@ module AST.Unmarshal
 , GHasAnn(..)
 ) where
 
+import           AST.Token as TS
 import           Control.Algebra (send)
 import           Control.Carrier.Reader hiding (asks)
 import           Control.Exception
@@ -35,6 +36,7 @@ import           Data.ByteString (ByteString)
 import qualified Data.ByteString as B
 import           Data.Coerce
 import           Data.Foldable (toList)
+import           Data.Functor.Identity
 import qualified Data.IntMap as IntMap
 import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Proxy
@@ -55,7 +57,6 @@ import           TreeSitter.Cursor as TS
 import           TreeSitter.Language as TS
 import           TreeSitter.Node as TS
 import           TreeSitter.Parser as TS
-import           AST.Token as TS
 import           TreeSitter.Tree as TS
 
 asks :: Has (Reader r) sig m => (r -> r') -> m r'
@@ -152,6 +153,11 @@ class SymbolMatching t => Unmarshal t where
 instance (Unmarshal f, Unmarshal g) => Unmarshal (f :+: g) where
   matchers = fmap (fmap (hoist L1)) matchers <> fmap (fmap (hoist R1)) matchers
 
+instance (Applicative shape, Unmarshal f) => Unmarshal (shape :.: f) where
+  matchers = let base = matchers @f in fmap (fmap promote) base
+    where
+      promote (Match f) = Match (fmap (fmap (Comp1 . pure)) f)
+
 instance Unmarshal t => Unmarshal (Rec1 t) where
   matchers = coerce (matchers @t)
 
@@ -218,6 +224,10 @@ instance UnmarshalField Maybe where
   unmarshalField _ _ [x] = Just <$> unmarshalNode x
   unmarshalField d f _   = liftIO . throwIO . UnmarshalError $ "type '" <> d <> "' expected zero or one nodes in field '" <> f <> "' but got multiple"
 
+instance UnmarshalField Identity where
+  unmarshalField _ _ [x] = Identity <$> unmarshalNode x
+  unmarshalField d f _   = liftIO . throwIO . UnmarshalError $ "type '" <> d <> "' expected zero or one nodes in field '" <> f <> "' but got multiple"
+
 instance UnmarshalField [] where
   unmarshalField d f (x:xs) = do
     head' <- unmarshalNode x
@@ -253,6 +263,10 @@ instance (KnownNat n, KnownSymbol sym) => SymbolMatching (Token sym n) where
 instance (SymbolMatching f, SymbolMatching g) => SymbolMatching (f :+: g) where
   matchedSymbols _ = matchedSymbols (Proxy @f) <> matchedSymbols (Proxy @g)
   showFailure _ = sep <$> showFailure (Proxy @f) <*> showFailure (Proxy @g)
+
+instance SymbolMatching f => SymbolMatching (shape :.: f) where
+  matchedSymbols _ = matchedSymbols (Proxy @f)
+  showFailure _ = showFailure (Proxy @f)
 
 sep :: String -> String -> String
 sep a b = a ++ ". " ++ b
@@ -308,6 +322,9 @@ instance (Datatype d, GUnmarshalData f) => GUnmarshal (M1 D d f) where
   gunmarshalNode = go (gunmarshalNode' (datatypeName @d undefined)) where
     go :: (Node -> MatchM (f a)) -> Node -> MatchM (M1 i c f a)
     go = coerce
+
+instance (GUnmarshal f, Applicative shape) => GUnmarshal (shape :.: f) where
+  gunmarshalNode = fmap (Comp1 . pure) . gunmarshalNode @f
 
 class GUnmarshalData f where
   gunmarshalNode'
