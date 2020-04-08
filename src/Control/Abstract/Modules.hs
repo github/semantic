@@ -62,10 +62,10 @@ lookupModule :: Has (Modules address value) sig m => ModulePath -> Evaluator ter
 lookupModule = sendModules . flip Lookup pure
 
 -- | Resolve a list of module paths to a possible module table entry.
-resolve :: Has (Modules address value) sig m => [FilePath] -> Evaluator term address value m (Maybe ModulePath)
+resolve :: Has (Modules address value) sig m => [Path.AbsRelFile] -> Evaluator term address value m (Maybe ModulePath)
 resolve = sendModules . flip Resolve pure
 
-listModulesInDir :: Has (Modules address value) sig m => FilePath -> Evaluator term address value m [ModulePath]
+listModulesInDir :: Has (Modules address value) sig m => Path.AbsRelDir -> Evaluator term address value m [ModulePath]
 listModulesInDir = sendModules . flip List pure
 
 
@@ -85,8 +85,8 @@ load path = sendModules (Load path pure)
 data Modules address value (m :: * -> *) k
   = Load    ModulePath (ModuleResult address value -> m k)
   | Lookup  ModulePath (Maybe (ModuleResult address value) -> m k)
-  | Resolve [FilePath] (Maybe ModulePath -> m k)
-  | List    FilePath   ([ModulePath] -> m k)
+  | Resolve [Path.AbsRelFile] (Maybe ModulePath -> m k)
+  | List    Path.AbsRelDir   ([ModulePath] -> m k)
   deriving (Functor, Generic1)
 
 instance HFunctor (Modules address value)
@@ -115,8 +115,8 @@ instance ( Has (Reader (ModuleTable (Module (ModuleResult address value)))) sig 
     case op of
       Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap moduleBody . ModuleTable.lookup name >>= k
       Lookup  path  k -> askModuleTable >>= k . fmap moduleBody . ModuleTable.lookup path
-      Resolve names k -> k (find (`Set.member` paths) (map Path.absRel names))
-      List    dir   k -> k (filter ((dir ==) . Path.toString  . Path.takeDirectory) (toList paths))
+      Resolve names k -> k (find (`Set.member` paths) names)
+      List    dir   k -> k (filter ((dir ==) . Path.takeDirectory) (toList paths))
   alg (R other) = ModulesC (alg (R (handleCoercible other)))
 
 askModuleTable :: Has (Reader (ModuleTable (Module (ModuleResult address value)))) sig m => m (ModuleTable (Module (ModuleResult address value)))
@@ -152,8 +152,8 @@ throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (Modu
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError resume where
-  NotFoundError :: String   -- The path that was not found.
-                -> [String] -- List of paths searched that shows where semantic looked for this module.
+  NotFoundError :: Path.AbsRelFileDir   -- The path that was not found.
+                -> [Path.AbsRelFile] -- List of paths searched that shows where semantic looked for this module.
                 -> Language -- Language.
                 -> ResolutionError ModulePath
 

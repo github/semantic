@@ -25,6 +25,7 @@ import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Source.Span
+import qualified System.Path as Path
 
 newtype Text a = Text { value :: T.Text }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
@@ -61,9 +62,9 @@ resolvePHPName :: ( Has (Modules address value) sig m
                -> Evaluator term address value m ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
-  maybeM (throwResolutionError $ NotFoundError name [name] Language.PHP) modulePath
+  maybeM (throwResolutionError $ NotFoundError (Path.toFileDir name) [name] Language.PHP) modulePath
   where name = toName n
-        toName = T.unpack . dropRelativePrefix . stripQuotes
+        toName = Path.absRel . T.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( Has (Modules address value) sig m
            , Has (Reader (CurrentFrame address)) sig m

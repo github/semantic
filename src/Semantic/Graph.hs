@@ -74,6 +74,7 @@ import           Data.Language as Language
 import           Data.List (find, isPrefixOf)
 import           Data.Map (Map)
 import qualified Data.Map as Map
+import           Data.Maybe (fromMaybe)
 import           Data.Proxy
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
@@ -383,7 +384,7 @@ resumingResolutionError :: ( Has Trace sig m
 resumingResolutionError = runResolutionErrorWith $ \ baseError -> do
   traceError "ResolutionError" baseError
   case baseErrorException baseError of
-    NotFoundError nameToResolve _ _ -> pure $ Path.absRel nameToResolve
+    NotFoundError nameToResolve _ _ -> pure $ fromMaybe (Path.toAbsRel Path.emptyFile) $ Path.fileFromFileDir nameToResolve
     GoImportError pathToResolve     -> pure [Path.absRel pathToResolve]
 
 resumingLoadError :: ( Has Trace sig m
