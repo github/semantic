@@ -16,7 +16,7 @@ import qualified System.Path as Path
 
 import qualified Analysis.File as File
 import           Data.Flag
-import           Proto.Semantic as P hiding (Blob, BlobPair)
+import           Proto.Semantic as P hiding (Blob)
 import           Semantic.Api.Symbols (parseSymbols)
 import           Semantic.Config as Config
 import           Semantic.Task
