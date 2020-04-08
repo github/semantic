@@ -32,6 +32,7 @@ import           Control.Effect.State
 import           Control.Lens (set, (^.))
 import           Data.Foldable
 import           Data.List.NonEmpty (NonEmpty (..))
+import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map.Strict as Map
 import           Data.Maybe
 import           Data.Monoid
@@ -44,7 +45,7 @@ import           GHC.TypeLits
 import qualified Language.Python.AST as Py
 import           Language.Python.Patterns
 import           Scope.Graph.Convert (Result (..), complete, todo)
-import           Scope.Types
+import           Scope.Types as Scope
 import           Source.Loc (Loc)
 import           Source.Span (Span, span_)
 import           Stack.Graph ((-<<), (>>-))
@@ -238,15 +239,16 @@ instance ToScopeGraph Py.GlobalStatement where scopeGraph = todo
 instance ToScopeGraph Py.Integer where scopeGraph = mempty
 
 instance ToScopeGraph Py.ImportStatement where
-  scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier _ _) :| _))) :| [])) = do
+  scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier ann definition) :| _))) :| [])) = do
     rootScope' <- rootScope
     name <- Name.gensym
 
-    childGraph <- addDeclarations ((\(Py.Identifier ann name) -> (Name.name name, Identifier, ann)) <$> names)
-    let childGraph' = (Stack.scope name >>- childGraph >>- Stack.vertex rootScope')
+    let names' = ((\(Py.Identifier ann name) -> (Name.name name, Identifier, ann)) <$> names)
+    childGraph <- addDeclarations names'
+    let childGraph' = (Stack.addEdge (Stack.Scope name) (Stack.Declaration (Name.name definition) Identifier ann) childGraph)
+    let childGraph'' = Stack.addEdge ((\(name, kind, ann) -> Stack.Reference name kind ann) (NonEmpty.last names')) rootScope' childGraph'
 
-    -- _b -> ...
-    modify (Stack.transpose . (Stack.transpose childGraph' -<<))
+    modify (Stack.overlay childGraph'')
 
     putCurrentScope name
 
@@ -309,20 +311,19 @@ instance ToScopeGraph Py.NonlocalStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.Module where
   scopeGraph term@(Py.Module ann _) = do
-    currentGraph <- get @(Stack.Graph Stack.Node)
+    rootScope' <- rootScope
 
     putCurrentScope "__main__"
 
-    put (Stack.scope "__main__")
+    modify (Stack.addEdge rootScope' (Stack.Scope "__main__"))
+    modify (Stack.addEdge (Stack.Scope "__main__") (Stack.Declaration "__main__" Identifier ann))
 
     onChildren term
 
     newGraph <- get @(Stack.Graph Stack.Node)
 
     ScopeGraph.CurrentScope currentName <- currentScope
-    let overlayedGraph = Stack.overlay (Stack.scope currentName -<< Stack.declaration "__main__" Identifier ann -<< currentGraph) newGraph
-
-    put (Stack.simplify overlayedGraph)
+    modify (Stack.overlay newGraph . (Stack.addEdge (Stack.Declaration "__main__" Identifier ann) (Stack.Scope currentName)))
 
     complete
 
