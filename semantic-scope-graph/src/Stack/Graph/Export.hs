@@ -26,8 +26,8 @@ nodeToDotName (_ :# i) = "node_" <> show i
 
 nodeAttributes :: Tagged Node -> [Dot.Attribute String]
 nodeAttributes (node :# idx) = case node of
-  Declaration s -> [ "shape" := "rect", "label" := sym s, "color" := "red", "penwidth" := "5" ]
-  Reference s   -> [ "shape" := "rect", "label" := sym s, "color" := "green", "peripheries" := "2"]
+  Declaration s _ _ -> [ "shape" := "rect", "label" := sym s, "color" := "red", "penwidth" := "5" ]
+  Reference s _ _   -> [ "shape" := "rect", "label" := sym s, "color" := "green", "peripheries" := "2"]
   PushSymbol s  -> [ "shape" := "rect", "label" := sym s, "color" := "green", "style" := "dashed"]
   PopSymbol s   -> [ "shape" := "diamond", "label" := sym s, "color" := "green", "style" := "dashed"]
   PushScope     -> [ "shape" := "rect", "label" := ("PUSH " <> show idx)]
