@@ -88,7 +88,7 @@ Available options:
 |          | JSX            | ✅     | ✅     | ✅    | 🔶  |         |              | | |
 |          | Haskell        | 🚧     | 🚧     | 🚧    | 🔶  | 🚧       |              | | |
 |          | Markdown       | 🚧     | 🚧     | 🚧    | 🚧  | N/A     | N/A          | N/A | &nbsp; |
-|          | CodeQL         | 🚧     | N/A    | 🚧    | 🚧  | 🚧     |           |  | |
+|          | CodeQL         | ✅     | N/A    | 🚧    | 🚧  |  ✅    |           |  | |
 
 * ✅ — Supported
 * 🔶 — Partial support
