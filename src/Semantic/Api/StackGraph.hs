@@ -218,7 +218,7 @@ toSGNode (node :# tag) = (case node of
 
 toPaths :: Stack.Graph Stack.Node -> [SGPath]
 toPaths graph = let
-  mainNodes = flip Set.filter (Stack.vertexSet (Stack.tagGraphUniquely (traceShowId graph))) $ isMainNode
+  mainNodes = flip Set.filter (Stack.vertexSet (Stack.tagGraphUniquely graph)) $ isMainNode
   currentPaths = flip Set.map mainNodes $ \taggedNode@(node Stack.:# _) ->
     let
       path = Path.Path { Path.startingNode = taggedNode, Path.endingNode = taggedNode, Path.edges = mempty, Path.startingSymbolStack = mempty, Path.endingSymbolStack = mempty, Path.startingScopeStackSize = Path.Zero, Path.endingScopeStack = mempty}
@@ -226,7 +226,7 @@ toPaths graph = let
     in
       if isReferenceNode taggedNode then referenceNodePath else path
   in
-    toSGPath <$> reducePaths' graph (toList (traceShow (toSGPath <$> toList currentPaths) currentPaths))
+    traceShow (Stack.edgeSet (Stack.tagGraphUniquely graph)) (toSGPath <$> reducePaths' graph (toList (traceShow (toSGPath <$> toList currentPaths) currentPaths)))
 
 reducePaths' :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
 reducePaths' graph initialPaths = runST $ do
@@ -247,16 +247,18 @@ reducePaths' graph initialPaths = runST $ do
 
           if (Path.completion currentPath == Path.Complete || Path.isPartial currentPath) && Path.validity currentPath == Path.Valid
           then do
-            traceM ("Current Path is complete: " <> show (Path.completion currentPath == Path.Complete) <> "partial: " <> show (Path.isPartial currentPath))
+            traceM ("Current Path is complete: " <> show (Path.completion currentPath == Path.Complete) <> " partial: " <> show (Path.isPartial currentPath))
             traceM (show (toSGPath currentPath))
             modifySTRef' pathsRef (currentPath :)
           else do
-            traceM "Current Path not complete or partial"
-            traceM (show (toSGPath currentPath))
+            -- traceM "Current Path not complete or partial"
+            -- traceM (show (toSGPath currentPath))
             pure ()
           do
             graph <- readSTRef graphRef
             let nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode currentPath) (Stack.edgeSet graph)
+
+            if null nextEdges then traceM ("No next edges found dropping current path" <> (show (toSGPath currentPath))) else pure ()
 
             for_ nextEdges $ \(a, b) -> do
               if Maybe.isJust ((Path.Edge a b "") `Seq.elemIndexL` (Path.edges currentPath))
@@ -264,6 +266,8 @@ reducePaths' graph initialPaths = runST $ do
                 traceM ("Ignoring edge:" <> show a <> show b)
                 pure ()
               else do
+                traceM "Attempting to append to:"
+                traceM (show (toSGPath currentPath))
                 let newPath = appendEdge currentPath (Path.Edge a b "")
                 case newPath of
                   Just newPath -> do
@@ -271,20 +275,22 @@ reducePaths' graph initialPaths = runST $ do
                     traceM (show (toSGPath newPath))
                     modifySTRef' currentPathsRef (newPath :)
                   Nothing -> do
-                    traceM "Failed to append edge to currentPath"
+                    traceM "Appending failed"
                     traceM (show (extract a))
-                    traceM (show (extract b))
+                    -- traceM (show (extract b))
                     pure ()
 
           go currentPathsRef pathsRef graphRef
 
 appendEdge :: Path.Path -> Path.Edge -> Maybe Path.Path
-appendEdge path edge = runST $ do
+appendEdge path edge@(Path.Edge sourceNode sinkNode _) = runST $ do
   currentPathRef <- newSTRef path
   newPathRef <- newSTRef Nothing
+  let isCheeseRef = (sourceNode^.identifier) == 5
   let node = Path.sinkNode edge
   -- FIXME: Append the new edge to the currentPath
-  modifySTRef' currentPathRef $ \path -> path { Path.edges = ((Path.edges path) |> edge), Path.endingNode = (Path.sinkNode edge) }
+  modifySTRef' currentPathRef $ \path -> path { Path.edges = ((Path.edges path) |> edge), Path.endingNode = sinkNode }
+  if isCheeseRef then traceM ("sinkNode ID:" <> show (sinkNode^.identifier)) else pure ()
 
   -- 2.
   if isReferenceOrPushSymbol node
