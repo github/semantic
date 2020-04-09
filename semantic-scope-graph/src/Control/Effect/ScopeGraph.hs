@@ -162,8 +162,7 @@ addDeclarations names = do
       graph''' = foldr (\(name, kind, loc) graph ->
         Stack.addEdge (Stack.Reference name kind loc) (Stack.PushSymbol ".") graph) mempty (NonEmpty.init $ NonEmpty.reverse names)
       graph'''' = Stack.overlay graph'' (Stack.addEdge (Stack.PushSymbol ".") ((\(name, kind, loc) -> (Stack.Reference name kind loc)) (NonEmpty.head names))  graph''')
-      graph''''' = foldr (\(name, kind, loc) graph ->
-        Stack.addEdge (Stack.Declaration name kind loc) (Stack.Reference name kind loc) graph) graph'''' names
+      graph''''' = (\(name, kind, loc) -> Stack.addEdge (Stack.Declaration name kind loc) (Stack.Reference name kind loc) graph'''') (NonEmpty.last names)
   pure graph'''''
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
