@@ -222,7 +222,7 @@ toPaths graph = let
   currentPaths = flip Set.map mainNodes $ \taggedNode@(node Stack.:# _) ->
     let
       path = Path.Path { Path.startingNode = taggedNode, Path.endingNode = taggedNode, Path.edges = mempty, Path.startingSymbolStack = mempty, Path.endingSymbolStack = mempty, Path.startingScopeStackSize = Path.Zero, Path.endingScopeStack = mempty}
-      referenceNodePath = path { Path.endingSymbolStack = ((Stack.symbol node :: Stack.Symbol) : (Path.endingSymbolStack path)) }
+      referenceNodePath = path { Path.endingSymbolStack = Stack.symbol node <| Path.endingSymbolStack path }
     in
       if isReferenceNode taggedNode then referenceNodePath else path
   in
@@ -296,7 +296,7 @@ appendEdge path edge@(Path.Edge sourceNode sinkNode _) = runST $ do
   if isReferenceOrPushSymbol node
     then do
       let (node' :# _) = node
-      modifySTRef' currentPathRef $ \path -> path { Path.endingSymbolStack = (Stack.symbol node') : (Path.endingSymbolStack path) }
+      modifySTRef' currentPathRef $ \path -> path { Path.endingSymbolStack = Stack.symbol node' <| Path.endingSymbolStack path }
       currentPath <- readSTRef currentPathRef
       writeSTRef newPathRef (Just currentPath)
       readSTRef newPathRef
@@ -305,17 +305,17 @@ appendEdge path edge@(Path.Edge sourceNode sinkNode _) = runST $ do
       let (node' :# _) = node
       -- 3.i.
       if null (Path.endingSymbolStack path) then do
-        modifySTRef' currentPathRef $ \path -> path { Path.startingSymbolStack = (Stack.symbol node') : (Path.startingSymbolStack path) }
+        modifySTRef' currentPathRef $ \path -> path { Path.startingSymbolStack = (Path.startingSymbolStack path) |> (Stack.symbol node') }
         currentPath <- readSTRef currentPathRef
         writeSTRef newPathRef (Just currentPath)
         readSTRef newPathRef
-      else if (Maybe.listToMaybe $ Path.endingSymbolStack path) /= Just (Stack.symbol node') then do
+      else if Seq.lookup 0 (Path.endingSymbolStack path) /= Just (Stack.symbol node') then do
           -- 3.ii.
           traceM "Partial Path is not valid: abort"
           readSTRef newPathRef
         else do
           -- 3.iii.
-          modifySTRef' currentPathRef $ \path -> path { Path.endingSymbolStack = drop 1 (Path.endingSymbolStack path) }
+          modifySTRef' currentPathRef $ \path -> path { Path.endingSymbolStack = Seq.drop 1 (Path.endingSymbolStack path) }
           currentPath <- readSTRef currentPathRef
           writeSTRef newPathRef (Just currentPath)
           readSTRef newPathRef
@@ -342,7 +342,7 @@ appendEdge path edge@(Path.Edge sourceNode sinkNode _) = runST $ do
         -- 5.ii.a
         path <- readSTRef currentPathRef
         let scopeTag = head (Path.endingScopeStack path)
-            scopeIdentifier = head (Path.endingSymbolStack path)
+            scopeIdentifier = Seq.index (Path.endingSymbolStack path) 0
         modifySTRef' currentPathRef $ \path -> path { Path.endingScopeStack = drop 1 (Path.endingScopeStack path) }
 
         -- 5.ii.b
@@ -425,13 +425,13 @@ isReferenceNode (node Stack.:# _) = case node of
 
 toSGPath :: Path.Path -> SGPath
 toSGPath Path.Path{..} = SGPath {
-    pathStartingSymbolStack = Name.formatName <$> startingSymbolStack
+    pathStartingSymbolStack = Name.formatName <$> toList startingSymbolStack
   , pathStartingScopeStackSize = fromIntegral (fromEnum startingScopeStackSize)
   , pathFrom = startingNode ^. identifier
   , pathEdges = foldMap Path.label edges
   , pathTo = endingNode ^. identifier
   , pathEndingScopeStack = endingScopeStack
-  , pathEndingSymbolStack = Name.formatName <$> endingSymbolStack
+  , pathEndingSymbolStack = Name.formatName <$> toList endingSymbolStack
 }
 
 class ToStackGraph term where

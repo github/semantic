@@ -138,8 +138,8 @@ pathToApiPath path =
     & P.from .~ path^.SG.startingNode_.identifier
     & P.to .~ path^.SG.endingNode_.identifier
     & P.endingScopeStack .~ path^.SG.endingScopeStack_
-    & P.startingSymbolStack .~ fmap formatName (path^.SG.startingSymbolStack_)
-    & P.endingSymbolStack .~ fmap formatName (path^.SG.endingSymbolStack_)
+    & P.startingSymbolStack .~ fmap formatName (toList $ path^.SG.startingSymbolStack_)
+    & P.endingSymbolStack .~ fmap formatName (toList $ path^.SG.endingSymbolStack_)
     & P.startingScopeStackSize .~ (if path^.SG.startingScopeStackSize_ == SG.One then 1 else 0)
     & P.edges .~ formatEdges (path^.SG.edges_)
       where
@@ -161,8 +161,8 @@ apiPathToPath nc path = Validation.toEither validate >>= ensureInvariantsHold
       endingNode <- lookupNode (path^.P.to)
       endingScopeStack <- pure (path^.P.endingScopeStack)
       edges <- pure . Seq.fromList . SG.parseEdges . view P.edges $ path
-      startingSymbolStack <- pure . fmap name . view P.startingSymbolStack $ path
-      endingSymbolStack <- pure . fmap name . view P.startingSymbolStack $ path
+      startingSymbolStack <- pure . Seq.fromList . fmap name . toList . view P.startingSymbolStack $ path
+      endingSymbolStack <- pure . Seq.fromList . fmap name . toList . view P.startingSymbolStack $ path
       startingScopeStackSize <- case path^.P.startingScopeStackSize of
         0 -> pure SG.Zero
         1 -> pure SG.One

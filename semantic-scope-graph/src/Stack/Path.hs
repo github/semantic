@@ -39,14 +39,15 @@ import           Control.Lens.Getter ((^.))
 import           Control.Lens.Lens
 import           Data.Functor.Tagged
 import           Data.Generics.Product
-import           Data.List (isPrefixOf)
 import           Data.Monoid
 import           Data.Semigroup (sconcat)
+import qualified Data.Sequence as Seq
 import           Data.Sequence (Seq (..), (|>))
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           GHC.Generics
 import           Stack.Graph (Node (..), Symbol, isRoot)
+import           Data.Monoid.Cancellative (isPrefixOf)
 
 -- | A partial path through a stack graph. These will be generated
 -- from walks through the stack graph, and can be thought of as
@@ -56,8 +57,8 @@ data Path = Path
   { startingNode           :: Tagged Node
   , endingNode             :: Tagged Node
   , edges                  :: Seq Edge
-  , startingSymbolStack    :: [Symbol]
-  , endingSymbolStack      :: [Symbol]
+  , startingSymbolStack    :: Seq Symbol
+  , endingSymbolStack      :: Seq Symbol
   , startingScopeStackSize :: StartingSize
   , endingScopeStack       :: [Tag] -- Should this be (Seq (Tagged Node))?
   } deriving (Eq, Show, Generic, Ord)
@@ -71,13 +72,13 @@ endingNode_ = field @"endingNode"
 edges_ :: Lens' Path (Seq Edge)
 edges_ = field @"edges"
 
-startingSymbolStack_ :: Lens' Path [Symbol]
+startingSymbolStack_ :: Lens' Path (Seq Symbol)
 startingSymbolStack_ = field @"startingSymbolStack"
 
 startingScopeStackSize_ :: Lens' Path StartingSize
 startingScopeStackSize_ = field @"startingScopeStackSize"
 
-endingSymbolStack_ :: Lens' Path [Symbol]
+endingSymbolStack_ :: Lens' Path (Seq Symbol)
 endingSymbolStack_ = field @"endingSymbolStack"
 
 endingScopeStack_ :: Lens' Path [Tag]
@@ -234,7 +235,7 @@ compatibility left right
             _                              -> False
        in bothRootNode || bothSameScope
     -- The starting symbol stack of 'right' is a prefix of the ending symbol stack of 'left'.
-    stackPrefix = startingSymbolStack right `isPrefixOf` endingSymbolStack left
+    stackPrefix = (startingSymbolStack right :: Seq Symbol) `isPrefixOf` (endingSymbolStack left :: Seq Symbol)
     -- The ending scope stack of 'left' has at least as many elements as the starting scope stack size of 'right'.
     hasElements = length (endingScopeStack left) >= fromEnum (startingScopeStackSize right)
 
@@ -253,7 +254,7 @@ concatenate left right
           -- Let new symbol stack be a copy of left's ending symbol stack.
           let newSymbolStack = endingSymbolStack left
               -- Remove right's starting symbol stack from the beginning of new symbol stack. (This must succeed because the two input paths are compatible.)
-              withoutRight = drop (length (startingSymbolStack right)) newSymbolStack
+              withoutRight = Seq.drop (length (startingSymbolStack right)) newSymbolStack
            in -- Prepend a copy of right's ending symbol stack to the beginning of new symbol stack.
               endingSymbolStack right <> withoutRight
         -- The new path's ending scope stack is the value of new scope stack after doing the following:
