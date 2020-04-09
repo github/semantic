@@ -241,14 +241,16 @@ instance ToScopeGraph Py.Integer where scopeGraph = mempty
 instance ToScopeGraph Py.ImportStatement where
   scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier ann definition) :| _))) :| [])) = do
     rootScope' <- rootScope
+    ScopeGraph.CurrentScope previousScope <- currentScope
+
     name <- Name.gensym
 
     let names' = ((\(Py.Identifier ann name) -> (Name.name name, Identifier, ann)) <$> names)
     childGraph <- addDeclarations names'
     let childGraph' = (Stack.addEdge (Stack.Scope name) (Stack.Declaration (Name.name definition) Identifier ann) childGraph)
-    let childGraph'' = Stack.addEdge ((\(name, kind, ann) -> Stack.Reference name kind ann) (NonEmpty.last names')) rootScope' childGraph'
+    let childGraph'' = Stack.addEdge ((\(name, kind, ann) -> Stack.Reference name kind ann) (NonEmpty.head names')) rootScope' childGraph'
 
-    modify (Stack.overlay childGraph'')
+    modify (Stack.addEdge (Stack.Scope name) (Stack.Scope previousScope) . Stack.overlay childGraph'')
 
     putCurrentScope name
 
@@ -315,15 +317,14 @@ instance ToScopeGraph Py.Module where
 
     putCurrentScope "__main__"
 
-    modify (Stack.addEdge rootScope' (Stack.Scope "__main__"))
-    modify (Stack.addEdge (Stack.Scope "__main__") (Stack.Declaration "__main__" Identifier ann))
+    modify (Stack.addEdge rootScope' (Stack.Declaration "__main__" Identifier ann))
 
     onChildren term
 
     newGraph <- get @(Stack.Graph Stack.Node)
 
     ScopeGraph.CurrentScope currentName <- currentScope
-    modify (Stack.overlay newGraph . (Stack.addEdge (Stack.Declaration "__main__" Identifier ann) (Stack.Scope currentName)))
+    modify ((Stack.addEdge (Stack.Declaration "__main__" Identifier ann) (Stack.Scope currentName)) . Stack.overlay newGraph)
 
     complete
 
