@@ -37,7 +37,7 @@ type Tag = Int64
 -- | If creating 'Tagged' values manually, it is your responsibility
 -- to ensure that the provided 'Tag' is actually unique. Consider using 'taggedM'.
 data Tagged a = a :# !Tag
-  deriving (Functor, Foldable, Traversable, Generic)
+  deriving (Functor, Foldable, Traversable, Generic, Show)
 
 infixl 7 :#
 
@@ -46,9 +46,6 @@ contents = position @1
 
 identifier :: Lens' (Tagged a) Tag
 identifier = position @2
-
-instance Show a => Show (Tagged a) where
-  showsPrec n (a :# t) = showsPrec n a <> showString " # " <> showsPrec n t
 
 -- | This is marked as overlappable so that custom types can define
 -- their own definitions of equality when wrapped in a Tagged. This
