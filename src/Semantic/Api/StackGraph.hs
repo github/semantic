@@ -218,7 +218,7 @@ toSGNode (node :# tag) = (case node of
 
 toPaths :: Stack.Graph Stack.Node -> [SGPath]
 toPaths graph = let
-  mainNodes = flip Set.filter (Stack.vertexSet (Stack.tagGraphUniquely graph)) $ isMainNode
+  mainNodes = flip Set.filter (traceShowId (Stack.vertexSet (Stack.tagGraphUniquely graph))) $ isMainNode
   currentPaths = flip Set.map mainNodes $ \taggedNode@(node Stack.:# _) ->
     let
       path = Path.Path { Path.startingNode = taggedNode, Path.endingNode = taggedNode, Path.edges = mempty, Path.startingSymbolStack = mempty, Path.endingSymbolStack = mempty, Path.startingScopeStackSize = Path.Zero, Path.endingScopeStack = mempty}
