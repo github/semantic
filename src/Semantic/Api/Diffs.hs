@@ -37,7 +37,7 @@ import           Data.Term (IsTerm (..))
 import qualified Data.Text as T
 import           Diffing.Interpreter (DiffTerms (..))
 import           Parsing.Parser
-import           Proto.Semantic as P hiding (Blob, BlobPair)
+import           Proto.Semantic as P hiding (Blob)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
 import           Rendering.Graph

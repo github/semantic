@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic
-version:             0.10.1.0
+version:             0.11.0.0
 synopsis:            Framework and executable for analyzing and diffing untrusted code.
 description:         Semantic is a library for parsing, analyzing, and comparing source code across many languages.
 homepage:            http://github.com/github/semantic#readme
@@ -92,7 +92,6 @@ library
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
-                     , Analysis.TOCSummary
                      , Analysis.Decorator
                      , Analysis.HasTextElement
                      , Analysis.PackageDef
@@ -212,7 +211,6 @@ library
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
-                     , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
@@ -226,7 +224,6 @@ library
                      , Semantic.Api.StackGraph
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
-                     , Semantic.Api.TOCSummaries
                      , Semantic.CLI
                      , Semantic.Config
                      , Semantic.Distribute
@@ -347,7 +344,6 @@ test-suite test
                      , Integration.Spec
                      , Numeric.Spec
                      , Parsing.Spec
-                     , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
                      , Semantic.IO.Spec
