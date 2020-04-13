@@ -5,6 +5,7 @@
 {-# LANGUAGE RecordWildCards #-}
 module Semantic.Api.StackGraph
   ( parseStackGraph
+  , parseStackGraphBuilder
   , TempStackGraph(..)
   , SGNode(..)
   , SGPath(..)
@@ -16,11 +17,13 @@ import qualified Analysis.Name as Name
 import qualified Control.Carrier.Sketch.ScopeGraph as ScopeGraph
 import           Control.Effect.Error
 import           Control.Effect.Parse
+import           Control.Effect.Reader
 import           Control.Exception
 import           Control.Lens hiding ((|>))
 import           Control.Monad (when)
 import           Control.Monad.ST
 import           Data.Blob
+import           Data.ByteString.Builder
 import           Data.Foldable
 import           Data.Functor.Tagged
 import           Data.Int
@@ -44,11 +47,15 @@ import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
 import qualified Scope.Graph.Convert as Graph
 import           Semantic.Api.Bridge
+import           Semantic.Config
 import           Semantic.Task
+import           Serializing.Format (Format)
 import           Source.Loc as Loc
 import qualified Stack.Graph as Stack
 import qualified Stack.Path as Path
 
+parseStackGraphBuilder :: (Effect sig, Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Has (Reader PerLanguageModes) sig m, Traversable t) => Format StackGraphResponse -> t Blob -> m Builder
+parseStackGraphBuilder format blobs = parseStackGraph blobs >>= serialize format
 
 parseStackGraph :: ( Has (Error SomeException) sig m
                    , Effect sig
