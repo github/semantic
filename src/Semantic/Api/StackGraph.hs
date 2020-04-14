@@ -254,37 +254,23 @@ reducePaths' graph initialPaths = runST $ do
 
           if (Path.completion currentPath == Path.Complete || Path.isPartial currentPath) && Path.validity currentPath == Path.Valid
           then do
-            traceM ("Current Path is complete: " <> show (Path.completion currentPath == Path.Complete) <> " partial: " <> show (Path.isPartial currentPath))
-            traceM (show (toSGPath currentPath))
             modifySTRef' pathsRef (currentPath :)
           else do
-            -- traceM "Current Path not complete or partial"
-            -- traceM (show (toSGPath currentPath))
             pure ()
           do
             graph <- readSTRef graphRef
             let nextEdges = toList $ Set.filter  (\(a, _) -> a == Path.endingNode currentPath) (Stack.edgeSet graph)
 
-            if null nextEdges then traceM ("No next edges found dropping current path" <> (show (toSGPath currentPath))) else pure ()
-
             for_ nextEdges $ \(a, b) -> do
               if Maybe.isJust ((Path.Edge a b "") `Seq.elemIndexL` (Path.edges currentPath))
               then do
-                traceM ("Ignoring edge:" <> show a <> show b)
                 pure ()
               else do
-                traceM "Attempting to append to:"
-                traceM (show (toSGPath currentPath))
                 let newPath = appendEdge currentPath (Path.Edge a b "")
                 case newPath of
                   Just newPath -> do
-                    traceM "Appending succeeded"
-                    traceM (show (toSGPath newPath))
                     modifySTRef' currentPathsRef (newPath :)
                   Nothing -> do
-                    traceM "Appending failed"
-                    traceM (show (extract a))
-                    -- traceM (show (extract b))
                     pure ()
 
           go currentPathsRef pathsRef graphRef
@@ -297,7 +283,6 @@ appendEdge path edge@(Path.Edge sourceNode sinkNode _) = runST $ do
   let node = Path.sinkNode edge
   -- FIXME: Append the new edge to the currentPath
   modifySTRef' currentPathRef $ \path -> path { Path.edges = ((Path.edges path) |> edge), Path.endingNode = sinkNode }
-  if isCheeseRef then traceM ("sinkNode ID:" <> show (sinkNode^.identifier)) else pure ()
 
   -- 2.
   if isReferenceOrPushSymbol node
@@ -318,7 +303,6 @@ appendEdge path edge@(Path.Edge sourceNode sinkNode _) = runST $ do
         readSTRef newPathRef
       else if Seq.lookup 0 (Path.endingSymbolStack path) /= Just (Stack.symbol node') then do
           -- 3.ii.
-          traceM "Partial Path is not valid: abort"
           readSTRef newPathRef
         else do
           -- 3.iii.
