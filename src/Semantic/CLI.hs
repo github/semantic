@@ -123,6 +123,9 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
         <|> flag' (parseSymbolsBuilder Proto)
                   (  long "proto-symbols"
                   <> help "Output protobufs symbol list")
+        <|> flag' (parseStackGraphBuilder Proto)
+                  (  long "proto-stack-graph"
+                  <> help "Output protobufs stack graph")
         <|> flag' (parseTermBuilder TermDotGraph)
                   (  long "dot"
                   <> help "Output DOT graph parse trees")
