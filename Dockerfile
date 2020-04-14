@@ -1,5 +1,5 @@
 # Put protoc and twirp tooling in its own image
-FROM haskell:8.8.1 as haskell
+FROM haskell:8.8.3 as haskell
 RUN cabal v2-update && \
     cabal v2-install proto-lens-protoc
 RUN which proto-lens-protoc
@@ -22,7 +22,7 @@ COPY --from=haskell /opt/ghc/8.8.1/lib/ghc-8.8.1/* /opt/ghc/8.8.1/lib/ghc-8.8.1/
 ENTRYPOINT ["/protobuf/bin/protoc", "-I/protobuf", "--plugin=protoc-gen-haskell=/usr/local/bin/proto-lens-protoc"]
 
 # Build semantic
-FROM haskell:8.8.1 as build
+FROM haskell:8.8.3 as build
 WORKDIR /build
 
 # Build all of semantic
