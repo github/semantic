@@ -17,7 +17,7 @@ RUN go get github.com/golang/protobuf/proto && \
 COPY --from=haskell /root/.cabal/bin/proto-lens-protoc /usr/local/bin/proto-lens-protoc
 
 # Bit of a hack so that proto-lens-protoc actually runs
-COPY --from=haskell /opt/ghc/8.8.1/lib/ghc-8.8.1/* /opt/ghc/8.8.1/lib/ghc-8.8.1/
+COPY --from=haskell /opt/ghc/8.8.3/lib/ghc-8.8.3/* /opt/ghc/8.8.3/lib/ghc-8.8.3/
 
 ENTRYPOINT ["/protobuf/bin/protoc", "-I/protobuf", "--plugin=protoc-gen-haskell=/usr/local/bin/proto-lens-protoc"]
 
