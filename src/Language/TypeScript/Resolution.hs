@@ -76,6 +76,10 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
+-- TODO: The NonRelative package means the packages in node_modules,
+--       laying relatively in filesystem under the project root. Perhaps we
+--       can rename the function like resolvePackagePath to resolve the
+--       confusion between Path.RelDir and NonRelative.
 resolveNonRelativePath :: ( Has (Modules address value) sig m
                           , Has (Reader M.ModuleInfo) sig m
                           , Has (Reader PackageInfo) sig m
