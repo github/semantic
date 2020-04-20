@@ -70,7 +70,7 @@ test-suite compiling
   import: haskell
   type: exitcode-stdio-1.0
   hs-source-dirs: test
-  main-is: Test.hs
+  main-is: CoreTest.hs
   ghc-options: -threaded
 
   build-depends: semantic-python == 0.0.0.0
