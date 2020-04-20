@@ -15,7 +15,7 @@ Note that we recently transitioned the system to auto-generate strongly-typed AS
     - `Language.[LANGUAGE].Grammar` - Provides statically-known rules corresponding to symbols in the grammar for each syntax node, generated with the `mkStaticallyKnownRuleGrammarData` Template Haskell splice. ([example](https://github.com/github/semantic/blob/master/semantic-python/src/Language/Python/Grammar.hs)).
     - `Language.[LANGUAGE]` - Semantic functionality for programs in a language ([example](https://github.com/github/semantic/blob/master/semantic-python/src/Language/Python.hs)).
     - `Language.[LANGUAGE].Tags` - Computes tags for code nav definitions and references found in source ([example](https://github.com/github/semantic/blob/master/semantic-python/src/Language/Python/Tags.hs)).
-5. **Add tests for diffing, tagging, graphing, and evaluating code written in that language.** Because tree-sitter grammars often change, we require extensive testing so as to avoid the unhappy situation of bitrotted languages that break as soon as a new grammar comes down the line.
+5. **Add tests for precise ASTs, diffing, tagging and graphing, and evaluating code written in that language.** Because tree-sitter grammars often change, we require extensive testing so as to avoid the unhappy situation of bitrotted languages that break as soon as a new grammar comes down the line.
 
 To summarize, each interaction made possible by the Semantic CLI corresponds to one (or more) of the above steps:
 
