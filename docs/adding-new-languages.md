@@ -1,6 +1,6 @@
 # Adding new languages to Semantic
 
-This document exists to outline the process associated with adding a new language to Semantic. Though the Semantic authors have architected the library such that adding new languages and syntax [requires no changes to existing code](https://en.wikipedia.org/wiki/Expression_problem), adding support for a new language is a nontrivial amount of work. Those willing to take the plunge will probably need a degree of Haskell experience.
+This document outlines the process for adding a new language to Semantic. Though the Semantic authors have architected the library such that adding new languages and syntax [requires no changes to existing code](https://en.wikipedia.org/wiki/Expression_problem), adding support for a new language is a nontrivial amount of work. Those willing to take the plunge will probably need a degree of Haskell experience.
 
 Please note that this list of steps reflects the state of Semantic as is, not where we authors are taking it: we're working on significant simplifications to this process (see the FAQs below).
 
