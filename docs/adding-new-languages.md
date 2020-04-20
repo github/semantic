@@ -2,7 +2,7 @@
 
 This document outlines the process for adding a new language to Semantic. Though the Semantic authors have architected the library such that adding new languages and syntax [requires no changes to existing code](https://en.wikipedia.org/wiki/Expression_problem), adding support for a new language is a nontrivial amount of work. Those willing to take the plunge will probably need a degree of Haskell experience.
 
-Please note that this list of steps reflects the state of Semantic as is, not where we authors are taking it.
+Note that we recently transitioned the system to auto-generate strongly-typed ASTs using [CodeGen](https://github.com/github/semantic/blob/master/docs/codegen.md), our new language support library. More information is provided below in the [FAQs](#FAQs).
 
 ## The procedure
 
