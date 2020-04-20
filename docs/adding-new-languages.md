@@ -23,7 +23,7 @@ To summarize, each interaction made possible by the Semantic CLI corresponds to 
 |------|-----------------|
 | 1, 2 | `ts-parse`      |
 | 3, 4 | `parse`, `diff` |
-| 5, 6 | `graph`         |
+| 5 | `graph`         |
 
 
 # FAQs
