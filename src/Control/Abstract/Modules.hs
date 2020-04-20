@@ -157,7 +157,9 @@ data ResolutionError resume where
                 -> Language -- Language.
                 -> ResolutionError ModulePath
 
-  GoImportError :: FilePath -> ResolutionError [ModulePath]
+  -- Go Lang may have its package import path as an uri like https://github.com/packagename rather than an file path
+  -- TODO: A typed path can be used here to represent the uri
+  GoImportError :: String -> ResolutionError [ModulePath]
 
 deriving instance Eq (ResolutionError b)
 deriving instance Show (ResolutionError b)
