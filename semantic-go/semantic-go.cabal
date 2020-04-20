@@ -61,7 +61,7 @@ test-suite test
   import: haskell
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test
-  main-is:          Test.hs
+  main-is:          PreciseTest.hs
   build-depends:    base
                   , bytestring ^>= 0.10.8.2
                   , hedgehog >= 0.6 && <2
