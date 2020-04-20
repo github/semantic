@@ -2,7 +2,7 @@ module Data.Abstract.Path
   ( dropRelativePrefix
   , joinPaths
   , stripQuotes
-  , joinPathf
+  , joinUntypedPaths
   ) where
 
 import           Data.Text (Text)
@@ -17,9 +17,9 @@ import System.Path.PartClass (FileDir)
 --     joinPaths "a/b" "./c" == "a/b/c"
 --
 -- Walking beyond the beginning of a just stops when you get to the root of a.
-joinPathf :: FilePath -> FilePath -> FilePath
-joinPathf a b = let bs = splitPath (normalise b)
-                    n = length (filter (== "../") bs)
+joinUntypedPaths :: FilePath -> FilePath -> FilePath
+joinUntypedPaths a b = let bs = splitPath (normalise b)
+                           n = length (filter (== "../") bs)
                 in normalise $ walkup n a </> joinPath (drop n bs)
   where
     walkup 0 str = str
@@ -33,7 +33,7 @@ joinPathf a b = let bs = splitPath (normalise b)
 -- Walking beyond the beginning of a just stops when you get to the root of a.
 -- TODO: Rewrite it with pathtype
 joinPaths :: FileDir fd => Path.AbsRelDir -> Path.Rel fd -> Path.AbsRel fd
-joinPaths x y= Path.path $ joinPathf (Path.toString x) (Path.toString y)
+joinPaths x y= Path.path $ joinUntypedPaths (Path.toString x) (Path.toString y)
 
 
 stripQuotes :: Text -> Text
