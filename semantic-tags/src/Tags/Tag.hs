@@ -23,7 +23,9 @@ data Kind
   | Module
   -- References
   | Call
-  -- Types
   | Type
+  -- Just as Call is to Class and Function, Implements is to Interface
+  | Interface
+  | Implementation
   -- Constant -- TODO: New kind for constant references
   deriving (Bounded, Enum, Eq, Show)
