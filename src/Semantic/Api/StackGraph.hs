@@ -233,7 +233,7 @@ toPaths graph = let
     in
       if isReferenceNode taggedNode then referenceNodePath else path
   in
-    Stack.edgeSet (Stack.tagGraphUniquely graph) (toSGPath <$> reducePaths' graph (toList (toSGPath <$> toList currentPaths) currentPaths))
+    toSGPath <$> reducePaths' graph (toList currentPaths)
 
 reducePaths' :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
 reducePaths' graph initialPaths = runST $ do
