@@ -29,7 +29,7 @@ import           Language.Haskell.TH as TH
 import           Language.Haskell.TH.Syntax as TH
 import           System.Directory
 import           System.FilePath.Posix
-import Data.Functor.Identity
+import           Data.Functor.Identity
 import qualified TreeSitter.Language as TS
 import           TreeSitter.Node
 import           TreeSitter.Symbol (TSSymbol, toHaskellCamelCaseIdentifier, toHaskellPascalCaseIdentifier)
