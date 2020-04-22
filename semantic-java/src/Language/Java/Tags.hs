@@ -82,12 +82,11 @@ instance ToTags Java.MethodInvocation where
 
 instance ToTags Java.InterfaceDeclaration where
   tags t@Java.InterfaceDeclaration
-    { ann = loc@Loc { byteRange = Range { start } }
+    { ann = loc@Loc { byteRange  }
     , name = Java.Identifier { text = name }
-    , body = Java.InterfaceBody { ann = Loc Range { start = end } _ }
     } = do
       src <- ask @Source
-      Tags.yield (Tag name Interface loc (Tags.firstLine src (Range start end)) Nothing)
+      Tags.yield (Tag name Interface loc (Tags.firstLine src byteRange) Nothing)
       gtags t
 
 instance ToTags Java.InterfaceTypeList where
