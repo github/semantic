@@ -168,7 +168,7 @@ stackGraphToTempStackGraph :: Stack.Graph Stack.Node -> TempStackGraph
 stackGraphToTempStackGraph graph = let
   graph' = Stack.tagGraphUniquely graph
   nodes = Maybe.catMaybes $ toSGNode <$> Graph.vertexList (Stack.unGraph graph')
-  paths = traceShowId (toPaths graph)
+  paths = toPaths graph
   in TempStackGraph { scopeGraphNodes = nodes, scopeGraphPaths = paths }
 
 toSGNode :: Tagged Stack.Node -> Maybe SGNode
@@ -225,7 +225,7 @@ toSGNode (node :# tag) = (case node of
 
 toPaths :: Stack.Graph Stack.Node -> [SGPath]
 toPaths graph = let
-  mainNodes = flip Set.filter (traceShowId (Stack.vertexSet (Stack.tagGraphUniquely graph))) $ isMainNode
+  mainNodes = flip Set.filter (Stack.vertexSet (Stack.tagGraphUniquely graph)) $ isMainNode
   currentPaths = flip Set.map mainNodes $ \taggedNode@(node Stack.:# _) ->
     let
       path = Path.Path { Path.startingNode = taggedNode, Path.endingNode = taggedNode, Path.edges = mempty, Path.startingSymbolStack = mempty, Path.endingSymbolStack = mempty, Path.startingScopeStackSize = Path.Zero, Path.endingScopeStack = mempty}
@@ -233,7 +233,7 @@ toPaths graph = let
     in
       if isReferenceNode taggedNode then referenceNodePath else path
   in
-    traceShow (Stack.edgeSet (Stack.tagGraphUniquely graph)) (toSGPath <$> reducePaths' graph (toList (traceShow (toSGPath <$> toList currentPaths) currentPaths)))
+    Stack.edgeSet (Stack.tagGraphUniquely graph) (toSGPath <$> reducePaths' graph (toList (toSGPath <$> toList currentPaths) currentPaths))
 
 reducePaths' :: Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
 reducePaths' graph initialPaths = runST $ do

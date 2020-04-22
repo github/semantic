@@ -61,7 +61,7 @@ openFileForReading path = ReadHandle <$> IO.openFile path IO.ReadMode
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: forall m. MonadIO m => Handle 'IO.ReadMode -> m [Blob]
 readBlobsFromHandle handle = do
-  request <- readFromHandle @Proto.ParseTreeRequest handle
+  request <- readFromHandle @Proto.StackGraphRequest handle
   pure (fromProto <$> request^.blobs)
 
 -- | Read line delimited paths from a handle
