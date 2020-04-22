@@ -13,7 +13,7 @@ import qualified Language.Python.Tags as PyTags
 import           Scope.Graph.Convert
 import qualified Tags.Tagging.Precise as Tags
 
-newtype Term a = Term { getTerm :: Py.Module a }
+newtype Term a = Term { getTerm :: Py.Module Err a }
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Py.Module)
