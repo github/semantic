@@ -1,10 +1,10 @@
 cabal-version:       2.4
 
-name:                semantic-typescript
+name:                semantic-codeql
 version:             0.0.0.0
-synopsis:            Semantic support for TypeScript.
-description:         Semantic support for TypeScript using the semantic-core intermediate language.
-homepage:            https://github.com/github/semantic/tree/master/semantic-typescript#readme
+synopsis:            Semantic support for CodeQL.
+description:         Semantic support for CodeQL using the semantic-core intermediate language.
+homepage:            https://github.com/github/semantic/tree/master/semantic-codeql#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
 license-file:        LICENSE
@@ -30,8 +30,8 @@ common haskell
                      , semantic-tags ^>= 0.0
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
-                     , tree-sitter ^>= 0.9.0.0
-                     , tree-sitter-typescript ^>= 0.5.0.1
+                     , tree-sitter ^>= 0.9
+                     , tree-sitter-ql ^>= 0.1.0.2
 
   ghc-options:
     -Weverything
@@ -51,10 +51,10 @@ common haskell
 library
   import: haskell
   exposed-modules:
-    Language.TypeScript
-    Language.TypeScript.AST
-    Language.TypeScript.Grammar
-    Language.TypeScript.Tags
+    Language.CodeQL
+    Language.CodeQL.AST
+    Language.CodeQL.Grammar
+    Language.CodeQL.Tags
   hs-source-dirs: src
 
 test-suite test
@@ -67,7 +67,7 @@ test-suite test
                   , hedgehog >= 0.6 && <2
                   , pathtype ^>= 0.8.1
                   , semantic-ast
-                  , semantic-typescript
+                  , semantic-codeql
                   , tasty
                   , tasty-hedgehog
                   , tasty-hunit

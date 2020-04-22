@@ -30,7 +30,7 @@ import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
 import Data.Flag
-import Proto.Semantic as P hiding (Blob, BlobPair)
+import Proto.Semantic as P hiding (Blob)
 import Proto.Semantic_Fields as P
 import Semantic.Api.Symbols (parseSymbols)
 import Semantic.Config as Config

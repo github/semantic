@@ -43,7 +43,7 @@ resolveGoImport :: ( Has (Modules address value) sig m
 resolveGoImport (ImportPath path Data.ImportPath.Unknown) = throwResolutionError $ GoImportError path
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
-  paths <- listModulesInDir $  (joinPaths (takeDirectory . Path.toString $ modulePath) path)
+  paths <- listModulesInDir $  (joinPaths (Path.takeDirectory modulePath) (Path.rel path))
   case paths of
     [] -> throwResolutionError $ GoImportError path
     _  -> pure paths
@@ -54,7 +54,7 @@ resolveGoImport (ImportPath path NonRelative) = do
     -- Import an absolute path that's defined in this package being analyzed.
     -- First two are source, next is package name, remaining are path to package
     -- (e.g. github.com/golang/<package>/path...).
-    (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
+    (_ : _ : p : xs) | p == package -> listModulesInDir (Path.toAbsRel $ Path.joinPath xs)
     _                               -> throwResolutionError $ GoImportError path
 
 -- | Import declarations (symbols are added directly to the calling environment).

@@ -80,7 +80,7 @@ instance Exc.Exception TSParseException where
     ParserTimedOut -> "tree-sitter: parser timed out"
     IncompatibleVersions -> "tree-sitter: incompatible versions"
     UnmarshalTimedOut -> "tree-sitter: unmarshal timed out"
-    UnmarshalFailure s -> "tree-sitter: unmarshal failure - " <> show s
+    UnmarshalFailure s -> "tree-sitter: unmarshal failure: " <> s
 
 runParse
   :: MonadIO m

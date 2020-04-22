@@ -97,11 +97,11 @@ resolvePythonModules q = do
     search rootDir x = do
       trace ("searching for " <> show x <> " in " <> show rootDir)
       let path = normalise (rootDir </> normalise x)
-      let searchPaths = [ path </> "__init__.py"
+      let searchPaths = Path.absRel <$> [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
       modulePath <- resolve searchPaths
-      maybeM (throwResolutionError $ NotFoundError path searchPaths Language.Python) modulePath
+      maybeM (throwResolutionError $ NotFoundError (Path.absRel path) searchPaths Language.Python) modulePath
 
 data Alias a = Alias { aliasValue :: a, aliasName :: a}
   deriving (Generic1, Diffable, Foldable, FreeVariables1, Functor, Hashable1, ToJSONFields1, Traversable)

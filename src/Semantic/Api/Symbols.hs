@@ -33,7 +33,7 @@ import           Data.Term (IsTerm (..), TermF)
 import           Data.Text (Text)
 import           Data.Text (pack)
 import qualified Parsing.Parser as Parser
-import           Proto.Semantic as P hiding (Blob, BlobPair)
+import           Proto.Semantic as P hiding (Blob)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
 import           Semantic.Api.Bridge
