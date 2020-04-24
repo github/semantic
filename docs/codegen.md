@@ -3,13 +3,12 @@
 CodeGen is the process for auto-generating language-specific, strongly-typed ASTs to be used in [Semantic](https://github.com/github/semantic-code/blob/d9f91a05dc30a61b9ff8c536d75661d417f3c506/design-docs/precise-code-navigation.md). 
 Since it is a critical component of Semantic's language support process, we recommend reading [these docs](https://github.com/github/semantic/blob/master/docs/adding-new-languages.md) first, as they provide an overview of the pipeline CodeGen supports.
 
-### Table of Contents
-- [CodeGen Documentation](#codegen-documentation)
-    - [CodeGen Pipeline](#codegen-pipeline))
-    - [Generating ASTs](#generating-asts)
-    - [Inspecting auto-generated datatypes](#inspecting-auto-generated-datatypes)
-    - [Tests](#tests)
-    - [Additional notes](#additional-notes)
+## Table of Contents
+- [CodeGen Pipeline](#codegen-pipeline)
+- [Generating ASTs](#generating-asts)
+- [Inspecting auto-generated datatypes](#inspecting-auto-generated-datatypes)
+- [Tests](#tests)
+- [Additional notes](#additional-notes)
 
 ### CodeGen Pipeline
 
