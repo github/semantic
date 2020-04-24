@@ -2,6 +2,14 @@
 
 CodeGen is the process for auto-generating language-specific, strongly-typed ASTs to be used in [Semantic](https://github.com/github/semantic-code/blob/d9f91a05dc30a61b9ff8c536d75661d417f3c506/design-docs/precise-code-navigation.md).
 
+### Table of Contents
+- [CodeGen Documentation](#codegen-documentation)
+    - [CodeGen Pipeline](#codegen-pipeline))
+    - [Generating ASTs](#generating-asts)
+    - [Inspecting auto-generated datatypes](#inspecting-auto-generated-datatypes)
+    - [Tests](#tests)
+    - [Additional notes](#additional-notes)
+
 ### CodeGen Pipeline
 
 During parser generation, tree-sitter produces a JSON file that captures the structure of a language's grammar. Based on this, we're able to derive datatypes representing surface languages, and then use those datatypes to generically build ASTs. This automates the engineering effort [historically required for adding a new language](https://github.com/github/semantic/blob/master/docs/adding-new-languages.md).
@@ -15,18 +23,7 @@ The following steps provide a high-level outline of the process:
 ![image](https://user-images.githubusercontent.com/875834/80240750-66d4dd80-8630-11ea-8bbf-4dd3adf65a58.png)
 
 The remaining document provides more details on generating ASTs, inspecting datatypes, tests, and information on decisions pertaining to relevant APIs.
-___
 
-### Table of Contents
-- [CodeGen Documentation](#codegen-documentation)
-    - [Prerequisites](#prerequisites)
-    - [CodeGen Pipeline](#codegen-pipeline)
-    - [Table of Contents](#table-of-contents)
-    - [Generating ASTs](#generating-asts)
-    - [Inspecting auto-generated datatypes](#inspecting-auto-generated-datatypes)
-    - [Tests](#tests)
-    - [Additional notes](#additional-notes)
-___
 
 ### Generating ASTs
 
