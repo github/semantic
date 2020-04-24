@@ -95,7 +95,7 @@ Here is an example that describes the relationship between a Python identifier r
 |----------|--------------|------------|
 |Named leaf|<code>{<br>"type": "identifier",<br>"named": true<br>}|<code>data TreeSitter.Python.AST.Identifier a<br>= TreeSitter.Python.AST.Identifier {TreeSitter.Python.AST.ann :: a,<br>TreeSitter.Python.AST.bytes :: text-1.2.3.1:Data.Text.Internal.Text} -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Show a => Show (TreeSitter.Python.AST.Identifier a) -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Ord a => Ord (TreeSitter.Python.AST.Identifier a) -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Eq a => Eq (TreeSitter.Python.AST.Identifier a) -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Traversable TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Functor TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Foldable TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Unmarshal TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance SymbolMatching TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1|
 
-### Tests
+## Tests
 
 As of right now, Hedgehog tests are minimal and only in place for the Python library.
 
