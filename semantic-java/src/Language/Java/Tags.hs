@@ -8,11 +8,12 @@ module Language.Java.Tags
 ( ToTags(..)
 ) where
 
+import           AST.Element
 import           AST.Token
 import           AST.Traversable1
 import           Control.Effect.Reader
 import           Control.Effect.Writer
-import           GHC.Generics ((:+:)(..))
+import           Data.Foldable
 import qualified Language.Java.AST as Java
 import           Source.Loc
 import           Source.Range
@@ -57,6 +58,9 @@ instance ToTags Java.MethodDeclaration where
       Tags.yield (Tag name Method loc line Nothing)
       gtags t
 
+-- TODO: we can coalesce a lot of these instances given proper use of HasField
+-- to do the equivalent of type-generic pattern-matching.
+
 instance ToTags Java.ClassDeclaration where
   tags t@Java.ClassDeclaration
     { ann = loc@Loc { byteRange = Range { start } }
@@ -76,6 +80,23 @@ instance ToTags Java.MethodInvocation where
       Tags.yield (Tag name Call loc (Tags.firstLine src range) Nothing)
       gtags t
 
+instance ToTags Java.InterfaceDeclaration where
+  tags t@Java.InterfaceDeclaration
+    { ann = loc@Loc { byteRange  }
+    , name = Java.Identifier { text = name }
+    } = do
+      src <- ask @Source
+      Tags.yield (Tag name Interface loc (Tags.firstLine src byteRange) Nothing)
+      gtags t
+
+instance ToTags Java.InterfaceTypeList where
+  tags t@Java.InterfaceTypeList { extraChildren = interfaces } = do
+    src <- ask @Source
+    for_ interfaces $ \x -> case x of
+      Java.Type (Prj (Java.UnannotatedType (Prj (Java.SimpleType ( Prj Java.TypeIdentifier { ann = loc@Loc {byteRange = range}, text = name }))))) ->
+        Tags.yield (Tag name Implementation loc (Tags.firstLine src range) Nothing)
+      _ -> pure ()
+    gtags t
 
 gtags
   :: ( Has (Reader Source) sig m
@@ -153,8 +174,8 @@ instance ToTags Java.InferredParameters
 instance ToTags Java.InstanceofExpression
 instance ToTags Java.IntegralType
 instance ToTags Java.InterfaceBody
-instance ToTags Java.InterfaceDeclaration
-instance ToTags Java.InterfaceTypeList
+--instance ToTags Java.InterfaceDeclaration
+-- instance ToTags Java.InterfaceTypeList
 instance ToTags Java.LabeledStatement
 instance ToTags Java.LambdaExpression
 instance ToTags Java.Literal
