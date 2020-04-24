@@ -192,7 +192,6 @@ ctorForTypes (DatatypeName constructorName) types = recC (toName Named construct
     toVarBangType str type' = TH.varBangType (mkName . toHaskellCamelCaseIdentifier $ str) (TH.bangType strictness type')
 
 
-
 -- | Convert field types to Q types
 fieldTypesToNestedSum :: Name -> NonEmpty AST.Deserialize.Type -> Q TH.Type
 fieldTypesToNestedSum shapeParameterName xs = go (toList xs)
