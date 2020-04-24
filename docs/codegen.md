@@ -1,6 +1,7 @@
 # CodeGen Documentation
 
-CodeGen is the process for auto-generating language-specific, strongly-typed ASTs to be used in [Semantic](https://github.com/github/semantic-code/blob/d9f91a05dc30a61b9ff8c536d75661d417f3c506/design-docs/precise-code-navigation.md).
+CodeGen is the process for auto-generating language-specific, strongly-typed ASTs to be used in [Semantic](https://github.com/github/semantic-code/blob/d9f91a05dc30a61b9ff8c536d75661d417f3c506/design-docs/precise-code-navigation.md). 
+Since this is a critical component of Semantic's process for adding a new language, we recommend reading [these docs](https://github.com/github/semantic/blob/master/docs/adding-new-languages.md) first. 
 
 ### Table of Contents
 - [CodeGen Documentation](#codegen-documentation)
