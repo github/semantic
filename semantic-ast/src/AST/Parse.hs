@@ -13,5 +13,5 @@ import GHC.TypeLits (Symbol, Nat)
 -- @
 -- type AnonymousPlus = Token "+" 123
 -- @
-newtype Err (symName :: Symbol) (symVal :: Nat) a = Token { ann :: a }
+data Err fail succeed = parseL (fail :: String) | parseR (succeed :: Symbol)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
