@@ -12,7 +12,7 @@ Since it is a critical component of Semantic's language support process, we reco
 
 ## CodeGen Pipeline
 
-During parser generation, tree-sitter produces a JSON file that captures the structure of a language's grammar. Based on this, we're able to derive datatypes representing surface languages, and then use those datatypes to generically build ASTs. This automates the engineering effort [historically required for adding a new language](https://github.com/github/semantic/blob/master/docs/adding-new-languages.md).
+During parser generation, tree-sitter produces a `node-types.json` file that captures the structure of a language's grammar. Based on this JSON file, we're able to derive datatypes representing surface languages, and then use those datatypes to generically build ASTs.
 
 The following steps provide a high-level outline of the process:
 
