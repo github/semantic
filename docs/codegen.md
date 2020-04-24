@@ -10,7 +10,7 @@ Since it is a critical component of Semantic's language support process, we reco
 - [Tests](#tests)
 - [Additional notes](#additional-notes)
 
-### CodeGen Pipeline
+## CodeGen Pipeline
 
 During parser generation, tree-sitter produces a JSON file that captures the structure of a language's grammar. Based on this, we're able to derive datatypes representing surface languages, and then use those datatypes to generically build ASTs. This automates the engineering effort [historically required for adding a new language](https://github.com/github/semantic/blob/master/docs/adding-new-languages.md).
 
@@ -24,8 +24,7 @@ The following steps provide a high-level outline of the process:
 
 The remaining document provides more details on generating ASTs, inspecting datatypes, tests, and information on decisions pertaining to relevant APIs.
 
-
-### Generating ASTs
+## Generating ASTs
 
 To parse source code and produce ASTs locally:
 
@@ -58,7 +57,7 @@ This generates the following AST:
 Right (Module {ann = (Span {start = Pos {line = 0, column = 0}, end = Pos {line = 0, column = 1}},Range {start = 0, end = 1}), extraChildren = [R1 (SimpleStatement {getSimpleStatement = L1 (R1 (R1 (L1 (ExpressionStatement {ann = (Span {start = Pos {line = 0, column = 0}, end = Pos {line = 0, column = 1}},Range {start = 0, end = 1}), extraChildren = L1 (L1 (Expression {getExpression = L1 (L1 (L1 (PrimaryExpression {getPrimaryExpression = R1 (L1 (L1 (L1 (Integer {ann = (Span {start = Pos {line = 0, column = 0}, end = Pos {line = 0, column = 1}},Range {start = 0, end = 1}), text = "1"}))))})))})) :| []}))))})]})
 ```
 
-### Inspecting auto-generated datatypes
+## Inspecting auto-generated datatypes
 
 Datatypes are derived from a language and its `node-types.json` file using the `GenerateSyntax` API. These datatypes can be viewed in the REPL just as they would for any other datatype, using `:i` after loading the language-specific `AST.hs` module for a given language. 
 
@@ -104,7 +103,7 @@ To run tests:
 
 `cabal v2-test semantic-python`
 
-### Additional notes
+## Additional notes
 
 - [GenerateSyntax](https://github.com/github/semantic/blob/master/semantic-ast/src/AST/GenerateSyntax.hs) provides a way to pre-define certain datatypes for which Template Haskell is not used. Any datatypes among the node types which have already been defined in the module where the splice is run will be skipped, allowing customization of the representation of parts of the tree. While this gives us flexibility, we encourage that this is used sparingly, as it imposes extra maintenance burden, particularly when the grammar is changed. This may be used to e.g. parse literals into Haskell equivalents (e.g. parsing the textual contents of integer literals into `Integer`s), and may require defining `TS.UnmarshalAnn` or `TS.SymbolMatching` instances for (parts of) the custom datatypes, depending on where and how the datatype occurs in the generated tree, in addition to the usual `Foldable`, `Functor`, etc. instances provided for generated datatypes.
 - Annotations are captured by a polymorphic parameter `a`
