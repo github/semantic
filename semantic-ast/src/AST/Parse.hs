@@ -17,6 +17,3 @@ import GHC.Generics (Generic, Generic1)
 data Err fail succeed = parseL (fail :: String) | parseR (succeed :: Symbol)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
-instance Functor (Err a) where
-    fmap f (parseL x) = parseL x
-    fmap f (parseR y) = parseR (f y)
