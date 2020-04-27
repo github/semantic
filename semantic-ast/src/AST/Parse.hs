@@ -4,7 +4,6 @@ module AST.Parse
 ) where
 
 import GHC.Generics (Generic, Generic1)
-import GHC.TypeLits (Symbol, Nat)
 
 -- | An AST node representing a token, indexed by its name and numeric value.
 --
