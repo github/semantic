@@ -12,15 +12,22 @@ Since it is a critical component of Semantic's language support process, we reco
 
 ## CodeGen Pipeline
 
-During parser generation, tree-sitter produces a `node-types.json` file that captures the structure of a language's grammar. Based on this JSON file, we're able to derive datatypes representing surface languages, and then use those datatypes to generically build ASTs.
+The following diagram outlines the entire language support pipeline.
 
-The following steps provide a high-level outline of the process:
+![image](https://user-images.githubusercontent.com/875834/80392707-801e9980-887d-11ea-9c95-e004bbe04be0.png)
 
-1. [**Deserialize.**](https://github.com/github/semantic/blob/master/semantic-ast/src/AST/Deserialize.hs) First, we deserialize the `node-types.json` file for a given language into the desired shape of datatypes via parsing capabilities afforded by the [Aeson](http://hackage.haskell.org/package/aeson) library. There are four distinct types represented in the node-types.json file takes on: sums, products, named leaves and anonymous leaves.
-2. [**Generate Syntax.**](https://github.com/github/semantic/blob/master/semantic-ast/src/AST/GenerateSyntax.hs) We then use Template Haskell to auto-generate language-specific, strongly-typed datatypes that represent various language constructs. This API exports the top-level function `astDeclarationsForLanguage` to auto-generate datatypes at compile-time, which is is invoked by a given language [AST](https://github.com/github/semantic/blob/master/semantic-python/src/Language/Python/AST.hs) module.
-3. [**Unmarshal.**](https://github.com/github/semantic/blob/master/semantic-ast/src/AST/Unmarshal.hs) Unmarshaling is the process of iterating over tree-sitter’s parse trees using its tree cursor API, and producing Haskell ASTs for the relevant nodes. We parse source code from tree-sitter and unmarshal the data we get to build these ASTs generically. This file exports the top-level function `parseByteString`, which takes source code and a language as arguments, and produces an AST.
-
-![image](https://user-images.githubusercontent.com/875834/80240750-66d4dd80-8630-11ea-8bbf-4dd3adf65a58.png)
+1. **Ingest source code.** The input to our system is blob data on GitHub.
+2. **Write and generate tree-sitter grammar.** During parser generation, tree-sitter produces a `node-types.json` file that captures the structure of a language's grammar. Based on this JSON file, we're able to derive datatypes representing surface languages, and then use those datatypes to generically build ASTs.
+3. **Provide interface to the C source.** The FFI provides us a way to bridge tree-sitter to our Haskell library. For more information, see our docs on [adding a new language](https://github.com/github/semantic/blob/master/docs/adding-new-languages.md). 
+4. **Automated AST generation via CodeGen APIs.** The CodeGen APIs live in the [`semantic-ast`](https://github.com/github/semantic/tree/master/semantic-ast) package within [Semantic](https://github.com/github/semantic), and are explained as follows:
+    - [**Deserialize.**](https://github.com/github/semantic/blob/master/semantic-ast/src/AST/Deserialize.hs) First, we deserialize the `node-types.json` file for a given language into the desired shape of datatypes via parsing capabilities afforded by the [Aeson](http://hackage.haskell.org/package/aeson) library. There are four distinct types represented in the node-types.json file takes on: sums, products, named leaves and anonymous leaves.
+    - [**Generate Syntax.**](https://github.com/github/semantic/blob/master/semantic-ast/src/AST/GenerateSyntax.hs) We then use Template Haskell to auto-generate language-specific, strongly-typed datatypes that represent various language constructs at compile-time. This API exports the top-level function `astDeclarationsForLanguage` to auto-generate datatypes at compile-time, which is is invoked by a given language [AST](https://github.com/github/semantic/blob/master/semantic-python/src/Language/Python/AST.hs) module.
+    - [**Unmarshal.**](https://github.com/github/semantic/blob/master/semantic-ast/src/AST/Unmarshal.hs) Unmarshaling is the runtime process of iterating over tree-sitter’s parse trees using its tree cursor API, and producing Haskell ASTs for the relevant nodes. We parse source code from tree-sitter and unmarshal the data we get to build these ASTs generically. This file exports the top-level function `parseByteString`, which takes source code and a language as arguments, and produces an AST.
+5. **Generate strongly-typed trees for a given language.** Finally, we create `semantic-[LANGUAGE]` packages (such as [this one](https://github.com/github/semantic/tree/master/semantic-python) for Python). From here, we can call our CodeGen APIs to generate language-specific, strongly-typed trees via the following process:
+    1. `Language.[LANGUAGE].AST` calls `astDeclarationsForLanguage`, passing in the relevant language as the argument, and using the `getNodeTypesPath` function to access the tree-sitter generated `node-types.json` file. 
+    2. This triggers the generation of the exhaustive syntax types contained by that language. 
+    3. `Language.[LANGUAGE]` provides the semantic functionality for Python programs, and calls the unmarshal API. 
+    4. Finally, the unmarshaling process takes the source code input, and auto-generates a tree using the syntax nodes generated in step 2. 
 
 The remaining document provides more details on generating ASTs, inspecting datatypes, tests, and information on decisions pertaining to relevant APIs.
 
