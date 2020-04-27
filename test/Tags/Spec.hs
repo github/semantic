@@ -28,15 +28,15 @@ spec = do
   describe "javascript and typescript" $ do
     it "produces tags for functions with docs (TODO)" $
       parseTestFile [Function] (Path.relFile "test/fixtures/javascript/tags/simple_function_with_docs.js") `shouldReturn`
-        [ Tag "myFunction" Function (Loc (Range 22 59) (Span (Pos 2 1) (Pos 4 2))) "function myFunction() {" Nothing ]
+        [ Tag "myFunction" Function (Loc (Range 31 41) (Span (Pos 2 10) (Pos 2 20))) "function myFunction() {" Nothing ]
 
     it "produces tags for classes" $
       parseTestFile [Class] (Path.relFile "test/fixtures/typescript/tags/class.ts") `shouldReturn`
-        [ Tag "FooBar" Class (Loc (Range 0 15) (Span (Pos 1 1) (Pos 1 16))) "class FooBar {}" Nothing ]
+        [ Tag "FooBar" Class (Loc (Range 6 12) (Span (Pos 1 7) (Pos 1 13))) "class FooBar {}" Nothing ]
 
     it "produces tags for modules" $
       parseTestFile [Tags.Module] (Path.relFile "test/fixtures/typescript/tags/module.ts") `shouldReturn`
-        [ Tag "APromise" Tags.Module (Loc (Range 0 19) (Span (Pos 1 1) (Pos 1 20))) "module APromise { }" Nothing ]
+        [ Tag "APromise" Tags.Module (Loc (Range 7 15) (Span (Pos 1 8) (Pos 1 16))) "module APromise { }" Nothing ]
 
   describe "python" $ do
     it "produces tags for functions" $
