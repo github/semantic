@@ -51,6 +51,7 @@ import           Foreign.Storable
 import           GHC.Generics
 import           GHC.Records
 import           GHC.TypeLits
+import           AST.Parse
 import           Source.Loc
 import           Source.Span
 import           TreeSitter.Cursor as TS
