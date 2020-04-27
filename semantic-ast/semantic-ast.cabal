@@ -43,6 +43,7 @@ library
     AST.GenerateSyntax
     AST.Grammar.TH
     AST.Marshal.JSON
+    AST.Parse
     AST.Token
     AST.Traversable1
     AST.Traversable1.Class
