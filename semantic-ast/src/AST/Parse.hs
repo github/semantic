@@ -5,9 +5,9 @@ module AST.Parse
 
 import GHC.Generics (Generic, Generic1)
 
--- | An AST node representing a token, indexed by its name and numeric value.
+-- | An AST node representing an Error, showing a parse that's succeeded or failed.
 --
--- For convenience, token types are typically used via type synonyms, e.g.:
+-- Error types are isomorphic to Either.
 --
 -- @
 -- type AnonymousPlus = Token "+" 123
