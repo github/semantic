@@ -144,7 +144,6 @@ yieldTag name kind loc srcLineRange = do
   Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
 
 {- ORMOLU_DISABLE -}
-
 instance ToTags Ts.AbstractClassDeclaration
 instance ToTags Ts.AbstractMethodSignature
 instance ToTags Ts.AccessibilityModifier
@@ -304,5 +303,4 @@ instance ToTags Ts.VariableDeclaration
 instance ToTags Ts.WhileStatement
 instance ToTags Ts.WithStatement
 instance ToTags Ts.YieldExpression
-
 {- ORMOLU_ENABLE -}
