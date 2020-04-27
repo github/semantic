@@ -9,8 +9,9 @@ import GHC.Generics (Generic, Generic1)
 --
 -- Error types are isomorphic to Either.
 --
+-- For example, consider the following:
 -- @
--- type AnonymousPlus = Token "+" 123
+-- data If f a = If { ann :: a, condition :: f (Expr f a), consequence :: f (Stmt f a), alternative :: f (Stmt f a) }
 -- @
 data Err fail succeed = parseL (fail :: String) | parseR (succeed :: Symbol)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
