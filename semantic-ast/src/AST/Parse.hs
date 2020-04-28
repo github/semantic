@@ -16,3 +16,9 @@ import GHC.Generics (Generic, Generic1)
 -- When the parse fails, the f will be substituted with Err
 data Err a = Fail String | Succeed a
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
+
+instance Applicative Err where
+    pure            = Succeed
+    Fail e <*> _    = Fail e
+    Succeed a <*> r = fmap a r
+
