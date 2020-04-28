@@ -13,5 +13,5 @@ import GHC.TypeLits (Symbol, Nat)
 -- @
 -- type AnonymousPlus = Token "+" 123
 -- @
-newtype Token (symName :: Symbol) (symVal :: Nat) a = Token { ann :: a }
+newtype Token (symName :: Symbol) (symVal :: Nat) (f :: * -> *) a = Token { ann :: a }
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
