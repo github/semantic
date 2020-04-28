@@ -12,6 +12,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+
 {-# OPTIONS_GHC -ddump-splices #-}
 
 
