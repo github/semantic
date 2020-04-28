@@ -14,5 +14,5 @@ import GHC.Generics (Generic, Generic1)
 -- data If f a = If { ann :: a, condition :: f (Expr f a), consequence :: f (Stmt f a), alternative :: f (Stmt f a) }
 -- @
 -- When the parse fails, the f will be substituted with Err
-data Err a = ParseFail { ann :: a } | ParseSucceed { ann :: a }
+data Err a = Fail String | Succeed a
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
