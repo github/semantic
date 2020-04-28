@@ -213,12 +213,13 @@ pointToPos (TSPoint line column) = Pos (fromIntegral line) (fromIntegral column)
 class UnmarshalField t where
   unmarshalField
     :: ( Unmarshal f
-       , UnmarshalAnn a
+       , UnmarshalAnn ann
        )
     => String -- ^ datatype name
     -> String -- ^ field name
     -> [Node] -- ^ nodes
-    -> MatchM (t (f a))
+    -> MatchM (t (f ann))
+
 instance UnmarshalField Err where
   unmarshalField _ _ [] = pure $ Fail "No items provided to unmarshalField."
   unmarshalField _ _ [x] = Succeed <$> unmarshalNode x
@@ -319,13 +320,13 @@ newtype FieldName = FieldName { getFieldName :: String }
 --   Sum types are constructed by using the current node’s symbol to select the corresponding constructor deterministically.
 class GUnmarshal f where
   gunmarshalNode
-    :: UnmarshalAnn a
+    :: UnmarshalAnn ann
     => Node
-    -> MatchM (f a)
+    -> MatchM (f ann)
 
 instance (Datatype d, GUnmarshalData f) => GUnmarshal (M1 D d f) where
   gunmarshalNode = go (gunmarshalNode' (datatypeName @d undefined)) where
-    go :: (Node -> MatchM (f a)) -> Node -> MatchM (M1 i c f a)
+    go :: (Node -> MatchM (f ann)) -> Node -> MatchM (M1 i c f ann)
     go = coerce
 
 instance (GUnmarshal f, Applicative shape) => GUnmarshal (shape :.: f) where
@@ -333,10 +334,10 @@ instance (GUnmarshal f, Applicative shape) => GUnmarshal (shape :.: f) where
 
 class GUnmarshalData f where
   gunmarshalNode'
-    :: UnmarshalAnn a
+    :: UnmarshalAnn ann
     => String
     -> Node
-    -> MatchM (f a)
+    -> MatchM (f ann)
 
 instance GUnmarshalData f => GUnmarshalData (M1 i c f) where
   gunmarshalNode' = go gunmarshalNode' where
@@ -372,11 +373,11 @@ instance (GUnmarshalProduct f, GUnmarshalProduct g) => GUnmarshalData (f :*: g) 
 -- | Generically unmarshal products
 class GUnmarshalProduct f where
   gunmarshalProductNode
-    :: UnmarshalAnn a
+    :: UnmarshalAnn ann
     => String
     -> Node
     -> Fields
-    -> MatchM (f a)
+    -> MatchM (f ann)
 
 -- Product structure
 instance (GUnmarshalProduct f, GUnmarshalProduct g) => GUnmarshalProduct (f :*: g) where
@@ -413,15 +414,15 @@ instance (Unmarshal t, Selector c) => GUnmarshalProduct (M1 S c (Rec1 t)) where
     fieldName = selName @c undefined
 
 
-class GHasAnn a t where
-  gann :: t a -> a
+class GHasAnn ann t where
+  gann :: t ann -> ann
 
-instance GHasAnn a f => GHasAnn a (M1 i c f) where
+instance GHasAnn ann f => GHasAnn ann (M1 i c f) where
   gann = gann . unM1
 
-instance (GHasAnn a l, GHasAnn a r) => GHasAnn a (l :+: r) where
+instance (GHasAnn ann l, GHasAnn ann r) => GHasAnn ann (l :+: r) where
   gann (L1 l) = gann l
   gann (R1 r) = gann r
 
-instance {-# OVERLAPPABLE #-} HasField "ann" (t a) a => GHasAnn a t where
+instance {-# OVERLAPPABLE #-} HasField "ann" (t ann) ann => GHasAnn ann t where
   gann = getField @"ann"
