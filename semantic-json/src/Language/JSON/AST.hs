@@ -14,6 +14,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+
 module Language.JSON.AST
 ( module Language.JSON.AST
 , JSON.getTestCorpusDir
