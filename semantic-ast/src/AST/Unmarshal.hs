@@ -162,7 +162,7 @@ instance (Applicative shape, Unmarshal f) => Unmarshal (shape :.: f) where
 instance Unmarshal t => Unmarshal (Rec1 t) where
   matchers = coerce (matchers @t)
 
-instance (KnownNat n, KnownSymbol sym) => Unmarshal (Token sym n) where
+instance (KnownNat n, KnownSymbol sym) => Unmarshal (Token sym n f) where
   matchers = singleton (fromIntegral (natVal (Proxy @n)), Match (fmap Token . unmarshalAnn))
 
 
@@ -257,7 +257,7 @@ instance SymbolMatching f => SymbolMatching (Rec1 f) where
   matchedSymbols _ = matchedSymbols (Proxy @f)
   showFailure _ = showFailure (Proxy @f)
 
-instance (KnownNat n, KnownSymbol sym) => SymbolMatching (Token sym n) where
+instance (KnownNat n, KnownSymbol sym) => SymbolMatching (Token sym n f) where
   matchedSymbols _ = [fromIntegral (natVal (Proxy @n))]
   showFailure _ _ = "expected " ++ symbolVal (Proxy @sym)
 
