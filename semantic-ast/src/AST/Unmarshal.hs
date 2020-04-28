@@ -248,11 +248,11 @@ instance UnmarshalField NonEmpty where
     pure $ head' :| tail'
   unmarshalField d f [] = liftIO . throwIO . UnmarshalError $ "type '" <> d <> "' expected one or more nodes in field '" <> f <> "' but got zero"
 
-class SymbolMatching (a :: * -> *) where
-  matchedSymbols :: Proxy a -> [Int]
+class SymbolMatching (sym :: * -> *) where
+  matchedSymbols :: Proxy sym -> [Int]
 
   -- | Provide error message describing the node symbol vs. the symbols this can match
-  showFailure :: Proxy a -> Node -> String
+  showFailure :: Proxy sym -> Node -> String
 
 instance SymbolMatching f => SymbolMatching (M1 i c f) where
   matchedSymbols _ = matchedSymbols (Proxy @f)
