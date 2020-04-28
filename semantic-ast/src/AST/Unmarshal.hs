@@ -219,6 +219,10 @@ class UnmarshalField t where
     -> String -- ^ field name
     -> [Node] -- ^ nodes
     -> MatchM (t (f a))
+instance UnmarshalField Err where
+  unmarshalField _ _ [] = pure $ Fail "No items provided to unmarshalField."
+  unmarshalField _ _ [x] = Succeed <$> unmarshalNode x
+  unmarshalField d f _ = pure $ Fail ("type '" <> d <> "' expected zero or one nodes in field '" <> f <> "' but got multiple")
 
 instance UnmarshalField Maybe where
   unmarshalField _ _ []  = pure Nothing
