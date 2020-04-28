@@ -6,6 +6,7 @@ module Language.Ruby
 , Language.Ruby.Grammar.tree_sitter_ruby
 ) where
 
+import qualified AST.Parse as Parse
 import qualified AST.Unmarshal as TS
 import           Control.Carrier.State.Strict
 import           Data.Proxy
@@ -15,7 +16,7 @@ import qualified Language.Ruby.Grammar (tree_sitter_ruby)
 import qualified Language.Ruby.Tags as RbTags
 import qualified Tags.Tagging.Precise as Tags
 
-newtype Term a = Term { getTerm :: Rb.Program a }
+newtype Term a = Term { getTerm :: Rb.Program Parse.Err a }
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Rb.Program)
