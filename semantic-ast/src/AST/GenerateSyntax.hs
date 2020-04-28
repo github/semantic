@@ -11,8 +11,8 @@ module AST.GenerateSyntax
 , astDeclarationsForLanguage
 ) where
 
-import           AST.Deserialize
-    (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
+import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
+import qualified AST.Parse as Parse
 import           AST.Token
 import           AST.Traversable1.Class
 import qualified AST.Unmarshal as TS
@@ -29,7 +29,6 @@ import           Language.Haskell.TH as TH
 import           Language.Haskell.TH.Syntax as TH
 import           System.Directory
 import           System.FilePath.Posix
-import           Data.Functor.Identity
 import qualified TreeSitter.Language as TS
 import           TreeSitter.Node
 import           TreeSitter.Symbol (TSSymbol, toHaskellCamelCaseIdentifier, toHaskellPascalCaseIdentifier)
@@ -114,7 +113,7 @@ makeStandaloneDerivings ty =
    deriving instance ((forall x . Eq x => Eq (f x)), Eq a) => Eq ($ty f a)
    deriving instance ((forall x . Ord x => Ord (f x)), (forall x . Eq x => Eq (f x)), Ord a) => Ord ($ty f a)
    deriving instance ((forall x . Show x => Show (f x)), Show a) => Show ($ty f a)
-   instance TS.Unmarshal ($ty Identity)
+   instance TS.Unmarshal ($ty Parse.Err)
 
    |]
 
