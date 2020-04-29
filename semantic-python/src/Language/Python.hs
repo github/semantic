@@ -4,6 +4,7 @@ module Language.Python
 , Language.Python.Grammar.tree_sitter_python
 ) where
 
+import qualified AST.Parse as Parse
 import qualified AST.Unmarshal as TS
 import           Data.Proxy
 import qualified Language.Python.AST as Py
