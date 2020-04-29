@@ -4,12 +4,13 @@ module Language.Java
 , Language.Java.Grammar.tree_sitter_java
 ) where
 
+import qualified AST.Parse as Parse
+import qualified AST.Unmarshal as TS
 import           Data.Proxy
 import qualified Language.Java.AST as Java
 import qualified Language.Java.Tags as JavaTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified Language.Java.Grammar (tree_sitter_java)
-import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Java.Program Err a }
 
