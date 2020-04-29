@@ -4,6 +4,7 @@ module Language.CodeQL
 , TreeSitter.QL.tree_sitter_ql
 ) where
 
+import qualified AST.Parse as Parse
 import qualified AST.Unmarshal as TS
 import           Data.Proxy
 import qualified Language.CodeQL.AST as CodeQL
@@ -11,7 +12,7 @@ import qualified Language.CodeQL.Tags as CodeQLTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.QL (tree_sitter_ql)
 
-newtype Term a = Term { getTerm :: CodeQL.Ql a }
+newtype Term a = Term { getTerm :: CodeQL.Ql Err a }
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy CodeQL.Ql)
