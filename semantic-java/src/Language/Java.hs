@@ -11,7 +11,7 @@ import qualified Tags.Tagging.Precise as Tags
 import qualified Language.Java.Grammar (tree_sitter_java)
 import qualified AST.Unmarshal as TS
 
-newtype Term a = Term { getTerm :: Java.Program a }
+newtype Term a = Term { getTerm :: Java.Program Err a }
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Java.Program)
