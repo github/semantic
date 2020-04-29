@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE  KindSignatures #-}
+
 module AST.Token
 ( Token(..)
 ) where
