@@ -5,14 +5,15 @@ module Language.TypeScript
 , Language.TypeScript.Grammar.tree_sitter_typescript
 ) where
 
+import qualified AST.Parse as Parse
+import qualified AST.Unmarshal as TS
 import           Data.Proxy
 import qualified Language.TypeScript.AST as TypeScript
 import qualified Language.TypeScript.Tags as TsTags
 import qualified Tags.Tagging.Precise as Tags
 import qualified Language.TypeScript.Grammar (tree_sitter_typescript)
-import qualified AST.Unmarshal as TS
 
-newtype Term a = Term { getTerm :: TypeScript.Program a }
+newtype Term a = Term { getTerm :: TypeScript.Program Err a }
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy TypeScript.Program)
