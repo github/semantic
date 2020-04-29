@@ -31,19 +31,19 @@ jobs:
       name: Cache ~/.cabal/packages
       with:
         path: ~/.cabal/packages
-        key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-packages
+        key: ${{ runner.os }}-${{ matrix.ghc }}-v1-cabal-packages
 
     - uses: actions/cache@v1
       name: Cache ~/.cabal/store
       with:
         path: ~/.cabal/store
-        key: ${{ runner.os }}-${{ matrix.ghc }}-v10-cabal-store
+        key: ${{ runner.os }}-${{ matrix.ghc }}-v11-cabal-store
 
     - uses: actions/cache@v1
       name: Cache dist-newstyle
       with:
         path: dist-newstyle
-        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-semantic-dist
+        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-v1-semantic-dist
 
     # - name: hlint
     #   run: |
@@ -60,6 +60,7 @@ jobs:
       run: |
         cabal v2-build --project-file=cabal.project.ci
         cabal v2-run   --project-file=cabal.project.ci semantic:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-codeql:test
         cabal v2-run   --project-file=cabal.project.ci semantic-core:test
         cabal v2-run   --project-file=cabal.project.ci semantic-go:test
         cabal v2-run   --project-file=cabal.project.ci semantic-java:test

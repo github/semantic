@@ -58,8 +58,9 @@ The graph should be
 
 
 runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
-runScopeGraph p _src item = snd . run . runSketch minfo $ scopeGraph item
-  where minfo = lowerBound
+runScopeGraph p _src item = snd . run . runSketch info $ scopeGraph item
+  where
+    info = ModuleInfo p "Python" mempty
 
 runScopeGraphTest :: Monad m => SketchC Name m Result -> m (ScopeGraph.ScopeGraph Name, Result)
 runScopeGraphTest val = do
@@ -72,23 +73,23 @@ sampleGraphThing = do
   declare "goodbye" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 3 0) (Pos 3 12)))
   pure Complete
 
-graphFile :: FilePath -> IO (ScopeGraph.ScopeGraph Name, Result)
+graphFile :: Path.AbsRelFile -> IO (ScopeGraph.ScopeGraph Name, Result)
 graphFile fp = do
-  file <- ByteString.readFile fp
+  file <- ByteString.readFile $ Path.toString fp
   tree <- TS.parseByteString @Py.Term @Loc TSP.tree_sitter_python file
   pyModule <- either die pure tree
-  pure $ runScopeGraph (Path.absRel fp) (Source.fromUTF8 file) pyModule
+  pure $ runScopeGraph fp (Source.fromUTF8 file) pyModule
 
 assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do
-  let path = "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
+  let path = Path.absRel "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
   (result, Complete) <- graphFile path
   (expecto, Complete) <- runScopeGraphTest sampleGraphThing
   HUnit.assertEqual "Should work for simple case" expecto result
 
 assertSimpleReference :: HUnit.Assertion
 assertSimpleReference = do
-  let path = "semantic-python/test/fixtures/5-01-simple-reference.py"
+  let path = Path.absRel "semantic-python/test/fixtures/5-01-simple-reference.py"
   (result, Complete) <- graphFile path
   (expecto, Complete) <- runScopeGraphTest expectedReference
 
@@ -120,7 +121,7 @@ expectedWildcardImport = do
 
 assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
-  let path = "semantic-python/test/fixtures/5-02-simple-function.py"
+  let path = Path.absRel "semantic-python/test/fixtures/5-02-simple-function.py"
   let info = ModuleInfo path "Python" mempty
   (graph, _) <- graphFile path
   (expecto, Complete) <- runScopeGraphTest expectedLexicalScope
@@ -136,7 +137,7 @@ expectedLexicalScope = do
 
 assertFunctionArg :: HUnit.Assertion
 assertFunctionArg = do
-  let path = "semantic-python/test/fixtures/5-03-function-argument.py"
+  let path = Path.absRel "semantic-python/test/fixtures/5-03-function-argument.py"
   (graph, _) <- graphFile path
   (expecto, Complete) <- runScopeGraphTest expectedFunctionArg
   HUnit.assertEqual "Should work for simple case" expecto graph
@@ -156,14 +157,14 @@ expectedFunctionArg = do
 
 assertWildcardImport :: HUnit.Assertion
 assertWildcardImport = do
-  let path = "semantic-python/test/fixtures/cheese/6-01-imports.py"
+  let path = Path.absRel "semantic-python/test/fixtures/cheese/6-01-imports.py"
   (graph, _) <- graphFile path
   (expecto, Complete) <- runScopeGraphTest expectedWildcardImport
   HUnit.assertEqual "Should work for simple case" expecto graph
 
 assertQualifiedImport :: HUnit.Assertion
 assertQualifiedImport = do
-  let path = "semantic-python/test/fixtures/cheese/6-02-qualified-imports.py"
+  let path = Path.absRel "semantic-python/test/fixtures/cheese/6-02-qualified-imports.py"
   (graph, _) <- graphFile path
   (expecto, Complete) <- runScopeGraphTest expectedQualifiedImport
   HUnit.assertEqual "Should work for simple case" expecto graph

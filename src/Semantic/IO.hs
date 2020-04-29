@@ -4,22 +4,17 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Semantic.IO
-  ( isDirectory
-  , findFilesInDir
+  ( findFilesInDir
   ) where
 
 import Prelude hiding (readFile)
 
 import           Control.Monad.IO.Class
-import           System.Directory (doesDirectoryExist)
 import           System.Directory.Tree (AnchoredDirTree (..))
 import qualified System.Directory.Tree as Tree
 import           System.FilePath
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
-
-isDirectory :: MonadIO m => FilePath -> m Bool
-isDirectory path = liftIO (doesDirectoryExist path)
 
 pathIsMinified :: FilePath -> Bool
 pathIsMinified = isExtensionOf ".min.js"

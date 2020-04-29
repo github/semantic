@@ -1,3 +1,9 @@
+# 0.1.0.0
+
+- Adds `CodeQL` language constructor.
+- Bumps `lingo-haskell` to 0.3.2.
+- Removes Span and Pos lower bound instances. This makes callers responsible for defining whether Span / Pos are 0 or 1 indexed.
+
 # 0.0.2.0
 
 - Adds `Source.Language`.

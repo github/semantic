@@ -37,7 +37,6 @@ import qualified Data.Map.Strict as Map
 import           Data.Maybe
 import           Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
-import           Data.Semilattice.Lower
 import           Data.Traversable
 import           Debug.Trace
 import           GHC.Records
@@ -47,7 +46,7 @@ import           Language.Python.Patterns
 import           Scope.Graph.Convert (Result (..), complete, todo)
 import           Scope.Types as Scope
 import           Source.Loc (Loc)
-import           Source.Span (Span, span_)
+import           Source.Span (Pos (..), Span, point, span_)
 import           Stack.Graph ((-<<), (>>-))
 import qualified Stack.Graph as Stack
 
@@ -204,7 +203,7 @@ instance ToScopeGraph Py.FunctionDefinition where
             { Props.kind = ScopeGraph.Parameter
             , Props.relation = ScopeGraph.Default
             , Props.associatedScope = Nothing
-            , Props.span = lowerBound
+            , Props.span = point (Pos 0 0)
             }
       let param (Py.Parameter (Prj (Py.Identifier pann pname))) = Just (pann, Name.name pname)
           param _                                               = Nothing

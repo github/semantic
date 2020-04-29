@@ -132,9 +132,8 @@ graphingModules recur m = do
   where
     -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
     includeModule path
-      = let path' = if Prelude.null path then "unknown, concrete semantics required" else path
-            info = moduleInfo m
-      in moduleInclusion (moduleVertex (ModuleInfo path' (moduleLanguage info) (moduleOid info)))
+      = let info = moduleInfo m
+      in moduleInclusion (moduleVertex (ModuleInfo path (moduleLanguage info) (moduleOid info)))
 
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: ( Has (Reader ModuleInfo) sig m

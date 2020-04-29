@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic
-version:             0.10.0.0
+version:             0.11.0.0
 synopsis:            Framework and executable for analyzing and diffing untrusted code.
 description:         Semantic is a library for parsing, analyzing, and comparing source code across many languages.
 homepage:            http://github.com/github/semantic#readme
@@ -59,7 +59,7 @@ common dependencies
                      , fused-effects-exceptions ^>= 1
                      , fused-effects-resumable ^>= 0.1
                      , hashable >= 1.2.7 && < 1.4
-                     , tree-sitter ^>= 0.9.0.0
+                     , tree-sitter ^>= 0.9.0.1
                      , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
@@ -69,12 +69,12 @@ common dependencies
                      , safe-exceptions ^>= 0.1.7.0
                      , semantic-analysis ^>= 0
                      , semantic-ast
-                     , semantic-source ^>= 0.0.2
+                     , semantic-source ^>= 0.1.0
                      , semilattices ^>= 0.0.0.3
                      , streaming ^>= 0.2.2.0
                      , text ^>= 1.2.3.1
                      , unix ^>= 2.7.2.2
-                     , lingo ^>= 0.3.0.0
+                     , lingo ^>= 0.3.2.0
 
 common executable-flags
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"
@@ -92,7 +92,6 @@ library
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
-                     , Analysis.TOCSummary
                      , Analysis.Decorator
                      , Analysis.HasTextElement
                      , Analysis.PackageDef
@@ -119,6 +118,7 @@ library
                      , Control.Effect.Parse
                      , Control.Effect.REPL
                      , Control.Effect.Sum.Project
+                     , Control.Effect.Timeout
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
                      , Data.Abstract.Address.Monovariant
@@ -210,7 +210,6 @@ library
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
-                     , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
@@ -224,7 +223,6 @@ library
                      , Semantic.Api.StackGraph
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
-                     , Semantic.Api.TOCSummaries
                      , Semantic.CLI
                      , Semantic.Config
                      , Semantic.Distribute
@@ -239,7 +237,6 @@ library
                      , Semantic.Telemetry.Error
                      , Semantic.Telemetry.Log
                      , Semantic.Telemetry.Stat
-                     , Semantic.Timeout
                      , Semantic.Util
                      , Semantic.Util.Pretty
                      , Semantic.Version
@@ -284,6 +281,7 @@ library
                      , semantic-json ^>= 0
                      , semantic-php ^>= 0
                      , semantic-python ^>= 0
+                     , semantic-codeql ^>= 0
                      , semantic-ruby ^>= 0
                      , semantic-scope-graph ^>= 0
                      , semantic-tags ^>= 0
@@ -303,6 +301,7 @@ library
                      , tree-sitter-json ^>= 0.7.0.0
                      , tree-sitter-php ^>= 0.4.0.0
                      , tree-sitter-python ^>= 0.9.0.1
+                     , tree-sitter-ql ^>= 0.1.0.1
                      , tree-sitter-ruby ^>= 0.5.0.0
                      , tree-sitter-typescript ^>= 0.5.0.0
                      , tree-sitter-tsx ^>= 0.5.0.0
@@ -345,7 +344,6 @@ test-suite test
                      , Integration.Spec
                      , Numeric.Spec
                      , Parsing.Spec
-                     , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
                      , Semantic.IO.Spec

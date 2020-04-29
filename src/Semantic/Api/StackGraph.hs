@@ -43,9 +43,11 @@ import           Debug.Trace
 import           Debug.Trace
 import qualified Parsing.Parser as Parser
 import           Proto.Semantic as P hiding (Blob, BlobPair)
+import           Proto.Semantic as P hiding (Blob)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
 import qualified Scope.Graph.Convert as Graph
+import           Semantic.Api.Bridge
 import           Semantic.Api.Bridge
 import           Semantic.Config
 import           Semantic.Task
@@ -79,7 +81,7 @@ parseStackGraph blobs = do
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
-        blobPath' = Text.pack $ blobPath blob
+        blobPath' = Text.pack $ blobFilePath blob
         errorFile e = defMessage
           & P.path .~ blobPath'
           & P.language .~ (bridging # blobLanguage')
@@ -102,7 +104,7 @@ parseStackGraph blobs = do
           & P.name .~ nodeName node
           & P.line .~ nodeLine node
           & P.kind .~ nodeKind node
-          & P.maybe'span ?~ converting # nodeSpan node
+          & P.maybe'span .~ fmap (converting #) (nodeSpan node) -- converting #? nodeSpan node
           & P.nodeType .~ nodeTypeToNodeType (Semantic.Api.StackGraph.nodeType node)
 
         pathToPath :: SGPath -> StackGraphPath
@@ -150,7 +152,7 @@ data SGNode
   , nodeName :: Text
   , nodeLine :: Text
   , nodeKind :: Text
-  , nodeSpan :: Loc.Span
+  , nodeSpan :: Maybe Loc.Span
   , nodeType :: SGNodeType
   }
   deriving (Eq, Show)
@@ -178,7 +180,7 @@ toSGNode (node :# tag) = (case node of
     , nodeName = Name.formatName symbol
     , nodeLine = ""
     , nodeKind = Text.pack $ show kind
-    , nodeSpan = Loc.span loc
+    , nodeSpan = Just (Loc.span loc)
     , Semantic.Api.StackGraph.nodeType = Definition
     }
   Stack.Reference symbol kind loc -> Just $ SGNode {
@@ -186,7 +188,7 @@ toSGNode (node :# tag) = (case node of
     , nodeName = Name.formatName symbol
     , nodeLine = ""
     , nodeKind = Text.pack $ show kind
-    , nodeSpan = Loc.span loc
+    , nodeSpan = Just (Loc.span loc)
     , Semantic.Api.StackGraph.nodeType = Reference
     }
   Stack.JumpToScope symbol -> Just $ SGNode {
@@ -194,7 +196,7 @@ toSGNode (node :# tag) = (case node of
     , nodeName = Name.formatName symbol
     , nodeLine = ""
     , nodeKind = ""
-    , nodeSpan = lowerBound
+    , nodeSpan = Nothing
     , Semantic.Api.StackGraph.nodeType = JumpToScope
     }
   Stack.ExportedScope symbol -> Just $ SGNode {
@@ -202,7 +204,7 @@ toSGNode (node :# tag) = (case node of
     , nodeName = Name.formatName symbol
     , nodeLine = ""
     , nodeKind = ""
-    , nodeSpan = lowerBound
+    , nodeSpan = Nothing
     , Semantic.Api.StackGraph.nodeType = ExportedScope
     }
   Stack.Root symbol -> Just $ SGNode {
@@ -210,7 +212,7 @@ toSGNode (node :# tag) = (case node of
     , nodeName = Name.formatName symbol
     , nodeLine = ""
     , nodeKind = ""
-    , nodeSpan = lowerBound
+    , nodeSpan = Nothing
     , Semantic.Api.StackGraph.nodeType = RootScope
     }
   Stack.Scope symbol -> Just $ SGNode {
@@ -218,7 +220,7 @@ toSGNode (node :# tag) = (case node of
     , nodeName = Name.formatName symbol
     , nodeLine = ""
     , nodeKind = ""
-    , nodeSpan = lowerBound
+    , nodeSpan = Nothing
     , Semantic.Api.StackGraph.nodeType = Scope
     }
   node -> Nothing)

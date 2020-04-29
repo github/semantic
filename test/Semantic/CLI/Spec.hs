@@ -5,7 +5,7 @@ import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Reader
 import           Data.ByteString.Builder
 import           Data.Language
-import           Semantic.Api hiding (Blob, BlobPair, File)
+import           Semantic.Api hiding (Blob, File)
 import           Semantic.Task
 import           Serializing.Format
 import           System.IO.Unsafe
@@ -71,8 +71,6 @@ diffFixtures :: [(String, [BlobPair] -> ParseC TaskC Builder, [(File Language, F
 diffFixtures =
   [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> Path.file "diff-tree.json")
   , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, Path.relFile "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
-  , ("toc summaries diff", runReader aLaCarteLanguageModes . diffSummaryBuilder Serializing.Format.JSON, pathMode, prefix </> Path.file "diff-tree.toc.json")
-  , ("protobuf diff", runReader aLaCarteLanguageModes . diffSummaryBuilder Serializing.Format.Proto, pathMode, prefix </> Path.file "diff-tree.toc.protobuf.bin")
   ]
   where pathMode = [(File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby, File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.B.rb") lowerBound Ruby)]
         prefix = Path.relDir "test/fixtures/cli"

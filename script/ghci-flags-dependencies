@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Computes the paths to files causing changes to the ghci flags. You probably won’t be running this yourself, but rather ghcide will via configuration in hie.yaml.
 
 set -e

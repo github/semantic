@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -O0 #-}
 module Analysis.Python.Spec (spec) where
 
-import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Value.Concrete
 import qualified Data.Language as Language
 import qualified Language.Python.Term as Python
@@ -15,7 +14,7 @@ spec = do
   describe "Python" $ do
     it "imports" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
-      case ModuleTable.lookup "main.py" <$> res of
+      case moduleLookup "main.py" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
           SpecHelpers.lookupDeclaration "a" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
@@ -27,7 +26,7 @@ spec = do
 
     it "imports with aliases" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main1.py", "a.py", "b/__init__.py", "b/c.py"]
-      case ModuleTable.lookup "main1.py" <$> res of
+      case moduleLookup "main1.py" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
           SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           SpecHelpers.lookupDeclaration "e" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
@@ -35,7 +34,7 @@ spec = do
 
     it "imports using from syntax" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
-      case ModuleTable.lookup "main2.py" <$> res of
+      case moduleLookup "main2.py" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
           SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
@@ -46,7 +45,7 @@ spec = do
 
     it "imports with relative syntax" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main3.py", "c/__init__.py", "c/utils.py"]
-      case ModuleTable.lookup "main3.py" <$> res of
+      case moduleLookup "main3.py" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
           SpecHelpers.lookupDeclaration "utils" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           -- (lookupDeclaration "utils" heap >>= deNamespace heap) `shouldBe` Just ("utils", ["to_s"])
@@ -54,7 +53,7 @@ spec = do
 
     it "subclasses" $ do
       (scopeGraph, (heap, res)) <- evaluate ["subclass.py"]
-      case ModuleTable.lookup "subclass.py" <$> res of
+      case moduleLookup "subclass.py" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
@@ -64,7 +63,7 @@ spec = do
 
     it "handles multiple inheritance left-to-right" $ do
       (scopeGraph, (heap, res)) <- evaluate ["multiple_inheritance.py"]
-      case ModuleTable.lookup "multiple_inheritance.py" <$> res of
+      case moduleLookup "multiple_inheritance.py" <$> res of
         Right (Just (Module _ (scopeAndFrame, value))) -> do
           SpecHelpers.lookupMembers "Baz" Superclass scopeAndFrame heap scopeGraph `shouldBe` Just [ "dang" ]
           value `shouldBe` String "\"bar!\""
