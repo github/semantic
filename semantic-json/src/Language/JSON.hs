@@ -4,6 +4,7 @@ module Language.JSON
 , TreeSitter.JSON.tree_sitter_json
 ) where
 
+import qualified AST.Parse as Parse
 import qualified AST.Unmarshal as TS
 import           Data.Functor.Identity
 import           Data.Proxy
@@ -11,7 +12,7 @@ import qualified Language.JSON.AST as JSON
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.JSON (tree_sitter_json)
 
-newtype Term a = Term { getTerm :: JSON.Document Identity a }
+newtype Term a = Term { getTerm :: JSON.Document Err a }
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy (JSON.Document Identity))
