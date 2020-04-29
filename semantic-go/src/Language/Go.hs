@@ -12,7 +12,7 @@ import qualified Tags.Tagging.Precise as Tags
 import qualified Language.Go.Grammar (tree_sitter_go)
 import qualified AST.Unmarshal as TS
 
-newtype Term a = Term { getTerm :: Go.SourceFile a }
+newtype Term a = Term { getTerm :: Go.SourceFile Err a }
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Go.SourceFile)
