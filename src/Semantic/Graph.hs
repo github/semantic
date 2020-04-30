@@ -67,8 +67,8 @@ import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
+import           Data.Functor (($>))
 import           Data.Functor.Foldable
-import           Data.Functor  (($>))
 import           Data.Graph.Algebraic
 import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language

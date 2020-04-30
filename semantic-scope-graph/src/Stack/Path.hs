@@ -40,14 +40,14 @@ import           Control.Lens.Lens
 import           Data.Functor.Tagged
 import           Data.Generics.Product
 import           Data.Monoid
+import           Data.Monoid.Cancellative (isPrefixOf)
 import           Data.Semigroup (sconcat)
-import qualified Data.Sequence as Seq
 import           Data.Sequence (Seq (..), (|>))
+import qualified Data.Sequence as Seq
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           GHC.Generics
 import           Stack.Graph (Node (..), Symbol, isRoot)
-import           Data.Monoid.Cancellative (isPrefixOf)
 
 -- | A partial path through a stack graph. These will be generated
 -- from walks through the stack graph, and can be thought of as
@@ -91,7 +91,7 @@ data Edge = Edge
   } deriving (Show, Ord)
 
 instance Eq Edge where
-  Edge (a :# _) (b :# _) "" == Edge (c :# _) (d :# _) "" = a == c && b == d
+  Edge (a :# _) (b :# _) c == Edge (d :# _) (e :# _) f = a == d && b == e && c == f
 
 parseEdges :: Text -> [Edge]
 parseEdges = const []

@@ -35,6 +35,8 @@ nodeAttributes (node :# idx) = case node of
   ExportedScope s -> [ "shape" := "circle", "label" := sym s]
   JumpToScope s  -> [ "shape" := "circle", "label" := sym s]
   IgnoreScope   -> [ "shape" := "rect", "label" := "IGNORE", "color" := "purple"]
+  TopScope s -> [ "shape" := "circle", "label" := "filled", "label" := sym s, "fillcolor" := "yellow", "fontcolor" := "white"]
+  BottomScope s -> [ "shape" := "circle", "label" := "filled", "label" := sym s, "fillcolor" := "purple", "fontcolor" := "white"]
   Root _         -> [ "shape" := "circle", "style" := "filled", "label" := "root", "fillcolor" := "black", "fontcolor" := "white"]
 
 

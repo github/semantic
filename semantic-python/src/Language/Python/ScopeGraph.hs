@@ -33,12 +33,10 @@ import           Control.Lens (set, (^.))
 import           Data.Foldable
 import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NonEmpty
-import qualified Data.Map.Strict as Map
 import           Data.Maybe
 import           Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Traversable
-import           Debug.Trace
 import           GHC.Records
 import           GHC.TypeLits
 import qualified Language.Python.AST as Py
@@ -47,7 +45,6 @@ import           Scope.Graph.Convert (Result (..), complete, todo)
 import           Scope.Types as Scope
 import           Source.Loc (Loc)
 import           Source.Span (Pos (..), Span, point, span_)
-import           Stack.Graph ((-<<), (>>-))
 import qualified Stack.Graph as Stack
 
 -- This typeclass is internal-only, though it shares the same interface
@@ -244,9 +241,9 @@ instance ToScopeGraph Py.ImportStatement where
 
     name <- Name.gensym
 
-    let names' = ((\(Py.Identifier ann name) -> (Name.name name, Identifier, ann)) <$> names)
+    let names' = (\(Py.Identifier ann name) -> (Name.name name, Identifier, ann)) <$> names
     childGraph <- addDeclarations names'
-    let childGraph' = (Stack.addEdge (Stack.Scope name) (Stack.Declaration (Name.name definition) Identifier ann) childGraph)
+    let childGraph' = Stack.addEdge (Stack.Scope name) (Stack.Declaration (Name.name definition) Identifier ann) childGraph
     let childGraph'' = Stack.addEdge ((\(name, kind, ann) -> Stack.Reference name kind ann) (NonEmpty.head names')) rootScope' childGraph'
 
     modify (Stack.addEdge (Stack.Scope name) (Stack.Scope previousScope) . Stack.overlay childGraph'')
@@ -261,7 +258,7 @@ instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
     complete <* newEdge ScopeGraph.Import (toName <$> names)
-  scopeGraph impossibleTerm@(Py.ImportFromStatement _ imports (L1 (Py.DottedName _ names@((Py.Identifier ann scopeName) :| _))) Nothing) = do
+  scopeGraph (Py.ImportFromStatement _ imports (L1 (Py.DottedName _ names@((Py.Identifier ann scopeName) :| _))) Nothing) = do
     let toName (Py.Identifier _ name) = Name.name name
     newEdge ScopeGraph.Import (toName <$> names)
 
@@ -281,16 +278,15 @@ instance ToScopeGraph Py.ImportFromStatement where
         (R1 (Py.DottedName _ (Py.Identifier ann name :| []))) -> do
           let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
           complete <* newReference (Name.name name) referenceProps
-        term@(L1 (Py.AliasedImport _ (Py.Identifier ann name) (Py.DottedName _ (Py.Identifier ann2 ref :| _)))) -> do
+        (L1 (Py.AliasedImport _ (Py.Identifier ann name) (Py.DottedName _ (Py.Identifier ann2 ref :| _)))) -> do
           let declProps = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (ann^.span_ :: Span)
           declare (Name.name name) declProps
-          scopeGraph <- get @(ScopeGraph.ScopeGraph Name.Name)
 
-          scopeGraph <- get @(ScopeGraph.ScopeGraph Name.Name)
           let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
           newReference (Name.name ref) referenceProps
 
           complete
+        (R1 (Py.DottedName _ ((Py.Identifier _ _) :| (_:_)))) -> undefined
 
     pure (mconcat completions)
   scopeGraph term = todo term
@@ -318,14 +314,14 @@ instance ToScopeGraph Py.Module where
 
     modify (Stack.addEdge rootScope' (Stack.Declaration "__main__" Identifier ann))
 
-    onChildren term
+    res <- onChildren term
 
     newGraph <- get @(Stack.Graph Stack.Node)
 
     ScopeGraph.CurrentScope currentName <- currentScope
-    modify ((Stack.addEdge (Stack.Declaration "__main__" Identifier ann) (Stack.Scope currentName)) . Stack.overlay newGraph)
+    modify (Stack.addEdge (Stack.Declaration "__main__" Identifier ann) (Stack.Scope currentName) . Stack.overlay newGraph)
 
-    complete
+    pure res
 
 instance ToScopeGraph Py.ReturnStatement where
   scopeGraph (Py.ReturnStatement _ mVal) = maybe (pure mempty) scopeGraph mVal

@@ -48,13 +48,11 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Module as Module
 import qualified Data.ScopeGraph as ScopeGraph
 import           Data.Semilattice.Lower
-import qualified Data.Set as Set
 import           Data.Text (Text)
 import           GHC.Records
 import qualified Scope.Reference as Reference
 import           Source.Loc
 import           Source.Span
-import           Stack.Graph ((-<<), (>>-))
 import qualified Stack.Graph as Stack
 
 import           Scope.Graph.AdjacencyList (ScopeGraph)
@@ -66,9 +64,6 @@ import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props.Reference
 import           Control.Effect.State
-
-import qualified Algebra.Graph as Graph
-import qualified Algebra.Graph.Class as Class
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
