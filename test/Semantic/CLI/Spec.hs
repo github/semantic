@@ -47,7 +47,7 @@ testForDiffFixture (diffRenderer, runDiff, files, expected) =
 testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile) -> TestTree
 testForParseFixture (format, runParse, files, expected) =
   goldenVsStringDiff
-    ("diff fixture renders to " <> format)
+    ("parse fixture renders to " <> format)
     renderDiff
     (Path.toString expected)
     (fmap toLazyByteString . runTaskOrDie $ readBlobs (FilesFromPaths files) >>= runParse)

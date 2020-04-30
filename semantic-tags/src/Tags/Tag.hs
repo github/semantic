@@ -23,7 +23,11 @@ data Kind
   | Module
   -- References
   | Call
-  -- Types
   | Type
+  -- Just as Call is to Class and Function, Implementation is to Interface.
+  -- This suggests that perhaps we should have an Instantiation kind that
+  -- we use for Class.
+  | Interface
+  | Implementation
   -- Constant -- TODO: New kind for constant references
   deriving (Bounded, Enum, Eq, Show)
