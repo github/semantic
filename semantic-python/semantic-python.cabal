@@ -73,7 +73,7 @@ test-suite compiling
   main-is: CoreTest.hs
   ghc-options: -threaded
 
-  build-depends: semantic-python == 0.0.0.0
+  build-depends: semantic-python
                , aeson ^>= 1.4.4
                , aeson-pretty ^>= 0.8.7
                , bytestring ^>= 0.10.8.2
