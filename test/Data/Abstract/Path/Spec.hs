@@ -8,7 +8,7 @@ spec :: Spec
 spec = parallel $
   describe "joinPaths" $ do
     it "joins empty paths" $
-      go (Path.currentDir) Path.currentDir $ Path.relDir "."
+      go Path.currentDir Path.currentDir $ Path.currentDir
     it "joins relative paths" $
       go (Path.relDir "a/b") (Path.relFile "./c") $ Path.relFile "a/b/c"
     it "joins absolute paths" $
