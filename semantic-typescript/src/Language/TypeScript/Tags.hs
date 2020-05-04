@@ -33,14 +33,14 @@ class ToTags t where
     ( Has (Reader Source) sig m,
       Has (Writer Tags.Tags) sig m
     ) =>
-    t Loc ->
+    t Parse.Err Loc ->
     m ()
   default tags ::
     ( Has (Reader Source) sig m,
       Has (Writer Tags.Tags) sig m,
       Traversable1 ToTags t
     ) =>
-    t Loc ->
+    t Parse.Err Loc ->
     m ()
   tags = gtags
 
