@@ -44,78 +44,78 @@ class ToTags t where
     m ()
   tags = gtags
 
-instance ToTags (Ts.Function Parse.Err) where
-  tags t@Ts.Function {ann = Loc {byteRange}, name = Just (Parse.Succeed Ts.Identifier {text, ann})} =
+instance ToTags Ts.Function where
+  tags t@Ts.Function {ann = Loc {byteRange}, name = Just Ts.Identifier {text, ann}} =
     yieldTag text Function ann byteRange >> gtags t
   tags t = gtags t
 
-instance ToTags (Ts.FunctionSignature Parse.Err) where
-  tags t@Ts.FunctionSignature {ann = Loc {byteRange}, name = Parse.Succeed Ts.Identifier {text, ann}} =
+instance ToTags Ts.FunctionSignature where
+  tags t@Ts.FunctionSignature {ann = Loc {byteRange}, name = Ts.Identifier {text, ann}} =
     yieldTag text Function ann byteRange >> gtags t
 
-instance ToTags (Ts.FunctionDeclaration Parse.Err) where
-  tags t@Ts.FunctionDeclaration {ann = Loc {byteRange}, name = Parse.Succeed Ts.Identifier {text, ann}} =
+instance ToTags Ts.FunctionDeclaration where
+  tags t@Ts.FunctionDeclaration {ann = Loc {byteRange}, name = Ts.Identifier {text, ann}} =
     yieldTag text Function ann byteRange >> gtags t
 
-instance ToTags (Ts.MethodDefinition Parse.Err) where
+instance ToTags Ts.MethodDefinition where
   tags t@Ts.MethodDefinition {ann = Loc {byteRange}, name} = case name of
-    Parse.Succeed (Prj Ts.PropertyIdentifier {text, ann}) -> yieldTag text Method ann byteRange >> gtags t
+    Prj Ts.PropertyIdentifier {text, ann} -> yieldTag text Method ann byteRange >> gtags t
     _ -> gtags t
 
-instance ToTags (Ts.Pair Parse.Err) where
-  tags t@Ts.Pair {ann = Loc {byteRange}, key, value = Parse.Succeed (Ts.Expression expr)} = case (key, expr) of
-    (Parse.Succeed (Prj Ts.PropertyIdentifier {text, ann}), Prj Ts.Function {}) -> yield text ann
-    (Parse.Succeed (Prj Ts.PropertyIdentifier {text, ann}), Prj Ts.ArrowFunction {}) -> yield text ann
+instance ToTags Ts.Pair where
+  tags t@Ts.Pair {ann = Loc {byteRange}, key, value = Ts.Expression expr} = case (key, expr) of
+    (Prj Ts.PropertyIdentifier {text, ann}, Prj Ts.Function {}) -> yield text ann
+    (Prj Ts.PropertyIdentifier {text, ann}, Prj Ts.ArrowFunction {}) -> yield text ann
     _ -> gtags t
     where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
 
-instance ToTags (Ts.ClassDeclaration Parse.Err) where
-  tags t@Ts.ClassDeclaration {ann = Loc {byteRange}, name = Parse.Succeed Ts.TypeIdentifier {text, ann}} =
+instance ToTags Ts.ClassDeclaration where
+  tags t@Ts.ClassDeclaration {ann = Loc {byteRange}, name = Ts.TypeIdentifier {text, ann}} =
     yieldTag text Class ann byteRange >> gtags t
 
-instance ToTags (Ts.CallExpression Parse.Err) where
-  tags t@Ts.CallExpression {ann = Loc {byteRange}, function = (Parse.Succeed (Ts.Expression expr))} = match expr
+instance ToTags Ts.CallExpression where
+  tags t@Ts.CallExpression {ann = Loc {byteRange}, function = Ts.Expression expr} = match expr
     where
       match expr = case expr of
         Prj Ts.Identifier {text, ann} -> yield text ann
-        Prj Ts.NewExpression {constructor = Parse.Succeed (Prj Ts.Identifier {text, ann})} -> yield text ann
-        Prj Ts.CallExpression {function = Parse.Succeed (Ts.Expression expr)} -> match expr
-        Prj Ts.MemberExpression {property = Parse.Succeed (Ts.PropertyIdentifier {text, ann})} -> yield text ann
-        -- Prj Ts.Function {name = Just Ts.Identifier {text, ann}} -> yield text ann
-        -- Prj Ts.ParenthesizedExpression {extraChildren} -> for_ extraChildren $ \x -> case x of
-        --   Prj (Ts.Expression expr) -> match expr
-        --   _ -> tags x
-        -- _ -> gtags t
+        Prj Ts.NewExpression {constructor = Prj Ts.Identifier {text, ann}} -> yield text ann
+        Prj Ts.CallExpression {function = Ts.Expression expr} -> match expr
+        Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}} -> yield text ann
+        Prj Ts.Function {name = Just Ts.Identifier {text, ann}} -> yield text ann
+        Prj Ts.ParenthesizedExpression {extraChildren} -> for_ extraChildren $ \x -> case x of
+          Prj (Ts.Expression expr) -> match expr
+          _ -> tags x
+        _ -> gtags t
       yield name loc = yieldTag name Call loc byteRange >> gtags t
 
-instance ToTags (Ts.Class Parse.Err) where
-  tags t@Ts.Class {ann = Loc {byteRange}, name = Just (Parse.Succeed (Ts.TypeIdentifier {text, ann}))} =
+instance ToTags Ts.Class where
+  tags t@Ts.Class {ann = Loc {byteRange}, name = Just Ts.TypeIdentifier {text, ann}} =
     yieldTag text Class ann byteRange >> gtags t
   tags t = gtags t
 
-instance ToTags (Ts.Module Parse.Err) where
+instance ToTags Ts.Module where
   tags t@Ts.Module {ann = Loc {byteRange}, name} = case name of
-    Parse.Succeed (Prj Ts.Identifier {text, ann}) -> yieldTag text Module ann byteRange >> gtags t
+    Prj Ts.Identifier {text, ann} -> yieldTag text Module ann byteRange >> gtags t
     _ -> gtags t
 
-instance ToTags (Ts.VariableDeclarator Parse.Err) where
-  tags t@Ts.VariableDeclarator {ann = Loc {byteRange}, name, value = Just (Parse.Succeed (Ts.Expression expr))} =
+instance ToTags Ts.VariableDeclarator where
+  tags t@Ts.VariableDeclarator {ann = Loc {byteRange}, name, value = Just (Ts.Expression expr)} =
     case (expr, name) of
-      (Prj Ts.Function {}, Parse.Succeed (Prj Ts.Identifier {text, ann})) -> yield text ann
-      (Prj Ts.ArrowFunction {}, Parse.Succeed (Prj Ts.Identifier {text, ann})) -> yield text ann
+      (Prj Ts.Function {}, Prj Ts.Identifier {text, ann}) -> yield text ann
+      (Prj Ts.ArrowFunction {}, Prj Ts.Identifier {text, ann}) -> yield text ann
       _ -> gtags t
     where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
   tags t = gtags t
 
-instance ToTags (Ts.AssignmentExpression Parse.Err) where
-  tags t@Ts.AssignmentExpression {ann = Loc {byteRange}, left, right = (Parse.Succeed (Ts.Expression expr))} =
+instance ToTags Ts.AssignmentExpression where
+  tags t@Ts.AssignmentExpression {ann = Loc {byteRange}, left, right = (Ts.Expression expr)} =
     case (left, expr) of
-      (Parse.Succeed (Prj Ts.Identifier {text, ann}), Prj Ts.Function {}) -> yield text ann
-      (Parse.Succeed (Prj Ts.Identifier {text, ann}), Prj Ts.ArrowFunction {}) -> yield text ann
-      -- (Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}}, Prj Ts.Function {}) -> yield text ann
-      -- (Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}}, Prj Ts.ArrowFunction {}) -> yield text ann
+      (Prj Ts.Identifier {text, ann}, Prj Ts.Function {}) -> yield text ann
+      (Prj Ts.Identifier {text, ann}, Prj Ts.ArrowFunction {}) -> yield text ann
+      (Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}}, Prj Ts.Function {}) -> yield text ann
+      (Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}}, Prj Ts.ArrowFunction {}) -> yield text ann
       _ -> gtags t
     where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
@@ -124,7 +124,7 @@ instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
   tags (R1 r) = tags r
 
-instance ToTags (Token sym n Parse.Err) where tags _ = pure ()
+instance ToTags (Token sym n) where tags _ = pure ()
 
 gtags ::
   ( Has (Reader Source) sig m,
@@ -148,163 +148,163 @@ yieldTag name kind loc srcLineRange = do
   Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
 
 {- ORMOLU_DISABLE -}
-instance ToTags (Ts.AbstractClassDeclaration Parse.Err)
-instance ToTags (Ts.AbstractMethodSignature Parse.Err)
-instance ToTags (Ts.AccessibilityModifier  Parse.Err)
-instance ToTags (Ts.AmbientDeclaration Parse.Err)
-instance ToTags (Ts.Arguments Parse.Err)
-instance ToTags (Ts.Array Parse.Err)
-instance ToTags (Ts.ArrayPattern Parse.Err)
-instance ToTags (Ts.ArrayType Parse.Err)
-instance ToTags (Ts.ArrowFunction Parse.Err)
-instance ToTags (Ts.AsExpression Parse.Err)
+instance ToTags Ts.AbstractClassDeclaration
+instance ToTags Ts.AbstractMethodSignature
+instance ToTags Ts.AccessibilityModifier
+instance ToTags Ts.AmbientDeclaration
+instance ToTags Ts.Arguments
+instance ToTags Ts.Array
+instance ToTags Ts.ArrayPattern
+instance ToTags Ts.ArrayType
+instance ToTags Ts.ArrowFunction
+instance ToTags Ts.AsExpression
 -- instance ToTags Ts.AssignmentExpression
-instance ToTags (Ts.AssignmentPattern Parse.Err)
-instance ToTags (Ts.AugmentedAssignmentExpression Parse.Err)
-instance ToTags (Ts.AwaitExpression Parse.Err)
-instance ToTags (Ts.BinaryExpression Parse.Err)
-instance ToTags (Ts.BreakStatement Parse.Err)
+instance ToTags Ts.AssignmentPattern
+instance ToTags Ts.AugmentedAssignmentExpression
+instance ToTags Ts.AwaitExpression
+instance ToTags Ts.BinaryExpression
+instance ToTags Ts.BreakStatement
 -- instance ToTags Ts.CallExpression
-instance ToTags (Ts.CallSignature Parse.Err)
-instance ToTags (Ts.CatchClause Parse.Err)
+instance ToTags Ts.CallSignature
+instance ToTags Ts.CatchClause
 -- instance ToTags Ts.Class
-instance ToTags (Ts.ClassBody Parse.Err)
+instance ToTags Ts.ClassBody
 -- instance ToTags Ts.ClassDeclaration
-instance ToTags (Ts.ClassHeritage Parse.Err)
-instance ToTags (Ts.ComputedPropertyName Parse.Err)
-instance ToTags (Ts.Constraint Parse.Err)
-instance ToTags (Ts.ConstructSignature Parse.Err)
-instance ToTags (Ts.ConstructorType Parse.Err)
-instance ToTags (Ts.ContinueStatement Parse.Err)
-instance ToTags (Ts.DebuggerStatement Parse.Err)
-instance ToTags (Ts.Declaration Parse.Err)
-instance ToTags (Ts.Decorator Parse.Err)
-instance ToTags (Ts.DefaultType Parse.Err)
-instance ToTags (Ts.DestructuringPattern Parse.Err)
-instance ToTags (Ts.DoStatement Parse.Err)
-instance ToTags (Ts.EmptyStatement Parse.Err)
-instance ToTags (Ts.EnumAssignment Parse.Err)
-instance ToTags (Ts.EnumBody Parse.Err)
-instance ToTags (Ts.EnumDeclaration Parse.Err)
-instance ToTags (Ts.EscapeSequence Parse.Err)
-instance ToTags (Ts.ExistentialType Parse.Err)
-instance ToTags (Ts.ExportClause Parse.Err)
-instance ToTags (Ts.ExportSpecifier Parse.Err)
-instance ToTags (Ts.ExportStatement Parse.Err)
-instance ToTags (Ts.Expression Parse.Err)
-instance ToTags (Ts.ExpressionStatement Parse.Err)
-instance ToTags (Ts.ExtendsClause Parse.Err)
-instance ToTags (Ts.False Parse.Err)
-instance ToTags (Ts.FinallyClause Parse.Err)
-instance ToTags (Ts.FlowMaybeType Parse.Err)
-instance ToTags (Ts.ForInStatement Parse.Err)
-instance ToTags (Ts.ForStatement Parse.Err)
-instance ToTags (Ts.FormalParameters Parse.Err)
+instance ToTags Ts.ClassHeritage
+instance ToTags Ts.ComputedPropertyName
+instance ToTags Ts.Constraint
+instance ToTags Ts.ConstructSignature
+instance ToTags Ts.ConstructorType
+instance ToTags Ts.ContinueStatement
+instance ToTags Ts.DebuggerStatement
+instance ToTags Ts.Declaration
+instance ToTags Ts.Decorator
+instance ToTags Ts.DefaultType
+instance ToTags Ts.DestructuringPattern
+instance ToTags Ts.DoStatement
+instance ToTags Ts.EmptyStatement
+instance ToTags Ts.EnumAssignment
+instance ToTags Ts.EnumBody
+instance ToTags Ts.EnumDeclaration
+instance ToTags Ts.EscapeSequence
+instance ToTags Ts.ExistentialType
+instance ToTags Ts.ExportClause
+instance ToTags Ts.ExportSpecifier
+instance ToTags Ts.ExportStatement
+instance ToTags Ts.Expression
+instance ToTags Ts.ExpressionStatement
+instance ToTags Ts.ExtendsClause
+instance ToTags Ts.False
+instance ToTags Ts.FinallyClause
+instance ToTags Ts.FlowMaybeType
+instance ToTags Ts.ForInStatement
+instance ToTags Ts.ForStatement
+instance ToTags Ts.FormalParameters
 -- instance ToTags Ts.Function
 -- instance ToTags Ts.FunctionDeclaration
 -- instance ToTags Ts.FunctionSignature
-instance ToTags (Ts.FunctionType Parse.Err)
-instance ToTags (Ts.GeneratorFunction Parse.Err)
-instance ToTags (Ts.GeneratorFunctionDeclaration Parse.Err)
-instance ToTags (Ts.GenericType Parse.Err)
-instance ToTags (Ts.HashBangLine Parse.Err)
-instance ToTags (Ts.Identifier Parse.Err)
-instance ToTags (Ts.IfStatement Parse.Err)
-instance ToTags (Ts.ImplementsClause Parse.Err)
-instance ToTags (Ts.Import Parse.Err)
-instance ToTags (Ts.ImportAlias Parse.Err)
-instance ToTags (Ts.ImportClause Parse.Err)
-instance ToTags (Ts.ImportRequireClause Parse.Err)
-instance ToTags (Ts.ImportSpecifier Parse.Err)
-instance ToTags (Ts.ImportStatement Parse.Err)
-instance ToTags (Ts.IndexSignature Parse.Err)
-instance ToTags (Ts.IndexTypeQuery Parse.Err)
-instance ToTags (Ts.InterfaceDeclaration Parse.Err)
-instance ToTags (Ts.InternalModule Parse.Err)
-instance ToTags (Ts.IntersectionType Parse.Err)
-instance ToTags (Ts.JsxAttribute Parse.Err)
-instance ToTags (Ts.JsxClosingElement Parse.Err)
-instance ToTags (Ts.JsxElement Parse.Err)
-instance ToTags (Ts.JsxExpression Parse.Err)
-instance ToTags (Ts.JsxFragment Parse.Err)
-instance ToTags (Ts.JsxNamespaceName Parse.Err)
-instance ToTags (Ts.JsxOpeningElement Parse.Err)
-instance ToTags (Ts.JsxSelfClosingElement Parse.Err)
-instance ToTags (Ts.JsxText Parse.Err)
-instance ToTags (Ts.LabeledStatement Parse.Err)
-instance ToTags (Ts.LexicalDeclaration Parse.Err)
-instance ToTags (Ts.LiteralType Parse.Err)
-instance ToTags (Ts.LookupType Parse.Err)
-instance ToTags (Ts.MappedTypeClause Parse.Err)
-instance ToTags (Ts.MemberExpression Parse.Err)
-instance ToTags (Ts.MetaProperty Parse.Err)
+instance ToTags Ts.FunctionType
+instance ToTags Ts.GeneratorFunction
+instance ToTags Ts.GeneratorFunctionDeclaration
+instance ToTags Ts.GenericType
+instance ToTags Ts.HashBangLine
+instance ToTags Ts.Identifier
+instance ToTags Ts.IfStatement
+instance ToTags Ts.ImplementsClause
+instance ToTags Ts.Import
+instance ToTags Ts.ImportAlias
+instance ToTags Ts.ImportClause
+instance ToTags Ts.ImportRequireClause
+instance ToTags Ts.ImportSpecifier
+instance ToTags Ts.ImportStatement
+instance ToTags Ts.IndexSignature
+instance ToTags Ts.IndexTypeQuery
+instance ToTags Ts.InterfaceDeclaration
+instance ToTags Ts.InternalModule
+instance ToTags Ts.IntersectionType
+instance ToTags Ts.JsxAttribute
+instance ToTags Ts.JsxClosingElement
+instance ToTags Ts.JsxElement
+instance ToTags Ts.JsxExpression
+instance ToTags Ts.JsxFragment
+instance ToTags Ts.JsxNamespaceName
+instance ToTags Ts.JsxOpeningElement
+instance ToTags Ts.JsxSelfClosingElement
+instance ToTags Ts.JsxText
+instance ToTags Ts.LabeledStatement
+instance ToTags Ts.LexicalDeclaration
+instance ToTags Ts.LiteralType
+instance ToTags Ts.LookupType
+instance ToTags Ts.MappedTypeClause
+instance ToTags Ts.MemberExpression
+instance ToTags Ts.MetaProperty
 -- instance ToTags Ts.MethodDefinition
-instance ToTags (Ts.MethodSignature Parse.Err)
+instance ToTags Ts.MethodSignature
 -- instance ToTags Ts.Module
-instance ToTags (Ts.NamedImports Parse.Err)
-instance ToTags (Ts.NamespaceImport Parse.Err)
-instance ToTags (Ts.NestedIdentifier Parse.Err)
-instance ToTags (Ts.NestedTypeIdentifier Parse.Err)
-instance ToTags (Ts.NewExpression Parse.Err)
-instance ToTags (Ts.NonNullExpression Parse.Err)
-instance ToTags (Ts.Null Parse.Err)
-instance ToTags (Ts.Number Parse.Err)
-instance ToTags (Ts.Object Parse.Err)
-instance ToTags (Ts.ObjectPattern Parse.Err)
-instance ToTags (Ts.ObjectType Parse.Err)
-instance ToTags (Ts.OptionalParameter Parse.Err)
+instance ToTags Ts.NamedImports
+instance ToTags Ts.NamespaceImport
+instance ToTags Ts.NestedIdentifier
+instance ToTags Ts.NestedTypeIdentifier
+instance ToTags Ts.NewExpression
+instance ToTags Ts.NonNullExpression
+instance ToTags Ts.Null
+instance ToTags Ts.Number
+instance ToTags Ts.Object
+instance ToTags Ts.ObjectPattern
+instance ToTags Ts.ObjectType
+instance ToTags Ts.OptionalParameter
 -- instance ToTags Ts.Pair
-instance ToTags (Ts.ParenthesizedExpression Parse.Err)
-instance ToTags (Ts.ParenthesizedType Parse.Err)
-instance ToTags (Ts.PredefinedType Parse.Err)
-instance ToTags (Ts.Program Parse.Err)
-instance ToTags (Ts.PropertyIdentifier Parse.Err)
-instance ToTags (Ts.PropertySignature Parse.Err)
-instance ToTags (Ts.PublicFieldDefinition Parse.Err)
-instance ToTags (Ts.Readonly Parse.Err)
-instance ToTags (Ts.Regex Parse.Err)
-instance ToTags (Ts.RegexFlags Parse.Err)
-instance ToTags (Ts.RegexPattern Parse.Err)
-instance ToTags (Ts.RequiredParameter Parse.Err)
-instance ToTags (Ts.RestParameter Parse.Err)
-instance ToTags (Ts.ReturnStatement Parse.Err)
-instance ToTags (Ts.SequenceExpression Parse.Err)
-instance ToTags (Ts.ShorthandPropertyIdentifier Parse.Err)
-instance ToTags (Ts.SpreadElement Parse.Err)
-instance ToTags (Ts.Statement Parse.Err)
-instance ToTags (Ts.StatementBlock Parse.Err)
-instance ToTags (Ts.StatementIdentifier Parse.Err)
-instance ToTags (Ts.String Parse.Err)
-instance ToTags (Ts.SubscriptExpression Parse.Err)
-instance ToTags (Ts.Super Parse.Err)
-instance ToTags (Ts.SwitchBody Parse.Err)
-instance ToTags (Ts.SwitchCase Parse.Err)
-instance ToTags (Ts.SwitchDefault Parse.Err)
-instance ToTags (Ts.SwitchStatement Parse.Err)
-instance ToTags (Ts.TemplateString Parse.Err)
-instance ToTags (Ts.TemplateSubstitution Parse.Err)
-instance ToTags (Ts.TernaryExpression Parse.Err)
-instance ToTags (Ts.This Parse.Err)
-instance ToTags (Ts.ThrowStatement Parse.Err)
-instance ToTags (Ts.True Parse.Err)
-instance ToTags (Ts.TryStatement Parse.Err)
-instance ToTags (Ts.TupleType Parse.Err)
-instance ToTags (Ts.TypeAliasDeclaration Parse.Err)
-instance ToTags (Ts.TypeAnnotation Parse.Err)
-instance ToTags (Ts.TypeArguments Parse.Err)
-instance ToTags (Ts.TypeAssertion Parse.Err)
-instance ToTags (Ts.TypeIdentifier Parse.Err)
-instance ToTags (Ts.TypeParameter Parse.Err)
-instance ToTags (Ts.TypeParameters Parse.Err)
-instance ToTags (Ts.TypePredicate Parse.Err)
-instance ToTags (Ts.TypeQuery Parse.Err)
-instance ToTags (Ts.UnaryExpression Parse.Err)
-instance ToTags (Ts.Undefined Parse.Err)
-instance ToTags (Ts.UnionType Parse.Err)
-instance ToTags (Ts.UpdateExpression Parse.Err)
-instance ToTags (Ts.VariableDeclaration Parse.Err)
+instance ToTags Ts.ParenthesizedExpression
+instance ToTags Ts.ParenthesizedType
+instance ToTags Ts.PredefinedType
+instance ToTags Ts.Program
+instance ToTags Ts.PropertyIdentifier
+instance ToTags Ts.PropertySignature
+instance ToTags Ts.PublicFieldDefinition
+instance ToTags Ts.Readonly
+instance ToTags Ts.Regex
+instance ToTags Ts.RegexFlags
+instance ToTags Ts.RegexPattern
+instance ToTags Ts.RequiredParameter
+instance ToTags Ts.RestParameter
+instance ToTags Ts.ReturnStatement
+instance ToTags Ts.SequenceExpression
+instance ToTags Ts.ShorthandPropertyIdentifier
+instance ToTags Ts.SpreadElement
+instance ToTags Ts.Statement
+instance ToTags Ts.StatementBlock
+instance ToTags Ts.StatementIdentifier
+instance ToTags Ts.String
+instance ToTags Ts.SubscriptExpression
+instance ToTags Ts.Super
+instance ToTags Ts.SwitchBody
+instance ToTags Ts.SwitchCase
+instance ToTags Ts.SwitchDefaultx
+instance ToTags Ts.SwitchStatement
+instance ToTags Ts.TemplateString
+instance ToTags Ts.TemplateSubstitution
+instance ToTags Ts.TernaryExpression
+instance ToTags Ts.This
+instance ToTags Ts.ThrowStatement
+instance ToTags Ts.True
+instance ToTags Ts.TryStatement
+instance ToTags Ts.TupleType
+instance ToTags Ts.TypeAliasDeclaration
+instance ToTags Ts.TypeAnnotation
+instance ToTags Ts.TypeArguments
+instance ToTags Ts.TypeAssertion
+instance ToTags Ts.TypeIdentifier
+instance ToTags Ts.TypeParameter
+instance ToTags Ts.TypeParameters
+instance ToTags Ts.TypePredicate
+instance ToTags Ts.TypeQuery
+instance ToTags Ts.UnaryExpression
+instance ToTags Ts.Undefined
+instance ToTags Ts.UnionType
+instance ToTags Ts.UpdateExpression
+instance ToTags Ts.VariableDeclaration
 -- instance ToTags Ts.VariableDeclarator
-instance ToTags (Ts.WhileStatement Parse.Err)
-instance ToTags (Ts.WithStatement Parse.Err)
-instance ToTags (Ts.YieldExpression Parse.Err)
+instance ToTags Ts.WhileStatement
+instance ToTags Ts.WithStatement
+instance ToTags Ts.YieldExpression
 {- ORMOLU_ENABLE -}
