@@ -279,7 +279,7 @@ instance ToTags Ts.SubscriptExpression
 instance ToTags Ts.Super
 instance ToTags Ts.SwitchBody
 instance ToTags Ts.SwitchCase
-instance ToTags Ts.SwitchDefaultx
+instance ToTags Ts.SwitchDefault
 instance ToTags Ts.SwitchStatement
 instance ToTags Ts.TemplateString
 instance ToTags Ts.TemplateSubstitution
