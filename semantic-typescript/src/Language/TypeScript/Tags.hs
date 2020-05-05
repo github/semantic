@@ -38,7 +38,7 @@ class ToTags (t :: ((* -> *) -> * -> *)) where
   default tags ::
     ( Has (Reader Source) sig m,
       Has (Writer Tags.Tags) sig m,
-      Traversable1 ToTags t
+      Traversable1 ToTags (t Parse.Err)
     ) =>
     t Parse.Err Loc ->
     m ()
