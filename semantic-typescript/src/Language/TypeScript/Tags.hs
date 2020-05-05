@@ -8,6 +8,8 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ConstraintKinds #-}
+
 
 module Language.TypeScript.Tags
   ( ToTags (..),
