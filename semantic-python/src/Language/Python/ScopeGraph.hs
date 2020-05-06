@@ -336,7 +336,16 @@ instance ToScopeGraph Py.Module where
     pure res
 
 instance ToScopeGraph Py.ReturnStatement where
-  scopeGraph (Py.ReturnStatement _ mVal) = maybe (pure mempty) scopeGraph mVal
+  scopeGraph (Py.ReturnStatement _ val) = do
+    case val of
+      Just mVal -> do
+        res <- scopeGraph mVal
+        case res of
+          ValueNode node -> do
+            modify (Stack.addEdge (Stack.Scope "R") node)
+            pure (ReturnNodes [Stack.Scope "R"])
+          _ -> pure Complete
+      Nothing -> pure Complete
 
 instance ToScopeGraph Py.True where scopeGraph = mempty
 
