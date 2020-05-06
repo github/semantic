@@ -19,76 +19,77 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Language.Python.ScopeGraph
-  ( scopeGraphModule
-  ) where
+  ( scopeGraphModule,
+  )
+where
 
+import AST.Element
 import qualified Analysis.Name as Name
-import           AST.Element
-import           Control.Effect.ScopeGraph
+import Control.Effect.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
-import           Control.Effect.State
-import           Control.Lens (set, (^.))
-import           Data.Foldable
-import           Data.List.NonEmpty (NonEmpty (..))
+import Control.Effect.State
+import Control.Lens ((^.), set)
+import Data.Foldable
+import Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NonEmpty
-import           Data.Maybe
-import           Data.Monoid
+import Data.Maybe
+import Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
-import           Data.Traversable
-import           GHC.Records
-import           GHC.TypeLits
+import Data.Traversable
+import GHC.Records
+import GHC.TypeLits
 import qualified Language.Python.AST as Py
-import           Language.Python.Patterns
-import           Scope.Graph.Convert (Result (..), complete, todo)
-import           Scope.Types as Scope
-import           Source.Loc (Loc)
-import           Source.Span (Pos (..), Span, point, span_)
+import Language.Python.Patterns
+import Scope.Graph.Convert (Result (..), complete, todo)
+import Scope.Types as Scope
+import Source.Loc (Loc)
+import Source.Span (Pos (..), Span, point, span_)
 import qualified Stack.Graph as Stack
 
 -- This typeclass is internal-only, though it shares the same interface
 -- as the one defined in semantic-scope-graph. The somewhat-unconventional
 -- quantified constraint is to avoid having to define Show1 instances for
 -- every single Python AST type.
-class (forall a . Show a => Show (t a)) => ToScopeGraph t where
+class (forall a. Show a => Show (t a)) => ToScopeGraph t where
   scopeGraph ::
-    ( ScopeGraphEff sig m
-    , Monoid (m Result)
-    )
-    => t Loc
-    -> m Result
+    ( ScopeGraphEff sig m,
+      Monoid (m Result)
+    ) =>
+    t Loc ->
+    m Result
 
 instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
   scopeGraph (L1 l) = scopeGraph l
   scopeGraph (R1 r) = scopeGraph r
 
 onField ::
-  forall (field :: Symbol) syn sig m r .
-  ( ScopeGraphEff sig m
-  , HasField field (r Loc) (syn Loc)
-  , ToScopeGraph syn
-  , Monoid (m Result)
-  )
-  => r Loc
-  -> m Result
-onField
-  = scopeGraph @syn
-  . getField @field
+  forall (field :: Symbol) syn sig m r.
+  ( ScopeGraphEff sig m,
+    HasField field (r Loc) (syn Loc),
+    ToScopeGraph syn,
+    Monoid (m Result)
+  ) =>
+  r Loc ->
+  m Result
+onField =
+  scopeGraph @syn
+    . getField @field
 
 onChildren ::
-  ( Traversable t
-  , ToScopeGraph syn
-  , ScopeGraphEff sig m
-  , HasField "extraChildren" (r Loc) (t (syn Loc))
-  , Monoid (m Result)
-  )
-  => r Loc
-  -> m Result
-onChildren
-  = fmap fold
-  . traverse scopeGraph
-  . getField @"extraChildren"
+  ( Traversable t,
+    ToScopeGraph syn,
+    ScopeGraphEff sig m,
+    HasField "extraChildren" (r Loc) (t (syn Loc)),
+    Monoid (m Result)
+  ) =>
+  r Loc ->
+  m Result
+onChildren =
+  fmap fold
+    . traverse scopeGraph
+    . getField @"extraChildren"
 
 scopeGraphModule :: ScopeGraphEff sig m => Py.Module Loc -> m Result
 scopeGraphModule = getAp . scopeGraph
@@ -97,12 +98,14 @@ instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
   scopeGraph (Py.Assignment ann (SingleIdentifier t) val _typ) = do
-    declare t Props.Declaration
-      { Props.kind     = ScopeGraph.Assignment
-      , Props.relation = ScopeGraph.Default
-      , Props.associatedScope = Nothing
-      , Props.span = ann^.span_
-      }
+    declare
+      t
+      Props.Declaration
+        { Props.kind = ScopeGraph.Assignment,
+          Props.relation = ScopeGraph.Default,
+          Props.associatedScope = Nothing,
+          Props.span = ann ^. span_
+        }
     maybe complete scopeGraph val
   scopeGraph x = todo x
 
@@ -124,18 +127,18 @@ instance ToScopeGraph Py.Block where scopeGraph = onChildren
 instance ToScopeGraph Py.BreakStatement where scopeGraph = mempty
 
 instance ToScopeGraph Py.Call where
-  scopeGraph Py.Call
-    { function
-    , arguments = L1 Py.ArgumentList { extraChildren = args }
-    } = do
+  scopeGraph
+    Py.Call
+      { function,
+        arguments = L1 Py.ArgumentList {extraChildren = args}
+      } = do
       result <- scopeGraph function
       let scopeGraphArg = \case
             Prj expr -> scopeGraph @Py.Expression expr
-            other    -> todo other
+            other -> todo other
       args <- traverse scopeGraphArg args
       pure (result <> mconcat args)
   scopeGraph it = todo it
-
 
 instance ToScopeGraph Py.ClassDefinition where scopeGraph = todo
 
@@ -185,34 +188,45 @@ instance ToScopeGraph Py.Float where scopeGraph = mempty
 instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.FunctionDefinition where
-  scopeGraph Py.FunctionDefinition
-    { ann
-    , name       = Py.Identifier _ann1 name
-    , parameters = Py.Parameters _ann2 parameters
-    , body
-    } = do
-    (_, associatedScope) <- declareFunction (Just $ Name.name name) Props.Function
-      { Props.kind = ScopeGraph.Function
-      , Props.span = ann^.span_
-      }
-    withScope associatedScope $ do
-      let declProps = Props.Declaration
-            { Props.kind = ScopeGraph.Parameter
-            , Props.relation = ScopeGraph.Default
-            , Props.associatedScope = Nothing
-            , Props.span = point (Pos 0 0)
+  scopeGraph
+    Py.FunctionDefinition
+      { ann,
+        name = Py.Identifier _ann1 name,
+        parameters = Py.Parameters _ann2 parameters,
+        body
+      } = do
+      let name' = Name.name name
+
+      (_, associatedScope) <-
+        declareFunction
+          (Just name')
+          Props.Function
+            { Props.kind = ScopeGraph.Function,
+              Props.span = ann ^. span_
             }
-      let param (Py.Parameter (Prj (Py.Identifier pann pname))) = Just (pann, Name.name pname)
-          param _                                               = Nothing
-      let parameterMs = fmap param parameters
-      if any isNothing parameterMs
-        then todo parameterMs
-        else do
-          let parameters' = catMaybes parameterMs
-          paramDeclarations <- for parameters' $ \(pos, parameter) ->
-            complete <* declare parameter (set span_ (pos^.span_) declProps)
-          bodyResult <- scopeGraph body
-          pure (mconcat paramDeclarations <> bodyResult)
+
+      CurrentScope currentScope' <- currentScope
+      modify (Stack.addEdge (Stack.Scope currentScope') (Stack.Declaration name' ScopeGraph.Function ann))
+
+      withScope associatedScope $ do
+        let declProps =
+              Props.Declaration
+                { Props.kind = ScopeGraph.Parameter,
+                  Props.relation = ScopeGraph.Default,
+                  Props.associatedScope = Nothing,
+                  Props.span = point (Pos 0 0)
+                }
+        let param (Py.Parameter (Prj (Py.Identifier pann pname))) = Just (pann, Name.name pname)
+            param _ = Nothing
+        let parameterMs = fmap param parameters
+        if any isNothing parameterMs
+          then todo parameterMs
+          else do
+            let parameters' = catMaybes parameterMs
+            paramDeclarations <- for parameters' $ \(pos, parameter) ->
+              complete <* declare parameter (set span_ (pos ^. span_) declProps)
+            bodyResult <- scopeGraph body
+            pure (mconcat paramDeclarations <> bodyResult)
 
 instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 
@@ -220,15 +234,15 @@ instance ToScopeGraph Py.GeneratorExpression where scopeGraph = todo
 
 instance ToScopeGraph Py.Identifier where
   scopeGraph (Py.Identifier ann name) = do
-    let refProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
+    let refProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
     newReference (Name.name name) refProps
     complete
 
 instance ToScopeGraph Py.IfStatement where
-  scopeGraph (Py.IfStatement _ alternative body condition)
-    = scopeGraph condition
-    <> scopeGraph body
-    <> foldMap scopeGraph alternative
+  scopeGraph (Py.IfStatement _ alternative body condition) =
+    scopeGraph condition
+      <> scopeGraph body
+      <> foldMap scopeGraph alternative
 
 instance ToScopeGraph Py.GlobalStatement where scopeGraph = todo
 
@@ -251,7 +265,6 @@ instance ToScopeGraph Py.ImportStatement where
     putCurrentScope name
 
     complete
-
   scopeGraph term = todo (show term)
 
 instance ToScopeGraph Py.ImportFromStatement where
@@ -262,7 +275,7 @@ instance ToScopeGraph Py.ImportFromStatement where
     let toName (Py.Identifier _ name) = Name.name name
     newEdge ScopeGraph.Import (toName <$> names)
 
-    let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
+    let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
     newReference (Name.name scopeName) referenceProps
 
     let pairs = zip (toList names) (tail $ toList names)
@@ -270,27 +283,26 @@ instance ToScopeGraph Py.ImportFromStatement where
       case pair of
         (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
           withScope (toName scopeIdentifier) $ do
-            let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
+            let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2 ^. span_ :: Span)
             newReference (toName referenceIdentifier) referenceProps
 
     completions <- for imports $ \identifier -> do
       case identifier of
         (R1 (Py.DottedName _ (Py.Identifier ann name :| []))) -> do
-          let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann^.span_ :: Span)
+          let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
           complete <* newReference (Name.name name) referenceProps
         (L1 (Py.AliasedImport _ (Py.Identifier ann name) (Py.DottedName _ (Py.Identifier ann2 ref :| _)))) -> do
-          let declProps = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (ann^.span_ :: Span)
+          let declProps = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (ann ^. span_ :: Span)
           declare (Name.name name) declProps
 
-          let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2^.span_ :: Span)
+          let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2 ^. span_ :: Span)
           newReference (Name.name ref) referenceProps
 
           complete
-        (R1 (Py.DottedName _ ((Py.Identifier _ _) :| (_:_)))) -> undefined
+        (R1 (Py.DottedName _ ((Py.Identifier _ _) :| (_ : _)))) -> undefined
 
     pure (mconcat completions)
   scopeGraph term = todo term
-
 
 instance ToScopeGraph Py.Lambda where scopeGraph = todo
 
@@ -357,17 +369,17 @@ instance ToScopeGraph Py.Subscript where scopeGraph = todo
 instance ToScopeGraph Py.Tuple where scopeGraph = onChildren
 
 instance ToScopeGraph Py.TryStatement where
-  scopeGraph (Py.TryStatement _ body elseClauses)
-    = scopeGraph body
-    <> foldMap scopeGraph elseClauses
+  scopeGraph (Py.TryStatement _ body elseClauses) =
+    scopeGraph body
+      <> foldMap scopeGraph elseClauses
 
 instance ToScopeGraph Py.UnaryOperator where scopeGraph = onField @"argument"
 
 instance ToScopeGraph Py.WhileStatement where
-  scopeGraph Py.WhileStatement{ alternative, body, condition }
-    = scopeGraph condition
-    <> scopeGraph body
-    <> foldMap scopeGraph alternative
+  scopeGraph Py.WhileStatement {alternative, body, condition} =
+    scopeGraph condition
+      <> scopeGraph body
+      <> foldMap scopeGraph alternative
 
 instance ToScopeGraph Py.WithStatement where
   scopeGraph = todo

@@ -14,74 +14,72 @@
 -- the lifetime of a monadic computation. The name is meant to evoke
 -- physically sketching the hierarchical outline of a graph.
 module Control.Effect.ScopeGraph
-  ( ScopeGraph
-  , ScopeGraphEff
-  , declare
-  , addDeclarations
-  -- Scope Manipulation
-  , currentScope
-  , rootScope
-  , putCurrentScope
-  , newEdge
-  , newReference
-  , newScope
-  , addBottomScope
-  , addTopScope
-  , connectScopes
-  , withScope
-  , declareFunction
-  , declareMaybeName
-  , reference
-  , Has
-  ) where
+  ( ScopeGraph,
+    ScopeGraphEff,
+    declare,
+    addDeclarations,
+    -- Scope Manipulation
+    currentScope,
+    rootScope,
+    putCurrentScope,
+    newEdge,
+    newReference,
+    newScope,
+    addBottomScope,
+    addTopScope,
+    connectScopes,
+    withScope,
+    declareFunction,
+    declareMaybeName,
+    reference,
+    Has,
+  )
+where
 
-import           Analysis.Name (Name)
+import Analysis.Name (Name)
 import qualified Analysis.Name as Name
-import           Control.Algebra
-import           Control.Effect.Fresh
-import           Control.Effect.Reader
-import           Control.Lens
-import           Data.List.NonEmpty
-import qualified Data.List.NonEmpty as NonEmpty
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import qualified Data.Module as Module
-import qualified Data.ScopeGraph as ScopeGraph
-import           Data.Semilattice.Lower
-import           Data.Text (Text)
-import           GHC.Records
-import qualified Scope.Reference as Reference
-import           Source.Loc
-import           Source.Span
-import qualified Stack.Graph as Stack
-
-import           Scope.Graph.AdjacencyList (ScopeGraph)
-import qualified Scope.Graph.AdjacencyList as AdjacencyList
-import           Scope.Types
-
+import Control.Algebra
+import Control.Effect.Fresh
+import Control.Effect.Reader
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props.Reference
-import           Control.Effect.State
+import Control.Effect.State
+import Control.Lens
+import Data.List.NonEmpty
+import qualified Data.List.NonEmpty as NonEmpty
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
+import qualified Data.Module as Module
+import qualified Data.ScopeGraph as ScopeGraph
+import Data.Semilattice.Lower
+import Data.Text (Text)
+import GHC.Records
+import Scope.Graph.AdjacencyList (ScopeGraph)
+import qualified Scope.Graph.AdjacencyList as AdjacencyList
+import qualified Scope.Reference as Reference
+import Scope.Types
+import Source.Loc
+import Source.Span
+import qualified Stack.Graph as Stack
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
 {-# INLINE maybeM #-}
 
-type ScopeGraphEff sig m
-  = ( Has (State (ScopeGraph Name)) sig m
-    , Has (State (Stack.Graph Stack.Node)) sig m
-    , Has (State (CurrentScope Name)) sig m
-    , Has (Reader Stack.Node) sig m
-    , Has (Reader Module.ModuleInfo) sig m
-    , Has Fresh sig m
-    )
+type ScopeGraphEff sig m =
+  ( Has (State (ScopeGraph Name)) sig m,
+    Has (State (Stack.Graph Stack.Node)) sig m,
+    Has (State (CurrentScope Name)) sig m,
+    Has (Reader Stack.Node) sig m, -- The root node of the module.
+    Has (Reader Module.ModuleInfo) sig m,
+    Has Fresh sig m
+  )
 
 graphInProgress :: ScopeGraphEff sig m => m (ScopeGraph Name)
 graphInProgress = get
-
 
 currentScope :: ScopeGraphEff sig m => m (CurrentScope Name)
 currentScope = get @(CurrentScope Name)
@@ -92,10 +90,11 @@ rootScope = ask @Stack.Node
 putCurrentScope :: ScopeGraphEff sig m => Name -> m ()
 putCurrentScope = put . CurrentScope
 
-withScope :: ScopeGraphEff sig m
-          => Name
-          -> m a
-          -> m a
+withScope ::
+  ScopeGraphEff sig m =>
+  Name ->
+  m a ->
+  m a
 withScope scope action = do
   CurrentScope s <- get @(CurrentScope Name)
   put (CurrentScope scope)
@@ -126,37 +125,45 @@ connectScopes scopeA existingScope = do
   modify (Stack.addEdge scopeA existingScope)
 
 -- | Establish a reference to a prior declaration.
-reference :: forall sig m . ScopeGraphEff sig m => Text -> Text -> Props.Reference -> m ()
+reference :: forall sig m. ScopeGraphEff sig m => Text -> Text -> Props.Reference -> m ()
 reference n decl props = do
   CurrentScope current <- currentScope
   old <- graphInProgress
   info <- ask
   let new =
-         ScopeGraph.reference
-         (ScopeGraph.Reference (Name.name n))
-         info
-         (Props.Reference.span props)
-         (Props.Reference.kind props)
-         (ScopeGraph.Declaration (Name.name decl))
-         current
-         old
+        ScopeGraph.reference
+          (ScopeGraph.Reference (Name.name n))
+          info
+          (Props.Reference.span props)
+          (Props.Reference.kind props)
+          (ScopeGraph.Declaration (Name.name decl))
+          current
+          old
   put new
 
-newScope :: forall sig m . ScopeGraphEff sig m => Map ScopeGraph.EdgeLabel [Name] -> m Name
-newScope edges = do
+newScope :: forall sig m. ScopeGraphEff sig m => Name -> m Name
+newScope currentScope = do
   name <- Name.gensym
-  modify (Stack.newScope name edges)
-  name <$ modify (ScopeGraph.newScope name edges)
-
+  name <$ modify (Stack.newScope name currentScope)
 
 addDeclarations :: ScopeGraphEff sig m => NonEmpty (Name, Kind, Loc) -> m (Stack.Graph Stack.Node)
 addDeclarations names = do
-  let graph' = foldr (\(name, kind, loc) graph ->
-        Stack.addEdge (Stack.Declaration name kind loc) (Stack.PopSymbol ".")  graph) mempty (NonEmpty.init names)
-      graph'' = (Stack.addEdge (Stack.PopSymbol ".") ((\(name, kind, loc) -> (Stack.Declaration name kind loc)) (NonEmpty.last names))  graph')
-      graph''' = foldr (\(name, kind, loc) graph ->
-        Stack.addEdge (Stack.Reference name kind loc) (Stack.PushSymbol ".") graph) mempty (NonEmpty.init $ NonEmpty.reverse names)
-      graph'''' = Stack.overlay graph'' (Stack.addEdge (Stack.PushSymbol ".") ((\(name, kind, loc) -> (Stack.Reference name kind loc)) (NonEmpty.head names))  graph''')
+  let graph' =
+        foldr
+          ( \(name, kind, loc) graph ->
+              Stack.addEdge (Stack.Declaration name kind loc) (Stack.PopSymbol ".") graph
+          )
+          mempty
+          (NonEmpty.init names)
+      graph'' = (Stack.addEdge (Stack.PopSymbol ".") ((\(name, kind, loc) -> (Stack.Declaration name kind loc)) (NonEmpty.last names)) graph')
+      graph''' =
+        foldr
+          ( \(name, kind, loc) graph ->
+              Stack.addEdge (Stack.Reference name kind loc) (Stack.PushSymbol ".") graph
+          )
+          mempty
+          (NonEmpty.init $ NonEmpty.reverse names)
+      graph'''' = Stack.overlay graph'' (Stack.addEdge (Stack.PushSymbol ".") ((\(name, kind, loc) -> (Stack.Reference name kind loc)) (NonEmpty.head names)) graph''')
       graph''''' = (\(name, kind, loc) -> Stack.addEdge (Stack.Declaration name kind loc) (Stack.Reference name kind loc) graph'''') (NonEmpty.last names)
   pure graph'''''
 
@@ -175,45 +182,50 @@ newReference name props = do
   CurrentScope currentAddress <- currentScope
   scope <- lookupScope currentAddress
 
-  let refProps = Reference.ReferenceInfo (props^.span_) (Props.Reference.kind props) lowerBound
+  let refProps = Reference.ReferenceInfo (props ^. span_) (Props.Reference.kind props) lowerBound
       insertRef' :: ScopeGraph.Path Name -> ScopeGraph.ScopeGraph Name -> ScopeGraph.ScopeGraph Name
-      insertRef' path scopeGraph = let
-          scope' = (ScopeGraph.insertReference (Reference.Reference name) lowerBound (Props.Reference.span props) (getField @"kind" props) path) scope
-        in
-          (ScopeGraph.insertScope currentAddress scope' scopeGraph)
+      insertRef' path scopeGraph =
+        let scope' = (ScopeGraph.insertReference (Reference.Reference name) lowerBound (Props.Reference.span props) (getField @"kind" props) path) scope
+         in (ScopeGraph.insertScope currentAddress scope' scopeGraph)
   scopeGraph <- get @(ScopeGraph.ScopeGraph Name)
   case AdjacencyList.findPath (const Nothing) (ScopeGraph.Declaration name) currentAddress scopeGraph of
     -- If a path to a declaration is found, insert a reference into the current scope.
     Just path -> modify (insertRef' path)
     -- If no path is found, insert a reference with a hole into the current scope.
-    Nothing   ->
-      modify (ScopeGraph.insertScope
-              currentAddress
-              (ScopeGraph.newReference
+    Nothing ->
+      modify
+        ( ScopeGraph.insertScope
+            currentAddress
+            ( ScopeGraph.newReference
                 (Reference.Reference name)
                 refProps
-                scope))
+                scope
+            )
+        )
 
-declareFunction :: forall sig m . ScopeGraphEff sig m => Maybe Name -> Props.Function -> m (Name, Name)
+declareFunction :: forall sig m. ScopeGraphEff sig m => Maybe Name -> Props.Function -> m (Name, Name)
 declareFunction name (Props.Function kind span) = do
   CurrentScope currentScope' <- currentScope
-  let lexicalEdges = Map.singleton ScopeGraph.Lexical [ currentScope' ]
-  associatedScope <- newScope lexicalEdges
-  name' <- declareMaybeName name Props.Declaration
-                                   { Props.relation = ScopeGraph.Default
-                                   , Props.kind = kind
-                                   , Props.associatedScope = Just associatedScope
-                                   , Props.span = span
-                                   }
+  associatedScope <- newScope currentScope'
+  name' <-
+    declareMaybeName
+      name
+      Props.Declaration
+        { Props.relation = ScopeGraph.Default,
+          Props.kind = kind,
+          Props.associatedScope = Just associatedScope,
+          Props.span = span
+        }
   pure (name', associatedScope)
 
-declareMaybeName :: ScopeGraphEff sig m
-                 => Maybe Name
-                 -> Props.Declaration
-                 -> m Name
+declareMaybeName ::
+  ScopeGraphEff sig m =>
+  Maybe Name ->
+  Props.Declaration ->
+  m Name
 declareMaybeName maybeName props = do
   case maybeName of
     Just name -> name <$ declare name props
-    _         -> do
+    _ -> do
       name <- Name.gensym
-      name <$ declare name (props { Props.relation = ScopeGraph.Gensym })
+      name <$ declare name (props {Props.relation = ScopeGraph.Gensym})
