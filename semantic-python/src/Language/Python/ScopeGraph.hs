@@ -206,7 +206,16 @@ instance ToScopeGraph Py.FunctionDefinition where
             }
 
       CurrentScope currentScope' <- currentScope
-      modify (Stack.addEdge (Stack.Scope currentScope') (Stack.Declaration name' ScopeGraph.Function ann))
+      let declaration = (Stack.Declaration name' ScopeGraph.Function ann)
+      modify (Stack.addEdge (Stack.Scope currentScope') declaration)
+      modify (Stack.addEdge declaration (Stack.PopSymbol "()"))
+
+      -- TODO: Evaluate the result of the body.
+      res <- scopeGraph body
+      case res of
+        ReturnNodes nodes -> for_ nodes $ \node ->
+          modify (Stack.addEdge (Stack.PopSymbol "()") node)
+        _ -> pure ()
 
       withScope associatedScope $ do
         let declProps =
