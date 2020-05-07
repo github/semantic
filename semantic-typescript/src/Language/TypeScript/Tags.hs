@@ -112,12 +112,12 @@ instance ToTags Ts.VariableDeclarator where
   tags t = gtags t
 
 instance ToTags Ts.AssignmentExpression where
-  tags t@Ts.AssignmentExpression {ann = Loc {byteRange}, left, right = (Ts.Expression expr)} =
+  tags t@Ts.AssignmentExpression {ann = Loc {byteRange}, left, right = Parse.Success (Ts.Expression expr)} =
     case (left, expr) of
-      (Prj Ts.Identifier {text, ann}, Prj Ts.Function {}) -> yield text ann
-      (Prj Ts.Identifier {text, ann}, Prj Ts.ArrowFunction {}) -> yield text ann
-      (Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}}, Prj Ts.Function {}) -> yield text ann
-      (Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}}, Prj Ts.ArrowFunction {}) -> yield text ann
+      (Parse.Success (Prj Ts.Identifier {text, ann}), Prj Ts.Function {}) -> yield text ann
+      (Parse.Success (Prj Ts.Identifier {text, ann}), Prj Ts.ArrowFunction {}) -> yield text ann
+      (EPrj Ts.MemberExpression {property = Parse.Success (Ts.PropertyIdentifier {text, ann})}, Prj Ts.Function {}) -> yield text ann
+      (EPrj Ts.MemberExpression {property = Parse.Success (Ts.PropertyIdentifier {text, ann})}, Prj Ts.ArrowFunction {}) -> yield text ann
       _ -> gtags t
     where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
