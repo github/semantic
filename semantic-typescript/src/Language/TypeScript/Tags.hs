@@ -102,10 +102,10 @@ instance ToTags Ts.Module where
     _ -> gtags t
 
 instance ToTags Ts.VariableDeclarator where
-  tags t@Ts.VariableDeclarator {ann = Loc {byteRange}, name, value = Just (Ts.Expression expr)} =
+  tags t@Ts.VariableDeclarator {ann = Loc {byteRange}, name, value = Just (Parse.Success (Ts.Expression expr))} =
     case (expr, name) of
-      (Prj Ts.Function {}, Prj Ts.Identifier {text, ann}) -> yield text ann
-      (Prj Ts.ArrowFunction {}, Prj Ts.Identifier {text, ann}) -> yield text ann
+      (Prj Ts.Function {}, Parse.Success (Prj Ts.Identifier {text, ann})) -> yield text ann
+      (Prj Ts.ArrowFunction {}, Parse.Success (Prj Ts.Identifier {text, ann})) -> yield text ann
       _ -> gtags t
     where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
