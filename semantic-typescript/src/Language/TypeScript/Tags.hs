@@ -64,7 +64,7 @@ instance ToTags Ts.MethodDefinition where
     _ -> gtags t
 
 instance ToTags Ts.Pair where
-  tags t@Ts.Pair {ann = Loc {byteRange}, key, value = Ts.Expression expr} = case (key, expr) of
+  tags t@Ts.Pair {ann = Loc {byteRange}, key = Parse.Success key, value = Parse.Success (Ts.Expression expr)} = case (key, expr) of
     (Prj Ts.PropertyIdentifier {text, ann}, Prj Ts.Function {}) -> yield text ann
     (Prj Ts.PropertyIdentifier {text, ann}, Prj Ts.ArrowFunction {}) -> yield text ann
     _ -> gtags t
