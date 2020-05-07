@@ -29,7 +29,7 @@ import Source.Source as Source
 import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
-class ToTags (t :: ((* -> *) -> * -> *)) where
+class ToTags (t :: * -> *) where
   tags ::
     ( Has (Reader Source) sig m,
       Has (Writer Tags.Tags) sig m
