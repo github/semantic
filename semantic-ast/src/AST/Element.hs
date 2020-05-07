@@ -22,6 +22,14 @@ pattern Prj :: Element sub sup => sub a -> sup a
 pattern Prj sub <- (prj -> Just sub)
 
 
+-- A pattern synonym that combines matching on @Success@ and @Prj@
+eprj :: Element sub sup => Parse.Err (sup a) -> Maybe (sub a)
+eprj (Parse.Success x) = prj x
+eprj _ = Nothing
+
+pattern EPrj :: Element sub sup => sub a -> Parse.Err (sup a)
+pattern EPrj sub <- (eprj -> Just sub)
+
 -- | Where does the element occur in the tree?
 data Side = None | Here | L | R
 
