@@ -79,13 +79,13 @@ instance ToTags Ts.CallExpression where
   tags t@Ts.CallExpression {ann = Loc {byteRange}, function = Parse.Success (Ts.Expression expr)} = match expr
     where
       match expr = case expr of
-        Prj Ts.Identifier {text, ann} -> yield text ann
-        Prj Ts.NewExpression {constructor = Prj Ts.Identifier {text, ann}} -> yield text ann
-        Prj Ts.CallExpression {function = Ts.Expression expr} -> match expr
-        Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}} -> yield text ann
-        Prj Ts.Function {name = Just Ts.Identifier {text, ann}} -> yield text ann
-        Prj Ts.ParenthesizedExpression {extraChildren} -> for_ extraChildren $ \x -> case x of
-          Prj (Ts.Expression expr) -> match expr
+        EPrj Ts.Identifier {text, ann} -> yield text ann
+        EPrj Ts.NewExpression {constructor = EPrj Ts.Identifier {text, ann}} -> yield text ann
+        EPrj Ts.CallExpression {function = Ts.Expression expr} -> match expr
+        EPrj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}} -> yield text ann
+        EPrj Ts.Function {name = Just Ts.Identifier {text, ann}} -> yield text ann
+        EPrj Ts.ParenthesizedExpression {extraChildren} -> for_ extraChildren $ \x -> case x of
+          EPrj (Ts.Expression expr) -> match expr
           _ -> tags x
         _ -> gtags t
       yield name loc = yieldTag name Call loc byteRange >> gtags t
