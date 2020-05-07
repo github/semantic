@@ -72,11 +72,11 @@ instance ToTags Ts.Pair where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
 
 instance ToTags Ts.ClassDeclaration where
-  tags t@Ts.ClassDeclaration {ann = Loc {byteRange}, name = Ts.TypeIdentifier {text, ann}} =
+  tags t@Ts.ClassDeclaration {ann = Loc {byteRange}, name = Parse.Success (Ts.TypeIdentifier {text, ann})} =
     yieldTag text Class ann byteRange >> gtags t
 
 instance ToTags Ts.CallExpression where
-  tags t@Ts.CallExpression {ann = Loc {byteRange}, function = Ts.Expression expr} = match expr
+  tags t@Ts.CallExpression {ann = Loc {byteRange}, function = Parse.Success (Ts.Expression expr)} = match expr
     where
       match expr = case expr of
         Prj Ts.Identifier {text, ann} -> yield text ann
@@ -91,13 +91,13 @@ instance ToTags Ts.CallExpression where
       yield name loc = yieldTag name Call loc byteRange >> gtags t
 
 instance ToTags Ts.Class where
-  tags t@Ts.Class {ann = Loc {byteRange}, name = Just Ts.TypeIdentifier {text, ann}} =
+  tags t@Ts.Class {ann = Loc {byteRange}, name = Just (Parse.Success Ts.TypeIdentifier {text, ann})} =
     yieldTag text Class ann byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Ts.Module where
   tags t@Ts.Module {ann = Loc {byteRange}, name} = case name of
-    Prj Ts.Identifier {text, ann} -> yieldTag text Module ann byteRange >> gtags t
+    Parse.Success (Prj Ts.Identifier {text, ann}) -> yieldTag text Module ann byteRange >> gtags t
     _ -> gtags t
 
 instance ToTags Ts.VariableDeclarator where
