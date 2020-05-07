@@ -46,16 +46,16 @@ class ToTags (t :: * -> *) where
   tags = gtags
 
 instance ToTags Ts.Function where
-  tags t@Ts.Function {ann = Loc {byteRange}, name = Just (Parse.Succeed Ts.Identifier {text, ann})} =
+  tags t@Ts.Function {ann = Loc {byteRange}, name = Just (Parse.Success Ts.Identifier {text, ann})} =
     yieldTag text Function ann byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Ts.FunctionSignature where
-  tags t@Ts.FunctionSignature {ann = Loc {byteRange}, name = Parse.Succeed (Ts.Identifier {text, ann})} =
+  tags t@Ts.FunctionSignature {ann = Loc {byteRange}, name = Parse.Success (Ts.Identifier {text, ann})} =
     yieldTag text Function ann byteRange >> gtags t
 
 instance ToTags Ts.FunctionDeclaration where
-  tags t@Ts.FunctionDeclaration {ann = Loc {byteRange}, name = Parse.Succeed (Ts.Identifier {text, ann})} =
+  tags t@Ts.FunctionDeclaration {ann = Loc {byteRange}, name = Parse.Success (Ts.Identifier {text, ann})} =
     yieldTag text Function ann byteRange >> gtags t
 
 instance ToTags Ts.MethodDefinition where
