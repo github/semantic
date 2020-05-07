@@ -5,6 +5,7 @@ module AST.Element
 , (:+:)(..)
 ) where
 
+import qualified AST.Parse as Parse
 import GHC.Generics ((:+:)(..))
 import GHC.TypeLits (ErrorMessage(..), TypeError)
 
