@@ -1,4 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -ddump-splices #-}
+
 module Language.Java.Grammar
 ( tree_sitter_java
 , Grammar(..)
