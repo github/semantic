@@ -60,7 +60,7 @@ instance ToTags Ts.FunctionDeclaration where
 
 instance ToTags Ts.MethodDefinition where
   tags t@Ts.MethodDefinition {ann = Loc {byteRange}, name} = case name of
-    Prj Ts.PropertyIdentifier {text, ann} -> yieldTag text Method ann byteRange >> gtags t
+    Parse.Success (Prj (Ts.PropertyIdentifier {text, ann})) -> yieldTag text Method ann byteRange >> gtags t
     _ -> gtags t
 
 instance ToTags Ts.Pair where
