@@ -4,7 +4,6 @@ module Language.Python
 , Language.Python.Grammar.tree_sitter_python
 ) where
 
-import qualified AST.Parse as Parse
 import qualified AST.Unmarshal as TS
 import           Data.Proxy
 import qualified Language.Python.AST as Py
@@ -14,7 +13,7 @@ import qualified Language.Python.Tags as PyTags
 import           Scope.Graph.Convert
 import qualified Tags.Tagging.Precise as Tags
 
-newtype Term a = Term { getTerm :: Py.Module Err a }
+newtype Term a = Term { getTerm :: Py.Module a }
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Py.Module)
