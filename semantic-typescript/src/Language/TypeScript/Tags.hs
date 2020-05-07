@@ -80,7 +80,7 @@ instance ToTags Ts.CallExpression where
     where
       match expr = case expr of
         Prj Ts.Identifier {text, ann} -> yield text ann
-        Prj Ts.NewExpression {constructor = Parse.Success (Prj Ts.Identifier {text, ann})} -> yield text ann
+        Prj Ts.NewExpression {constructor = EPrj Ts.Identifier {text, ann}} -> yield text ann
         Prj Ts.CallExpression {function = Parse.Success (Ts.Expression expr)} -> match expr
         Prj Ts.MemberExpression {property = Parse.Success (Ts.PropertyIdentifier {text, ann})} -> yield text ann
         Prj Ts.Function {name = Just (Parse.Success (Ts.Identifier {text, ann}))} -> yield text ann
