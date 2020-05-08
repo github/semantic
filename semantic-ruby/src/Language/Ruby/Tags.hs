@@ -92,7 +92,7 @@ instance ToTags Rb.Class where
       _ -> gtags t
       where
         range' = case extraChildren of
-          Prj Rb.Superclass {ann = Loc {byteRange = Range {end}}} : _ -> Range start end
+          EPrj Rb.Superclass {ann = Loc {byteRange = Range {end}}} : _ -> Range start end
           _ -> Range start (getEnd expr)
         getEnd = Range.end . byteRange . TS.gann
         yield name loc = yieldTag name Class loc range' >> gtags t
@@ -237,15 +237,15 @@ instance ToTags Rb.Lhs where
   tags t@(Rb.Lhs expr) = case expr of
     -- NOTE: Calls do not look for locals
     Prj Rb.Call {ann = Loc {byteRange}, method} -> case method of
-      Prj Rb.Identifier {text, ann} -> yieldCall text ann byteRange
-      Prj Rb.Constant {text, ann} -> yieldCall text ann byteRange
-      Prj Rb.Operator {text, ann} -> yieldCall text ann byteRange
+      EPrj Rb.Identifier {text, ann} -> yieldCall text ann byteRange
+      EPrj Rb.Constant {text, ann} -> yieldCall text ann byteRange
+      EPrj Rb.Operator {text, ann} -> yieldCall text ann byteRange
       _ -> gtags t
     -- These do check for locals before yielding a call tag
     Prj (Rb.Variable (Prj Rb.Identifier {ann = loc@Loc {byteRange}, text})) -> yield text Call loc byteRange
-    Prj Rb.ScopeResolution {ann = loc@Loc {byteRange}, name = Prj Rb.Identifier {text}} -> yield text Call loc byteRange
+    Prj Rb.ScopeResolution {ann = loc@Loc {byteRange}, name = EPrj Rb.Identifier {text}} -> yield text Call loc byteRange
     Prj (Rb.Variable (Prj Rb.Constant { ann = loc@Loc { byteRange }, text })) -> yield text Call loc byteRange -- TODO: Should yield Constant
-    Prj Rb.ScopeResolution { ann = loc@Loc { byteRange }, name = Prj Rb.Constant { text } } -> yield text Call loc byteRange -- TODO: Should yield Constant
+    Prj Rb.ScopeResolution { ann = loc@Loc { byteRange }, name = EPrj Rb.Constant { text } } -> yield text Call loc byteRange -- TODO: Should yield Constant
     _ -> gtags t
     where
       yieldCall name loc range = yieldTag name Call loc range >> gtags t
