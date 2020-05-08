@@ -64,7 +64,7 @@ keywordFunctionCall t loc range name = yieldTag name Function loc range Nothing 
 
 instance ToTags Py.String where
   tags Py.String {extraChildren} = for_ extraChildren $ \x -> case x of
-    Prj t@Py.Interpolation {} -> tags t
+    Parse.Success (Prj t@Py.Interpolation {}) -> tags t
     _ -> pure ()
 
 instance ToTags Py.Interpolation where
