@@ -261,14 +261,14 @@ instance ToTags Rb.MethodCall where
       { ann = Loc {byteRange = byteRange@Range {}},
         method = expr
       } = case expr of
-      Prj (Rb.Variable (Prj Rb.Identifier {text, ann})) -> yield text Call ann
-      Prj (Rb.Variable (Prj Rb.Constant {text, ann})) -> yield text Call ann -- TODO: Should yield Constant
-      Prj Rb.ScopeResolution {name = Prj Rb.Identifier {text, ann}} -> yield text Call ann
-      Prj Rb.ScopeResolution {name = Prj Rb.Constant {text, ann}} -> yield text Call ann -- TODO: Should yield Constant
-      Prj Rb.Call {method} -> case method of
-        Prj Rb.Identifier {text, ann} -> yield text Call ann
-        Prj Rb.Constant {text, ann} -> yield text Call ann
-        Prj Rb.Operator {text, ann} -> yield text Call ann
+      EPrj (Rb.Variable (Prj Rb.Identifier {text, ann})) -> yield text Call ann
+      EPrj (Rb.Variable (Prj Rb.Constant {text, ann})) -> yield text Call ann -- TODO: Should yield Constant
+      EPrj Rb.ScopeResolution {name = EPrj Rb.Identifier {text, ann}} -> yield text Call ann
+      EPrj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}} -> yield text Call ann -- TODO: Should yield Constant
+      EPrj Rb.Call {method} -> case method of
+        EPrj Rb.Identifier {text, ann} -> yield text Call ann
+        EPrj Rb.Constant {text, ann} -> yield text Call ann
+        EPrj Rb.Operator {text, ann} -> yield text Call ann
         _ -> gtags t
       _ -> gtags t
       where
