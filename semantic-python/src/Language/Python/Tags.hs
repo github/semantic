@@ -12,6 +12,7 @@ module Language.Python.Tags
 where
 
 import AST.Element
+import qualified AST.Parse as Parse
 import AST.Token
 import AST.Traversable1
 import Control.Effect.Reader
