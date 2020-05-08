@@ -18,7 +18,6 @@ class Element sub sup where
 instance (Element' side sub sup, side ~ Find sub sup) => Element sub sup where
   prj = prj' @side
 
-
 -- | A pattern synonym to conveniently project out matching elements.
 pattern Prj :: Element sub sup => sub a -> sup a
 pattern Prj sub <- (prj -> Just sub)
