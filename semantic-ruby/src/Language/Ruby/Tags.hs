@@ -101,16 +101,16 @@ instance ToTags Rb.SingletonClass where
   tags
     t@Rb.SingletonClass
       { ann = Loc {byteRange = range@Range {start}},
-        value = Rb.Arg expr,
+        value = Parse.Success (Rb.Arg expr),
         extraChildren
       } = enterScope True $ case expr of
       Prj (Rb.Primary (Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Constant {text, ann})))))) -> yield text ann
-      Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution {name = Prj Rb.Constant {text, ann}})))) -> yield text ann
-      Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution {name = Prj Rb.Identifier {text, ann}})))) -> yield text ann
+      Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}})))) -> yield text ann
+      Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution {name = EPrj Rb.Identifier {text, ann}})))) -> yield text ann
       _ -> gtags t
       where
         range' = case extraChildren of
-          x : _ -> Range start (getStart x)
+          Parse.Success x : _ -> Range start (getStart x)
           _ -> range
         getStart = Range.start . byteRange . TS.gann
         yield name loc = yieldTag name Class loc range' >> gtags t
