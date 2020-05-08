@@ -119,14 +119,14 @@ instance ToTags Py.Call where
   tags
     t@Py.Call
       { ann = Loc {byteRange},
-        function = Py.PrimaryExpression expr
+        function = Parse.Success (Py.PrimaryExpression expr)
       } = match expr
       where
         match expr = case expr of
-          Prj Py.Attribute {attribute = Py.Identifier {text, ann}} -> yield text ann
+          Prj Py.Attribute {attribute = Parse.Success (Py.Identifier {text, ann})} -> yield text ann
           Prj Py.Identifier {text, ann} -> yield text ann
-          Prj Py.Call {function = Py.PrimaryExpression expr'} -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
-          Prj (Py.ParenthesizedExpression _ (Prj (Py.Expression (Prj (Py.PrimaryExpression expr'))))) -> match expr' -- Parenthesized expressions
+          Prj Py.Call {function = Parse.Success (Py.PrimaryExpression expr')} -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
+          Prj (Py.ParenthesizedExpression _ (Parse.Success (Prj (Py.Expression (Prj (Py.PrimaryExpression expr')))))) -> match expr' -- Parenthesized expressions
           _ -> gtags t
         yield name loc = yieldTag name Call loc byteRange Nothing >> gtags t
 
