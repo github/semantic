@@ -69,7 +69,7 @@ instance ToTags Py.String where
 
 instance ToTags Py.Interpolation where
   tags Py.Interpolation {extraChildren} = for_ extraChildren $ \x -> case x of
-    Prj (Py.Expression expr) -> tags expr
+    Parse.Success (Prj (Py.Expression expr)) -> tags expr
     _ -> pure ()
 
 instance ToTags Py.AssertStatement where
