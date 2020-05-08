@@ -65,8 +65,7 @@ getAllSymbols language = do
       let named = if t == 0 then Named else Anonymous
       pure (n, named)
 
-shapeParameterName, annParameterName :: Name
-shapeParameterName = mkName "f"
+annParameterName :: Name
 annParameterName = mkName "a"
 
 -- Auto-generate Haskell datatypes for sums, products and leaf types
