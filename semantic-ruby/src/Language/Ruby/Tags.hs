@@ -86,9 +86,9 @@ instance ToTags Rb.Class where
         name = expr,
         extraChildren
       } = enterScope True $ case expr of
-      Prj Rb.Constant {text, ann} -> yield text ann
-      Prj Rb.ScopeResolution {name = Prj Rb.Constant {text, ann}} -> yield text ann
-      Prj Rb.ScopeResolution {name = Prj Rb.Identifier {text, ann}} -> yield text ann
+      EPrj Rb.Constant {text, ann} -> yield text ann
+      EPrj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}} -> yield text ann
+      EPrj Rb.ScopeResolution {name = EPrj Rb.Identifier {text, ann}} -> yield text ann
       _ -> gtags t
       where
         range' = case extraChildren of
