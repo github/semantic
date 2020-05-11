@@ -42,7 +42,7 @@ instance ToTags Go.FunctionDeclaration where
   tags
     t@Go.FunctionDeclaration
       { ann = Loc {byteRange},
-        name = Go.Identifier {text, ann}
+        name = Parse.Success (Go.Identifier {text, ann})
       } = yieldTag text Function ann byteRange >> gtags t
 
 instance ToTags Go.MethodDeclaration where
