@@ -169,13 +169,13 @@ instance ToTags Rb.Method where
   tags
     t@Rb.Method
       { ann = Loc {byteRange = Range {start}},
-        name,
+        name = Parse.Success n,
         parameters
-      } = yieldMethodNameTag t range' name
+      } = yieldMethodNameTag t range' n
       where
         range' = case parameters of
-          Just Rb.MethodParameters {ann = Loc {byteRange = Range {end}}} -> Range start end
-          _ -> Range start (getEnd name)
+          Just (Parse.Success (Rb.MethodParameters {ann = Loc {byteRange = Range {end}}})) -> Range start end
+          _ -> Range start (getEnd n)
         getEnd = Range.end . byteRange . TS.gann
 
 instance ToTags Rb.SingletonMethod where
