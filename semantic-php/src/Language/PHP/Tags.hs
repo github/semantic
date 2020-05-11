@@ -12,6 +12,7 @@ module Language.PHP.Tags
 where
 
 import AST.Element
+import qualified AST.Parse as Parse
 import AST.Token
 import AST.Traversable1
 import Control.Effect.Reader
@@ -63,14 +64,14 @@ instance ToTags PHP.FunctionDefinition where
   tags
     t@PHP.FunctionDefinition
       { PHP.ann = Loc {byteRange},
-        PHP.name = PHP.Name {text, ann}
+        PHP.name = Parse.Success (PHP.Name {text, ann})
       } = yieldTag text Method ann byteRange >> gtags t
 
 instance ToTags PHP.MethodDeclaration where
   tags
     t@PHP.MethodDeclaration
       { PHP.ann = Loc {byteRange},
-        PHP.name = PHP.Name {text, ann}
+        PHP.name = Parse.Success (PHP.Name {text, ann})
       } = yieldTag text Function ann byteRange >> gtags t
 
 instance ToTags PHP.FunctionCallExpression where
@@ -82,8 +83,8 @@ instance ToTags PHP.FunctionCallExpression where
       where
         yield name loc = yieldTag name Call loc byteRange >> gtags t
         match expr = case expr of
-          Prj PHP.VariableName {extraChildren = PHP.Name {text, ann}} -> yield text ann *> gtags t
-          Prj PHP.QualifiedName {extraChildren = [Prj PHP.Name {text, ann}]} -> yield text ann *> gtags t
+          EPrj PHP.VariableName {extraChildren = Parse.Success (PHP.Name {text, ann})} -> yield text ann *> gtags t
+          EPrj PHP.QualifiedName {extraChildren = [EPrj PHP.Name {text, ann}]} -> yield text ann *> gtags t
           _ -> gtags t
 
 
@@ -91,7 +92,7 @@ instance ToTags PHP.MemberCallExpression where
   tags
     t@PHP.MemberCallExpression
       { PHP.ann = Loc {byteRange},
-        PHP.name = Prj PHP.Name {text, ann}
+        PHP.name = Parse.Success (Prj PHP.Name {text, ann})
       } = yieldTag text Call ann byteRange >> gtags t
   tags t = gtags t
 
