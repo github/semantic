@@ -97,8 +97,8 @@ instance ToTags Py.FunctionDefinition where
   tags
     t@Py.FunctionDefinition
       { ann = Loc {byteRange = Range {start}},
-        name = Py.Identifier {text, ann},
-        body = Py.Block {ann = Loc Range {start = end} _, extraChildren}
+        name = Parse.Success (Py.Identifier {text, ann}),
+        body = Parse.Success (Py.Block {ann = Loc Range {start = end} _, extraChildren})
       } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
@@ -108,8 +108,8 @@ instance ToTags Py.ClassDefinition where
   tags
     t@Py.ClassDefinition
       { ann = Loc {byteRange = Range {start}},
-        name = Py.Identifier {text, ann},
-        body = Py.Block {ann = Loc Range {start = end} _, extraChildren}
+        name = Parse.Success (Py.Identifier {text, ann}),
+        body = Parse.Success (Py.Block {ann = Loc Range {start = end} _, extraChildren})
       } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
