@@ -135,8 +135,25 @@ yieldTag name kind loc srcLineRange docs = do
   src <- ask @Source
   Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) docs)
 
-docComment :: Source -> (Py.CompoundStatement :+: Py.SimpleStatement) Loc -> Maybe Text
-docComment src (R1 (Py.SimpleStatement (Prj Py.ExpressionStatement {extraChildren = Parse.Success (L1 (Prj (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.String {ann})))))) :| _}))) = Just (toText (slice src (byteRange ann)))
+docComment :: Source -> Parse.Err ((Py.CompoundStatement :+: Py.SimpleStatement) Loc) -> Maybe Text
+docComment
+  src
+  ( Parse.Success
+      ( R1
+          ( Py.SimpleStatement
+              ( Prj
+                  Py.ExpressionStatement
+                    { extraChildren =
+                        Parse.Success
+                          ( L1
+                              (Prj (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.String {ann})))))
+                            )
+                          :| _
+                    }
+                )
+            )
+        )
+    ) = Just (toText (slice src (byteRange ann)))
 docComment _ _ = Nothing
 
 gtags ::
