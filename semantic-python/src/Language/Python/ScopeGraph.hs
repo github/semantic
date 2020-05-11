@@ -98,15 +98,16 @@ instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
   scopeGraph (Py.Assignment ann (SingleIdentifier t) val _typ) = do
-    declare
-      t
-      Props.Declaration
-        { Props.kind = ScopeGraph.Assignment,
-          Props.relation = ScopeGraph.Default,
-          Props.associatedScope = Nothing,
-          Props.span = ann ^. span_
-        }
-    maybe complete scopeGraph val
+    -- declare
+    --   t
+    --   Props.Declaration
+    --     { Props.kind = ScopeGraph.Assignment,
+    --       Props.relation = ScopeGraph.Default,
+    --       Props.associatedScope = Nothing,
+    --       Props.span = ann ^. span_
+    --     }
+    -- maybe complete scopeGraph val
+    todo "Plz implement ScopeGraph.hs l110"
   scopeGraph x = todo x
 
 instance ToScopeGraph Py.Await where
@@ -196,46 +197,55 @@ instance ToScopeGraph Py.FunctionDefinition where
         body
       } = do
       let name' = Name.name name
-
-      (_, associatedScope) <-
-        declareFunction
-          (Just name')
-          Props.Function
-            { Props.kind = ScopeGraph.Function,
-              Props.span = ann ^. span_
-            }
-
+      
       CurrentScope currentScope' <- currentScope
       let declaration = (Stack.Declaration name' ScopeGraph.Function ann)
       modify (Stack.addEdge (Stack.Scope currentScope') declaration)
       modify (Stack.addEdge declaration (Stack.PopSymbol "()"))
 
-      -- TODO: Evaluate the result of the body.
-      res <- scopeGraph body
-      case res of
-        ReturnNodes nodes -> for_ nodes $ \node ->
-          modify (Stack.addEdge (Stack.PopSymbol "()") node)
-        _ -> pure ()
+      let declProps =
+            Props.Declaration
+              { Props.kind = ScopeGraph.Parameter,
+                Props.relation = ScopeGraph.Default,
+                Props.associatedScope = Nothing,
+                Props.span = point (Pos 0 0)
+              }
+      let param (Py.Parameter (Prj (Py.Identifier pann pname))) = (pann, Name.name pname)
+          param _ = error "Plz implement ScopeGraph.hs l223"
+      let parameterMs = fmap param parameters
+      
+      -- Add the formal parameters scope pointing to each of the parameter nodes
+      let formalParametersScope =  Stack.Scope (Name.name "FormalParameters")
+      for_ (zip [0..] parameterMs) $ \(ix,(pos,parameter)) -> do
+            paramNode <- declareParameter parameter ix ScopeGraph.Parameter pos
+            modify (Stack.addEdge formalParametersScope paramNode)
+      
+      -- Add the parent scope pointing to the formal parameters node
+      let parentScopeName = Name.name "ParentScope"
+          parentScope = Stack.Scope parentScopeName
+      modify (Stack.addEdge parentScope formalParametersScope)
 
-      withScope associatedScope $ do
-        let declProps =
-              Props.Declaration
-                { Props.kind = ScopeGraph.Parameter,
-                  Props.relation = ScopeGraph.Default,
-                  Props.associatedScope = Nothing,
-                  Props.span = point (Pos 0 0)
-                }
-        let param (Py.Parameter (Prj (Py.Identifier pann pname))) = Just (pann, Name.name pname)
-            param _ = Nothing
-        let parameterMs = fmap param parameters
-        if any isNothing parameterMs
-          then todo parameterMs
-          else do
-            let parameters' = catMaybes parameterMs
-            paramDeclarations <- for parameters' $ \(pos, parameter) ->
-              complete <* declare parameter (set span_ (pos ^. span_) declProps)
-            bodyResult <- scopeGraph body
-            pure (mconcat paramDeclarations <> bodyResult)
+      -- Convert the body, using the parent scope name as the root scope
+      res <- withScope parentScopeName $ scopeGraph body
+      let callNode = Stack.PopSymbol "()"
+      case res of
+        ReturnNodes nodes -> do
+          for_ nodes $ \node ->
+            modify (Stack.addEdge callNode node)
+        _ -> pure ()
+      
+      -- Add the scope that contains the declared function name
+      (functionNameNode, associatedScope) <-
+        declareFunction
+          (Just name')
+          ScopeGraph.Function
+          ann
+      
+      modify (Stack.addEdge functionNameNode callNode)
+      
+      pure (ReturnNodes [])
+
+      
 
 instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 
@@ -281,36 +291,39 @@ instance ToScopeGraph Py.ImportFromStatement where
     let toName (Py.Identifier _ name) = Name.name name
     complete <* newEdge ScopeGraph.Import (toName <$> names)
   scopeGraph (Py.ImportFromStatement _ imports (L1 (Py.DottedName _ names@((Py.Identifier ann scopeName) :| _))) Nothing) = do
-    let toName (Py.Identifier _ name) = Name.name name
-    newEdge ScopeGraph.Import (toName <$> names)
+    -- let toName (Py.Identifier _ name) = Name.name name
+    -- newEdge ScopeGraph.Import (toName <$> names)
 
-    let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
-    newReference (Name.name scopeName) referenceProps
+    -- let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
+    -- newReference (Name.name scopeName) referenceProps
 
-    let pairs = zip (toList names) (tail $ toList names)
-    for_ pairs $ \pair -> do
-      case pair of
-        (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
-          withScope (toName scopeIdentifier) $ do
-            let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2 ^. span_ :: Span)
-            newReference (toName referenceIdentifier) referenceProps
+    -- let pairs = zip (toList names) (tail $ toList names)
+    -- for_ pairs $ \pair -> do
+    --   case pair of
+    --     (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
+    --       withScope (toName scopeIdentifier) $ do
+    --         let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2 ^. span_ :: Span)
+    --         newReference (toName referenceIdentifier) referenceProps
 
-    completions <- for imports $ \identifier -> do
-      case identifier of
-        (R1 (Py.DottedName _ (Py.Identifier ann name :| []))) -> do
-          let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
-          complete <* newReference (Name.name name) referenceProps
-        (L1 (Py.AliasedImport _ (Py.Identifier ann name) (Py.DottedName _ (Py.Identifier ann2 ref :| _)))) -> do
-          let declProps = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (ann ^. span_ :: Span)
-          declare (Name.name name) declProps
+    -- completions <- for imports $ \identifier -> do
+    --   case identifier of
+    --     (R1 (Py.DottedName _ (Py.Identifier ann name :| []))) -> do
+    --       let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
+    --       complete <* newReference (Name.name name) referenceProps
+    --     (L1 (Py.AliasedImport _ (Py.Identifier ann name) (Py.DottedName _ (Py.Identifier ann2 ref :| _)))) -> do
+    --       let declProps = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (ann ^. span_ :: Span)
+    --       declare (Name.name name) declProps
 
-          let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2 ^. span_ :: Span)
-          newReference (Name.name ref) referenceProps
+    --       let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2 ^. span_ :: Span)
+    --       newReference (Name.name ref) referenceProps
 
-          complete
-        (R1 (Py.DottedName _ ((Py.Identifier _ _) :| (_ : _)))) -> undefined
+    --       complete
+    --     (R1 (Py.DottedName _ ((Py.Identifier _ _) :| (_ : _)))) -> undefined
 
-    pure (mconcat completions)
+    -- pure (mconcat completions)
+    todo "Plz implement: ScopeGraph.hs l321"
+
+
   scopeGraph term = todo term
 
 instance ToScopeGraph Py.Lambda where scopeGraph = todo

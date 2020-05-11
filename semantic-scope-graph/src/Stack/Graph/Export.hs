@@ -33,7 +33,7 @@ nodeAttributes (node :# idx) = case node of
   PushScope     -> [ "shape" := "rect", "label" := ("PUSH " <> show idx)]
   Scope s       -> [ "shape" := "circle", "label" := sym s, "style" := "filled"]
   ExportedScope s -> [ "shape" := "circle", "label" := sym s]
-  JumpToScope s  -> [ "shape" := "circle", "label" := sym s]
+  JumpToScope   -> [ "shape" := "circle", "label" := "JUMP"]
   IgnoreScope   -> [ "shape" := "rect", "label" := "IGNORE", "color" := "purple"]
   TopScope s -> [ "shape" := "circle", "label" := "filled", "label" := sym s, "fillcolor" := "yellow", "fontcolor" := "white"]
   BottomScope s -> [ "shape" := "circle", "label" := "filled", "label" := sym s, "fillcolor" := "purple", "fontcolor" := "white"]

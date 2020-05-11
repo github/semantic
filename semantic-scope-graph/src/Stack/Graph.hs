@@ -88,7 +88,7 @@ data Node
   | PushScope
   | Scope {symbol :: Symbol}
   | ExportedScope {symbol :: Symbol}
-  | JumpToScope {symbol :: Symbol}
+  | JumpToScope
   | IgnoreScope
   | BottomScope {symbol :: Symbol}
   | TopScope {symbol :: Symbol}

@@ -145,7 +145,7 @@ checkNodeInvariants Path { startingNode, endingNode }
 
       checkEnd = case extract endingNode of
         Root{}        -> mempty
-        JumpToScope{} -> mempty
+        JumpToScope   -> mempty
         Declaration{} -> mempty
         _other        -> pure (BadEndingNode endingNode)
 
@@ -175,7 +175,7 @@ validity p = sconcat [vStart, vEnd, vSize]
       _otherwise -> Valid
 
     vSize = case (startingScopeStackSize p, extract (endingNode p)) of
-      (One, JumpToScope{}) -> Valid
+      (One, JumpToScope)   -> Valid
       (One, IgnoreScope{}) -> Valid
       (One, _)             -> Invalid
       _otherwise           -> Valid
@@ -201,7 +201,7 @@ isPartial path = (case startingNode path of
     (Root _ :# _)           -> True
     (Scope (Name.I 0) :# _) -> True
     (ExportedScope _ :# _)  -> True
-    (JumpToScope _ :# _)    -> True
+    (JumpToScope :# _)      -> True
     (Declaration{} :# _)    -> True
     _                       -> False)
 
@@ -269,7 +269,7 @@ concatenate left right
         newEndingNode = endingNode right
         newEdges = case newEndingNode of
           -- If right's ending node is a jump to scope node node, then:
-          JumpToScope scopeIdentifier :# _ ->
+          JumpToScope :# _ ->
             -- Let jump edge be a new edge whose:
             let jumpEdge =
                   Edge
@@ -279,7 +279,7 @@ concatenate left right
                         -- If anyone haa a better idea, hit me up.
 
                       -- sink node is an exported scope node whose scope identifier is resolved scope identifier
-                      sinkNode = unsafeTagged (ExportedScope scopeIdentifier),
+                      sinkNode = unsafeTagged (ExportedScope "todo: this should come from newEndingScopeStack"),
                       -- label is `jump`
                       label = "jump"
                     }

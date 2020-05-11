@@ -228,11 +228,11 @@ toSGNode (node :# tag) = case node of
           nodeSpan = Just (Loc.span loc),
           Semantic.Api.StackGraph.nodeType = Reference
         }
-  Stack.JumpToScope symbol ->
+  Stack.JumpToScope ->
     Just $
       SGNode
         { nodeId = tag,
-          nodeName = Name.formatName symbol,
+          nodeName = Name.formatName "JUMP",
           nodeLine = "",
           nodeKind = "",
           nodeSpan = Nothing,
@@ -520,7 +520,7 @@ isScope (node Stack.:# _) = case node of
 
 isJumpToScope :: Stack.Tagged Stack.Node -> Bool
 isJumpToScope (node Stack.:# _) = case node of
-  Stack.JumpToScope {} -> True
+  Stack.JumpToScope -> True
   _ -> False
 
 isIgnoreScope :: Stack.Tagged Stack.Node -> Bool

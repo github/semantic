@@ -32,6 +32,7 @@ data Result
   = Complete
   | ValueNode Stack.Node
   | ReturnNodes [Stack.Node]
+  | ParamNode Stack.Node
   | Todo (NonEmpty String)
   deriving (Eq, Show, Ord)
 

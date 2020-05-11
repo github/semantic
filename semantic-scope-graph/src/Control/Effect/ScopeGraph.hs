@@ -31,6 +31,7 @@ module Control.Effect.ScopeGraph
     withScope,
     declareFunction,
     declareMaybeName,
+    declareParameter,
     reference,
     Has,
   )
@@ -102,11 +103,17 @@ withScope scope action = do
   put (CurrentScope s)
   pure x
 
-declare :: ScopeGraphEff sig m => Name -> Props.Declaration -> m ()
-declare n props = do
-  CurrentScope current <- currentScope
-  let Props.Declaration kind relation associatedScope span = props
-  modify (fst . ScopeGraph.declare (ScopeGraph.Declaration n) (lowerBound @Module.ModuleInfo) relation ScopeGraph.Public span kind associatedScope current)
+declare :: ScopeGraphEff sig m => Name -> Kind -> Loc -> m Stack.Node
+declare n kind loc = do
+  let declNode = Stack.Declaration n kind loc
+  -- ToDo: generate a unique id for the node in the graph
+  pure declNode
+
+refer :: ScopeGraphEff sig m => Name -> Kind -> Loc -> m Stack.Node
+refer n kind loc = do
+  let nameNode = Stack.Reference n kind loc
+  -- ToDo: generate a unique id for the node in the graph
+  return nameNode
 
 addBottomScope :: ScopeGraphEff sig m => m Stack.Node
 addBottomScope = do
@@ -203,29 +210,34 @@ newReference name props = do
             )
         )
 
-declareFunction :: forall sig m. ScopeGraphEff sig m => Maybe Name -> Props.Function -> m (Name, Name)
-declareFunction name (Props.Function kind span) = do
+declareFunction :: forall sig m. ScopeGraphEff sig m => Maybe Name -> Kind -> Loc -> m (Stack.Node, Name)
+declareFunction name kind loc = do
   CurrentScope currentScope' <- currentScope
   associatedScope <- newScope currentScope'
-  name' <-
-    declareMaybeName
-      name
-      Props.Declaration
-        { Props.relation = ScopeGraph.Default,
-          Props.kind = kind,
-          Props.associatedScope = Just associatedScope,
-          Props.span = span
-        }
-  pure (name', associatedScope)
+  node <- declareMaybeName name kind loc
+  pure (node, associatedScope)
 
 declareMaybeName ::
   ScopeGraphEff sig m =>
   Maybe Name ->
-  Props.Declaration ->
-  m Name
-declareMaybeName maybeName props = do
+  Kind ->
+  Loc ->
+  m Stack.Node
+declareMaybeName maybeName kind loc = do
   case maybeName of
-    Just name -> name <$ declare name props
+    Just name -> declare name kind loc
     _ -> do
       name <- Name.gensym
-      name <$ declare name (props {Props.relation = ScopeGraph.Gensym})
+      declare name kind loc
+
+declareParameter :: ScopeGraphEff sig m => Name -> Int -> Kind -> Loc -> m Stack.Node
+declareParameter n ix kind loc = do
+  declNode <- declare n kind loc
+  nameNode <- refer n kind loc
+  indexNode <- refer (Name.nameI ix) kind loc
+  let jumpNode = Stack.JumpToScope
+  modify (Stack.addEdge declNode nameNode)
+  modify (Stack.addEdge declNode indexNode)
+  modify (Stack.addEdge nameNode jumpNode)
+  modify (Stack.addEdge indexNode jumpNode)
+  pure declNode
