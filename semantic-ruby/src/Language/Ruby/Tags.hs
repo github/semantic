@@ -151,7 +151,7 @@ yieldMethodNameTag t range (Rb.MethodName expr) = enterScope True $ case expr of
   Prj Rb.Operator {text, ann} -> yield text ann
   -- Prj Rb.GlobalVariable { text = name } -> yield name
   -- Prj Rb.InstanceVariable { text = name } -> yield name
-  Prj Rb.Setter {extraChildren = Rb.Identifier {text, ann}} -> yield (text <> "=") ann-- NB: Matches existing tags output, TODO: Remove this.
+  Prj Rb.Setter {extraChildren = Parse.Success (Rb.Identifier {text, ann})} -> yield (text <> "=") ann-- NB: Matches existing tags output, TODO: Remove this.
         -- TODO: Should we report symbol method names as tags?
         -- Prj Rb.Symbol { extraChildren = [Prj Rb.EscapeSequence { text = name }] } -> yield name
   _ -> gtags t
