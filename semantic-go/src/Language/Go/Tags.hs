@@ -49,21 +49,21 @@ instance ToTags Go.MethodDeclaration where
   tags
     t@Go.MethodDeclaration
       { ann = Loc {byteRange},
-        name = Go.FieldIdentifier {text, ann}
+        name = Parse.Success (Go.FieldIdentifier {text, ann})
       } = yieldTag text Method ann byteRange >> gtags t
 
 instance ToTags Go.CallExpression where
   tags
     t@Go.CallExpression
       { ann = Loc {byteRange},
-        function = Go.Expression expr
+        function = Parse.Success (Go.Expression expr)
       } = match expr
       where
         match expr = case expr of
-          Prj Go.SelectorExpression {field = Go.FieldIdentifier {text, ann}} -> yield text ann
+          Prj Go.SelectorExpression {field = Parse.Success (Go.FieldIdentifier {text, ann})} -> yield text ann
           Prj Go.Identifier {text, ann} -> yield text ann
-          Prj Go.CallExpression {function = Go.Expression e} -> match e
-          Prj Go.ParenthesizedExpression {extraChildren = Go.Expression e} -> match e
+          Prj Go.CallExpression {function = Parse.Success (Go.Expression e)} -> match e
+          Prj Go.ParenthesizedExpression {extraChildren = Parse.Success (Go.Expression e)} -> match e
           _ -> gtags t
         yield name loc = yieldTag name Call loc byteRange >> gtags t
 
