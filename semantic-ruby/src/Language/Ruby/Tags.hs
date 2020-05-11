@@ -119,16 +119,16 @@ instance ToTags Rb.Module where
   tags
     t@Rb.Module
       { ann = Loc {byteRange = Range {start}},
-        name = expr,
+        name = Parse.Success expr,
         extraChildren
       } = enterScope True $ case expr of
-      EPrj Rb.Constant {text, ann} -> yield text ann
-      EPrj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}} -> yield text ann
-      EPrj Rb.ScopeResolution {name = EPrj Rb.Identifier {text, ann}} -> yield text ann
+      Prj Rb.Constant {text, ann} -> yield text ann
+      Prj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}} -> yield text ann
+      Prj Rb.ScopeResolution {name = EPrj Rb.Identifier {text, ann}} -> yield text ann
       _ -> gtags t
       where
         range' = case extraChildren of
-          x : _ -> Range start (getStart x)
+          Parse.Success x : _ -> Range start (getStart x)
           _ -> Range start (getEnd expr)
         getEnd = Range.end . byteRange . TS.gann
         getStart = Range.start . byteRange . TS.gann
