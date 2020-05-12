@@ -17,6 +17,7 @@ packages: .
           semantic-tsx
           semantic-typescript
           semantic-tags
+          semantic-rust
 
 -- Packages brought in from other repos instead of hackage
 -- ATTENTION: remember to update cabal.project.ci when bumping SHAs here!
