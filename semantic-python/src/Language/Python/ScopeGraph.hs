@@ -27,17 +27,14 @@ import AST.Element
 import qualified Analysis.Name as Name
 import Control.Effect.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
-import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import Control.Effect.State
-import Control.Lens ((^.), set)
+import Control.Lens ((^.))
 import Data.Foldable
 import Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.Maybe
 import Data.Monoid
 import qualified Data.ScopeGraph as ScopeGraph
-import Data.Traversable
 import GHC.Records
 import GHC.TypeLits
 import qualified Language.Python.AST as Py
@@ -197,7 +194,7 @@ instance ToScopeGraph Py.FunctionDefinition where
         body
       } = do
       let name' = Name.name name
-      
+
       CurrentScope currentScope' <- currentScope
       let declaration = (Stack.Declaration name' ScopeGraph.Function ann)
       modify (Stack.addEdge (Stack.Scope currentScope') declaration)
@@ -213,13 +210,13 @@ instance ToScopeGraph Py.FunctionDefinition where
       let param (Py.Parameter (Prj (Py.Identifier pann pname))) = (pann, Name.name pname)
           param _ = error "Plz implement ScopeGraph.hs l223"
       let parameterMs = fmap param parameters
-      
+
       -- Add the formal parameters scope pointing to each of the parameter nodes
-      let formalParametersScope =  Stack.Scope (Name.name "FormalParameters")
-      for_ (zip [0..] parameterMs) $ \(ix,(pos,parameter)) -> do
-            paramNode <- declareParameter parameter ix ScopeGraph.Parameter pos
-            modify (Stack.addEdge formalParametersScope paramNode)
-      
+      let formalParametersScope = Stack.Scope (Name.name "FormalParameters")
+      for_ (zip [0 ..] parameterMs) $ \(ix, (pos, parameter)) -> do
+        paramNode <- declareParameter parameter ix ScopeGraph.Parameter pos
+        modify (Stack.addEdge formalParametersScope paramNode)
+
       -- Add the parent scope pointing to the formal parameters node
       let parentScopeName = Name.name "ParentScope"
           parentScope = Stack.Scope parentScopeName
@@ -228,24 +225,22 @@ instance ToScopeGraph Py.FunctionDefinition where
       -- Convert the body, using the parent scope name as the root scope
       res <- withScope parentScopeName $ scopeGraph body
       let callNode = Stack.PopSymbol "()"
-      case res of
+      case (res :: Result) of
         ReturnNodes nodes -> do
           for_ nodes $ \node ->
             modify (Stack.addEdge callNode node)
         _ -> pure ()
-      
+
       -- Add the scope that contains the declared function name
       (functionNameNode, associatedScope) <-
         declareFunction
           (Just name')
           ScopeGraph.Function
           ann
-      
-      modify (Stack.addEdge functionNameNode callNode)
-      
-      pure (ReturnNodes [])
 
-      
+      modify (Stack.addEdge functionNameNode callNode)
+
+      pure (ReturnNodes [])
 
 instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
 
@@ -322,8 +317,6 @@ instance ToScopeGraph Py.ImportFromStatement where
 
     -- pure (mconcat completions)
     todo "Plz implement: ScopeGraph.hs l321"
-
-
   scopeGraph term = todo term
 
 instance ToScopeGraph Py.Lambda where scopeGraph = todo

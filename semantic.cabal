@@ -16,7 +16,7 @@ build-type:          Simple
 stability:           alpha
 extra-source-files:  README.md
 
-tested-with:         GHC == 8.8.1
+tested-with:         GHC == 8.8.3
 
 flag release
   description: Build with optimizations on (for CI or deployment builds)

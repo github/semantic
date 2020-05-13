@@ -42,8 +42,6 @@ import qualified Analysis.Name as Name
 import Control.Algebra
 import Control.Effect.Fresh
 import Control.Effect.Reader
-import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
-import qualified Control.Effect.ScopeGraph.Properties.Function as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props.Reference
 import Control.Effect.State
@@ -51,7 +49,6 @@ import Control.Lens
 import Data.List.NonEmpty
 import qualified Data.List.NonEmpty as NonEmpty
 import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
 import qualified Data.Module as Module
 import qualified Data.ScopeGraph as ScopeGraph
 import Data.Semilattice.Lower
