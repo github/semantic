@@ -150,7 +150,6 @@ parseStackGraph blobs = do
         nodeTypeToNodeType = \case
           RootScope -> P.StackGraphNode'ROOT_SCOPE
           JumpToScope -> P.StackGraphNode'JUMP_TO_SCOPE
-          ExportedScope -> P.StackGraphNode'EXPORTED_SCOPE
           Definition -> P.StackGraphNode'DEFINITION
           Reference -> P.StackGraphNode'REFERENCE
           Scope -> P.StackGraphNode'EXPORTED_SCOPE
@@ -182,7 +181,7 @@ data SGNode = SGNode
   }
   deriving (Eq, Show)
 
-data SGNodeType = Scope | RootScope | JumpToScope | ExportedScope | Definition | Reference
+data SGNodeType = Scope | RootScope | JumpToScope | Definition | Reference
   deriving (Eq, Show)
 
 graphForBlob ::
@@ -237,16 +236,6 @@ toSGNode (node :# tag) = case node of
           nodeKind = "",
           nodeSpan = Nothing,
           Semantic.Api.StackGraph.nodeType = JumpToScope
-        }
-  Stack.ExportedScope symbol ->
-    Just $
-      SGNode
-        { nodeId = tag,
-          nodeName = Name.formatName symbol,
-          nodeLine = "",
-          nodeKind = "",
-          nodeSpan = Nothing,
-          Semantic.Api.StackGraph.nodeType = ExportedScope
         }
   Stack.Root symbol ->
     Just $
@@ -455,7 +444,7 @@ appendEdge path edge@(Path.Edge _ sinkNode _) = runST $ do
                       let jumpEdge =
                             Path.Edge
                               node
-                              ((Stack.ExportedScope scopeIdentifier) :# scopeTag)
+                              ((Stack.Scope scopeIdentifier) :# scopeTag)
                               "jump"
                       -- 5.ii.c
                       modifySTRef' currentPathRef $ \path ->
@@ -537,9 +526,8 @@ isDefinitionOrPopSymbol (node Stack.:# _) = case node of
 isMainNode :: Stack.Tagged Stack.Node -> Bool
 isMainNode (node Stack.:# _) = case node of
   Stack.Root _ -> True
-  Stack.ExportedScope {} -> True
+  Stack.Scope {} -> True
   Stack.Reference {} -> True
-  Stack.Scope (Name.I 0) -> True
   _ -> False
 
 isReferenceNode :: Stack.Tagged Stack.Node -> Bool
