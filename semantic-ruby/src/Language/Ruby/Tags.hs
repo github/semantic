@@ -365,7 +365,7 @@ instance ToTags Rb.Assignment where
       introduceLhsLocals xs = for_ xs $ \x -> case x of
         EPrj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier {text})))) -> modify (text :)
         EPrj Rb.DestructuredLeftAssignment {extraChildren} -> introduceLhsLocals extraChildren
-        Prj Rb.RestAssignment {extraChildren = Just (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier {text}))))} -> modify (text :)
+        EPrj Rb.RestAssignment {extraChildren = Just (Parse.Success (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier {text})))))} -> modify (text :)
         _ -> pure ()
 
 instance ToTags Rb.OperatorAssignment where
