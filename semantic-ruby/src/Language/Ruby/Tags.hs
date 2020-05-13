@@ -308,7 +308,7 @@ instance ToTags Rb.Undef where
     t@Rb.Undef
       { extraChildren,
         ann = Loc {byteRange}
-      } = for_ extraChildren $ \(Rb.MethodName expr) -> do
+      } = for_ extraChildren $ \(Parse.Success (Rb.MethodName expr)) -> do
       case expr of
         Prj Rb.Identifier {ann, text} -> yieldTag text Call ann byteRange
         _ -> tags expr
