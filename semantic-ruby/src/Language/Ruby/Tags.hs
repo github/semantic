@@ -235,7 +235,7 @@ instance ToTags Rb.Unless where
       _ -> pure ()
 
 instance ToTags Rb.While where
-  tags Rb.While {condition, body} = tags condition >> tags body
+  tags Rb.While {condition = Parse.Success cond, body = Parse.Success b} = tags cond >> tags b
 
 instance ToTags Rb.Until where
   tags Rb.Until {condition, body} = tags condition >> tags body
