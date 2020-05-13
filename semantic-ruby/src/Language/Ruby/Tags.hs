@@ -198,9 +198,11 @@ instance ToTags Rb.DoBlock where
   tags = enterScope False . gtags
 
 instance ToTags Rb.Lambda where
-  tags Rb.Lambda {body, parameters} = enterScope False $ do
-    maybe (pure ()) tags parameters
-    tags body
+  tags Rb.Lambda {body = Parse.Success b, parameters} = enterScope False $ do
+    case parameters of
+      Just (Parse.Success p) -> tags p
+      _ -> pure ()
+    tags b
 
 instance ToTags Rb.If where
   tags Rb.If {condition, consequence, alternative} = do
