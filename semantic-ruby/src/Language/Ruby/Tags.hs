@@ -291,8 +291,8 @@ instance ToTags Rb.MethodCall where
 instance ToTags Rb.Alias where
   tags
     t@Rb.Alias
-      { alias = Rb.MethodName aliasExpr,
-        name = Rb.MethodName nameExpr,
+      { alias = Parse.Success (Rb.MethodName aliasExpr),
+        name = Parse.Success (Rb.MethodName nameExpr),
         ann = Loc {byteRange}
       } = do
       case aliasExpr of
