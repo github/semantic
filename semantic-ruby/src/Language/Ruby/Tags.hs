@@ -205,10 +205,14 @@ instance ToTags Rb.Lambda where
     tags b
 
 instance ToTags Rb.If where
-  tags Rb.If {condition, consequence, alternative} = do
-    tags condition
-    maybe (pure ()) tags consequence
-    maybe (pure ()) tags alternative
+  tags Rb.If {condition = Parse.Success cond, consequence, alternative} = do
+    tags cond
+    case consequence of 
+      Just (Parse.Success cons) -> tags cons
+      _ -> pure ()
+    case alternative of
+      Just (Parse.Success alt) -> tags alt
+      _ -> pure ()
 
 instance ToTags Rb.Elsif where
   tags Rb.Elsif {condition, consequence, alternative} = do
