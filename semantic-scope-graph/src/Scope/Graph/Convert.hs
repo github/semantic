@@ -19,33 +19,29 @@ import Control.Effect.ScopeGraph
 import Data.List.NonEmpty
 import Data.Typeable
 import Source.Loc
-import qualified Stack.Graph as Stack
 
 class Typeable t => ToScopeGraph t where
   scopeGraph ::
     ( ScopeGraphEff sig m
     ) =>
     t Loc ->
-    m Result
+    m (Result a)
 
-data Result
-  = Complete
-  | ValueNode Stack.Node
-  | ReturnNodes [Stack.Node]
-  | ParamNode Stack.Node
+data Result a
+  = Complete a
   | Todo (NonEmpty String)
   deriving (Eq, Show, Ord)
 
-instance Semigroup Result where
-  Complete <> Complete = Complete
+instance Semigroup a => Semigroup (Result a) where
+  Complete a <> Complete b = Complete (a <> b)
   Todo a <> Todo b = Todo (a <> b)
-  a <> Complete = a
-  Complete <> a = a
+  a <> Complete _ = a
+  Complete _ <> b = b
 
-instance Monoid Result where mempty = Complete
+instance Monoid a => Monoid (Result a) where mempty = Complete mempty
 
-todo :: (Show a, Applicative m) => a -> m Result
+todo :: (Show a, Applicative m) => a -> m (Result b)
 todo = pure . Todo . pure . show
 
-complete :: Applicative m => m Result
-complete = pure Complete
+complete :: (Monoid b, Applicative m) => m (Result b)
+complete = pure (Complete mempty)

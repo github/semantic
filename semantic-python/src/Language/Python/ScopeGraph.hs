@@ -15,6 +15,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
@@ -50,26 +51,29 @@ import qualified Stack.Graph as Stack
 -- quantified constraint is to avoid having to define Show1 instances for
 -- every single Python AST type.
 class (forall a. Show a => Show (t a)) => ToScopeGraph t where
+  type FocalPoint (t :: * -> *)
+
   scopeGraph ::
     ( ScopeGraphEff sig m,
-      Monoid (m Result)
+      Monoid (m (Result (FocalPoint t)))
     ) =>
     t Loc ->
-    m Result
+    m (Result (FocalPoint t))
 
 instance (ToScopeGraph l, ToScopeGraph r) => ToScopeGraph (l :+: r) where
-  scopeGraph (L1 l) = scopeGraph l
-  scopeGraph (R1 r) = scopeGraph r
+  type FocalPoint (l :+: r) = Either (FocalPoint l) (FocalPoint r)
+  scopeGraph (L1 l) = fmap Left <$> scopeGraph l
+  scopeGraph (R1 r) = fmap Right <$> scopeGraph r
 
 onField ::
   forall (field :: Symbol) syn sig m r.
   ( ScopeGraphEff sig m,
     HasField field (r Loc) (syn Loc),
     ToScopeGraph syn,
-    Monoid (m Result)
+    Monoid (m (Result (FocalPoint syn)))
   ) =>
   r Loc ->
-  m Result
+  m (Result (FocalPoint syn))
 onField =
   scopeGraph @syn
     . getField @field
@@ -79,16 +83,16 @@ onChildren ::
     ToScopeGraph syn,
     ScopeGraphEff sig m,
     HasField "extraChildren" (r Loc) (t (syn Loc)),
-    Monoid (m Result)
+    Monoid (m (Result (FocalPoint syn)))
   ) =>
   r Loc ->
-  m Result
+  m (Result (FocalPoint syn))
 onChildren =
   fmap fold
     . traverse scopeGraph
     . getField @"extraChildren"
 
-scopeGraphModule :: ScopeGraphEff sig m => Py.Module Loc -> m Result
+scopeGraphModule :: ScopeGraphEff sig m => Py.Module Loc -> m (Result ())
 scopeGraphModule = getAp . scopeGraph
 
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
@@ -120,7 +124,9 @@ instance ToScopeGraph Py.AugmentedAssignment where scopeGraph = onField @"right"
 
 instance ToScopeGraph Py.Attribute where scopeGraph = todo
 
-instance ToScopeGraph Py.Block where scopeGraph = onChildren
+instance ToScopeGraph Py.Block where
+  type FocalPoint Py.Block = [Stack.Node]
+  scopeGraph = onChildren
 
 instance ToScopeGraph Py.BreakStatement where scopeGraph = mempty
 
@@ -160,9 +166,13 @@ instance ToScopeGraph Py.DictionaryComprehension where scopeGraph = todo
 
 instance ToScopeGraph Py.DictionarySplat where scopeGraph = todo
 
-deriving instance ToScopeGraph Py.Expression
+instance ToScopeGraph Py.Expression where
+  type FocalPoint Py.Expression = Stack.Node
+  scopeGraph = onChildren
 
-instance ToScopeGraph Py.ElseClause where scopeGraph = onField @"body"
+instance ToScopeGraph Py.ElseClause where
+  type FocalPoint Py.ElseClause = [Stack.Node]
+  scopeGraph = onField @"body"
 
 instance ToScopeGraph Py.ElifClause where
   scopeGraph (Py.ElifClause _ body condition) = scopeGraph condition <> scopeGraph body
@@ -175,7 +185,9 @@ instance ToScopeGraph Py.ExecStatement where scopeGraph = mempty
 
 instance ToScopeGraph Py.ExpressionStatement where scopeGraph = onChildren
 
-instance ToScopeGraph Py.ExpressionList where scopeGraph = onChildren
+instance ToScopeGraph Py.ExpressionList where
+  type FocalPoint Py.ExpressionList = [Stack.Node]
+  scopeGraph = onChildren
 
 instance ToScopeGraph Py.False where scopeGraph _ = pure mempty
 
@@ -186,6 +198,8 @@ instance ToScopeGraph Py.Float where scopeGraph = mempty
 instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 
 instance ToScopeGraph Py.FunctionDefinition where
+  type FocalPoint Py.FunctionDefinition = [Stack.Node]
+
   scopeGraph
     Py.FunctionDefinition
       { ann,
@@ -225,11 +239,11 @@ instance ToScopeGraph Py.FunctionDefinition where
       -- Convert the body, using the parent scope name as the root scope
       res <- withScope parentScopeName $ scopeGraph body
       let callNode = Stack.PopSymbol "()"
-      case (res :: Result) of
-        ReturnNodes nodes -> do
-          for_ nodes $ \node ->
-            modify (Stack.addEdge callNode node)
-        _ -> pure ()
+      -- case (res :: Result) of
+      --   ReturnNodes nodes -> do
+      --     for_ nodes $ \node ->
+      --       modify (Stack.addEdge callNode node)
+      --   _ -> pure ()
 
       -- Add the scope that contains the declared function name
       (functionNameNode, associatedScope) <-
@@ -351,16 +365,19 @@ instance ToScopeGraph Py.Module where
     pure res
 
 instance ToScopeGraph Py.ReturnStatement where
+  type FocalPoint Py.ReturnStatement = [Stack.Node]
   scopeGraph (Py.ReturnStatement _ val) = do
     case val of
       Just mVal -> do
         res <- scopeGraph mVal
-        case res of
-          ValueNode node -> do
-            modify (Stack.addEdge (Stack.Scope "R") node)
-            pure (ReturnNodes [Stack.Scope "R"])
-          _ -> pure Complete
-      Nothing -> pure Complete
+        _
+        pure $ Complete mempty
+      -- case res of
+      --   ValueNode node -> do
+      --     modify (Stack.addEdge (Stack.Scope "R") node)
+      --     pure (Complete [Stack.Scope "R"])
+      --   _ -> pure $ Complete mempty
+      Nothing -> pure $ Complete mempty
 
 instance ToScopeGraph Py.True where scopeGraph = mempty
 
@@ -400,12 +417,14 @@ instance ToScopeGraph Py.TryStatement where
 instance ToScopeGraph Py.UnaryOperator where scopeGraph = onField @"argument"
 
 instance ToScopeGraph Py.WhileStatement where
-  scopeGraph Py.WhileStatement {alternative, body, condition} =
-    scopeGraph condition
-      <> scopeGraph body
-      <> foldMap scopeGraph alternative
+  type FocalPoint Py.WhileStatement = [Stack.Node]
+  scopeGraph Py.WhileStatement {alternative, body, condition} = do
+    _ <- scopeGraph condition
+    scopeGraph body <> foldMap scopeGraph alternative
 
 instance ToScopeGraph Py.WithStatement where
   scopeGraph = todo
 
-instance ToScopeGraph Py.Yield where scopeGraph = onChildren
+instance ToScopeGraph Py.Yield where
+  type FocalPoint Py.Yield = (FocalPoint (Py.Expression :+: Py.ExpressionList))
+  scopeGraph = onChildren
