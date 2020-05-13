@@ -238,7 +238,7 @@ instance ToTags Rb.While where
   tags Rb.While {condition = Parse.Success cond, body = Parse.Success b} = tags cond >> tags b
 
 instance ToTags Rb.Until where
-  tags Rb.Until {condition, body} = tags condition >> tags body
+  tags Rb.Until {condition = Parse.Success cond, body = Parse.Success b} = tags cond >> tags b
 
 instance ToTags Rb.Regex where
   tags Rb.Regex {} = pure ()
