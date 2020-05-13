@@ -361,7 +361,7 @@ instance ToTags Rb.Assignment where
 instance ToTags Rb.OperatorAssignment where
   tags t@Rb.OperatorAssignment {left} = do
     case left of
-      Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier {text})))) -> modify (text :)
+      EPrj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier {text})))) -> modify (text :)
       _ -> pure ()
     gtags t
 
