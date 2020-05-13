@@ -326,7 +326,7 @@ introduceLocals ::
   ] ->
   m ()
 introduceLocals params = for_ params $ \param -> case param of
-  Prj Rb.BlockParameter {name = Rb.Identifier {text = lvar}} -> modify (lvar :)
+  Prj Rb.BlockParameter {name = Parse.Success (Rb.Identifier {text = lvar})} -> modify (lvar :)
   Prj Rb.DestructuredParameter {extraChildren} -> introduceLocals extraChildren
   Prj Rb.HashSplatParameter {name = Just Rb.Identifier {text = lvar}} -> modify (lvar :)
   Prj Rb.Identifier {text = lvar} -> modify (lvar :)
