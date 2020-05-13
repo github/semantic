@@ -319,15 +319,20 @@ introduceLocals ::
     Has (Writer Tags.Tags) sig m,
     Has (State [Text]) sig m
   ) =>
-  [ [Parse.Err
-      ((:+:)
+  [ Parse.Err
+      ( (:+:)
           Rb.BlockParameter
-          (Rb.DestructuredParameter
-          :+: (Rb.HashSplatParameter
-                :+: (Rb.Identifier
-                    :+: (Rb.KeywordParameter
-                          :+: (Rb.OptionalParameter :+: Rb.SplatParameter)))))
-          Loc)]
+          ( Rb.DestructuredParameter
+              :+: ( Rb.HashSplatParameter
+                      :+: ( Rb.Identifier
+                              :+: ( Rb.KeywordParameter
+                                      :+: (Rb.OptionalParameter :+: Rb.SplatParameter)
+                                  )
+                          )
+                  )
+          )
+          Loc
+      )
   ] ->
   m ()
 introduceLocals params = for_ params $ \param -> case param of
