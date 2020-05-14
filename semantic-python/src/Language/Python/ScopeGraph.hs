@@ -36,6 +36,7 @@ import Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NonEmpty
 import Data.Monoid (getAp)
 import qualified Data.ScopeGraph as ScopeGraph
+import qualified Data.Text as Text
 import GHC.Records
 import GHC.TypeLits
 import qualified Language.Python.AST as Py
@@ -295,7 +296,7 @@ instance ToScopeGraph Py.FunctionDefinition where
         modify (Stack.addEdge formalParametersScope paramNode)
 
       -- Add the parent scope pointing to the formal parameters node
-      let parentScopeName = Name.name "ParentScope"
+      let parentScopeName = Name.name (Text.pack "ParentScope" <> name)
           parentScope = Stack.Scope parentScopeName
       modify (Stack.addEdge parentScope formalParametersScope)
 
