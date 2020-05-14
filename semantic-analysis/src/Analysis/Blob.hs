@@ -4,6 +4,7 @@ module Analysis.Blob
   , fromSource
   , blobLanguage
   , blobPath
+  , blobFilePath
   , nullBlob
   ) where
 
@@ -28,7 +29,6 @@ instance FromJSON Blob where
     let lang' = if knownLanguage lang then lang else Language.forPath pth
     pure (fromSource (pth :: Path.AbsRelFile) lang' src)
 
-
 -- | Create a Blob from a provided path, language, and UTF-8 source.
 -- The resulting Blob's span is taken from the 'totalSpan' of the source.
 fromSource :: Path.PartClass.AbsRel ar => Path.File ar -> Language -> Source -> Blob
@@ -38,8 +38,12 @@ fromSource filepath language source
 blobLanguage :: Blob -> Language
 blobLanguage = Analysis.File.fileBody . blobFile
 
-blobPath :: Blob -> FilePath
-blobPath = Path.toString . Analysis.File.filePath . blobFile
+blobPath :: Blob -> Path.AbsRelFile
+blobPath = Analysis.File.filePath . blobFile
+
+-- | Show FilePath for error or json outputs.
+blobFilePath :: Blob -> String
+blobFilePath = Path.toString . blobPath
 
 nullBlob :: Blob -> Bool
 nullBlob = Source.null . blobSource

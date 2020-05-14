@@ -20,7 +20,7 @@ import qualified Data.Map as Map
 import           Data.Semilattice.Lower
 import           Data.Set (Set)
 import           Prelude hiding (lookup)
-import           System.FilePath.Posix
+import qualified System.Path as Path
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
   deriving (Eq, Foldable, Functor, Lower, Monoid, Ord, Semigroup, Traversable)
@@ -32,7 +32,7 @@ modulePaths :: ModuleTable a -> Set ModulePath
 modulePaths = Map.keysSet . unModuleTable
 
 modulePathsInDir :: FilePath -> ModuleTable a -> [ModulePath]
-modulePathsInDir k = filter (\e -> k == takeDirectory e) . Map.keys . unModuleTable
+modulePathsInDir k = filter (\e -> Path.absRel k == Path.takeDirectory e) . Map.keys . unModuleTable
 
 lookup :: ModulePath -> ModuleTable a -> Maybe a
 lookup k = Map.lookup k . unModuleTable

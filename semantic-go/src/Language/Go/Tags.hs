@@ -1,66 +1,70 @@
-{-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE DefaultSignatures #-}{-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-module Language.Go.Tags
-( ToTags(..)
-) where
 
-import           AST.Element
-import           AST.Token
-import           AST.Traversable1
-import           Control.Effect.Reader
-import           Control.Effect.Writer
-import           Data.Text as Text
+module Language.Go.Tags
+  ( ToTags (..),
+  )
+where
+
+import AST.Element
+import AST.Token
+import AST.Traversable1
+import Control.Effect.Reader
+import Control.Effect.Writer
+import Data.Text as Text
 import qualified Language.Go.AST as Go
-import           Source.Loc
-import           Source.Source as Source
-import           Tags.Tag
+import Source.Loc
+import Source.Source as Source
+import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags t where
-  tags
-    :: ( Has (Reader Source) sig m
-       , Has (Writer Tags.Tags) sig m
-       )
-    => t Loc
-    -> m ()
-  default tags
-    :: ( Has (Reader Source) sig m
-       , Has (Writer Tags.Tags) sig m
-       , Traversable1 ToTags t
-       )
-    => t Loc
-    -> m ()
+  tags ::
+    ( Has (Reader Source) sig m,
+      Has (Writer Tags.Tags) sig m
+    ) =>
+    t Loc ->
+    m ()
+  default tags ::
+    ( Has (Reader Source) sig m,
+      Has (Writer Tags.Tags) sig m,
+      Traversable1 ToTags t
+    ) =>
+    t Loc ->
+    m ()
   tags = gtags
 
 instance ToTags Go.FunctionDeclaration where
-  tags t@Go.FunctionDeclaration
-    { ann = loc@Loc { byteRange }
-    , name = Go.Identifier { text }
-    } = yieldTag text Function loc byteRange >> gtags t
+  tags
+    t@Go.FunctionDeclaration
+      { ann = Loc {byteRange},
+        name = Go.Identifier {text, ann}
+      } = yieldTag text Function ann byteRange >> gtags t
 
 instance ToTags Go.MethodDeclaration where
-  tags t@Go.MethodDeclaration
-    { ann = loc@Loc { byteRange }
-    , name = Go.FieldIdentifier { text }
-    } = yieldTag text Method loc byteRange >> gtags t
+  tags
+    t@Go.MethodDeclaration
+      { ann = Loc {byteRange},
+        name = Go.FieldIdentifier {text, ann}
+      } = yieldTag text Method ann byteRange >> gtags t
 
 instance ToTags Go.CallExpression where
-  tags t@Go.CallExpression
-    { ann = loc@Loc { byteRange }
-    , function = Go.Expression expr
-    } = match expr
+  tags
+    t@Go.CallExpression
+      { ann = Loc {byteRange},
+        function = Go.Expression expr
+      } = match expr
       where
         match expr = case expr of
-          Prj Go.SelectorExpression { field = Go.FieldIdentifier { text }}   -> yield text
-          Prj Go.Identifier { text }                                         -> yield text
-          Prj Go.CallExpression { function = Go.Expression e }               -> match e
-          Prj Go.ParenthesizedExpression { extraChildren = Go.Expression e } -> match e
-          _                                                                  -> gtags t
-        yield name = yieldTag name Call loc byteRange >> gtags t
+          Prj Go.SelectorExpression {field = Go.FieldIdentifier {text, ann}} -> yield text ann
+          Prj Go.Identifier {text, ann} -> yield text ann
+          Prj Go.CallExpression {function = Go.Expression e} -> match e
+          Prj Go.ParenthesizedExpression {extraChildren = Go.Expression e} -> match e
+          _ -> gtags t
+        yield name loc = yieldTag name Call loc byteRange >> gtags t
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
@@ -68,19 +72,19 @@ instance (ToTags l, ToTags r) => ToTags (l :+: r) where
 
 instance ToTags (Token sym n) where tags _ = pure ()
 
-gtags
-  :: ( Has (Reader Source) sig m
-     , Has (Writer Tags.Tags) sig m
-     , Traversable1 ToTags t
-     )
-  => t Loc
-  -> m ()
+gtags ::
+  ( Has (Reader Source) sig m,
+    Has (Writer Tags.Tags) sig m,
+    Traversable1 ToTags t
+  ) =>
+  t Loc ->
+  m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
-yieldTag name kind loc range = do
+yieldTag name kind loc srcLineRange = do
   src <- ask @Source
-  Tags.yield (Tag name kind loc (Tags.firstLine src range) Nothing)
+  Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
 
 
 instance ToTags Go.ArgumentList

@@ -134,13 +134,34 @@ instance ToJSON ParseTreeGraphResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance FromJSONPB ParseTreeStackGraphResponse where
-  parseJSONPB = withObject "ParseTreeStackGraphResponse" $ \obj -> do
+instance FromJSONPB StackGraphRequest where
+  parseJSONPB = withObject "StackGraphRequest" $ \obj -> do
+    blobs' <- obj .: "blobs"
+    pure $ defMessage
+      & P.blobs .~ blobs'
+
+instance ToJSONPB StackGraphRequest where
+  toJSONPB x = object
+    [ "blobs" .= (x^.blobs)
+    ]
+  toEncodingPB x = pairs
+    [ "blobs" .= (x^.blobs)
+    ]
+
+instance FromJSON StackGraphRequest where
+  parseJSON = parseJSONPB
+
+instance ToJSON StackGraphRequest where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB StackGraphResponse where
+  parseJSONPB = withObject "StackGraphResponse" $ \obj -> do
     files' <- obj .: "files"
     pure $ defMessage
       & P.files .~ files'
 
-instance ToJSONPB ParseTreeStackGraphResponse where
+instance ToJSONPB StackGraphResponse where
   toJSONPB x = object
     [ "files" .= (x^.files)
     ]
@@ -148,10 +169,10 @@ instance ToJSONPB ParseTreeStackGraphResponse where
     [ "files" .= (x^.files)
     ]
 
-instance FromJSON ParseTreeStackGraphResponse where
+instance FromJSON StackGraphResponse where
   parseJSON = parseJSONPB
 
-instance ToJSON ParseTreeStackGraphResponse where
+instance ToJSON StackGraphResponse where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
@@ -264,139 +285,6 @@ instance FromJSON ParseError where
   parseJSON = parseJSONPB
 
 instance ToJSON ParseError where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
-instance FromJSONPB DiffTreeRequest where
-  parseJSONPB = withObject "DiffTreeRequest" $ \obj -> do
-    blobs' <- obj .: "blobs"
-    pure $ defMessage
-      & P.blobs .~ blobs'
-
-instance ToJSONPB DiffTreeRequest where
-  toJSONPB x = object
-    [ "blobs" .= (x^.blobs)
-    ]
-  toEncodingPB x = pairs
-    [ "blobs" .= (x^.blobs)
-    ]
-
-instance FromJSON DiffTreeRequest where
-  parseJSON = parseJSONPB
-
-instance ToJSON DiffTreeRequest where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
-instance FromJSONPB DiffTreeTOCResponse where
-  parseJSONPB = withObject "DiffTreeTOCResponse" $ \obj -> do
-    files' <- obj .: "files"
-    pure $ defMessage
-      & P.files .~ files'
-
-instance ToJSONPB DiffTreeTOCResponse where
-  toJSONPB x = object
-    [ "files" .= (x^.files)
-    ]
-  toEncodingPB x = pairs
-    [ "files" .= (x^.files)
-    ]
-
-instance FromJSON DiffTreeTOCResponse where
-  parseJSON = parseJSONPB
-
-instance ToJSON DiffTreeTOCResponse where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
-instance FromJSONPB TOCSummaryFile where
-  parseJSONPB = withObject "TOCSummaryFile" $ \obj -> do
-    path' <- obj .: "path"
-    language' <- obj .: "language"
-    changes' <- obj .: "changes"
-    errors' <- obj .: "errors"
-    pure $ defMessage
-      & P.path .~ path'
-      & P.language .~ language'
-      & P.changes .~ changes'
-      & P.errors .~ errors'
-
-instance ToJSONPB TOCSummaryFile where
-  toJSONPB x = object
-    [ "path" .= (x^.path)
-    , "language" .= (x^.language)
-    , "changes" .= (x^.changes)
-    , "errors" .= (x^.errors)
-    ]
-  toEncodingPB x = pairs
-    [ "path" .= (x^.path)
-    , "language" .= (x^.language)
-    , "changes" .= (x^.changes)
-    , "errors" .= (x^.errors)
-    ]
-
-instance FromJSON TOCSummaryFile where
-  parseJSON = parseJSONPB
-
-instance ToJSON TOCSummaryFile where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
-instance FromJSONPB TOCSummaryChange where
-  parseJSONPB = withObject "TOCSummaryChange" $ \obj -> do
-    category' <- obj .: "category"
-    term' <- obj .: "term"
-    span' <- obj A..:? "span"
-    changeType' <- obj .: "changeType"
-    pure $ defMessage
-      & P.category .~ category'
-      & P.term .~ term'
-      & P.maybe'span .~ span'
-      & P.changeType .~ changeType'
-
-instance ToJSONPB TOCSummaryChange where
-  toJSONPB x = object
-    [ "category" .= (x^.category)
-    , "term" .= (x^.term)
-    , "span" .= (x^.maybe'span)
-    , "changeType" .= (x^.changeType)
-    ]
-  toEncodingPB x = pairs
-    [ "category" .= (x^.category)
-    , "term" .= (x^.term)
-    , "span" .= (x^.maybe'span)
-    , "changeType" .= (x^.changeType)
-    ]
-
-instance FromJSON TOCSummaryChange where
-  parseJSON = parseJSONPB
-
-instance ToJSON TOCSummaryChange where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
-instance FromJSONPB TOCSummaryError where
-  parseJSONPB = withObject "TOCSummaryError" $ \obj -> do
-    error' <- obj .: "error"
-    span' <- obj A..:? "span"
-    pure $ defMessage
-      & P.error .~ error'
-      & P.maybe'span .~ span'
-
-instance ToJSONPB TOCSummaryError where
-  toJSONPB x = object
-    [ "error" .= (x^.error)
-    , "span" .= (x^.maybe'span)
-    ]
-  toEncodingPB x = pairs
-    [ "error" .= (x^.error)
-    , "span" .= (x^.maybe'span)
-    ]
-
-instance FromJSON TOCSummaryError where
-  parseJSON = parseJSONPB
-
-instance ToJSON TOCSummaryError where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
@@ -675,31 +563,6 @@ instance ToJSON Blob where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance FromJSONPB BlobPair where
-  parseJSONPB = withObject "BlobPair" $ \obj -> do
-    before' <- obj A..:? "before"
-    after' <- obj A..:? "after"
-    pure $ defMessage
-      & P.maybe'before .~ before'
-      & P.maybe'after .~ after'
-
-instance ToJSONPB BlobPair where
-  toJSONPB x = object
-    [ "before" .= (x^.maybe'before)
-    , "after" .= (x^.maybe'after)
-    ]
-  toEncodingPB x = pairs
-    [ "before" .= (x^.maybe'before)
-    , "after" .= (x^.maybe'after)
-    ]
-
-instance FromJSON BlobPair where
-  parseJSON = parseJSONPB
-
-instance ToJSON BlobPair where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
 instance FromJSONPB File where
   parseJSONPB = withObject "File" $ \obj -> do
     path' <- obj .: "path"
@@ -888,15 +751,15 @@ instance FromJSONPB StackGraphNode where
     name' <- obj .: "name"
     line' <- obj .: "line"
     kind' <- obj .: "kind"
-    isDefinition' <- obj .: "isDefinition"
     span' <- obj A..:? "span"
+    nodeType' <- obj .: "nodeType"
     pure $ defMessage
       & P.id .~ id'
       & P.name .~ name'
       & P.line .~ line'
       & P.kind .~ kind'
-      & P.isDefinition .~ isDefinition'
       & P.maybe'span .~ span'
+      & P.nodeType .~ nodeType'
 
 instance ToJSONPB StackGraphNode where
   toJSONPB x = object
@@ -904,22 +767,41 @@ instance ToJSONPB StackGraphNode where
     , "name" .= (x^.name)
     , "line" .= (x^.line)
     , "kind" .= (x^.kind)
-    , "isDefinition" .= (x^.isDefinition)
     , "span" .= (x^.maybe'span)
+    , "nodeType" .= (x^.nodeType)
     ]
   toEncodingPB x = pairs
     [ "id" .= (x^.id)
     , "name" .= (x^.name)
     , "line" .= (x^.line)
     , "kind" .= (x^.kind)
-    , "isDefinition" .= (x^.isDefinition)
     , "span" .= (x^.maybe'span)
+    , "nodeType" .= (x^.nodeType)
     ]
 
 instance FromJSON StackGraphNode where
   parseJSON = parseJSONPB
 
 instance ToJSON StackGraphNode where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB StackGraphNode'NodeType where
+  parseJSONPB (JSONPB.String "ROOT_SCOPE") = pure StackGraphNode'ROOT_SCOPE
+  parseJSONPB (JSONPB.String "JUMP_TO_SCOPE") = pure StackGraphNode'JUMP_TO_SCOPE
+  parseJSONPB (JSONPB.String "EXPORTED_SCOPE") = pure StackGraphNode'EXPORTED_SCOPE
+  parseJSONPB (JSONPB.String "DEFINITION") = pure StackGraphNode'DEFINITION
+  parseJSONPB (JSONPB.String "REFERENCE") = pure StackGraphNode'REFERENCE
+  parseJSONPB x = typeMismatch "NodeType" x
+
+instance ToJSONPB StackGraphNode'NodeType where
+  toJSONPB x _ = A.String . T.toUpper . T.pack $ show x
+  toEncodingPB x _ = E.text . T.toUpper . T.pack  $ show x
+
+instance FromJSON StackGraphNode'NodeType where
+  parseJSON = parseJSONPB
+
+instance ToJSON StackGraphNode'NodeType where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
@@ -965,23 +847,5 @@ instance FromJSON StackGraphPath where
   parseJSON = parseJSONPB
 
 instance ToJSON StackGraphPath where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
-instance FromJSONPB ChangeType where
-  parseJSONPB (JSONPB.String "NONE") = pure NONE
-  parseJSONPB (JSONPB.String "ADDED") = pure ADDED
-  parseJSONPB (JSONPB.String "REMOVED") = pure REMOVED
-  parseJSONPB (JSONPB.String "MODIFIED") = pure MODIFIED
-  parseJSONPB x = typeMismatch "ChangeType" x
-
-instance ToJSONPB ChangeType where
-  toJSONPB x _ = A.String . T.toUpper . T.pack $ show x
-  toEncodingPB x _ = E.text . T.toUpper . T.pack  $ show x
-
-instance FromJSON ChangeType where
-  parseJSON = parseJSONPB
-
-instance ToJSON ChangeType where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding

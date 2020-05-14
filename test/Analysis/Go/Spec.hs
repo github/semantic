@@ -2,19 +2,17 @@
 {-# OPTIONS_GHC -O0 #-}
 module Analysis.Go.Spec (spec) where
 
-import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Language as Language
 import qualified Language.Go.Term as Go
 import           Source.Loc
 import           SpecHelpers
-
 
 spec :: (?session :: TaskSession) => Spec
 spec = do
   describe "Go" $ do
     it "imports and wildcard imports" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
-      case ModuleTable.lookup "main.go" <$> res of
+      case moduleLookup "main.go" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
           SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           SpecHelpers.lookupMembers "foo" Import scopeAndFrame heap scopeGraph `shouldBe` Just ["New"]
@@ -25,7 +23,7 @@ spec = do
 
     it "imports with aliases (and side effects only)" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
-      case ModuleTable.lookup "main1.go" <$> res of
+      case moduleLookup "main1.go" <$> res of
         Right (Just (Module _ (scopeAndFrame, _))) -> do
           SpecHelpers.lookupDeclaration "f" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust
           SpecHelpers.lookupDeclaration "main" scopeAndFrame heap scopeGraph `shouldSatisfy` isJust

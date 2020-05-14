@@ -15,9 +15,9 @@ module Language.Python.AST
 , Python.getTestCorpusDir
 ) where
 
-import           Prelude hiding (False, Float, Integer, String, True)
 import           AST.GenerateSyntax
 import           Language.Haskell.TH.Syntax (runIO)
+import           Prelude hiding (False, Float, Integer, String, True)
 import qualified TreeSitter.Python as Python (getNodeTypesPath, getTestCorpusDir, tree_sitter_python)
 
 runIO Python.getNodeTypesPath >>= astDeclarationsForLanguage Python.tree_sitter_python

@@ -6,7 +6,7 @@
 
 {-# OPTIONS_GHC -O1 #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds -Wno-unused-imports #-}
-module Main (main) where
+module Main (main, parseStackGraphFilePath, testStackGraph) where
 
 import qualified Analysis.File as File
 import           Control.Carrier.Parse.Measured
@@ -30,8 +30,9 @@ import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
 import Data.Flag
-import Proto.Semantic as P hiding (Blob, BlobPair)
+import Proto.Semantic as P hiding (Blob)
 import Proto.Semantic_Fields as P
+import Semantic.Api.StackGraph (parseStackGraph)
 import Semantic.Api.Symbols (parseSymbols)
 import Semantic.Config as Config
 import Semantic.Task
@@ -52,7 +53,7 @@ le = LanguageExample
 examples :: [LanguageExample]
 examples =
   [ le "go" "**/*.go" goFileSkips goDirSkips
-  , le "python" "**/*.py" mempty mempty
+  , le "python" "**/*.py" pythonFileSkips mempty
   , le "ruby" "**/*.rb" rubySkips mempty
   , le "typescript" "**/*.[jt]s" typescriptSkips mempty
   , le "typescript" "**/*.[jt]sx" tsxSkips mempty
@@ -98,6 +99,14 @@ goDirSkips = Path.relDir <$>
   , "go/test/syntax"
   , "go/test/method4.dir"
   , "go/test"
+  ]
+
+pythonFileSkips :: [Path.RelFile]
+pythonFileSkips = Path.relPath <$>
+  [
+  -- Assignment doesn't handle f-strings
+    "thealgorithms/analysis/compression_analysis/psnr.py"
+  , "thealgorithms/maths/greater_common_divisor.py"
   ]
 
 rubySkips :: [Path.RelFile]
@@ -287,3 +296,19 @@ parseSymbolsFilePath ::
   -> Path.RelFile
   -> m ParseTreeSymbolResponse
 parseSymbolsFilePath languageModes path = readBlob (File.fromPath path) >>= runReader languageModes . parseSymbols . pure @[]
+
+parseStackGraphFilePath ::
+  ( Has (Error SomeException) sig m
+  , Has Distribute sig m
+  , Has Parse sig m
+  , Has Files sig m
+  , Effect sig
+  )
+  => Path.RelFile
+  -> m StackGraphResponse
+parseStackGraphFilePath path = readBlob (File.fromPath path) >>= runReader preciseLanguageModes . parseStackGraph . pure @[]
+
+testStackGraph :: Path.RelFile -> IO (Either SomeException StackGraphResponse)
+testStackGraph path = withOptions testOptions $ \ config logger statter -> do
+  let session = TaskSession config "-" False logger statter
+  runTask session (runParse (parseStackGraphFilePath path))

@@ -68,7 +68,6 @@ import           Semantic.Distribute
 import           Semantic.Resolution
 import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
-import           Semantic.Timeout
 import           Serializing.Format hiding (Options)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
@@ -80,9 +79,8 @@ type TaskC
   ( TraceInTelemetryC
   ( TelemetryC
   ( ErrorC SomeException
-  ( TimeoutC
   ( DistributeC
-  ( LiftC IO)))))))))
+  ( LiftC IO))))))))
 
 serialize :: Has (Reader Config) sig m
           => Format input
@@ -99,8 +97,8 @@ data TaskSession
   , isPublic  :: Bool
   , logger    :: LogQueue
   , statter   :: StatQueue
-  }
 
+}
 -- | Execute a 'TaskC' yielding its result value in 'IO'.
 runTask :: TaskSession -> TaskC a -> IO (Either SomeException a)
 runTask taskSession@TaskSession{..} task = do
@@ -109,7 +107,6 @@ runTask taskSession@TaskSession{..} task = do
         run
           = runM
           . withDistribute
-          . withTimeout
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry

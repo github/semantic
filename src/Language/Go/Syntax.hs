@@ -11,9 +11,9 @@ import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.Package as Package
-import           Data.Abstract.Path
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Foldable
+import           Data.Abstract.Path
 import           Data.Functor.Classes
 import           Data.Functor.Classes.Generic
 import           Data.Hashable.Lifted
@@ -27,7 +27,9 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics (Generic1)
+import qualified System.Path as Path
 import           System.FilePath.Posix
+
 
 resolveGoImport :: ( Has (Modules address value) sig m
                    , Has (Reader ModuleInfo) sig m
@@ -41,7 +43,7 @@ resolveGoImport :: ( Has (Modules address value) sig m
 resolveGoImport (ImportPath path Data.ImportPath.Unknown) = throwResolutionError $ GoImportError path
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
-  paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)
+  paths <- listModulesInDir $  (joinPaths (Path.takeDirectory modulePath) (Path.rel path))
   case paths of
     [] -> throwResolutionError $ GoImportError path
     _  -> pure paths
@@ -52,7 +54,7 @@ resolveGoImport (ImportPath path NonRelative) = do
     -- Import an absolute path that's defined in this package being analyzed.
     -- First two are source, next is package name, remaining are path to package
     -- (e.g. github.com/golang/<package>/path...).
-    (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
+    (_ : _ : p : xs) | p == package -> listModulesInDir (Path.toAbsRel $ Path.joinPath xs)
     _                               -> throwResolutionError $ GoImportError path
 
 -- | Import declarations (symbols are added directly to the calling environment).

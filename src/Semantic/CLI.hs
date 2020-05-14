@@ -94,7 +94,6 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
       renderer <- flag  (parseDiffBuilder DiffSExpression) (parseDiffBuilder DiffSExpression) (long "sexpression" <> help "Output s-expression diff tree (default)")
               <|> flag'                                    (parseDiffBuilder DiffJSONTree)    (long "json"        <> help "Output JSON diff trees")
               <|> flag'                                    (parseDiffBuilder DiffJSONGraph)   (long "json-graph"  <> help "Output JSON diff trees")
-              <|> flag'                                    (diffSummaryBuilder JSON)          (long "toc"         <> help "Output JSON table of contents diff summary")
               <|> flag'                                    (parseDiffBuilder DiffDotGraph)    (long "dot"         <> help "Output the diff as a DOT graph")
               <|> flag'                                    (parseDiffBuilder DiffShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some ((,) <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
@@ -123,6 +122,9 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
         <|> flag' (parseSymbolsBuilder Proto)
                   (  long "proto-symbols"
                   <> help "Output protobufs symbol list")
+        <|> flag' (parseStackGraphBuilder Proto)
+                  (  long "proto-stack-graph"
+                  <> help "Output protobufs stack graph")
         <|> flag' (parseTermBuilder TermDotGraph)
                   (  long "dot"
                   <> help "Output DOT graph parse trees")
@@ -157,8 +159,8 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       let paths = rights (Path.parse <$> strPaths)
       blobs <- traverse readBlobFromPath paths
       case paths of
-        (x:_) -> pure $! Project (Path.toString (Path.takeDirectory x)) blobs (Language.forPath x) mempty
-        _     -> pure $! Project "/" mempty Language.Unknown mempty
+        (x:_) -> pure $! Project (Path.takeDirectory x) blobs (Language.forPath x) mempty
+        _     -> pure $! Project (Path.toAbsRel Path.rootDir) mempty Language.Unknown mempty
 
     allLanguages = intercalate "|" . fmap show $ [Language.Go .. maxBound]
     readProjectRecursively = makeReadProjectRecursivelyTask

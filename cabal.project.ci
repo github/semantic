@@ -4,6 +4,7 @@
 packages: .
           semantic-analysis
           semantic-ast
+          semantic-codeql
           semantic-core
           semantic-go
           semantic-java
@@ -29,11 +30,6 @@ source-repository-package
   location: https://github.com/antitypical/fused-syntax.git
   tag: d11e14581217590a5c67f79cbaeee35ac8acee6a
 
-source-repository-package
-  type: git
-  location: https://github.com/fused-effects/fused-effects-readline.git
-  tag: 7a96949c77c73c6e5975c8d6171ffb63eb76b467
-
 
 -- Treat warnings as errors for CI builds
 package semantic
@@ -43,6 +39,9 @@ package semantic-analysis
   ghc-options: -Werror
 
 package semantic-ast
+  ghc-options: -Werror
+
+package semantic-codeql
   ghc-options: -Werror
 
 package semantic-core

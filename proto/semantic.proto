@@ -27,7 +27,11 @@ message ParseTreeGraphResponse {
   repeated ParseTreeFileGraph files = 1;
 }
 
-message ParseTreeStackGraphResponse {
+message StackGraphRequest {
+  repeated Blob blobs = 1;
+}
+
+message StackGraphResponse {
   repeated StackGraphFile files = 1;
 }
 
@@ -52,40 +56,6 @@ message TermVertex {
 
 message ParseError {
   string error = 1;
-}
-
-message DiffTreeRequest {
-  repeated BlobPair blobs = 1;
-}
-
-message DiffTreeTOCResponse {
-  repeated TOCSummaryFile files = 1;
-}
-
-message TOCSummaryFile {
-  string path = 1;
-  string language = 2;
-  repeated TOCSummaryChange changes = 3;
-  repeated TOCSummaryError errors = 4;
-}
-
-message TOCSummaryChange {
-  string category = 1;
-  string term = 2;
-  Span span = 3;
-  ChangeType change_type = 4;
-}
-
-message TOCSummaryError {
-  string error = 1;
-  Span span = 2;
-}
-
-enum ChangeType {
-  NONE = 0;
-  ADDED = 1;
-  REMOVED = 2;
-  MODIFIED = 3;
 }
 
 message DiffTreeGraphResponse {
@@ -144,11 +114,6 @@ message Blob {
   string language = 3;
 }
 
-message BlobPair {
-  Blob before = 1;
-  Blob after = 2;
-}
-
 message File {
   string path = 1;
   string language = 2;
@@ -192,8 +157,15 @@ message StackGraphNode {
   string name = 2;
   string line = 3;
   string kind = 4;
-  bool is_definition = 5;
-  Span span = 6;
+  Span span = 5;
+  enum NodeType {
+    ROOT_SCOPE = 0;
+    JUMP_TO_SCOPE = 1;
+    EXPORTED_SCOPE = 2;
+    DEFINITION = 3;
+    REFERENCE = 4;
+  }
+  NodeType node_type = 6;
 }
 
 message StackGraphPath {
@@ -202,6 +174,6 @@ message StackGraphPath {
   int64 from = 3;
   string edges = 4;
   int64 to = 5;
-  repeated string ending_scope_stack = 6;
+  repeated int64 ending_scope_stack = 6;
   repeated string ending_symbol_stack = 7;
 }

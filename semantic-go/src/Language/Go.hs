@@ -5,12 +5,13 @@ module Language.Go
 ) where
 
 
+import qualified AST.Unmarshal as TS
 import           Data.Proxy
 import qualified Language.Go.AST as Go
-import qualified Language.Go.Tags as GoTags
-import qualified Tags.Tagging.Precise as Tags
 import qualified Language.Go.Grammar (tree_sitter_go)
-import qualified AST.Unmarshal as TS
+import qualified Language.Go.Tags as GoTags
+import           Scope.Graph.Convert
+import qualified Tags.Tagging.Precise as Tags
 
 newtype Term a = Term { getTerm :: Go.SourceFile a }
 
@@ -23,3 +24,6 @@ instance TS.Unmarshal Term where
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . GoTags.tags . getTerm
+
+instance ToScopeGraph Term where
+  scopeGraph = undefined

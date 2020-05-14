@@ -4,12 +4,13 @@ module Language.Java
 , Language.Java.Grammar.tree_sitter_java
 ) where
 
+import qualified AST.Unmarshal as TS
 import           Data.Proxy
 import qualified Language.Java.AST as Java
-import qualified Language.Java.Tags as JavaTags
-import qualified Tags.Tagging.Precise as Tags
 import qualified Language.Java.Grammar (tree_sitter_java)
-import qualified AST.Unmarshal as TS
+import qualified Language.Java.Tags as JavaTags
+import           Scope.Graph.Convert
+import qualified Tags.Tagging.Precise as Tags
 
 newtype Term a = Term { getTerm :: Java.Program a }
 
@@ -22,3 +23,6 @@ instance TS.Unmarshal Term where
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . JavaTags.tags . getTerm
+
+instance ToScopeGraph Term where
+  scopeGraph = undefined

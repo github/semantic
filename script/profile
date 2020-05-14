@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Usage: script/profile FILE_A FILE_B
 # Builds and runs semantic on the given files with profiling enabled.
 

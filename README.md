@@ -35,7 +35,7 @@ Available options:
 
 #### Diff
 ```
-Usage: semantic diff ([--sexpression] | [--json] | [--json-graph] | [--toc] |
+Usage: semantic diff ([--sexpression] | [--json] | [--json-graph] |
                      [--dot] | [--show]) [FILE_A] [FILE_B]
   Compute changes between paths
 
@@ -43,7 +43,6 @@ Available options:
   --sexpression            Output s-expression diff tree (default)
   --json                   Output JSON diff trees
   --json-graph             Output JSON diff trees
-  --toc                    Output JSON table of contents diff summary
   --dot                    Output the diff as a DOT graph
   --show                   Output using the Show instance (debug only, format
                            subject to change without notice)
@@ -75,20 +74,20 @@ Available options:
 
 ## Language support
 
-| Priority | Language       | Parse | Assign | Diff  | ToC | Symbols | Import graph | Call graph | Control flow graph |
-| :---:    | :------------- | :---: | :---:  | :---: | :--:| :---:   | :---:        | :---:      | :---: |
-| 1        | Ruby           | ✅     | ✅     | ✅    | ✅  | ✅      | ✅          | 🚧 | |
-| 2        | JavaScript     | ✅     | ✅     | ✅    | ✅  | ✅      | ✅           | 🚧 | |
-| 3        | TypeScript     | ✅     | ✅     | ✅    | ✅  | ✅      | ✅          | 🚧  | |
-| 4        | Python         | ✅     | ✅     | ✅    | ✅  | ✅      | ✅           | 🚧 | |
-| 5        | Go             | ✅     | ✅     | ✅    | ✅  | ✅      | ✅           | 🚧 | |
-|          | PHP            | 🚧     | 🚧   | 🚧  | 🚧| 🚧    | | | |
-|          | Java           | 🚧     | N/A    | 🚧    | 🚧  | ✅      |               | | |
-|          | JSON           | ✅     | N/A    | ✅    | N/A | N/A     | N/A          | N/A| |
-|          | Java           | 🚧     | 🚧     | 🚧    | 🔶  | ✅      |               | | |
-|          | JSX            | ✅     | ✅     | ✅    | 🔶  |         |              | | |
-|          | Haskell        | 🚧     | 🚧     | 🚧    | 🔶  | 🚧       |              | | |
-|          | Markdown       | 🚧     | 🚧     | 🚧    | 🚧  | N/A     | N/A          | N/A | &nbsp; |
+| Priority | Language       | Parse | Assign | Diff  | Symbols | Import graph | Call graph | Control flow graph |
+| :---:    | :------------- | :---: | :---:  | :---: | :---:   | :---:        | :---:      | :---:              |
+| 1        | Ruby           | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
+| 2        | JavaScript     | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
+| 3        | TypeScript     | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
+| 4        | Python         | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
+| 5        | Go             | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
+|          | PHP            | 🚧    | 🚧     | 🚧    | 🚧      |              |            |                    |
+|          | Java           | 🚧    | N/A    | 🚧    | ✅      |              |            |                    |
+|          | JSON           | ✅    | N/A    | ✅    | N/A     | N/A          | N/A        |                    |
+|          | JSX            | ✅    | ✅     | ✅    |         |              |            |                    |
+|          | Haskell        | 🚧    | 🚧     | 🚧    | 🚧      |              |            |                    |
+|          | Markdown       | 🚧    | 🚧     | 🚧    | N/A     | N/A          | N/A        | &nbsp;             |
+|          | CodeQL         | ✅    | N/A    | 🚧    | ✅      |              |            |                    |
 
 * ✅ — Supported
 * 🔶 — Partial support

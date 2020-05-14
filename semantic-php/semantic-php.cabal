@@ -26,12 +26,13 @@ common haskell
                      , parsers ^>= 0.12.10
                      , semantic-ast
                      , semantic-core ^>= 0.0
-                     , semantic-source ^>= 0.0.2
+                     , semantic-source ^>= 0.1.0
                      , semantic-tags ^>= 0.0
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.9
                      , tree-sitter-php ^>= 0.4.0.0
+                     , semantic-scope-graph
 
   ghc-options:
     -Weverything

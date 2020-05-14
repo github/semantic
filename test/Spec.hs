@@ -25,7 +25,6 @@ import qualified Graphing.Calls.Spec
 import qualified Integration.Spec
 import qualified Numeric.Spec
 import qualified Parsing.Spec
-import qualified Rendering.TOC.Spec
 import qualified Tags.Spec
 import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
@@ -81,7 +80,6 @@ legacySpecs = parallel $ do
   describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
   describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
   describe "Graphing.Calls" Graphing.Calls.Spec.spec
-  describe "Rendering.TOC" Rendering.TOC.Spec.spec
   describe "Tags.Spec" Tags.Spec.spec
   describe "Semantic" Semantic.Spec.spec
   describe "Semantic.IO" Semantic.IO.Spec.spec

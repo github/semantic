@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 store_dir="$HOME/.cabal/store/ghc-$(ghc --numeric-version)"
 

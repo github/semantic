@@ -25,6 +25,7 @@ library
     Control.Effect.ScopeGraph.Properties.Declaration
     Control.Effect.ScopeGraph.Properties.Function
     Control.Effect.ScopeGraph.Properties.Reference
+    Data.Functor.Tagged
     Scope.Graph.AdjacencyList
     Scope.Graph.Convert
     Scope.Info
@@ -32,17 +33,18 @@ library
     Scope.Reference
     Scope.Scope
     Scope.Types
+    Stack.Path
     Stack.Graph
     Stack.Graph.Export
     Data.Hole
     Data.Module
     Data.ScopeGraph
-    Data.Functor.Tagged
   build-depends:
       base                >= 4.13 && < 5
     , aeson
     , algebraic-graphs    >= 0.3 && < 0.5
     , containers
+    , comonad
     , fused-effects      ^>= 1.0
     , generic-monoid
     , generic-lens
@@ -51,7 +53,7 @@ library
     , pathtype
     , process
     , semantic-analysis
-    , semantic-source    ^>= 0.0.2
+    , semantic-source    ^>= 0.1.0
     , semilattices
     , streaming
     , streaming-bytestring
@@ -59,6 +61,7 @@ library
     , text               ^>= 1.2.3.1
     , temporary
     , comonad
+    , monoid-subclasses
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:
