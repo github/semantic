@@ -32,6 +32,10 @@ data Result a
   | Todo (NonEmpty String)
   deriving (Eq, Show, Ord)
 
+instance Functor Result where
+  fmap f (Complete x) = Complete (f x)
+  fmap _ (Todo msg) = Todo msg
+
 instance Semigroup a => Semigroup (Result a) where
   Complete a <> Complete b = Complete (a <> b)
   Todo a <> Todo b = Todo (a <> b)
