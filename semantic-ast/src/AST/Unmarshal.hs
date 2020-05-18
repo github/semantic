@@ -28,6 +28,7 @@ module AST.Unmarshal
 ) where
 
 import           AST.Token as TS
+import           AST.Parse
 import           Control.Algebra (send)
 import           Control.Carrier.Reader hiding (asks)
 import           Control.Exception
@@ -51,7 +52,6 @@ import           Foreign.Storable
 import           GHC.Generics
 import           GHC.Records
 import           GHC.TypeLits
-import           AST.Parse
 import           Source.Loc
 import           Source.Span
 import           TreeSitter.Cursor as TS
