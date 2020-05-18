@@ -5,7 +5,7 @@
 -- | The 'Function' record type is used by the 'Control.Effect.Sketch' module to keep
 -- track of the parameters that need to be passed when establishing a new declaration.
 -- That is to say, it is a record type primarily used for its selector names.
-module Control.Effect.ScopeGraph.Properties.Function
+module Control.Effect.StackGraph.Properties.Function
   ( Function (..),
   )
 where

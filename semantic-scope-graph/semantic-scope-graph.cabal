@@ -20,11 +20,11 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Control.Carrier.Sketch.ScopeGraph
-    Control.Effect.ScopeGraph
-    Control.Effect.ScopeGraph.Properties.Declaration
-    Control.Effect.ScopeGraph.Properties.Function
-    Control.Effect.ScopeGraph.Properties.Reference
+    Control.Carrier.StackGraph
+    Control.Effect.StackGraph
+    Control.Effect.StackGraph.Properties.Declaration
+    Control.Effect.StackGraph.Properties.Function
+    Control.Effect.StackGraph.Properties.Reference
     Data.Functor.Tagged
     Scope.Graph.AdjacencyList
     Scope.Graph.Convert

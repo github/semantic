@@ -20,7 +20,7 @@ import qualified Analysis.File as File
 import qualified Analysis.Name as Name
 import Control.Carrier.Parse.Measured
 import Control.Carrier.Reader
-import qualified Control.Carrier.Sketch.ScopeGraph as ScopeGraph
+import qualified Control.Carrier.StackGraph as ScopeGraph
 import Control.Effect.Error
 import Control.Exception
 import Control.Lens hiding ((|>))
@@ -220,7 +220,7 @@ graphForBlob ::
 graphForBlob blob =
   parseWith
     toStackGraphParsers
-    (fmap fst . ScopeGraph.runSketch lowerBound . Graph.scopeGraph)
+    (fmap fst . ScopeGraph.runStackGraph lowerBound . Graph.scopeGraph)
     blob
   where
     toStackGraphParsers :: Map Language (Parser.SomeParser Graph.ToScopeGraph Loc)

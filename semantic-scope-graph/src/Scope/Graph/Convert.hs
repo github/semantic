@@ -15,7 +15,7 @@ module Scope.Graph.Convert
   )
 where
 
-import Control.Effect.ScopeGraph
+import Control.Effect.StackGraph
 import Data.List.NonEmpty
 import Data.Typeable
 import Source.Loc
@@ -23,7 +23,7 @@ import qualified Stack.Graph as Stack
 
 class Typeable t => ToScopeGraph t where
   scopeGraph ::
-    ( ScopeGraphEff sig m
+    ( StackGraphEff sig m
     ) =>
     t Loc ->
     m Result

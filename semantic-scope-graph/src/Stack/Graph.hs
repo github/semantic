@@ -92,6 +92,7 @@ data Node
   | IgnoreScope
   | BottomScope {symbol :: Symbol}
   | TopScope {symbol :: Symbol}
+  | ParentScope {symbol :: Symbol}
   deriving (Show, Eq, Ord)
 
 -- This overlapping instance is problematic but helps us make sure we don't differentiate two root nodes.
