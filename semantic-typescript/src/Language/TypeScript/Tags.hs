@@ -8,7 +8,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Language.TypeScript.Tags
   ( ToTags (..),
