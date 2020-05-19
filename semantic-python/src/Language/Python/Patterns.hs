@@ -9,6 +9,7 @@ module Language.Python.Patterns
   ) where
 
 import           AST.Element
+import qualified AST.Parse as Parse
 import qualified Analysis.Name
 import qualified Language.Python.AST as Py
 
@@ -19,6 +20,6 @@ import qualified Language.Python.AST as Py
 pattern SingleIdentifier :: Analysis.Name.Name -> Py.ExpressionList a
 pattern SingleIdentifier n <- Py.ExpressionList
   { Py.extraChildren =
-    [ Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = Analysis.Name.name -> n })))
+    [ Parse.Success (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.Identifier { text = Analysis.Name.name -> n }))))
     ]
   }
