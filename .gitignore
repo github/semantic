@@ -18,6 +18,7 @@ dist-repl
 
 tmp/
 /bin/
+/bazel-*
 
 /src/Semantic/Version.hs.bak
 /semanticd/test/current
