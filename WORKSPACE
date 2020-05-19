@@ -79,6 +79,7 @@ stack_snapshot(
         "trifecta",
         "tree-sitter",
         "tree-sitter-python",
+        "tree-sitter-ruby",
         "unordered-containers",
     ],
     tools = ["@happy"]
