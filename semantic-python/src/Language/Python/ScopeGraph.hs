@@ -186,7 +186,7 @@ instance ToScopeGraph Py.FunctionDefinition where
     { ann
     , name       = Parse.Success (Py.Identifier _ann1 name)
     , parameters = Parse.Success (Py.Parameters _ann2 parameters)
-    , body
+    , body = Parse.Success b
     } = do
     (_, associatedScope) <- declareFunction (Just $ Name.name name) Props.Function
       { Props.kind = ScopeGraph.Function
@@ -208,7 +208,7 @@ instance ToScopeGraph Py.FunctionDefinition where
           let parameters' = catMaybes parameterMs
           paramDeclarations <- for parameters' $ \(pos, parameter) ->
             complete <* declare parameter (set span_ (pos^.span_) declProps)
-          bodyResult <- scopeGraph body
+          bodyResult <- scopeGraph b
           pure (mconcat paramDeclarations <> bodyResult)
 
 instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
