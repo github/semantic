@@ -1,27 +1,29 @@
 {-# LANGUAGE OverloadedStrings #-}
-module AST.Test
-  ( CorpusExample(..)
-  , readCorpusFiles
-  , readCorpusFiles'
-  , parseCorpusFile
-  , testCorpus
-  ) where
 
-import           Control.Applicative
-import           Control.Monad
-import           Data.Attoparsec.ByteString.Char8
-import           Data.ByteString (ByteString, readFile)
-import           Data.ByteString.Char8 (pack, unpack)
-import           Data.Either
-import           Data.Functor
-import           Prelude hiding (takeWhile)
-import           System.Exit (exitFailure)
-import           System.Path ((</>))
+module AST.Test
+  ( CorpusExample (..),
+    readCorpusFiles,
+    readCorpusFiles',
+    parseCorpusFile,
+    testCorpus,
+  )
+where
+
+import Control.Applicative
+import Control.Monad
+import Data.Attoparsec.ByteString.Char8
+import Data.ByteString (ByteString, readFile)
+import Data.ByteString.Char8 (pack, unpack)
+import Data.Either
+import Data.Functor
+import System.Exit (exitFailure)
+import System.FilePath.Glob
+import System.Path ((</>))
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path
-import           System.FilePath.Glob
-import           Test.Tasty
-import           Test.Tasty.HUnit
+import Test.Tasty
+import Test.Tasty.HUnit
+import Prelude hiding (takeWhile)
 
 testCorpus :: (ByteString -> IO (Either String (t a))) -> Path.AbsRelFile -> IO TestTree
 testCorpus parse path = do
@@ -41,22 +43,22 @@ findCorpus :: Path.RelDir -> IO Path.RelDir
 findCorpus p = do
   cwd <- Path.getCurrentDirectory
   if Path.takeDirName cwd == Just (Path.relDir "haskell-tree-sitter")
-     then pure p
-     else pure (Path.relDir ".." </> p)
+    then pure p
+    else pure (Path.relDir ".." </> p)
 
 -- The path is expected to be relative to the language project.
-readCorpusFiles :: Path.RelDir ->  IO [Path.RelFile]
+readCorpusFiles :: Path.RelDir -> IO [Path.RelFile]
 readCorpusFiles parent = do
   dir <- findCorpus parent
   files <- globDir1 (compile "**/*.txt") (Path.toString dir)
   pure (Path.relPath <$> files)
 
-readCorpusFiles' :: Path.AbsDir ->  IO [Path.AbsRelFile]
+readCorpusFiles' :: Path.AbsDir -> IO [Path.AbsRelFile]
 readCorpusFiles' dir = do
   files <- globDir1 (compile "**/*.txt") (Path.toString dir)
   pure (Path.file <$> files)
 
-data CorpusExample = CorpusExample { name :: String, code :: ByteString }
+data CorpusExample = CorpusExample {name :: String, code :: ByteString}
   deriving (Eq, Show)
 
 parseCorpusFile :: Path.AbsRelFile -> IO (Either String [CorpusExample])
@@ -76,7 +78,8 @@ exampleParser = do
   code <- manyTill anyChar outputSepParser
   _out <- manyTill anyChar (choice [endOfInput, char '=' $> ()])
   pure (CorpusExample name (pack code))
-  where outputSepParser = choice [string "\n---\n", string "\r\n---\r\n"]
+  where
+    outputSepParser = choice [string "\n" *> many1 "-" *> string "\n", string "\r\n" *> many1 "-" *> string "\r\n"]
 
 exampleNameParser :: Parser String
 exampleNameParser = do
