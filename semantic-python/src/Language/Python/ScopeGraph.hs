@@ -23,6 +23,7 @@ module Language.Python.ScopeGraph
 
 import qualified Analysis.Name as Name
 import           AST.Element
+import qualified AST.Parse as Parse
 import           Control.Effect.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
@@ -92,7 +93,7 @@ scopeGraphModule = getAp . scopeGraph
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment ann (SingleIdentifier t) val _typ) = do
+  scopeGraph (Py.Assignment ann (Parse.Success (SingleIdentifier t)) val _typ) = do
     declare t Props.Declaration
       { Props.kind     = ScopeGraph.Assignment
       , Props.relation = ScopeGraph.Default
