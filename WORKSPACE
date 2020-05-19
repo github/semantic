@@ -43,16 +43,50 @@ stack_snapshot(
     name = "stackage",
     local_snapshot = "//:stack-snapshot.yaml",
     packages = [
+        "Glob",
         "aeson",
+        "aeson-pretty",
+        "algebraic-graphs",
+        "attoparsec",
         "bytestring",
-        "deepseq",
         "containers",
+        "deepseq",
+        "directory",
         "filepath",
+        "fused-effects",
+        "fused-effects-readline",
+        "fused-syntax",
         "generic-monoid",
         "hashable",
+        "haskeline",
+        "hedgehog",
+        "optparse-applicative",
         "pathtype",
+        "pretty-simple",
+        "prettyprinter",
+        "prettyprinter-ansi-terminal",
         "semilattices",
+        "tasty",
+        "tasty-hedgehog",
+        "tasty-hunit",
+        "template-haskell",
+        "terminal-size",
         "text",
         "transformers",
+        "tree-sitter",
+        "tree-sitter-python",
+        "unordered-containers",
     ],
+    tools = ["@happy"]
+)
+
+http_archive(
+    name = "happy",
+    build_file_content = """
+load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary")
+haskell_cabal_binary(name = "happy", srcs = glob(["**"]), visibility = ["//visibility:public"])
+    """,
+    sha256 = "fb9a23e41401711a3b288f93cf0a66db9f97da1ce32ec4fffea4b78a0daeb40f",
+    strip_prefix = "happy-1.19.12",
+    urls = ["http://hackage.haskell.org/package/happy-1.19.12/happy-1.19.12.tar.gz"],
 )
