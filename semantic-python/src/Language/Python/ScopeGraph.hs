@@ -122,12 +122,12 @@ instance ToScopeGraph Py.BreakStatement where scopeGraph = mempty
 
 instance ToScopeGraph Py.Call where
   scopeGraph Py.Call
-    { function
-    , arguments = L1 Py.ArgumentList { extraChildren = args }
+    { function = Parse.Success f
+    , arguments = Parse.Success (L1 Py.ArgumentList { extraChildren = args })
     } = do
-      result <- scopeGraph function
+      result <- scopeGraph f
       let scopeGraphArg = \case
-            Prj expr -> scopeGraph @Py.Expression expr
+            EPrj expr -> scopeGraph @Py.Expression expr
             other    -> todo other
       args <- traverse scopeGraphArg args
       pure (result <> mconcat args)
