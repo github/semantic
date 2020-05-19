@@ -161,7 +161,7 @@ deriving instance ToScopeGraph Py.Expression
 instance ToScopeGraph Py.ElseClause where scopeGraph = onField @"body"
 
 instance ToScopeGraph Py.ElifClause where
-  scopeGraph (Py.ElifClause _ body condition) = scopeGraph condition <> scopeGraph body
+  scopeGraph (Py.ElifClause _ (Parse.Success body) (Parse.Success condition)) = scopeGraph condition <> scopeGraph body
 
 instance ToScopeGraph Py.Ellipsis where scopeGraph = mempty
 
