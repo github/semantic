@@ -184,8 +184,8 @@ instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 instance ToScopeGraph Py.FunctionDefinition where
   scopeGraph Py.FunctionDefinition
     { ann
-    , name       = Py.Identifier _ann1 name
-    , parameters = Py.Parameters _ann2 parameters
+    , name       = Parse.Success (Py.Identifier _ann1 name)
+    , parameters = Parse.Success (Py.Parameters _ann2 parameters)
     , body
     } = do
     (_, associatedScope) <- declareFunction (Just $ Name.name name) Props.Function
