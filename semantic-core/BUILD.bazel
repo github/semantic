@@ -21,7 +21,6 @@ haskell_library(
     name = "lib",
     src_strip_prefix = "src",
     srcs = glob(['src/**/*.hs']),
-    compiler_flags = ["-XOverloadedStrings"],
     deps = [
         ":base",
         "//semantic-analysis:lib",
