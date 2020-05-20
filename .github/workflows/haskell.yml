@@ -50,10 +50,11 @@ jobs:
       run: |
         curl -L https://github.com/haskell-works/cabal-cache/releases/download/v1.0.1.8/cabal-cache_x86_64_linux.tar.gz > ./cc.tar.gz
         tar -xvf ./cc.tar.gz
+        cabal v2-update
 
     - name: Configure project
+      if: steps.cache-cabal.outputs.cache-hit != 'true'
       run: |
-        cabal v2-update
         cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
 
     - name: Restore from cache
