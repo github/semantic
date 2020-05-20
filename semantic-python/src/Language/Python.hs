@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeFamilies #-}
+
 -- | Semantic functionality for Python programs.
 module Language.Python
 ( Term(..)
@@ -26,4 +28,5 @@ instance Tags.ToTags Term where
   tags src = Tags.runTagging src . PyTags.tags . getTerm
 
 instance ToScopeGraph Term where
+  type FocalPoint Term = ()
   scopeGraph = scopeGraphModule . getTerm

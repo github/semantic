@@ -20,7 +20,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Language.Python.ScopeGraph
-  ( scopeGraphModule,
+  ( scopeGraphModule
   )
 where
 
@@ -85,7 +85,7 @@ onField =
     . getField @field
 
 scopeGraphModule :: ScopeGraphEff sig m => Py.Module Loc -> m (Result ())
-scopeGraphModule = getAp . scopeGraph
+scopeGraphModule = scopeGraph
 
 instance ToScopeGraph Py.AssertStatement where
   type FocalPoint Py.AssertStatement = [Stack.Node]

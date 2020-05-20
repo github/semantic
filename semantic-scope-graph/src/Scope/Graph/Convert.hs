@@ -5,6 +5,7 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Scope.Graph.Convert
@@ -21,11 +22,12 @@ import Data.Typeable
 import Source.Loc
 
 class Typeable t => ToScopeGraph t where
+  type FocalPoint (t :: * -> *)
   scopeGraph ::
     ( ScopeGraphEff sig m
     ) =>
     t Loc ->
-    m (Result a)
+    m (Result (FocalPoint t))
 
 data Result a
   = Complete a
