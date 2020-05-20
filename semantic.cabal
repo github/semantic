@@ -42,6 +42,7 @@ common haskell
     ghc-options: -Wno-missing-deriving-strategies
 
 
+
 -- Except in case of vendored dependencies, these deps should be expressed
 -- as caret-operator bounds relative to a version in Stackage.
 -- These are currently pinned to lts-13.13.
