@@ -27,12 +27,10 @@ jobs:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
 
-    - uses: actions/cache@v1
-      id: cache-cabal
-      name: Cache Cabal artifacts
+    - uses: actions/download-artifact@v2
       with:
-        path: dist-cache
-        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache
+        name: semantic-ci-build-artifacts
+        path: artifact-cache
 
     - name: Get cabal-cache
       run: |
@@ -46,7 +44,7 @@ jobs:
 
     - name: Restore from cache
       if: steps.cache-cabal.outputs.cache-hit == 'true'
-      run: ./cabal-cache sync-from-archive --threads=2 --archive-uri=dist-cache
+      run: ./cabal-cache sync-from-archive --threads=2 --archive-uri=artifact-cache
 
     - name: Build & test
       run: |
@@ -67,4 +65,9 @@ jobs:
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:doctest -- src; cd ..
 
     - name: Write out cache
-      run: ./cabal-cache sync-to-archive --threads=2 --archive-uri=dist-cache
+      run: ./cabal-cache sync-to-archive --threads=2 --archive-uri=artifact-cache
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: semantic-ci-build-artifacts
+        path: artifact-cache
