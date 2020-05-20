@@ -96,12 +96,12 @@ test-suite compiling
   other-modules: Directive
                , Instances
 
-test-suite graphing
-  import: haskell
-  type: exitcode-stdio-1.0
-  hs-source-dirs: test-graphing
-  main-is: GraphTest.hs
-  ghc-options: -threaded
+-- test-suite graphing
+--   import: haskell
+--   type: exitcode-stdio-1.0
+--   hs-source-dirs: test-graphing
+--   main-is: GraphTest.hs
+--   ghc-options: -threaded
 
   build-depends: base
                , semantic-python
