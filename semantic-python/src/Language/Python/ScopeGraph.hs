@@ -83,26 +83,13 @@ onField =
   scopeGraph @syn
     . getField @field
 
-onChildren ::
-  ( Traversable t,
-    ToScopeGraph syn,
-    ScopeGraphEff sig m,
-    HasField "extraChildren" (r Loc) (t (syn Loc))
-  ) =>
-  r Loc ->
-  m (Result (FocalPoint syn))
-onChildren =
-  fmap fold
-    . traverse scopeGraph
-    . getField @"extraChildren"
-
 scopeGraphModule :: ScopeGraphEff sig m => Py.Module Loc -> m (Result ())
 scopeGraphModule = getAp . scopeGraph
 
 instance ToScopeGraph Py.AssertStatement where
   type FocalPoint Py.AssertStatement = [Stack.Node]
   scopeGraph assertStmt =
-    fmap (\x -> [x]) <$> onChildren assertStmt
+    fmap (\x -> [x]) <$> todo assertStmt
 
 instance ToScopeGraph Py.Assignment where
   type FocalPoint Py.Assignment = Stack.Node
@@ -143,7 +130,7 @@ instance ToScopeGraph Py.Attribute where
 instance ToScopeGraph Py.Block where
   type FocalPoint Py.Block = [Stack.Node]
   scopeGraph block =
-    fmap (either (fromEither . fromEither . fromEither) id) <$> onChildren block
+    fmap (either (fromEither . fromEither . fromEither) id) <$> todo block
 
 instance ToScopeGraph Py.BreakStatement where
   type FocalPoint Py.BreakStatement = [Stack.Node]
@@ -176,7 +163,7 @@ deriving instance ToScopeGraph Py.CompoundStatement
 
 instance ToScopeGraph Py.ConditionalExpression where
   type FocalPoint Py.ConditionalExpression = Stack.Node
-  scopeGraph = onChildren
+  scopeGraph = todo
 
 instance ToScopeGraph Py.ContinueStatement where
   type FocalPoint Py.ContinueStatement = [Stack.Node]
@@ -188,7 +175,7 @@ instance ToScopeGraph Py.DecoratedDefinition where
 
 instance ToScopeGraph Py.ComparisonOperator where
   type FocalPoint Py.ComparisonOperator = Stack.Node
-  scopeGraph = onChildren
+  scopeGraph = todo
 
 instance ToScopeGraph Py.DeleteStatement where
   type FocalPoint Py.DeleteStatement = [Stack.Node]
@@ -226,18 +213,18 @@ instance ToScopeGraph Py.Ellipsis where
 
 instance ToScopeGraph Py.ExceptClause where
   type FocalPoint Py.ExceptClause = [Stack.Node]
-  scopeGraph x = fmap (either (const []) id) <$> onChildren x
+  scopeGraph x = fmap (either (const []) id) <$> todo x
 
 instance ToScopeGraph Py.ExecStatement where
   type FocalPoint Py.ExecStatement = [Stack.Node]
   scopeGraph x = do
-    onChildren x
+    todo x
     pure (Complete [])
 
 instance ToScopeGraph Py.ExpressionStatement where
   type FocalPoint Py.ExpressionStatement = [Stack.Node]
   scopeGraph x = do
-    onChildren x
+    todo x
     pure (Complete [])
 
 instance ToScopeGraph Py.ExpressionList where
@@ -441,14 +428,14 @@ instance ToScopeGraph Py.NonlocalStatement where
 
 instance ToScopeGraph Py.Module where
   type FocalPoint Py.Module = ()
-  scopeGraph term@(Py.Module ann _) = do
+  scopeGraph term@(Py.Module ann stmts) = do
     rootScope' <- rootScope
 
     putCurrentScope "__main__"
 
     modify (Stack.addEdge rootScope' (Stack.Declaration "__main__" Identifier ann))
 
-    _ <- onChildren term
+    _ <- mapM scopeGraph stmts
 
     newGraph <- get @(Stack.Graph Stack.Node)
 
