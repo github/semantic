@@ -33,6 +33,7 @@ module Control.Effect.ScopeGraph
     declareMaybeName,
     declareParameter,
     reference,
+    refer,
     Has,
   )
 where
