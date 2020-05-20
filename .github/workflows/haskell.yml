@@ -27,10 +27,10 @@ jobs:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
 
-    - uses: actions/download-artifact@v2
-      with:
-        name: semantic-ci-build-artifacts
-        path: artifact-cache
+    # - uses: actions/download-artifact@v2
+    #   with:
+    #     name: semantic-ci-build-artifacts
+    #     path: artifact-cache
 
     - name: Get cabal-cache
       run: |
