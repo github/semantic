@@ -52,6 +52,7 @@ module Semantic.Task
 , throwError
 , SomeException(..)
 , Telemetry
+, blah
 ) where
 
 import           Control.Algebra
@@ -69,6 +70,9 @@ import           Semantic.Resolution
 import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
 import           Serializing.Format hiding (Options)
+
+blah :: ()
+blah = ()
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskC
