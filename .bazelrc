@@ -3,7 +3,10 @@ build:ci --jobs=2
 build:ci --verbose_failures
 common:ci --color=no
 test:ci --test_output=errors
-build:darwin --jobs=8
+
+build --disk_cache=tmp/bazel-disk
+build --repository_cache=tmp/bazel-repo
+build --color=yes
 
 
 # test environment does not propagate locales by default

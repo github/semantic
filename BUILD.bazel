@@ -7,6 +7,7 @@ load(
     "haskell_toolchain_library",
     "haskell_library",
     "haskell_binary",
+    "haskell_repl",
 )
 
 # haskell_toolchain_library can access builtin GHC packages
@@ -25,9 +26,17 @@ haskell_toolchain_library(name = "base")
 # )
 
 haskell_library(
-    name = "semantic-source"
+    name = "semantic-source",
     src_strip_prefix = "semantic-source/src",
     srcs = glob(['semantic-source/**/*.hs'])
+)
+
+haskell_repl(
+    name = "repl",
+    deps = [
+        "//semantic-source:lib",
+        "//semantic-analysis:lib"
+    ]
 )
 
 # An example binary using the Prelude module from the
