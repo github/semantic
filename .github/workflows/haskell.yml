@@ -33,9 +33,11 @@ jobs:
       with:
         path: dist-cache
         key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-${{ hashFiles('**/*.cabal') }}
-        restore-keys:
-          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-
+          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-
           ${{ runner.os }}-${{ matrix.ghc }}-
+          ${{ runner.os }}-
 
     - name: Get cabal-cache
       run: |
