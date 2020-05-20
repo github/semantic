@@ -318,9 +318,6 @@ instance ToScopeGraph Py.GeneratorExpression where
 instance ToScopeGraph Py.Identifier where
   type FocalPoint Py.Identifier = Stack.Node
   scopeGraph (Py.Identifier ann name) = do
-    let refProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
-    -- newReference (Name.name name) refProps
-    -- refer :: ScopeGraphEff sig m => Name -> Kind -> Loc -> m Stack.Node
     node <- refer (Name.name name) ScopeGraph.Identifier ann
     pure (Complete node)
 
