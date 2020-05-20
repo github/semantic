@@ -3,7 +3,7 @@ build:ci --jobs=2
 build:ci --verbose_failures
 common:ci --color=no
 test:ci --test_output=errors
-
+build:darwin --jobs=8
 
 
 # test environment does not propagate locales by default
