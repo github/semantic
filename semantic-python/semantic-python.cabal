@@ -57,7 +57,7 @@ library
   exposed-modules:
     Language.Python
     Language.Python.AST
-    Language.Python.Core
+    -- Language.Python.Core
     Language.Python.Grammar
     Language.Python.Failure
     Language.Python.Patterns
