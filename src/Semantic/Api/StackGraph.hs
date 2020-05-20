@@ -3,10 +3,12 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Semantic.Api.StackGraph
   ( parseStackGraph,
     parseStackGraphBuilder,
+    testStackGraph,
     TempStackGraph (..),
     SGNode (..),
     SGPath (..),
@@ -14,16 +16,18 @@ module Semantic.Api.StackGraph
 where
 
 import qualified Algebra.Graph as Graph
+import qualified Analysis.File as File
 import qualified Analysis.Name as Name
+import Control.Carrier.Parse.Measured
+import Control.Carrier.Reader
 import qualified Control.Carrier.Sketch.ScopeGraph as ScopeGraph
 import Control.Effect.Error
-import Control.Effect.Parse
-import Control.Effect.Reader
 import Control.Exception
 import Control.Lens hiding ((|>))
 import Control.Monad.ST
 import Data.Blob
 import Data.ByteString.Builder
+import Data.Flag
 import Data.Foldable
 import Data.Functor.Tagged
 import Data.Int
@@ -46,12 +50,14 @@ import Proto.Semantic_Fields as P
 import Proto.Semantic_JSON ()
 import qualified Scope.Graph.Convert as Graph
 import Semantic.Api.Bridge
-import Semantic.Config
+import Semantic.Config as Config
 import Semantic.Task
+import Semantic.Task.Files
 import Serializing.Format (Format)
 import Source.Loc as Loc
 import qualified Stack.Graph as Stack
 import qualified Stack.Path as Path
+import qualified System.Path as SystemPath
 
 parseStackGraphBuilder ::
   ( Effect sig,
@@ -66,6 +72,29 @@ parseStackGraphBuilder ::
   m Builder
 parseStackGraphBuilder format blobs =
   parseStackGraph blobs >>= serialize format
+
+testOptions :: Config.Options
+testOptions =
+  defaultOptions
+    { optionsFailOnWarning = flag FailOnWarning True,
+      optionsLogLevel = Nothing
+    }
+
+parseStackGraphFilePath ::
+  ( Has (Error SomeException) sig m,
+    Has Distribute sig m,
+    Has Parse sig m,
+    Has Files sig m,
+    Effect sig
+  ) =>
+  SystemPath.RelFile ->
+  m StackGraphResponse
+parseStackGraphFilePath path = readBlob (File.fromPath path) >>= runReader preciseLanguageModes . parseStackGraph . pure @[]
+
+testStackGraph :: SystemPath.RelFile -> IO (Either SomeException StackGraphResponse)
+testStackGraph path = withOptions testOptions $ \config logger statter -> do
+  let session = TaskSession config "-" False logger statter
+  runTask session (runParse (parseStackGraphFilePath path))
 
 parseStackGraph ::
   ( Has (Error SomeException) sig m,
