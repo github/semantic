@@ -10,7 +10,7 @@ import qualified Language.Python.AST as Py
 import qualified Language.Python.Grammar (tree_sitter_python)
 -- import           Language.Python.ScopeGraph
 import qualified Language.Python.Tags as PyTags
-import           Scope.Graph.Convert
+-- import           Scope.Graph.Convert
 import qualified Tags.Tagging.Precise as Tags
 
 newtype Term a = Term { getTerm :: Py.Module a }
