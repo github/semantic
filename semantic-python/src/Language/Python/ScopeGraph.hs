@@ -17,6 +17,10 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
+-- NOTE: This file needs to be updated to accommodate new AST shapes.
+-- A portion of instances have been updated to include the Err functor; 
+-- remaining instances are to be updated once this is stable.
+
 module Language.Python.ScopeGraph
   ( scopeGraphModule
   ) where
