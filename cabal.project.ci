@@ -13,6 +13,7 @@ packages: .
           semantic-php
           semantic-python
           semantic-ruby
+          semantic-rust
           semantic-scope-graph
           semantic-tsx
           semantic-typescript
@@ -29,7 +30,6 @@ source-repository-package
   type: git
   location: https://github.com/antitypical/fused-syntax.git
   tag: d11e14581217590a5c67f79cbaeee35ac8acee6a
-
 
 -- Treat warnings as errors for CI builds
 package semantic
