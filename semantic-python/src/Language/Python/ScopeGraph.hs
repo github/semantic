@@ -222,7 +222,7 @@ instance ToScopeGraph Py.Identifier where
     complete
 
 instance ToScopeGraph Py.IfStatement where
-  scopeGraph (Py.IfStatement _ alternative body condition)
+  scopeGraph (Py.IfStatement _ alternative (Parse.Success body) (Parse.Success condition))
     = scopeGraph condition
     <> scopeGraph body
     <> foldMap scopeGraph alternative
