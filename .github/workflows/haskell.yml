@@ -19,8 +19,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      submodules: true
       if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
+      with:
+        submodules: true
+
 
     - uses: actions/setup-haskell@v1
       name: Setup Haskell
