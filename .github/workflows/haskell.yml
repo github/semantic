@@ -32,7 +32,10 @@ jobs:
       name: Cache Cabal artifacts
       with:
         path: dist-cache
-        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache
+        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-${{ hashFiles('**/*.cabal'} }
+        restore-keys:
+          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-
+          ${{ runner.os }}-${{ matrix.ghc }}-
 
     - name: Get cabal-cache
       run: |
