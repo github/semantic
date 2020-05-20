@@ -1,0 +1,6 @@
+[submodule "vendor/fused-syntax"]
+	path = vendor/fused-syntax
+	url = https://github.com/antitypical/fused-syntax.git
+[submodule "vendor/proto-lens-jsonpb"]
+	path = vendor/proto-lens-jsonpb
+	url = https://github.com/tclem/proto-lens-jsonpb.git
