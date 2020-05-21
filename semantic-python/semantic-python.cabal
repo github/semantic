@@ -93,7 +93,8 @@ test-suite compiling
                , trifecta >= 2 && <3
                , unordered-containers ^>= 0.2.10
 
-  other-modules: Directive
+  other-modules: 
+              -- Directive
                , Instances
 
 -- test-suite graphing
