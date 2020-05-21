@@ -10,6 +10,8 @@ load(
     "haskell_repl",
 )
 
+load("@rules_haskell//haskell:doctest.bzl", "haskell_doctest_toolchain", "haskell_doctest")
+
 # haskell_toolchain_library can access builtin GHC packages
 # and assign them a bazel target name, so that they
 # can be referenced as dependencies.
@@ -46,3 +48,5 @@ haskell_binary(
     srcs = [":Example.hs"],
     deps = [":base"],
 )
+
+haskell_doctest_toolchain(name="doctest", doctest="@doctest")

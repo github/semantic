@@ -1,5 +1,5 @@
 # Set all target’s visibility in this package to "public".
-package(default_visibility = ["//visibility:public"])
+package(default_visibility=["//visibility:public"])
 
 # Load rules_haskell rules.
 load(
@@ -9,19 +9,21 @@ load(
     "haskell_binary",
 )
 
-load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary", "haskell_cabal_library")
+load(
+    "@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary", "haskell_cabal_library"
+)
 
 # haskell_toolchain_library can access builtin GHC packages
 # and assign them a bazel target name, so that they
 # can be referenced as dependencies.
-haskell_toolchain_library(name = "base")
+haskell_toolchain_library(name="base")
 
 # You can add your own libraries with haskell_library.
 haskell_library(
-    name = "lib",
-    src_strip_prefix = "src",
-    srcs = glob(['src/**/*.hs']),
-    deps = [
+    name="lib",
+    src_strip_prefix="src",
+    srcs=glob(["src/**/*.hs"]),
+    deps=[
         ":base",
         "//semantic-analysis:lib",
         "//semantic-ast:lib",
@@ -44,6 +46,5 @@ haskell_library(
         "@stackage//:text",
         "@stackage//:tree-sitter",
         "@stackage//:tree-sitter-ruby",
-    ]
-
+    ],
 )
