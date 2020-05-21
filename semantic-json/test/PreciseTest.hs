@@ -16,7 +16,7 @@ main
   >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
-  where parse = parseByteString @(JSON.Document Identity) @() tree_sitter_json
+  where parse = parseByteString @(JSON.Document) @() tree_sitter_json
 
 tests :: [TestTree] -> TestTree
 tests = testGroup "tree-sitter-json corpus tests"
