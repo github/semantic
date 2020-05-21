@@ -1,16 +1,14 @@
 {-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications #-}
 module Main (main) where
 
-import qualified System.Path as Path
-import           Test.Tasty
-import           Language.Go.Grammar
+
 import qualified Language.Go.AST as Go
+import           Language.Go.Grammar
 import           AST.TestHelpers
 import           AST.Unmarshal
-import qualified Language.Go.AST as Go
-import           Language.Go.Grammar
 import qualified System.Path as Path
 import           Test.Tasty
+
 
 main :: IO ()
 main
