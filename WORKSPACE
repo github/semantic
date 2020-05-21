@@ -52,6 +52,7 @@ stack_snapshot(
         "containers",
         "deepseq",
         "directory",
+        "doctest",
         "filepath",
         "fused-effects",
         "fused-effects-readline",
