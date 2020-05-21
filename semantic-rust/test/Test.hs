@@ -5,7 +5,6 @@ module Main (main) where
 import           AST.TestHelpers
 import           AST.Unmarshal (parseByteString)
 import qualified Language.Rust.AST as Rust
-import           Language.Rust.Grammar
 import qualified System.Path as Path
 import           Test.Tasty
 import Control.Monad (liftM)
