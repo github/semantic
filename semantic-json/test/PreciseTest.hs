@@ -5,14 +5,10 @@ module Main (main) where
 
 import           AST.TestHelpers
 import           AST.Unmarshal
-import           Data.Functor.Identity
 import qualified Language.JSON.AST as JSON
 import           Language.JSON.Grammar
 import qualified System.Path as Path
-import qualified System.Path as Path
 import           Test.Tasty
-import           Test.Tasty
-import           TreeSitter.JSON
 
 main :: IO ()
 main
