@@ -6,7 +6,7 @@ load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_toolchain_library",
     "haskell_library",
-    "haskell_binary",
+    "haskell_test",
 )
 
 load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary", "haskell_cabal_library")
@@ -36,5 +36,24 @@ haskell_library(
         "@stackage//:trifecta",
         "@stackage//:unordered-containers",
     ]
+)
 
+haskell_test(
+    name = "test",
+    src_strip_prefix = "test",
+    srcs = glob(['test/*.hs', 'test/Source/Test.hs']),
+    deps = [
+        ":base",
+        ":lib",
+        "//semantic-analysis:lib",
+        "//semantic-source:lib",
+        "@stackage//:fused-effects",
+        "@stackage//:fused-syntax",
+        "@stackage//:hedgehog",
+        "@stackage//:tasty",
+        "@stackage//:tasty-hedgehog",
+        "@stackage//:tasty-hunit",
+        "@stackage//:text",
+        "@stackage//:trifecta",
+    ],
 )

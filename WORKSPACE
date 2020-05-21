@@ -44,6 +44,7 @@ stack_snapshot(
     local_snapshot = "//:stack-snapshot.yaml",
     packages = [
         "Glob",
+        "QuickCheck",
         "aeson",
         "aeson-pretty",
         "algebraic-graphs",

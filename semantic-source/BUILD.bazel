@@ -50,3 +50,17 @@ haskell_test(
         "@stackage//:text",
     ],
 )
+
+haskell_test(
+    name = "doctest",
+    src_strip_prefix = "test",
+    srcs = ['test/Doctest.hs'],
+    data = glob(['src/*.hs']),
+    deps = [
+        ":base",
+        ":lib",
+        "@stackage//:directory",
+        "@stackage//:doctest",
+        "@stackage//:QuickCheck",
+    ],
+)
