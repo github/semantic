@@ -45,7 +45,7 @@ import qualified AST.Unmarshal as TS
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
-import qualified Directive
+-- import qualified Directive
 import           Instances ()
 
 parsePrelude :: IO (Term (Ann Span :+: Core) Name)
