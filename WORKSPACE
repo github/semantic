@@ -34,9 +34,9 @@ load(
     "haskell_cabal_binary",
 )
 
-load("@rules_haskell//haskell:doctest.bzl", "haskell_doctest_toolchain")
+# load("@rules_haskell//haskell:doctest.bzl", "haskell_doctest_toolchain")
 
-register_toolchains("//:doctest")
+# register_toolchains("//:doctest")
 
 stack_snapshot(
     name="stackage",
@@ -83,7 +83,7 @@ stack_snapshot(
         "tree-sitter-ruby",
         "unordered-containers",
     ],
-    tools=["@happy", "@doctest"],
+    tools=["@happy"],  # , "@doctest"],
 )
 
 http_archive(
@@ -97,13 +97,13 @@ haskell_cabal_binary(name = "happy", srcs = glob(["**"]), visibility = ["//visib
     urls=["http://hackage.haskell.org/package/happy-1.19.12/happy-1.19.12.tar.gz"],
 )
 
-http_archive(
-    name="doctest",
-    build_file_content="""
-load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary")
-haskell_cabal_binary(name = "doctest", srcs = glob(["**"]), visibility = ["//visibility:public"])
-    """,
-    strip_prefix="doctest-0.16.3",
-    sha256="cfe9629f9c4d0aa24a11b5c4dd216fb5b9ebce7b3f6a8a7e58716280943a34f8",
-    urls=["http://hackage.haskell.org/package/doctest-0.16.3/doctest-0.16.3.tar.gz"],
-)
+# http_archive(
+#     name="doctest",
+#     build_file_content="""
+# load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary")
+# haskell_cabal_binary(name = "doctest", srcs = glob(["**"]), visibility = ["//visibility:public"])
+#     """,
+#     strip_prefix="doctest-0.16.3",
+#     sha256="cfe9629f9c4d0aa24a11b5c4dd216fb5b9ebce7b3f6a8a7e58716280943a34f8",
+#     urls=["http://hackage.haskell.org/package/doctest-0.16.3/doctest-0.16.3.tar.gz"],
+# )
