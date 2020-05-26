@@ -94,8 +94,8 @@ test-suite compiling
                , unordered-containers ^>= 0.2.10
 
   other-modules: 
-              -- Directive
-               , Instances
+              Instances
+            -- , Directive
 
 -- test-suite graphing
 --   import: haskell
