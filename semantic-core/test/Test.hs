@@ -12,7 +12,7 @@ import           Analysis.File
 import           Core.Core
 import           Core.Pretty
 import           Core.Parser as Parse
--- import qualified Core.Eval as Eval
+import qualified Core.Eval as Eval
 import           Core.Name
 import qualified Generators as Gen
 import           Source.Span
