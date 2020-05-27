@@ -20,7 +20,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Language.Python.ScopeGraph
-  ( scopeGraphModule
+  ( scopeGraphModule,
   )
 where
 
@@ -47,13 +47,10 @@ import Source.Loc (Loc)
 import Source.Span (Pos (..), Span, point, span_)
 import qualified Stack.Graph as Stack
 
-
-
 -- Utility function to avoid a dependency. Alternatively, we could import
 -- Data.Either.Utils from MissingH or Data.Either.Extra from extra
 fromEither :: Either a a -> a
 fromEither = either id id
-
 
 -- This typeclass is internal-only, though it shares the same interface
 -- as the one defined in semantic-scope-graph. The somewhat-unconventional
@@ -63,7 +60,7 @@ class (forall a. Show a => Show (t a)) => ToScopeGraph t where
   type FocalPoint (t :: * -> *)
 
   scopeGraph ::
-    ( ScopeGraphEff sig m) =>
+    (ScopeGraphEff sig m) =>
     t Loc ->
     m (Result (FocalPoint t))
 
@@ -122,7 +119,8 @@ instance ToScopeGraph Py.BinaryOperator where
 instance ToScopeGraph Py.AugmentedAssignment where
   type FocalPoint Py.AugmentedAssignment = Stack.Node
   scopeGraph = todo
-  --(Py.AugmentedAssignment _ _ lhs rhs) = fmap _augmentedAssignment <$> onField @"right" x
+
+--(Py.AugmentedAssignment _ _ lhs rhs) = fmap _augmentedAssignment <$> onField @"right" x
 
 instance ToScopeGraph Py.Attribute where
   type FocalPoint Py.Attribute = Stack.Node
@@ -284,7 +282,8 @@ instance ToScopeGraph Py.FunctionDefinition where
 
       -- Add the parent scope pointing to the formal parameters node
       let parentScopeName = Name.name (Text.pack "ParentScope" <> name)
-          parentScope = Stack.Scope parentScopeName
+          -- TODO: Should InternalScope take Lexical or Class? Is this an edge type?
+          parentScope = Stack.InternalScope parentScopeName
       modify (Stack.addEdge parentScope formalParametersScope)
 
       -- Convert the body, using the parent scope name as the root scope
@@ -328,7 +327,8 @@ instance ToScopeGraph Py.IfStatement where
     res <- scopeGraph body
     reses <- mapM scopeGraph alternative
     pure (res <> mconcat (map (fmap fromEither) reses))
-    -- scopeGraph body <> (fmap fromEither <$> foldMap scopeGraph alternative)
+
+-- scopeGraph body <> (fmap fromEither <$> foldMap scopeGraph alternative)
 
 instance ToScopeGraph Py.GlobalStatement where
   type FocalPoint Py.GlobalStatement = [Stack.Node]
@@ -474,7 +474,8 @@ instance ToScopeGraph Py.Pair where
 instance ToScopeGraph Py.ParenthesizedExpression where
   type FocalPoint Py.ParenthesizedExpression = Stack.Node
   scopeGraph = todo
-  --onField @"extraChildren"
+
+--onField @"extraChildren"
 
 instance ToScopeGraph Py.PassStatement where
   type FocalPoint Py.PassStatement = [Stack.Node]
@@ -485,7 +486,8 @@ instance ToScopeGraph Py.PrintStatement where
   scopeGraph (Py.PrintStatement _ args _chevron) = do
     mapM_ scopeGraph args
     pure (Complete [])
-  --(Py.PrintStatement _ args _chevron) = foldMap scopeGraph args
+
+--(Py.PrintStatement _ args _chevron) = foldMap scopeGraph args
 
 instance ToScopeGraph Py.PrimaryExpression where
   type FocalPoint Py.PrimaryExpression = Stack.Node
@@ -525,12 +527,14 @@ instance ToScopeGraph Py.TryStatement where
     res <- scopeGraph body
     reses <- mapM scopeGraph elseClauses
     pure (res <> mconcat (map (fmap (either id fromEither)) (toList reses)))
-    --scopeGraph body <> (_tryStatement (foldMap scopeGraph elseClauses))
+
+--scopeGraph body <> (_tryStatement (foldMap scopeGraph elseClauses))
 
 instance ToScopeGraph Py.UnaryOperator where
   type FocalPoint Py.UnaryOperator = Stack.Node
   scopeGraph = todo
-  --onField @"argument"
+
+--onField @"argument"
 
 instance ToScopeGraph Py.WhileStatement where
   type FocalPoint Py.WhileStatement = [Stack.Node]
@@ -539,7 +543,8 @@ instance ToScopeGraph Py.WhileStatement where
     res <- scopeGraph body
     reses <- mapM scopeGraph alternative
     pure (res <> maybe (Complete []) id reses)
-    --scopeGraph body <> foldMap scopeGraph alternative
+
+--scopeGraph body <> foldMap scopeGraph alternative
 
 instance ToScopeGraph Py.WithStatement where
   type FocalPoint Py.WithStatement = [Stack.Node]
