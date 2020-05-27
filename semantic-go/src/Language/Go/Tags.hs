@@ -45,6 +45,7 @@ instance ToTags Go.FunctionDeclaration where
       { ann = Loc {byteRange},
         name = Parse.Success (Go.Identifier {text, ann})
       } = yieldTag text Function ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Go.MethodDeclaration where
   tags
