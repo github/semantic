@@ -27,7 +27,7 @@ import qualified Data.Map as Map
 import           Data.Maybe
 import           Data.Text (Text)
 import           GHC.Stack
-import qualified Language.Python.Core as Py
+-- import qualified Language.Python.Core as Py
 import           Language.Python.Failure
 import           Prelude hiding (fail)
 import           Source.Span
