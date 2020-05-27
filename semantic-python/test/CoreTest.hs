@@ -13,11 +13,11 @@ import           Control.Carrier.Fail.Either
 import           Control.Carrier.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.IO.Class
-import           Core.Core
-import qualified Core.Eval as Eval
-import           Core.Name
-import qualified Core.Parser
-import           Core.Pretty
+-- import           Core.Core
+-- import qualified Core.Eval as Eval
+-- import           Core.Name
+-- import qualified Core.Parser
+-- import           Core.Pretty
 import qualified Data.ByteString.Char8 as ByteString
 import           Data.Foldable
 import           Data.Function
