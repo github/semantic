@@ -1,34 +1,35 @@
 # Set all target’s visibility in this package to "public".
-package(default_visibility=["//visibility:public"])
+package(default_visibility = ["//visibility:public"])
 
 # Load rules_haskell rules.
 load(
     "@rules_haskell//haskell:defs.bzl",
-    "haskell_toolchain_library",
     "haskell_library",
     "haskell_test",
+    "haskell_toolchain_library",
 )
-
 load(
-    "@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary", "haskell_cabal_library"
+    "@rules_haskell//haskell:cabal.bzl",
+    "haskell_cabal_binary",
+    "haskell_cabal_library",
 )
 load(
     "@rules_haskell//haskell:doctest.bzl",
-    "haskell_doctest_toolchain",
     "haskell_doctest",
+    "haskell_doctest_toolchain",
 )
 
 # haskell_toolchain_library can access builtin GHC packages
 # and assign them a bazel target name, so that they
 # can be referenced as dependencies.
-haskell_toolchain_library(name="base")
+haskell_toolchain_library(name = "base")
 
 haskell_library(
-    name="lib",
-    src_strip_prefix="src",
-    srcs=glob(["src/**/*.hs"]),
-    compiler_flags=["-XOverloadedStrings"],
-    deps=[
+    name = "lib",
+    srcs = glob(["src/**/*.hs"]),
+    compiler_flags = ["-XOverloadedStrings"],
+    src_strip_prefix = "src",
+    deps = [
         ":base",
         "@stackage//:aeson",
         "@stackage//:bytestring",
@@ -37,17 +38,20 @@ haskell_library(
         "@stackage//:filepath",
         "@stackage//:generic-monoid",
         "@stackage//:hashable",
+        "@stackage//:pathtype",
         "@stackage//:semilattices",
         "@stackage//:text",
-        "@stackage//:pathtype",
     ],
 )
 
 haskell_test(
-    name="test",
-    src_strip_prefix="test",
-    srcs=["test/Test.hs", "test/Source/Test.hs"],
-    deps=[
+    name = "test",
+    srcs = [
+        "test/Source/Test.hs",
+        "test/Test.hs",
+    ],
+    src_strip_prefix = "test",
+    deps = [
         ":base",
         ":lib",
         "@stackage//:hedgehog",
@@ -58,13 +62,15 @@ haskell_test(
     ],
 )
 
-
 haskell_doctest(
-    name="doctest-lib",
-    modules=["Source.Range"],  # exclude Baz and succeed
-    visibility=["//visibility:public"],
-    deps=[":lib-b"],
+    name = "doctest-lib",
+    modules = ["Source.Range"],  # exclude Baz and succeed
+    visibility = ["//visibility:public"],
+    deps = [":lib-b"],
 )
 
-
-haskell_doctest(name="doctest", deps=[":doctest-lib",], modules=["Source.Range"])
+haskell_doctest(
+    name = "doctest",
+    modules = ["Source.Range"],
+    deps = [":doctest-lib"],
+)
