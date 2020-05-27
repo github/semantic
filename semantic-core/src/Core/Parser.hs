@@ -15,7 +15,7 @@ import           Control.Algebra
 import           Control.Applicative
 import           Control.Monad
 import           Core.Core ((:<-) (..), Core)
-import qualified Core.Core as Core
+-- import qualified Core.Core as Core
 import           Core.Name hiding (name)
 import qualified Data.Char as Char
 import           Data.Foldable (foldl')
