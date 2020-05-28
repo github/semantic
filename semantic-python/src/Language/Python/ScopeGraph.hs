@@ -123,8 +123,25 @@ instance ToScopeGraph Py.Attribute where
   type FocalPoint Py.Attribute = Stack.Node
   scopeGraph = todo
 
+type BodyStruct a =
+  BodyStruct
+    { nameBindings :: [(Name, Stack.Node, Term a)],
+      returnNodes :: [Stack.Node]
+    }
+
+class A
+  def foo():
+    x = 5
+    y = 6
+    return y
+
+bodyStructOfFoo = [(x, node'), (y, node'')], [R -> y]
+fooBodyStruct = [(foo, node''')] []
+
+aBodyStruct = [(A, node'''')] []
+
 instance ToScopeGraph Py.Block where
-  type FocalPoint Py.Block = [Stack.Node]
+  type FocalPoint Py.Block = BodyStruct
   scopeGraph block =
     fmap (either (fromEither . fromEither . fromEither) id) <$> todo block
 
@@ -149,7 +166,30 @@ instance ToScopeGraph Py.Call where
 
 instance ToScopeGraph Py.ClassDefinition where
   type FocalPoint Py.ClassDefinition = [Stack.Node]
-  scopeGraph = todo
+  scopeGraph
+    Py.ClassDefinition
+      { ann,
+        name = Py.Identifier _ann1 name,
+        superclasses = _superclasses,
+        body
+      } = do
+      let name' = Name.name name
+
+      CurrentScope currentScope' <- currentScope
+      let declaration = (Stack.Declaration name' ScopeGraph.Class ann)
+      modify (Stack.addEdge (Stack.Scope currentScope') declaration)
+      modify (Stack.addEdge declaration (Stack.PopSymbol "()"))
+
+      modify (Stack.addEdge (Stack.PopSymbol "()") (Stack.SelfScope "self"))
+      modify (Stack.addEdge (Stack.SelfScope "self") (Stack.PopSymbol "."))
+      modify (Stack.addEdge (Stack.PopSymbol ".") (Stack.InternalMembers "IM"))
+      modify (Stack.addEdge (Stack.InternalMembers "IM") (Stack.ClassMembers "CM"))
+
+      modify (Stack.addEdge declaration (Stack.PopSymbol "."))
+      modify (Stack.addEdge (Stack.PopSymbol ".") (Stack.ClassMembers "CM"))
+
+      _res <- withScope parentScopeName $ scopeGraph body
+      let callNode = Stack.PopSymbol "()"
 
 instance ToScopeGraph Py.ConcatenatedString where
   type FocalPoint Py.ConcatenatedString = Stack.Node
@@ -282,13 +322,15 @@ instance ToScopeGraph Py.FunctionDefinition where
       modify (Stack.addEdge parentScope formalParametersScope)
 
       -- Convert the body, using the parent scope name as the root scope
-      _res <- withScope parentScopeName $ scopeGraph body
+      returnNodesResult <- withScope parentScopeName $ scopeGraph body
       let callNode = Stack.PopSymbol "()"
-      -- case (res :: Result) of
-      --   ReturnNodes nodes -> do
-      --     for_ nodes $ \node ->
-      --       modify (Stack.addEdge callNode node)
-      --   _ -> pure ()
+      case returnNodesResult of
+        Complete nodes -> do
+          for_ nodes $ \node ->
+            modify (Stack.addEdge callNode node)
+        result -> do
+          traceM result
+          pure ()
 
       -- Add the scope that contains the declared function name
       (functionNameNode, _associatedScope) <-
