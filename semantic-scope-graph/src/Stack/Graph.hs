@@ -92,6 +92,9 @@ data Node
   | IgnoreScope
   | BottomScope {symbol :: Symbol}
   | TopScope {symbol :: Symbol}
+  | InstanceMembers {symbol :: Symbol}
+  | ClassMembers {symbol :: Symbol}
+  | SelfScope {symbol :: Symbol}
   deriving (Show, Eq, Ord)
 
 -- This overlapping instance is problematic but helps us make sure we don't differentiate two root nodes.
