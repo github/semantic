@@ -1,17 +1,20 @@
+{-# LANGUAGE TypeFamilies #-}
+
 -- | Semantic functionality for JSON programs.
 module Language.JSON
-( Term(..)
-, TreeSitter.JSON.tree_sitter_json
-) where
+  ( Term (..),
+    TreeSitter.JSON.tree_sitter_json,
+  )
+where
 
 import qualified AST.Unmarshal as TS
-import           Data.Proxy
+import Data.Proxy
 import qualified Language.JSON.AST as JSON
-import           Scope.Graph.Convert
+import Scope.Graph.Convert
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.JSON (tree_sitter_json)
 
-newtype Term a = Term { getTerm :: JSON.Document a }
+newtype Term a = Term {getTerm :: JSON.Document a}
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy JSON.Document)
@@ -25,4 +28,5 @@ instance Tags.ToTags Term where
   tags _ _ = []
 
 instance ToScopeGraph Term where
-  scopeGraph = undefined
+  type FocalPoint Term = ()
+  scopeGraph _ = todo "TODO: No scope graph possible for JSON."

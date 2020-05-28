@@ -3,8 +3,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
@@ -49,7 +47,6 @@ import Control.Effect.State
 import Control.Lens
 import Data.List.NonEmpty
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.Map.Strict (Map)
 import qualified Data.Module as Module
 import qualified Data.ScopeGraph as ScopeGraph
 import Data.Semilattice.Lower

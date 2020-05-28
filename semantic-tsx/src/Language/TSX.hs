@@ -1,19 +1,22 @@
+{-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -freduction-depth=0 #-}
+
 -- | Semantic functionality for TSX programs.
 module Language.TSX
-( Term(..)
-, Language.TSX.Grammar.tree_sitter_tsx
-) where
+  ( Term (..),
+    Language.TSX.Grammar.tree_sitter_tsx,
+  )
+where
 
 import qualified AST.Unmarshal as TS
-import           Data.Proxy
+import Data.Proxy
 import qualified Language.TSX.AST as TSX
 import qualified Language.TSX.Grammar (tree_sitter_tsx)
 import qualified Language.TSX.Tags as TsxTags
-import           Scope.Graph.Convert
+import Scope.Graph.Convert
 import qualified Tags.Tagging.Precise as Tags
 
-newtype Term a = Term { getTerm :: TSX.Program a }
+newtype Term a = Term {getTerm :: TSX.Program a}
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy TSX.Program)
@@ -26,4 +29,5 @@ instance Tags.ToTags Term where
   tags src = Tags.runTagging src . TsxTags.tags . getTerm
 
 instance ToScopeGraph Term where
-  scopeGraph = undefined
+  type FocalPoint Term = ()
+  scopeGraph _ = todo "Implement scope graph for TSX"

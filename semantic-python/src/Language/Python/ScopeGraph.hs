@@ -28,13 +28,10 @@ import AST.Element
 import qualified Analysis.Name as Name
 import Control.Effect.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
-import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import Control.Effect.State
-import Control.Lens ((^.))
 import Data.Foldable
 import Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.Monoid (getAp)
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Data.Text as Text
 import GHC.Records
@@ -44,7 +41,7 @@ import Language.Python.Patterns
 import Scope.Graph.Convert (Result (..), complete, todo)
 import Scope.Types as Scope
 import Source.Loc (Loc)
-import Source.Span (Pos (..), Span, point, span_)
+import Source.Span (Pos (..), point)
 import qualified Stack.Graph as Stack
 
 -- Utility function to avoid a dependency. Alternatively, we could import
@@ -91,7 +88,7 @@ instance ToScopeGraph Py.AssertStatement where
 
 instance ToScopeGraph Py.Assignment where
   type FocalPoint Py.Assignment = Stack.Node
-  scopeGraph (Py.Assignment ann (SingleIdentifier t) val _typ) = do
+  scopeGraph (Py.Assignment _ann (SingleIdentifier _t) _val _typ) = do
     -- declare
     --   t
     --   Props.Declaration
@@ -101,7 +98,7 @@ instance ToScopeGraph Py.Assignment where
     --       Props.span = ann ^. span_
     --     }
     -- maybe complete scopeGraph val
-    todo "Plz implement ScopeGraph.hs l110"
+    todo ("Plz implement ScopeGraph.hs l110" :: String)
   scopeGraph x = todo x
 
 instance ToScopeGraph Py.Await where
@@ -142,11 +139,11 @@ instance ToScopeGraph Py.Call where
       { function,
         arguments = L1 Py.ArgumentList {extraChildren = args}
       } = do
-      result <- scopeGraph function
+      _result <- scopeGraph function
       let scopeGraphArg = \case
             Prj expr -> scopeGraph @Py.Expression expr
             other -> todo other
-      args <- traverse scopeGraphArg args
+      _args <- traverse scopeGraphArg args
       pure (Todo ("Plz implement ScopeGraph.hs l164" :| [])) --(result <> mconcat args)
   scopeGraph it = todo it
 
@@ -218,13 +215,11 @@ instance ToScopeGraph Py.ExecStatement where
   type FocalPoint Py.ExecStatement = [Stack.Node]
   scopeGraph x = do
     todo x
-    pure (Complete [])
 
 instance ToScopeGraph Py.ExpressionStatement where
   type FocalPoint Py.ExpressionStatement = [Stack.Node]
   scopeGraph x = do
     todo x
-    pure (Complete [])
 
 instance ToScopeGraph Py.ExpressionList where
   type FocalPoint Py.ExpressionList = [Stack.Node]
@@ -263,7 +258,7 @@ instance ToScopeGraph Py.FunctionDefinition where
       modify (Stack.addEdge (Stack.Scope currentScope') declaration)
       modify (Stack.addEdge declaration (Stack.PopSymbol "()"))
 
-      let declProps =
+      let _declProps =
             Props.Declaration
               { Props.kind = ScopeGraph.Parameter,
                 Props.relation = ScopeGraph.Default,
@@ -287,7 +282,7 @@ instance ToScopeGraph Py.FunctionDefinition where
       modify (Stack.addEdge parentScope formalParametersScope)
 
       -- Convert the body, using the parent scope name as the root scope
-      res <- withScope parentScopeName $ scopeGraph body
+      _res <- withScope parentScopeName $ scopeGraph body
       let callNode = Stack.PopSymbol "()"
       -- case (res :: Result) of
       --   ReturnNodes nodes -> do
@@ -296,7 +291,7 @@ instance ToScopeGraph Py.FunctionDefinition where
       --   _ -> pure ()
 
       -- Add the scope that contains the declared function name
-      (functionNameNode, associatedScope) <-
+      (functionNameNode, _associatedScope) <-
         declareFunction
           (Just name')
           ScopeGraph.Function
@@ -363,7 +358,7 @@ instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
     complete <* newEdge ScopeGraph.Import (toName <$> names)
-  scopeGraph (Py.ImportFromStatement _ imports (L1 (Py.DottedName _ names@((Py.Identifier ann scopeName) :| _))) Nothing) = do
+  scopeGraph (Py.ImportFromStatement _ _imports (L1 (Py.DottedName _ _names@((Py.Identifier _ann _scopeName) :| _))) Nothing) = do
     -- let toName (Py.Identifier _ name) = Name.name name
     -- newEdge ScopeGraph.Import (toName <$> names)
 
@@ -394,7 +389,7 @@ instance ToScopeGraph Py.ImportFromStatement where
     --     (R1 (Py.DottedName _ ((Py.Identifier _ _) :| (_ : _)))) -> undefined
 
     -- pure (mconcat completions)
-    todo "Plz implement: ScopeGraph.hs l321"
+    todo ("Plz implement: ScopeGraph.hs l321" :: String)
   scopeGraph term = todo term
 
 instance ToScopeGraph Py.Lambda where
@@ -427,7 +422,7 @@ instance ToScopeGraph Py.NonlocalStatement where
 
 instance ToScopeGraph Py.Module where
   type FocalPoint Py.Module = ()
-  scopeGraph term@(Py.Module ann stmts) = do
+  scopeGraph _term@(Py.Module ann stmts) = do
     rootScope' <- rootScope
 
     putCurrentScope "__main__"

@@ -1,18 +1,21 @@
+{-# LANGUAGE TypeFamilies #-}
+
 -- | Semantic functionality for CodeQL programs.
 module Language.CodeQL
-( Term(..)
-, TreeSitter.QL.tree_sitter_ql
-) where
+  ( Term (..),
+    TreeSitter.QL.tree_sitter_ql,
+  )
+where
 
 import qualified AST.Unmarshal as TS
-import           Data.Proxy
+import Data.Proxy
 import qualified Language.CodeQL.AST as CodeQL
 import qualified Language.CodeQL.Tags as CodeQLTags
-import           Scope.Graph.Convert
+import Scope.Graph.Convert
 import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.QL (tree_sitter_ql)
 
-newtype Term a = Term { getTerm :: CodeQL.Ql a }
+newtype Term a = Term {getTerm :: CodeQL.Ql a}
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy CodeQL.Ql)
@@ -25,4 +28,5 @@ instance Tags.ToTags Term where
   tags src = Tags.runTagging src . CodeQLTags.tags . getTerm
 
 instance ToScopeGraph Term where
-  scopeGraph = undefined
+  type FocalPoint Term = ()
+  scopeGraph _ = todo "Implement stack graphs for CodeQL"
