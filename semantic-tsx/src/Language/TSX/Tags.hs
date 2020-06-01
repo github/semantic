@@ -5,7 +5,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Language.TSX.Tags
   ( ToTags (..),
@@ -50,10 +49,12 @@ instance ToTags Tsx.Function where
 instance ToTags Tsx.FunctionSignature where
   tags t@Tsx.FunctionSignature {ann = Loc {byteRange}, name = Parse.Success (Tsx.Identifier {text, ann})} =
     yieldTag text Function ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Tsx.FunctionDeclaration where
   tags t@Tsx.FunctionDeclaration {ann = Loc {byteRange}, name = Parse.Success (Tsx.Identifier {text, ann})} =
     yieldTag text Function ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Tsx.MethodDefinition where
   tags t@Tsx.MethodDefinition {ann = Loc {byteRange}, name} = case name of
@@ -67,10 +68,12 @@ instance ToTags Tsx.Pair where
     _ -> gtags t
     where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Tsx.ClassDeclaration where
   tags t@Tsx.ClassDeclaration {ann = Loc {byteRange}, name = Parse.Success (Tsx.TypeIdentifier {text, ann})} =
     yieldTag text Class ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Tsx.CallExpression where
   tags t@Tsx.CallExpression {ann = Loc {byteRange}, function = Parse.Success (Tsx.Expression expr)} = match expr
@@ -87,6 +90,7 @@ instance ToTags Tsx.CallExpression where
           Parse.Fail _ -> pure ()
         _ -> gtags t
       yield name loc = yieldTag name Call loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Tsx.Class where
   tags t@Tsx.Class {ann = Loc {byteRange}, name = Just (Parse.Success (Tsx.TypeIdentifier {text, ann}))} =
@@ -118,6 +122,7 @@ instance ToTags Tsx.AssignmentExpression where
       _ -> gtags t
     where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
