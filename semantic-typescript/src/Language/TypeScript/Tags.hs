@@ -8,7 +8,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Language.TypeScript.Tags
   ( ToTags (..),
@@ -53,10 +52,13 @@ instance ToTags Ts.Function where
 instance ToTags Ts.FunctionSignature where
   tags t@Ts.FunctionSignature {ann = Loc {byteRange}, name = Parse.Success (Ts.Identifier {text, ann})} =
     yieldTag text Function ann byteRange >> gtags t
+  tags _ = pure ()
+
 
 instance ToTags Ts.FunctionDeclaration where
   tags t@Ts.FunctionDeclaration {ann = Loc {byteRange}, name = Parse.Success (Ts.Identifier {text, ann})} =
     yieldTag text Function ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Ts.MethodDefinition where
   tags t@Ts.MethodDefinition {ann = Loc {byteRange}, name} = case name of
@@ -70,10 +72,12 @@ instance ToTags Ts.Pair where
     _ -> gtags t
     where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Ts.ClassDeclaration where
   tags t@Ts.ClassDeclaration {ann = Loc {byteRange}, name = Parse.Success (Ts.TypeIdentifier {text, ann})} =
     yieldTag text Class ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Ts.CallExpression where
   tags t@Ts.CallExpression {ann = Loc {byteRange}, function = Parse.Success (Ts.Expression expr)} = match expr
@@ -90,6 +94,7 @@ instance ToTags Ts.CallExpression where
           Parse.Fail _ -> pure ()
         _ -> gtags t
       yield name loc = yieldTag name Call loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Ts.Class where
   tags t@Ts.Class {ann = Loc {byteRange}, name = Just (Parse.Success Ts.TypeIdentifier {text, ann})} =
@@ -121,6 +126,7 @@ instance ToTags Ts.AssignmentExpression where
       _ -> gtags t
     where
       yield text loc = yieldTag text Function loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
