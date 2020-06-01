@@ -6,7 +6,6 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 
 {-# HLINT ignore "Reduce duplication" #-}
@@ -98,6 +97,7 @@ instance ToTags Rb.Class where
           _ -> Range start (getEnd expr)
         getEnd = Range.end . byteRange . TS.gann
         yield name loc = yieldTag name Class loc range' >> gtags t
+  tags _ = pure ()
 
 instance ToTags Rb.SingletonClass where
   tags
@@ -116,6 +116,7 @@ instance ToTags Rb.SingletonClass where
           _ -> range
         getStart = Range.start . byteRange . TS.gann
         yield name loc = yieldTag name Class loc range' >> gtags t
+  tags _ = pure ()
 
 instance ToTags Rb.Module where
   tags
@@ -135,6 +136,7 @@ instance ToTags Rb.Module where
         getEnd = Range.end . byteRange . TS.gann
         getStart = Range.start . byteRange . TS.gann
         yield name loc = yieldTag name Module loc range' >> gtags t
+  tags _ = pure ()
 
 yieldMethodNameTag ::
   ( Has (State [Text]) sig m,
@@ -179,6 +181,7 @@ instance ToTags Rb.Method where
           Just (Parse.Success (Rb.MethodParameters {ann = Loc {byteRange = Range {end}}})) -> Range start end
           _ -> Range start (getEnd n)
         getEnd = Range.end . byteRange . TS.gann
+  tags _ = pure ()
 
 instance ToTags Rb.SingletonMethod where
   tags
@@ -192,6 +195,7 @@ instance ToTags Rb.SingletonMethod where
           Just (Parse.Success (Rb.MethodParameters {ann = Loc {byteRange = Range {end}}})) -> Range start end
           _ -> Range start (getEnd n)
         getEnd = Range.end . byteRange . TS.gann
+  tags _ = pure ()
 
 instance ToTags Rb.Block where
   tags = enterScope False . gtags
@@ -205,6 +209,7 @@ instance ToTags Rb.Lambda where
       Just (Parse.Success p) -> tags p
       _ -> pure ()
     tags b
+  tags _ = pure ()
 
 instance ToTags Rb.If where
   tags Rb.If {condition = Parse.Success cond, consequence, alternative} = do
@@ -215,6 +220,7 @@ instance ToTags Rb.If where
     case alternative of
       Just (Parse.Success alt) -> tags alt
       _ -> pure ()
+  tags _ = pure ()
 
 instance ToTags Rb.Elsif where
   tags Rb.Elsif {condition = Parse.Success cond, consequence, alternative} = do
@@ -225,6 +231,7 @@ instance ToTags Rb.Elsif where
     case alternative of
       Just (Parse.Success alt) -> tags alt
       _ -> pure ()
+  tags _ = pure ()
 
 instance ToTags Rb.Unless where
   tags Rb.Unless {condition = Parse.Success cond, consequence, alternative} = do
@@ -235,12 +242,15 @@ instance ToTags Rb.Unless where
     case alternative of
       Just (Parse.Success alt) -> tags alt
       _ -> pure ()
+  tags _ = pure ()
 
 instance ToTags Rb.While where
   tags Rb.While {condition = Parse.Success cond, body = Parse.Success b} = tags cond >> tags b
+  tags _ = pure ()
 
 instance ToTags Rb.Until where
   tags Rb.Until {condition = Parse.Success cond, body = Parse.Success b} = tags cond >> tags b
+  tags _ = pure ()
 
 instance ToTags Rb.Regex where
   tags Rb.Regex {} = pure ()
@@ -304,6 +314,7 @@ instance ToTags Rb.Alias where
         Prj Rb.Identifier {ann, text} -> yieldTag text Call ann byteRange
         _ -> tags nameExpr
       gtags t
+  tags _ = pure ()
 
 instance ToTags Rb.Undef where
   tags
