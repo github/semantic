@@ -3,7 +3,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Language.Go.Tags
   ( ToTags (..),
@@ -53,6 +52,7 @@ instance ToTags Go.MethodDeclaration where
       { ann = Loc {byteRange},
         name = Parse.Success (Go.FieldIdentifier {text, ann})
       } = yieldTag text Method ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Go.CallExpression where
   tags
@@ -68,6 +68,7 @@ instance ToTags Go.CallExpression where
           Prj Go.ParenthesizedExpression {extraChildren = Parse.Success (Go.Expression e)} -> match e
           _ -> gtags t
         yield name loc = yieldTag name Call loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
