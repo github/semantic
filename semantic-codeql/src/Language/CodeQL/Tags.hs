@@ -4,7 +4,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Language.CodeQL.Tags
   ( ToTags (..),
@@ -67,6 +66,7 @@ instance ToTags CodeQL.Module where
       { ann = Loc {byteRange},
         name = Parse.Success (CodeQL.ModuleName {extraChildren = Parse.Success (CodeQL.SimpleId {text, ann})})
       } = yieldTag text Module ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags CodeQL.ClasslessPredicate where
   tags
@@ -74,6 +74,7 @@ instance ToTags CodeQL.ClasslessPredicate where
       { ann = Loc {byteRange},
         name = Parse.Success (CodeQL.PredicateName {text, ann})
       } = yieldTag text Function ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags CodeQL.AritylessPredicateExpr where
   tags
@@ -81,6 +82,7 @@ instance ToTags CodeQL.AritylessPredicateExpr where
       { ann = Loc {byteRange},
         name = Parse.Success (CodeQL.LiteralId {text, ann})
       } = yieldTag text Call ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags CodeQL.Dataclass where
   tags
@@ -88,6 +90,7 @@ instance ToTags CodeQL.Dataclass where
       { ann = Loc {byteRange},
         name = Parse.Success (CodeQL.ClassName {text, ann})
       } = yieldTag text Class ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags CodeQL.MemberPredicate where
   tags
@@ -95,6 +98,7 @@ instance ToTags CodeQL.MemberPredicate where
       { ann = Loc {byteRange},
         name = Parse.Success (CodeQL.PredicateName {text, ann})
       } = yieldTag text Method ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags CodeQL.Datatype where
   tags
@@ -102,6 +106,7 @@ instance ToTags CodeQL.Datatype where
       { ann = Loc {byteRange},
         name = Parse.Success (CodeQL.ClassName {text, ann})
       } = yieldTag text Class ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags CodeQL.DatatypeBranch where
   tags
@@ -109,6 +114,7 @@ instance ToTags CodeQL.DatatypeBranch where
       { ann = Loc {byteRange},
         name = Parse.Success (CodeQL.ClassName {text, ann})
       } = yieldTag text Class ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags CodeQL.ClasslessPredicateCall where
   tags
