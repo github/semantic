@@ -4,7 +4,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Language.Java.Tags
   ( ToTags (..),
@@ -62,9 +61,11 @@ instance ToTags Java.MethodDeclaration where
                 { end = case body of
                     Just (Parse.Success (Java.Block {ann = Loc Range {end} _})) -> end
                     Nothing -> end range
+                    Just (Parse.Fail _) -> end range
                 }
       Tags.yield (Tag text Method ann line Nothing)
       gtags t
+  tags _ = pure ()
 
 -- TODO: we can coalesce a lot of these instances given proper use of HasField
 -- to do the equivalent of type-generic pattern-matching.
@@ -79,6 +80,7 @@ instance ToTags Java.ClassDeclaration where
       src <- ask @Source
       Tags.yield (Tag text Class ann (Tags.firstLine src (Range start end)) Nothing)
       gtags t
+  tags _ = pure ()
 
 instance ToTags Java.MethodInvocation where
   tags
@@ -89,6 +91,7 @@ instance ToTags Java.MethodInvocation where
       src <- ask @Source
       Tags.yield (Tag text Call ann (Tags.firstLine src range) Nothing)
       gtags t
+  tags _ = pure ()
 
 instance ToTags Java.InterfaceDeclaration where
   tags
@@ -99,6 +102,7 @@ instance ToTags Java.InterfaceDeclaration where
       src <- ask @Source
       Tags.yield (Tag text Interface ann (Tags.firstLine src byteRange) Nothing)
       gtags t
+  tags _ = pure ()
 
 instance ToTags Java.InterfaceTypeList where
   tags t@Java.InterfaceTypeList {extraChildren = interfaces} = do
