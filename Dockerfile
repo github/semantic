@@ -1,5 +1,5 @@
 # Put protoc and twirp tooling in its own image
-FROM haskell:8.8 as haskell
+FROM haskell:8.8.1 as haskell
 RUN cabal v2-update && \
     cabal v2-install proto-lens-protoc
 RUN which proto-lens-protoc
