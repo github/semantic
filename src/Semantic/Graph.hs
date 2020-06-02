@@ -68,6 +68,7 @@ import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
 import           Data.Functor.Foldable
+import           Data.Functor  (($>))
 import           Data.Graph.Algebraic
 import           Data.Graph.ControlFlowVertex (VertexDeclaration)
 import           Data.Language as Language
@@ -83,11 +84,19 @@ import           Semantic.Analysis
 import           Semantic.Task as Task
 import           Source.Loc as Loc
 import           Source.Span
-import           System.FilePath.Posix (takeDirectory, (</>))
 import qualified System.Path as Path
 import           Text.Show.Pretty (ppShow)
 
+-- TODO: this should be zero-indexed (https://github.com/github/semantic/issues/263)
+initialSpan :: Span
+initialSpan = point (Pos 1 1)
+
 data GraphType = ImportGraph | CallGraph
+
+isPathPrefixOf :: Path.AbsRelDir -> Path.AbsRelFile -> Bool
+isPathPrefixOf a b = ra == rb && isPrefixOf a' b' where
+  (ra, a', _) = Path.splitPath a
+  (rb, b', _) = Path.splitPath b
 
 -- | Constraints required to analyze a term.
 class
@@ -188,8 +197,8 @@ runCallGraph lang includePackages modules package
   . resumingResolutionError
   . resumingAddressError
   . raiseHandler (runReader (packageInfo package))
-  . raiseHandler (runReader (lowerBound @Span))
-  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader initialSpan)
+  . raiseHandler (runState initialSpan)
   . raiseHandler (runReader (lowerBound @ControlFlowVertex))
   . providingLiveSet
   . runModuleTable
@@ -251,8 +260,8 @@ runImportGraph lang package f
   . runModuleTable
   . runModules (ModuleTable.modulePaths (packageModules package))
   . raiseHandler (runReader (packageInfo package))
-  . raiseHandler (runState (lowerBound @Span))
-  . raiseHandler (runReader (lowerBound @Span))
+  . raiseHandler (runState initialSpan)
+  . raiseHandler (runReader initialSpan)
   . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) Precise))))
   . runAllocator
   $ evaluate lang (graphingModuleInfo (runDomainEffects (evalTerm id))) (snd <$> ModuleTable.toPairs (packageModules package))
@@ -314,12 +323,12 @@ parsePythonPackage parser project = do
         . runModuleTable
         . runModules lowerBound
         . raiseHandler (runReader (PackageInfo (Data.Abstract.Evaluatable.name "setup") lowerBound))
-        . raiseHandler (runState (lowerBound @Span))
-        . raiseHandler (runReader (lowerBound @Span))
+        . raiseHandler (runState initialSpan)
+        . raiseHandler (runReader initialSpan)
         . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) Precise))))
         . runAllocator
 
-  strat <- case find (\b -> blobPath b == (projectRootDir project </> "setup.py")) (projectBlobs project) of
+  strat <- case find (\b -> blobPath b == (projectRootDir project Path.</> Path.relFile "setup.py")) (projectBlobs project) of
     Just setupFile -> do
       setupModule <- fmap snd <$> parseModule project parser setupFile
       fst <$> runAnalysis (evaluate (Proxy @'Language.Python) (runDomainEffects (runPythonPackaging . evalTerm id)) [ setupModule ])
@@ -332,17 +341,17 @@ parsePythonPackage parser project = do
     PythonPackage.Packages dirs ->
       packageFromProject project [ blob | dir <- dirs
                                         , blob <- projectBlobs project
-                                        , packageDir <- [projectRootDir project </> unpack dir]
-                                        , packageDir `isPrefixOf` blobPath blob
+                                        , packageDir <- [projectRootDir project Path.</> Path.relDir (unpack dir) ]
+                                        , packageDir `isPathPrefixOf` blobPath blob
                                         ]
     PythonPackage.FindPackages excludeDirs -> do
       trace "In Graph.FindPackages"
       let initFiles = filter (isInit . filePath) (projectFiles project)
           isInit = (== Path.relFile "__init__.py") . Path.takeFileName
-          packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . Path.toString . filePath <$> initFiles)
+          packageDirs = filter (`notElem` ((projectRootDir project Path.</>) . Path.relDir . unpack <$> excludeDirs)) (Path.takeDirectory . filePath <$> initFiles)
       packageFromProject project [ blob | dir <- packageDirs
                                         , blob <- projectBlobs project
-                                        , dir `isPrefixOf` blobPath blob
+                                        , dir `isPathPrefixOf` blobPath blob
                                         ]
     where
       packageFromProject project filteredBlobs = do
@@ -356,7 +365,7 @@ parseModule :: Has Parse sig m
             -> Parser term
             -> Blob
             -> m (Module (Blob, term))
-parseModule proj parser blob = moduleForBlob (Just (projectRootDir proj)) blob . (,) blob <$> parse parser blob
+parseModule proj parser blob = moduleForBlob (Just (Path.toString $ projectRootDir proj)) blob . (,) blob <$> parse parser blob
 
 withTermSpans :: ( Has (Reader Span) sig m
                  , Has (State Span) sig m -- last evaluated child's span
@@ -375,8 +384,8 @@ resumingResolutionError :: ( Has Trace sig m
 resumingResolutionError = runResolutionErrorWith $ \ baseError -> do
   traceError "ResolutionError" baseError
   case baseErrorException baseError of
-    NotFoundError nameToResolve _ _ -> pure nameToResolve
-    GoImportError pathToResolve     -> pure [pathToResolve]
+    NotFoundError nameToResolve _ _ -> maybe (traceError ("NotFileError: resolve path is " ++ show nameToResolve) baseError $> Path.toAbsRel Path.emptyFile) pure $ Path.fileFromFileDir nameToResolve
+    GoImportError pathToResolve     -> pure [Path.absRel pathToResolve]
 
 resumingLoadError :: ( Has Trace sig m
                      , AbstractHole value

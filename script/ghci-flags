@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Computes the flags for ghcide to pass to ghci. You probably won’t be running this yourself, but rather ghcide will via configuration in hie.yaml.
 
 set -e
@@ -50,6 +50,8 @@ function flags {
   # TODO: would be nice to figure this out from cabal.project & the .cabal files
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
+  echo "-isemantic-codeql/src"
+  echo "-isemantic-codeql/test"
   echo "-isemantic-core/src"
   echo "-isemantic-go/src"
   echo "-isemantic-java/src"
@@ -59,6 +61,7 @@ function flags {
   echo "-isemantic-python/src"
   echo "-isemantic-python/test"
   echo "-isemantic-ruby/src"
+  echo "-isemantic-rust/src"
   echo "-isemantic-scope-graph/src"
   echo "-isemantic-tsx/src"
   echo "-isemantic-typescript/src"

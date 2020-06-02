@@ -112,7 +112,7 @@ renderJSONError blob e = JSON [ renderError blob e ]
 renderError :: ToJSON a => Blob -> a -> SomeJSON
 renderError b e = SomeJSON $ object
   [ "error"    .= e
-  , "path"     .= blobPath b
+  , "path"     .= blobFilePath b
   , "language" .= blobLanguage b
   ]
 

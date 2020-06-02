@@ -34,6 +34,7 @@ import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Source.Span
+import qualified System.Path as Path
 
 data QualifiedName
   = QualifiedName (NonEmpty FilePath)
@@ -80,14 +81,14 @@ resolvePythonModules :: ( Has (Modules address value) sig m
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \relPath -> do
-    x <- search relRootDir relPath
+    x <- search (Path.toString relRootDir) relPath
     x <$ traceResolve relPath x
   where
-    rootDir (QualifiedName _) ModuleInfo{..}           = mempty -- overall rootDir of the Package.
-    rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (takeDirectory modulePath)
+    rootDir (QualifiedName _) ModuleInfo{..}           = Path.toAbsRel Path.currentDir -- overall rootDir of the Package.
+    rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (Path.takeDirectory modulePath)
       where numDots = pred (length n)
             upDir n dir | n <= 0 = dir
-                        | otherwise = takeDirectory (upDir (pred n) dir)
+                        | otherwise = maybe dir (upDir (pred n)) $ Path.takeSuperDirectory dir
 
     moduleNames (QualifiedName qualifiedName)          = NonEmpty.scanl1 (</>) qualifiedName
     moduleNames (RelativeQualifiedName x Nothing)      = error $ "importing from '" <> show x <> "' is not implemented"
@@ -96,11 +97,11 @@ resolvePythonModules q = do
     search rootDir x = do
       trace ("searching for " <> show x <> " in " <> show rootDir)
       let path = normalise (rootDir </> normalise x)
-      let searchPaths = [ path </> "__init__.py"
+      let searchPaths = Path.absRel <$> [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
       modulePath <- resolve searchPaths
-      maybeM (throwResolutionError $ NotFoundError path searchPaths Language.Python) modulePath
+      maybeM (throwResolutionError $ NotFoundError (Path.absRel path) searchPaths Language.Python) modulePath
 
 data Alias a = Alias { aliasValue :: a, aliasName :: a}
   deriving (Generic1, Diffable, Foldable, FreeVariables1, Functor, Hashable1, ToJSONFields1, Traversable)

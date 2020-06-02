@@ -22,7 +22,7 @@ COPY --from=haskell /opt/ghc/8.8.1/lib/ghc-8.8.1/* /opt/ghc/8.8.1/lib/ghc-8.8.1/
 ENTRYPOINT ["/protobuf/bin/protoc", "-I/protobuf", "--plugin=protoc-gen-haskell=/usr/local/bin/proto-lens-protoc"]
 
 # Build semantic
-FROM haskell:8.8 as build
+FROM haskell:8.8.1 as build
 WORKDIR /build
 
 # Build all of semantic

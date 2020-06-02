@@ -20,7 +20,7 @@ import           Data.Language
 import           Data.Foldable
 import           Data.ProtoLens (defMessage)
 import           Semantic.Api.Bridge
-import           Proto.Semantic as P hiding (Blob, BlobPair)
+import           Proto.Semantic as P hiding (Blob)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
 import           Data.Text (Text, pack)
@@ -48,7 +48,7 @@ parseStackGraph blobs = do
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob
-        blobPath' = pack $ blobPath blob
+        blobPath' = pack $ blobFilePath blob
         errorFile e = defMessage
           & P.path .~ blobPath'
           & P.language .~ (bridging # blobLanguage')

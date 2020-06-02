@@ -58,40 +58,6 @@ message ParseError {
   string error = 1;
 }
 
-message DiffTreeRequest {
-  repeated BlobPair blobs = 1;
-}
-
-message DiffTreeTOCResponse {
-  repeated TOCSummaryFile files = 1;
-}
-
-message TOCSummaryFile {
-  string path = 1;
-  string language = 2;
-  repeated TOCSummaryChange changes = 3;
-  repeated TOCSummaryError errors = 4;
-}
-
-message TOCSummaryChange {
-  string category = 1;
-  string term = 2;
-  Span span = 3;
-  ChangeType change_type = 4;
-}
-
-message TOCSummaryError {
-  string error = 1;
-  Span span = 2;
-}
-
-enum ChangeType {
-  NONE = 0;
-  ADDED = 1;
-  REMOVED = 2;
-  MODIFIED = 3;
-}
-
 message DiffTreeGraphResponse {
   repeated DiffTreeFileGraph files = 1;
 }
@@ -146,11 +112,6 @@ message Blob {
   string content = 1;
   string path = 2;
   string language = 3;
-}
-
-message BlobPair {
-  Blob before = 1;
-  Blob after = 2;
 }
 
 message File {

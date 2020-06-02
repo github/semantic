@@ -27,7 +27,7 @@ common haskell
                      , semantic-analysis ^>= 0
                      , semantic-ast
                      , semantic-core ^>= 0.0
-                     , semantic-source ^>= 0.0.2
+                     , semantic-source ^>= 0.1.0
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0
                      , semilattices ^>= 0
@@ -70,10 +70,10 @@ test-suite compiling
   import: haskell
   type: exitcode-stdio-1.0
   hs-source-dirs: test
-  main-is: Test.hs
+  main-is: CoreTest.hs
   ghc-options: -threaded
 
-  build-depends: semantic-python == 0.0.0.0
+  build-depends: semantic-python
                , aeson ^>= 1.4.4
                , aeson-pretty ^>= 0.8.7
                , bytestring ^>= 0.10.8.2

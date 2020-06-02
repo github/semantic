@@ -56,6 +56,7 @@ import qualified Language.Go as GoPrecise
 import qualified Language.Java as Java
 import qualified Language.JSON as JSON
 import qualified Language.PHP as PHPPrecise
+import qualified Language.CodeQL as CodeQLPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Ruby as RubyPrecise
 import qualified Language.TSX as TSXPrecise
@@ -78,7 +79,7 @@ termGraph blobs = do
           & P.edges .~ mempty
           & P.errors .~ [defMessage & P.error .~ T.pack (show e)]
       where
-        path = T.pack $ blobPath blob
+        path = T.pack $ blobFilePath blob
         lang = bridging # blobLanguage blob
 
 data TermOutputFormat
@@ -111,7 +112,7 @@ quietTerm blob = showTiming blob <$> time' ( asks showTermParsers >>= \ parsers 
     timingError (SomeException e) = pure (Left (show e))
     showTiming Blob{..} (res, duration) =
       let status = if isLeft res then "ERR" else "OK"
-      in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobPath blob <> "\t" <> show duration <> " ms\n")
+      in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobFilePath blob <> "\t" <> show duration <> " ms\n")
 
 
 showTermParsers :: PerLanguageModes -> Map Language (SomeParser ShowTerm Loc)
@@ -140,6 +141,9 @@ instance ShowTermBy 'Precise PHPPrecise.Term where
 
 instance ShowTermBy 'Precise PythonPrecise.Term where
   showTermBy = serialize Show . void . PythonPrecise.getTerm
+
+instance ShowTermBy 'Precise CodeQLPrecise.Term where
+  showTermBy = serialize Show . void . CodeQLPrecise.getTerm
 
 instance ShowTermBy 'Precise RubyPrecise.Term where
   showTermBy = serialize Show . void . RubyPrecise.getTerm
@@ -180,6 +184,9 @@ instance SExprTermBy 'Precise PHPPrecise.Term where
 
 instance SExprTermBy 'Precise PythonPrecise.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . PythonPrecise.getTerm
+
+instance SExprTermBy 'Precise CodeQLPrecise.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . CodeQLPrecise.getTerm
 
 instance SExprTermBy 'Precise RubyPrecise.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . RubyPrecise.getTerm
@@ -224,7 +231,7 @@ instance (Recursive (term Loc), ToTreeGraph TermVertex (Base (term Loc))) => JSO
   jsonGraphTerm blob t
     = let graph = renderTreeGraph t
           toEdge (Edge (a, b)) = defMessage & P.source .~ a^.vertexId & P.target .~ b^.vertexId
-          path = T.pack $ blobPath blob
+          path = T.pack $ blobFilePath blob
           lang = bridging # blobLanguage blob
       in defMessage
           & P.path     .~ path

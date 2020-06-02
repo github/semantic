@@ -4,36 +4,39 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-module Language.Java.Tags
-( ToTags(..)
-) where
 
-import           AST.Token
-import           AST.Traversable1
-import           Control.Effect.Reader
-import           Control.Effect.Writer
-import           GHC.Generics ((:+:)(..))
+module Language.Java.Tags
+  ( ToTags (..),
+  )
+where
+
+import AST.Element
+import AST.Token
+import AST.Traversable1
+import Control.Effect.Reader
+import Control.Effect.Writer
+import Data.Foldable
 import qualified Language.Java.AST as Java
-import           Source.Loc
-import           Source.Range
-import           Source.Source as Source
-import           Tags.Tag
+import Source.Loc
+import Source.Range
+import Source.Source as Source
+import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags t where
-  tags
-    :: ( Has (Reader Source) sig m
-       , Has (Writer Tags.Tags) sig m
-       )
-    => t Loc
-    -> m ()
-  default tags
-    :: ( Has (Reader Source) sig m
-       , Has (Writer Tags.Tags) sig m
-       , Traversable1 ToTags t
-       )
-    => t Loc
-    -> m ()
+  tags ::
+    ( Has (Reader Source) sig m,
+      Has (Writer Tags.Tags) sig m
+    ) =>
+    t Loc ->
+    m ()
+  default tags ::
+    ( Has (Reader Source) sig m,
+      Has (Writer Tags.Tags) sig m,
+      Traversable1 ToTags t
+    ) =>
+    t Loc ->
+    m ()
   tags = gtags
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
@@ -43,47 +46,74 @@ instance (ToTags l, ToTags r) => ToTags (l :+: r) where
 instance ToTags (Token sym n) where tags _ = pure ()
 
 instance ToTags Java.MethodDeclaration where
-  tags t@Java.MethodDeclaration
-    { ann = loc@Loc { byteRange = range }
-    , name = Java.Identifier { text = name }
-    , body
-    } = do
+  tags
+    t@Java.MethodDeclaration
+      { ann = Loc {byteRange = range},
+        name = Java.Identifier {text, ann},
+        body
+      } = do
       src <- ask @Source
-      let line = Tags.firstLine src range
-            { end = case body of
-              Just Java.Block { ann = Loc Range { end } _ } -> end
-              Nothing                                       -> end range
-            }
-      Tags.yield (Tag name Method loc line Nothing)
+      let line =
+            Tags.firstLine
+              src
+              range
+                { end = case body of
+                    Just Java.Block {ann = Loc Range {end} _} -> end
+                    Nothing -> end range
+                }
+      Tags.yield (Tag text Method ann line Nothing)
       gtags t
 
+-- TODO: we can coalesce a lot of these instances given proper use of HasField
+-- to do the equivalent of type-generic pattern-matching.
+
 instance ToTags Java.ClassDeclaration where
-  tags t@Java.ClassDeclaration
-    { ann = loc@Loc { byteRange = Range { start } }
-    , name = Java.Identifier { text = name }
-    , body = Java.ClassBody { ann = Loc Range { start = end } _ }
-    } = do
+  tags
+    t@Java.ClassDeclaration
+      { ann = Loc {byteRange = Range {start}},
+        name = Java.Identifier {text, ann},
+        body = Java.ClassBody {ann = Loc Range {start = end} _}
+      } = do
       src <- ask @Source
-      Tags.yield (Tag name Class loc (Tags.firstLine src (Range start end)) Nothing)
+      Tags.yield (Tag text Class ann (Tags.firstLine src (Range start end)) Nothing)
       gtags t
 
 instance ToTags Java.MethodInvocation where
-  tags t@Java.MethodInvocation
-    { ann = loc@Loc { byteRange = range }
-    , name = Java.Identifier { text = name }
-    } = do
+  tags
+    t@Java.MethodInvocation
+      { ann = Loc {byteRange = range},
+        name = Java.Identifier {text, ann}
+      } = do
       src <- ask @Source
-      Tags.yield (Tag name Call loc (Tags.firstLine src range) Nothing)
+      Tags.yield (Tag text Call ann (Tags.firstLine src range) Nothing)
       gtags t
 
+instance ToTags Java.InterfaceDeclaration where
+  tags
+    t@Java.InterfaceDeclaration
+      { ann = Loc {byteRange},
+        name = Java.Identifier {text, ann}
+      } = do
+      src <- ask @Source
+      Tags.yield (Tag text Interface ann (Tags.firstLine src byteRange) Nothing)
+      gtags t
 
-gtags
-  :: ( Has (Reader Source) sig m
-     , Has (Writer Tags.Tags) sig m
-     , Traversable1 ToTags t
-     )
-  => t Loc
-  -> m ()
+instance ToTags Java.InterfaceTypeList where
+  tags t@Java.InterfaceTypeList {extraChildren = interfaces} = do
+    src <- ask @Source
+    for_ interfaces $ \x -> case x of
+      Java.Type (Prj (Java.UnannotatedType (Prj (Java.SimpleType (Prj Java.TypeIdentifier {ann = loc@Loc {byteRange = range}, text = name}))))) ->
+        Tags.yield (Tag name Implementation loc (Tags.firstLine src range) Nothing)
+      _ -> pure ()
+    gtags t
+
+gtags ::
+  ( Has (Reader Source) sig m,
+    Has (Writer Tags.Tags) sig m,
+    Traversable1 ToTags t
+  ) =>
+  t Loc ->
+  m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
 instance ToTags Java.AnnotatedType
@@ -153,8 +183,8 @@ instance ToTags Java.InferredParameters
 instance ToTags Java.InstanceofExpression
 instance ToTags Java.IntegralType
 instance ToTags Java.InterfaceBody
-instance ToTags Java.InterfaceDeclaration
-instance ToTags Java.InterfaceTypeList
+--instance ToTags Java.InterfaceDeclaration
+-- instance ToTags Java.InterfaceTypeList
 instance ToTags Java.LabeledStatement
 instance ToTags Java.LambdaExpression
 instance ToTags Java.Literal

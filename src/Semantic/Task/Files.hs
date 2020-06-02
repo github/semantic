@@ -47,7 +47,6 @@ import qualified System.Path.IO as IO (withBinaryFile)
 data Source blob where
   FromPath       :: File Language                   -> Source Blob
   FromHandle     :: Handle 'IO.ReadMode             -> Source [Blob]
-  FromDir        :: Path.AbsRelDir                  -> Source [Blob]
   FromPathPair   :: File Language -> File Language  -> Source BlobPair
   FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
 
@@ -86,7 +85,6 @@ instance (Has (Error SomeException) sig m, MonadFail m, MonadIO m) => Algebra (F
   alg (L op) = case op of
     Read (FromPath path) k                                    -> readBlobFromFile' path >>= k
     Read (FromHandle handle) k                                -> readBlobsFromHandle handle >>= k
-    Read (FromDir dir) k                                      -> readBlobsFromDir dir >>= k
     Read (FromPathPair p1 p2) k                               -> readFilePair p1 p2 >>= k
     Read (FromPairHandle handle) k                            -> readBlobPairsFromHandle handle >>= k
     ReadProject rootDir dir language excludeDirs k            -> readProjectFromPaths rootDir dir language excludeDirs >>= k

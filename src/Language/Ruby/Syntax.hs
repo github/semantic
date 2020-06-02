@@ -32,7 +32,7 @@ import qualified Data.Text as T
 import           Data.Traversable (for)
 import           Diffing.Algorithm
 import           GHC.Generics (Generic1)
-import           System.FilePath.Posix
+import qualified System.Path as Path
 
 -- TODO: Fully sort out ruby require/load mechanics
 --
@@ -46,9 +46,9 @@ resolveRubyName :: ( Has (Modules address value) sig m
                 -> Evaluator term address value m M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
-  let paths = [name' <.> "rb"]
+  let paths = [name' Path.<.> "rb"]
   modulePath <- resolve paths
-  maybeM (throwResolutionError $ NotFoundError name' paths Language.Ruby) modulePath
+  maybeM (throwResolutionError $ NotFoundError (Path.toFileDir name') paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
 resolveRubyPath :: ( Has (Modules address value) sig m
@@ -61,10 +61,10 @@ resolveRubyPath :: ( Has (Modules address value) sig m
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
-  maybeM (throwResolutionError $ NotFoundError name' [name'] Language.Ruby) modulePath
+  maybeM (throwResolutionError $ NotFoundError (Path.toFileDir name') [name'] Language.Ruby) modulePath
 
-cleanNameOrPath :: Text -> String
-cleanNameOrPath = T.unpack . dropRelativePrefix . stripQuotes
+cleanNameOrPath :: Text -> Path.AbsRelFile
+cleanNameOrPath = Path.absRel . T.unpack . dropRelativePrefix . stripQuotes
 
 data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
   deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)

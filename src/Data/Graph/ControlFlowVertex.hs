@@ -45,6 +45,7 @@ import           GHC.Generics (V1)
 import           Prelude hiding (span)
 import qualified Source.Loc as Loc
 import           Source.Span
+import qualified System.Path as Path
 
 -- | A vertex of representing some node in a control flow graph.
 data ControlFlowVertex
@@ -60,19 +61,19 @@ packageVertex :: PackageInfo -> ControlFlowVertex
 packageVertex (PackageInfo name _) = Package (formatName name)
 
 moduleVertex :: ModuleInfo -> ControlFlowVertex
-moduleVertex = Module . T.pack . modulePath
+moduleVertex = Module . T.pack . Path.toString . modulePath
 
 unknownModuleVertex :: ModuleInfo -> ControlFlowVertex
-unknownModuleVertex = UnknownModule . T.pack . modulePath
+unknownModuleVertex = UnknownModule . T.pack . Path.toString . modulePath
 
 variableVertex :: Text -> ModuleInfo -> Span -> ControlFlowVertex
-variableVertex name ModuleInfo{..} = Variable name (T.pack modulePath)
+variableVertex name ModuleInfo{..} = Variable name (T.pack $ Path.toString modulePath)
 
 methodVertex :: Text -> ModuleInfo -> Span -> ControlFlowVertex
-methodVertex name ModuleInfo{..} = Method name (T.pack modulePath)
+methodVertex name ModuleInfo{..} = Method name (T.pack $ Path.toString modulePath)
 
 functionVertex :: Text -> ModuleInfo -> Span -> ControlFlowVertex
-functionVertex name ModuleInfo{..} = Function name (T.pack modulePath)
+functionVertex name ModuleInfo{..} = Function name (T.pack $ Path.toString modulePath)
 
 vertexIdentifier :: ControlFlowVertex -> Text
 vertexIdentifier v = case v of

@@ -28,38 +28,35 @@ jobs:
         cabal-version: ${{ matrix.cabal }}
 
     - uses: actions/cache@v1
-      name: Cache ~/.cabal/packages
+      id: cache-cabal
+      name: Cache Cabal artifacts
       with:
-        path: ~/.cabal/packages
-        key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-packages
+        path: dist-cache
+        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-${{ hashFiles('**/*.cabal') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-
+          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-
+          ${{ runner.os }}-${{ matrix.ghc }}-
+          ${{ runner.os }}-
 
-    - uses: actions/cache@v1
-      name: Cache ~/.cabal/store
-      with:
-        path: ~/.cabal/store
-        key: ${{ runner.os }}-${{ matrix.ghc }}-v10-cabal-store
+    - name: Get cabal-cache
+      run: |
+        curl -L https://github.com/haskell-works/cabal-cache/releases/download/v1.0.1.8/cabal-cache_x86_64_linux.tar.gz > ./cc.tar.gz
+        tar -xvf ./cc.tar.gz
 
-    - uses: actions/cache@v1
-      name: Cache dist-newstyle
-      with:
-        path: dist-newstyle
-        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-semantic-dist
-
-    # - name: hlint
-    #   run: |
-    #     test -f dist-newstyle/hlint || cabal install hlint --installdir=dist-newstyle
-    #     dist-newstyle/hlint src semantic-python
-
-    - name: Install dependencies
+    - name: Configure project
       run: |
         cabal v2-update
         cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
-        cabal v2-build     --project-file=cabal.project.ci all --only-dependencies
+
+    - name: Restore from cache
+      run: ./cabal-cache sync-from-archive --threads=2 --archive-uri=dist-cache || true
 
     - name: Build & test
       run: |
         cabal v2-build --project-file=cabal.project.ci
         cabal v2-run   --project-file=cabal.project.ci semantic:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-codeql:test
         cabal v2-run   --project-file=cabal.project.ci semantic-core:test
         cabal v2-run   --project-file=cabal.project.ci semantic-go:test
         cabal v2-run   --project-file=cabal.project.ci semantic-java:test
@@ -72,3 +69,6 @@ jobs:
         cabal v2-run   --project-file=cabal.project.ci semantic-typescript:test
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:test; cd ..
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:doctest -- src; cd ..
+
+    - name: Write out cache
+      run: ./cabal-cache sync-to-archive --threads=2 --archive-uri=dist-cache

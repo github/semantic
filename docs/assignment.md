@@ -1,3 +1,5 @@
+_Note that this document describes a process that is now deprecated. For more information, see documentation on [adding a new language](https://github.com/github/semantic/blob/master/docs/adding-new-languages.md)._
+
 ### What is Assignment?
 
 "Assignment" refers to the part of our system that parses parse trees. The step preceding assignment uses [`tree-sitter`](https://github.com/tree-sitter/tree-sitter) to parse source code and output rose trees labeled with symbols in the [language's grammar](https://github.com/github/semantic/blob/master/docs/grammar-development-guide.md) and source locations (represented as byte range and span). Assignment is a second layer of parsing required to get these ASTs in a shape appropriate for our Haskell project and to support the types of analyses we'd like to perform further along. Assignment represents a partial map from AST nodes onto another structure, typically terms.

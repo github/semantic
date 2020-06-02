@@ -5,8 +5,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 module Semantic.Api.LegacyTypes
-  ( DiffTreeRequest(..)
-  , ParseTreeRequest(..)
+  ( ParseTreeRequest(..)
   , ParseTreeSymbolResponse(..)
   , File(..)
   , Symbol(..)
@@ -18,9 +17,6 @@ import Data.Aeson
 import Data.Blob
 import Data.Text (Text)
 import GHC.Generics (Generic)
-
-newtype DiffTreeRequest = DiffTreeRequest { blobs :: [BlobPair] }
-  deriving (Eq, Show, Generic, FromJSON)
 
 --
 -- Legacy Symbols API

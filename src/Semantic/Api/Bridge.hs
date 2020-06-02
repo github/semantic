@@ -11,7 +11,6 @@ module Semantic.Api.Bridge
 import           Analysis.File
 import           Control.Lens
 import qualified Data.Blob as Data
-import qualified Data.Edit as Data
 import           Data.Either
 import qualified Data.Language as Data
 import           Data.ProtoLens (defMessage)
@@ -81,7 +80,7 @@ instance APIBridge API.Blob Data.Blob where
     blobToApiBlob b
       = defMessage
       & P.content .~ Source.toText (Data.blobSource b)
-      & P.path .~ T.pack (Data.blobPath b)
+      & P.path .~ T.pack (Data.blobFilePath b)
       & P.language .~ (bridging # Data.blobLanguage b)
     apiBlobToBlob blob =
       let src = blob^.content.to Source.fromText
@@ -90,17 +89,3 @@ instance APIBridge API.Blob Data.Blob where
       { blobSource = src
       , blobFile = File pth (Source.totalSpan src) (blob^.language.bridging)
       }
-
-
-instance APIConvert API.BlobPair Data.BlobPair where
-  converting = prism' blobPairToApiBlobPair apiBlobPairToBlobPair where
-
-    apiBlobPairToBlobPair blobPair = case (blobPair^.maybe'before, blobPair^.maybe'after) of
-      (Just before, Just after) -> Just $ Data.Compare (before^.bridging) (after^.bridging)
-      (Just before, Nothing)    -> Just $ Data.Delete (before^.bridging)
-      (Nothing, Just after)     -> Just $ Data.Insert (after^.bridging)
-      _                         -> Nothing
-
-    blobPairToApiBlobPair (Data.Compare before after) = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ (bridging #? after)
-    blobPairToApiBlobPair (Data.Insert after)         = defMessage & P.maybe'before .~ Nothing & P.maybe'after .~ (bridging #? after)
-    blobPairToApiBlobPair (Data.Delete before)        = defMessage & P.maybe'before .~ (bridging #? before) & P.maybe'after .~ Nothing
