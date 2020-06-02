@@ -5,7 +5,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Language.Python.Tags
   ( ToTags (..),
@@ -104,6 +103,7 @@ instance ToTags Py.FunctionDefinition where
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
       yieldTag text Function ann (Range start end) docs >> gtags t
+  tags _ = pure ()
 
 instance ToTags Py.ClassDefinition where
   tags
@@ -115,6 +115,7 @@ instance ToTags Py.ClassDefinition where
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
       yieldTag text Class ann (Range start end) docs >> gtags t
+  tags _ = pure ()
 
 instance ToTags Py.Call where
   tags
@@ -130,6 +131,7 @@ instance ToTags Py.Call where
           Prj (Py.ParenthesizedExpression _ (Parse.Success (Prj (Py.Expression (Prj (Py.PrimaryExpression expr')))))) -> match expr' -- Parenthesized expressions
           _ -> gtags t
         yield name loc = yieldTag name Call loc byteRange Nothing >> gtags t
+  tags _ = pure ()
 
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> Maybe Text -> m ()
 yieldTag name kind loc srcLineRange docs = do
