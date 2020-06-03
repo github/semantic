@@ -111,11 +111,14 @@ parseSymbols blobs = do
 
         nodeTypeForKind :: Kind -> NodeType
         nodeTypeForKind = \case
-          Function -> DEFINITION
-          Method   -> DEFINITION
-          Class    -> DEFINITION
-          Module   -> DEFINITION
-          Call     -> REFERENCE
+          Function       -> DEFINITION
+          Method         -> DEFINITION
+          Class          -> DEFINITION
+          Module         -> DEFINITION
+          Interface      -> DEFINITION
+          Call           -> REFERENCE
+          Type           -> REFERENCE
+          Implementation -> REFERENCE
 
 tagsForBlob :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m) => Blob -> m [Tag]
 tagsForBlob blob = asks toTagsParsers >>= \p -> parseWith p (pure . tags symbolsToSummarize blob) blob
