@@ -43,14 +43,14 @@ instance ToTags Go.FunctionDeclaration where
     t@Go.FunctionDeclaration
       { ann = Loc {byteRange},
         name = Go.Identifier {text, ann}
-      } = yieldTag text P.FUNCTION ann byteRange >> gtags t
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 
 instance ToTags Go.MethodDeclaration where
   tags
     t@Go.MethodDeclaration
       { ann = Loc {byteRange},
         name = Go.FieldIdentifier {text, ann}
-      } = yieldTag text P.METHOD ann byteRange >> gtags t
+      } = yieldTag text P.METHOD P.DEFINITION ann byteRange >> gtags t
 
 instance ToTags Go.CallExpression where
   tags
@@ -65,7 +65,7 @@ instance ToTags Go.CallExpression where
           Prj Go.CallExpression {function = Go.Expression e} -> match e
           Prj Go.ParenthesizedExpression {extraChildren = Go.Expression e} -> match e
           _ -> gtags t
-        yield name loc = yieldTag name P.CALL loc byteRange >> gtags t
+        yield name loc = yieldTag name P.CALL P.REFERENCE loc byteRange >> gtags t
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
@@ -82,10 +82,10 @@ gtags ::
   m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> Loc -> Range -> m ()
-yieldTag name kind loc srcLineRange = do
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag name kind ty loc srcLineRange = do
   src <- ask @Source
-  Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
+  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
 
 instance ToTags Go.ArgumentList

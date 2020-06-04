@@ -6,10 +6,11 @@ import Source.Loc
 
 data Tag
   = Tag
-      { name :: Text,
-        kind :: P.SyntaxType,
-        loc :: Loc,
-        line :: Text,
-        docs :: Maybe Text
+      { tagName :: Text,
+        tagSyntaxType :: P.SyntaxType,
+        tagNodeType :: P.NodeType,
+        tagLoc :: Loc,
+        tagLine :: Text,
+        tagDocs :: Maybe Text
       }
   deriving (Eq, Show)

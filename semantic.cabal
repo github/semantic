@@ -242,8 +242,6 @@ library
                      , Serializing.Format
                      , Serializing.SExpression
                      , Serializing.SExpression.Precise
-                     , Tags.Taggable
-                     , Tags.Tagging
                      -- Custom Prelude
   autogen-modules:     Paths_semantic
   other-modules:       Paths_semantic

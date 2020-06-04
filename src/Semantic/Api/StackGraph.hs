@@ -109,8 +109,8 @@ data SGNode
       { nodeId :: Int64,
         nodeName :: Text,
         nodeLine :: Text,
-        nodeSyntaxType :: P.SyntaxType,
         nodeSpan :: Loc.Span,
+        nodeSyntaxType :: P.SyntaxType,
         nodeNodeType :: P.NodeType
       }
   deriving (Eq, Show)

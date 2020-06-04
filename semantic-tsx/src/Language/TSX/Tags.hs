@@ -43,20 +43,20 @@ class ToTags t where
 
 instance ToTags Tsx.Function where
   tags t@Tsx.Function {ann = Loc {byteRange}, name = Just Tsx.Identifier {text, ann}} =
-    yieldTag text P.FUNCTION ann byteRange >> gtags t
+    yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Tsx.FunctionSignature where
   tags t@Tsx.FunctionSignature {ann = Loc {byteRange}, name = Tsx.Identifier {text, ann}} =
-    yieldTag text P.FUNCTION ann byteRange >> gtags t
+    yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 
 instance ToTags Tsx.FunctionDeclaration where
   tags t@Tsx.FunctionDeclaration {ann = Loc {byteRange}, name = Tsx.Identifier {text, ann}} =
-    yieldTag text P.FUNCTION ann byteRange >> gtags t
+    yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 
 instance ToTags Tsx.MethodDefinition where
   tags t@Tsx.MethodDefinition {ann = Loc {byteRange}, name} = case name of
-    Prj Tsx.PropertyIdentifier {text, ann} -> yieldTag text P.METHOD ann byteRange >> gtags t
+    Prj Tsx.PropertyIdentifier {text, ann} -> yieldTag text P.METHOD P.DEFINITION ann byteRange >> gtags t
     _ -> gtags t
 
 instance ToTags Tsx.Pair where
@@ -65,11 +65,11 @@ instance ToTags Tsx.Pair where
     (Prj Tsx.PropertyIdentifier {text, ann}, Prj Tsx.ArrowFunction {}) -> yield text ann
     _ -> gtags t
     where
-      yield text loc = yieldTag text P.FUNCTION loc byteRange >> gtags t
+      yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
 
 instance ToTags Tsx.ClassDeclaration where
   tags t@Tsx.ClassDeclaration {ann = Loc {byteRange}, name = Tsx.TypeIdentifier {text, ann}} =
-    yieldTag text P.CLASS ann byteRange >> gtags t
+    yieldTag text P.CLASS P.DEFINITION ann byteRange >> gtags t
 
 instance ToTags Tsx.CallExpression where
   tags t@Tsx.CallExpression {ann = Loc {byteRange}, function = Tsx.Expression expr} = match expr
@@ -84,16 +84,16 @@ instance ToTags Tsx.CallExpression where
           Prj (Tsx.Expression expr) -> match expr
           _ -> tags x
         _ -> gtags t
-      yield name loc = yieldTag name P.CALL loc byteRange >> gtags t
+      yield name loc = yieldTag name P.CALL P.REFERENCE loc byteRange >> gtags t
 
 instance ToTags Tsx.Class where
   tags t@Tsx.Class {ann = Loc {byteRange}, name = Just Tsx.TypeIdentifier {text, ann}} =
-    yieldTag text P.CLASS ann byteRange >> gtags t
+    yieldTag text P.CLASS P.DEFINITION ann byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Tsx.Module where
   tags t@Tsx.Module {ann = Loc {byteRange}, name} = case name of
-    Prj Tsx.Identifier {text, ann} -> yieldTag text P.MODULE ann byteRange >> gtags t
+    Prj Tsx.Identifier {text, ann} -> yieldTag text P.MODULE P.DEFINITION ann byteRange >> gtags t
     _ -> gtags t
 
 instance ToTags Tsx.VariableDeclarator where
@@ -103,7 +103,7 @@ instance ToTags Tsx.VariableDeclarator where
       (Prj Tsx.ArrowFunction {}, Prj Tsx.Identifier {text, ann}) -> yield text ann
       _ -> gtags t
     where
-      yield text loc = yieldTag text P.FUNCTION loc byteRange >> gtags t
+      yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Tsx.AssignmentExpression where
@@ -115,7 +115,7 @@ instance ToTags Tsx.AssignmentExpression where
       (Prj Tsx.MemberExpression {property = Tsx.PropertyIdentifier {text, ann}}, Prj Tsx.ArrowFunction {}) -> yield text ann
       _ -> gtags t
     where
-      yield text loc = yieldTag text P.FUNCTION loc byteRange >> gtags t
+      yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
@@ -138,11 +138,11 @@ gtags = traverse1_ @ToTags (const (pure ())) tags
 nameBlacklist :: [Text]
 nameBlacklist = ["require"]
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> Loc -> Range -> m ()
-yieldTag name P.CALL _ _ | name `elem` nameBlacklist = pure ()
-yieldTag name kind loc srcLineRange = do
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag name P.CALL _ _ _ | name `elem` nameBlacklist = pure ()
+yieldTag name kind ty loc srcLineRange = do
   src <- ask @Source
-  Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
+  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
 {- ORMOLU_DISABLE -}
 instance ToTags Tsx.AbstractClassDeclaration
