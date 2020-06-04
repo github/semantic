@@ -35,6 +35,7 @@ import Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Data.Text as Text
+import Data.Traversable
 import Debug.Trace
 import GHC.Records
 import GHC.TypeLits
@@ -81,13 +82,13 @@ onField =
     . getField @field
 
 -- ([(node_for_the_name, ast_for_the_decl)], ...)
-type ClassBodyBinders = Py.Assignment
+type ClassBodyBinder = Py.Assignment
                     :+: Py.AugmentedAssignment 
                     :+: Py.FunctionDefinition
                     :+: Py.ClassDefinition
                     :+: Py.DecoratedDefinition
 
-type BodyStruct a b = ([(Stack.Node, [ClassBodyBinders a])], b)
+type BodyStruct a b = ([(Stack.Node, ClassBodyBinder a)], b)
 
 noBindings :: b -> BodyStruct a b
 noBindings x = ([],x)
@@ -108,8 +109,14 @@ instance ToScopeGraph Py.Assignment where
   scopeGraph asgn@(Py.Assignment ann (SingleIdentifier identifier) (Just val) _typ) = do
     -- TODO: What should we do with the type of an assignment?
     -- TODO: What should we do with the right hand side of an assignment?
-    _ <- scopeGraph val
-    pure (Complete ([_], Stack.Declaration identifier Scope.Identifier ann))
+    res <- scopeGraph val
+    let propagateThese = case res of
+                           Complete (Left (Left (bindings, _)))   -> bindings
+                           Complete (Left (Right (bindings, _)))  -> bindings
+                           Complete (Right (Left (bindings, _)))  -> bindings
+                           Complete (Right (Right (bindings, _))) -> bindings
+        decl = Stack.Declaration identifier Scope.Identifier ann
+    pure (Complete ((decl,L1 asgn) : propagateThese, decl))
   scopeGraph x = todo x
 
 instance ToScopeGraph Py.Await where
@@ -205,49 +212,31 @@ instance ToScopeGraph Py.ClassDefinition where
       res <- scopeGraph body
       case res of
         Complete (bindings, _) -> do
-          for_ bindings $ \(node, statements) -> 
-            _
-            {-
-            do
+          for_ bindings $ \(node, statement) -> 
             if isInstanceMember statement then
               modify (Stack.addEdge (Stack.InstanceMembers "IM") node)
             else if isClassMember statement then
               modify (Stack.addEdge (Stack.ClassMembers "CM") node)
             else pure ()
-            -}
           pure ()
         res -> pure ()
       
       -- TODO: replace R1L1 with injection
-      pure (Complete ([(declaration,[R1 (R1 (R1 (L1 def)))])], []))
+      pure (Complete ([(declaration,R1 (R1 (R1 (L1 def))))], []))
 
       -- for_ bindings $ \(node, statement) -> do
       --   -- let callNode = Stack.PopSymbol "()"
       --   undefined
 
-isInstanceMember :: ClassBodyBinders a -> Bool
-isInstanceMember statement = case statement of
-  L1 (Py.SimpleStatement _) -> False
-  R1 (Py.CompoundStatement compoundStatement) -> case compoundStatement of
-    Prj (Py.FunctionDefinition {}) -> True
-    _ -> False
+isInstanceMember :: ClassBodyBinder a -> Bool
+isInstanceMember (Prj (Py.FunctionDefinition {})) = True
+isInstanceMember _ = False
 
-isClassMember :: ClassBodyBinders a -> Bool
-isClassMember statement = case statement of
-  L1 (Py.SimpleStatement simpleStatement) -> case simpleStatement of
-    Prj (Py.ExpressionStatement _ expressions) -> all isAssignment expressions
-    _ -> False
-  R1 (Py.CompoundStatement compoundStatement) -> case compoundStatement of
-    _ -> False
-
-isAssignment :: (:+:)
-             (Py.Expression :+: Py.Assignment)
-             (Py.AugmentedAssignment :+: Py.Yield)
-             a -> Bool
-isAssignment expressionStatement = case expressionStatement of
-  Prj (Py.Assignment {}) -> True
-  Prj (Py.AugmentedAssignment {}) -> True
-  _ -> False
+isClassMember :: ClassBodyBinder a -> Bool
+isClassMember (Prj (Py.Assignment {})) = True
+isClassMember (Prj (Py.ClassDefinition {})) = True
+isClassMember (Prj (Py.DecoratedDefinition {})) = True
+isClassMember _ = False
 
 instance ToScopeGraph Py.ConcatenatedString where
   type FocalPoint Py.ConcatenatedString a = BodyStruct a Stack.Node
@@ -318,8 +307,14 @@ instance ToScopeGraph Py.ExecStatement where
 
 instance ToScopeGraph Py.ExpressionStatement where
   type FocalPoint Py.ExpressionStatement a = BodyStruct a [Stack.Node]
-  scopeGraph x = do
-    todo x
+  scopeGraph (Py.ExpressionStatement _ statements) = do
+    bindings <- for statements $ \stmt -> do
+      res <- scopeGraph stmt
+      let flattenEithers = fst . fromEither . bimap fromEither fromEither
+      case res of
+        Complete r -> pure (flattenEithers r)
+        _ -> pure []
+    pure (Complete (concat (toList bindings), []))
 
 instance ToScopeGraph Py.ExpressionList where
   type FocalPoint Py.ExpressionList a = BodyStruct a [Stack.Node]
@@ -593,7 +588,12 @@ instance ToScopeGraph Py.PrimaryExpression where
 
 instance ToScopeGraph Py.SimpleStatement where
   type FocalPoint Py.SimpleStatement a = BodyStruct a [Stack.Node]
-  scopeGraph = todo
+  scopeGraph (Py.SimpleStatement stmt) =
+    fmap (either (either (either id fromEither)
+                         (either fromEither fromEither))
+                 (either (either fromEither fromEither)
+                         (either fromEither fromEither)))
+      <$> (scopeGraph stmt)
 
 instance ToScopeGraph Py.RaiseStatement where
   type FocalPoint Py.RaiseStatement a = BodyStruct a [Stack.Node]
