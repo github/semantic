@@ -208,6 +208,8 @@ instance ToScopeGraph Py.ClassDefinition where
           for_ bindings $ \(node, statement) -> do
             if isInstanceMember statement then
               modify (Stack.addEdge (Stack.InstanceMembers "IM") node)
+            else if isClassMember statement then
+              modify (Stack.addEdge (Stack.ClassMembers "CM") node)
             else pure ()
           undefined
         res -> pure res
@@ -218,10 +220,27 @@ instance ToScopeGraph Py.ClassDefinition where
 
 isInstanceMember :: (Py.SimpleStatement :+: Py.CompoundStatement) a -> Bool
 isInstanceMember statement = case statement of
-  L1 _ -> False
+  L1 (Py.SimpleStatement _) -> False
   R1 (Py.CompoundStatement compoundStatement) -> case compoundStatement of
     Prj (Py.FunctionDefinition {}) -> True
     _ -> False
+
+isClassMember :: (Py.SimpleStatement :+: Py.CompoundStatement) a -> Bool
+isClassMember statement = case statement of
+  L1 (Py.SimpleStatement simpleStatement) -> case simpleStatement of
+    Prj (Py.ExpressionStatement _ expressions) -> all isAssignment expressions
+    _ -> False
+  R1 (Py.CompoundStatement compoundStatement) -> case compoundStatement of
+    _ -> False
+
+isAssignment :: (:+:)
+             (Py.Expression :+: Py.Assignment)
+             (Py.AugmentedAssignment :+: Py.Yield)
+             a -> Bool
+isAssignment expressionStatement = case expressionStatement of
+  Prj (Py.Assignment {}) -> True
+  Prj (Py.AugmentedAssignment {}) -> True
+  _ -> False
 
 instance ToScopeGraph Py.ConcatenatedString where
   type FocalPoint Py.ConcatenatedString _ = Stack.Node
