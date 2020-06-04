@@ -80,70 +80,82 @@ onField =
   scopeGraph @syn
     . getField @field
 
+-- ([(node_for_the_name, ast_for_the_decl)], ...)
+type ClassBodyBinders = Py.Assignment
+                    :+: Py.AugmentedAssignment 
+                    :+: Py.FunctionDefinition
+                    :+: Py.ClassDefinition
+                    :+: Py.DecoratedDefinition
+
+type BodyStruct a b = ([(Stack.Node, [ClassBodyBinders a])], b)
+
+noBindings :: b -> BodyStruct a b
+noBindings x = ([],x)
+
 scopeGraphModule :: ScopeGraphEff sig m => Py.Module Loc -> m (Result ())
-scopeGraphModule = scopeGraph
+scopeGraphModule x = fmap (const ()) <$> scopeGraph x
 
 instance ToScopeGraph Py.AssertStatement where
-  type FocalPoint Py.AssertStatement a = BodyStruct a
+  type FocalPoint Py.AssertStatement a = BodyStruct a [Stack.Node]
   scopeGraph assertStmt = todo assertStmt
 
 -- fmap (\x -> [x]) <$> todo assertStmt
 
 instance ToScopeGraph Py.Assignment where
-  type FocalPoint Py.Assignment _ = Stack.Node
-  scopeGraph (Py.Assignment ann (SingleIdentifier identifier) val _typ) = do
+  type FocalPoint Py.Assignment a = BodyStruct a Stack.Node
+  scopeGraph asgn@(Py.Assignment _ _ Nothing _) =
+    todo asgn
+  scopeGraph asgn@(Py.Assignment ann (SingleIdentifier identifier) (Just val) _typ) = do
     -- TODO: What should we do with the type of an assignment?
     -- TODO: What should we do with the right hand side of an assignment?
     _ <- scopeGraph val
-    pure (Complete (Stack.Declaration identifier Scope.Identifier ann))
+    pure (Complete ([_], Stack.Declaration identifier Scope.Identifier ann))
   scopeGraph x = todo x
 
 instance ToScopeGraph Py.Await where
-  type FocalPoint Py.Await _ = Stack.Node
+  type FocalPoint Py.Await a = BodyStruct a Stack.Node
   scopeGraph (Py.Await _ a) = scopeGraph a
 
 instance ToScopeGraph Py.BooleanOperator where
-  type FocalPoint Py.BooleanOperator _ = Stack.Node
+  type FocalPoint Py.BooleanOperator a = BodyStruct a Stack.Node
   scopeGraph = todo -- (Py.BooleanOperator _ _ left right) = scopeGraph left <> scopeGraph right
 
 instance ToScopeGraph Py.BinaryOperator where
-  type FocalPoint Py.BinaryOperator _ = Stack.Node
+  type FocalPoint Py.BinaryOperator a = BodyStruct a Stack.Node
   scopeGraph = todo -- (Py.BinaryOperator _ _ left right) = scopeGraph left <> scopeGraph right
 
 instance ToScopeGraph Py.AugmentedAssignment where
-  type FocalPoint Py.AugmentedAssignment _ = Stack.Node
+  type FocalPoint Py.AugmentedAssignment a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 --(Py.AugmentedAssignment _ _ lhs rhs) = fmap _augmentedAssignment <$> onField @"right" x
 
 instance ToScopeGraph Py.Attribute where
-  type FocalPoint Py.Attribute _ = Stack.Node
+  type FocalPoint Py.Attribute a = BodyStruct a Stack.Node
   scopeGraph = todo
 
-type BodyStruct a = ([(Stack.Node, (Py.SimpleStatement :+: Py.CompoundStatement) a)], [Stack.Node])
-
 instance ToScopeGraph Py.Block where
-  type FocalPoint Py.Block a = BodyStruct a
+  type FocalPoint Py.Block a = BodyStruct a [Stack.Node]
   scopeGraph (Py.Block _ statements) = do
     whatev <- mapM scopeGraph statements
     let results = sequenceA whatev
     let res' = fmap (fmap fromEithers') results
-    pure $ fmap (foldr (\oldBody (newBindings, newNodes) -> (newBindings <> fst oldBody, newNodes <> snd oldBody)) mempty) (res' :: Result [BodyStruct Loc])
+    pure $ fmap (foldr (\oldBody (newBindings, newNodes) -> (newBindings <> fst oldBody, newNodes <> snd oldBody)) mempty) (res' :: Result [BodyStruct Loc [Stack.Node]])
     where
       fromEithers' ::
         Either
           ( Either
               ( Either
-                  (Either (BodyStruct Loc) (BodyStruct Loc))
-                  (Either (BodyStruct Loc) (BodyStruct Loc))
+                  (Either (BodyStruct Loc b) (BodyStruct Loc b))
+                  (Either (BodyStruct Loc b) (BodyStruct Loc b))
               )
               ( Either
-                  (Either (BodyStruct Loc) (BodyStruct Loc))
-                  (Either (BodyStruct Loc) (BodyStruct Loc))
+                  (Either (BodyStruct Loc b) (BodyStruct Loc b))
+                  (Either (BodyStruct Loc b) (BodyStruct Loc b))
               )
           )
-          (BodyStruct Loc) ->
-        BodyStruct Loc
+          (BodyStruct Loc b) ->
+        BodyStruct Loc b
       fromEithers' bodyStructs = (fromEither . first fromEither . first fromEither . first fromEither) bodyStructs
 
 -- foldM
@@ -153,11 +165,11 @@ instance ToScopeGraph Py.Block where
 --   )
 
 instance ToScopeGraph Py.BreakStatement where
-  type FocalPoint Py.BreakStatement a = BodyStruct a
+  type FocalPoint Py.BreakStatement a = BodyStruct a [Stack.Node]
   scopeGraph statement = todo statement
 
 instance ToScopeGraph Py.Call where
-  type FocalPoint Py.Call _ = Stack.Node
+  type FocalPoint Py.Call a = BodyStruct a Stack.Node
   scopeGraph
     Py.Call
       { function,
@@ -172,9 +184,9 @@ instance ToScopeGraph Py.Call where
   scopeGraph it = todo it
 
 instance ToScopeGraph Py.ClassDefinition where
-  type FocalPoint Py.ClassDefinition a = BodyStruct a
+  type FocalPoint Py.ClassDefinition a = BodyStruct a [Stack.Node]
   scopeGraph
-    Py.ClassDefinition
+    def@Py.ClassDefinition
       { ann,
         name = Py.Identifier _ann1 name,
         superclasses = _superclasses,
@@ -194,32 +206,39 @@ instance ToScopeGraph Py.ClassDefinition where
 
       modify (Stack.addEdge declaration (Stack.PopSymbol "."))
       modify (Stack.addEdge (Stack.PopSymbol ".") (Stack.ClassMembers "CM"))
-
+      
       -- TODO: Should we assert return nodes is empty here.
       res <- scopeGraph body
       case res of
         Complete (bindings, _) -> do
-          for_ bindings $ \(node, statement) -> do
+          for_ bindings $ \(node, statements) -> 
+            _
+            {-
+            do
             if isInstanceMember statement then
               modify (Stack.addEdge (Stack.InstanceMembers "IM") node)
             else if isClassMember statement then
               modify (Stack.addEdge (Stack.ClassMembers "CM") node)
             else pure ()
-          undefined
-        res -> pure res
+            -}
+          pure ()
+        res -> pure ()
+      
+      -- TODO: replace R1L1 with injection
+      pure (Complete ([(declaration,[R1 (R1 (R1 (L1 def)))])], []))
 
       -- for_ bindings $ \(node, statement) -> do
       --   -- let callNode = Stack.PopSymbol "()"
       --   undefined
 
-isInstanceMember :: (Py.SimpleStatement :+: Py.CompoundStatement) a -> Bool
+isInstanceMember :: ClassBodyBinders a -> Bool
 isInstanceMember statement = case statement of
   L1 (Py.SimpleStatement _) -> False
   R1 (Py.CompoundStatement compoundStatement) -> case compoundStatement of
     Prj (Py.FunctionDefinition {}) -> True
     _ -> False
 
-isClassMember :: (Py.SimpleStatement :+: Py.CompoundStatement) a -> Bool
+isClassMember :: ClassBodyBinders a -> Bool
 isClassMember statement = case statement of
   L1 (Py.SimpleStatement simpleStatement) -> case simpleStatement of
     Prj (Py.ExpressionStatement _ expressions) -> all isAssignment expressions
@@ -237,99 +256,99 @@ isAssignment expressionStatement = case expressionStatement of
   _ -> False
 
 instance ToScopeGraph Py.ConcatenatedString where
-  type FocalPoint Py.ConcatenatedString _ = Stack.Node
+  type FocalPoint Py.ConcatenatedString a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 deriving instance ToScopeGraph Py.CompoundStatement
 
 instance ToScopeGraph Py.ConditionalExpression where
-  type FocalPoint Py.ConditionalExpression _ = Stack.Node
+  type FocalPoint Py.ConditionalExpression a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.ContinueStatement where
-  type FocalPoint Py.ContinueStatement a = BodyStruct a
+  type FocalPoint Py.ContinueStatement a = BodyStruct a [Stack.Node]
   scopeGraph _ = pure (Complete ([], []))
 
 instance ToScopeGraph Py.DecoratedDefinition where
-  type FocalPoint Py.DecoratedDefinition a = BodyStruct a
+  type FocalPoint Py.DecoratedDefinition a = BodyStruct a [Stack.Node]
   scopeGraph = todo
 
 instance ToScopeGraph Py.ComparisonOperator where
-  type FocalPoint Py.ComparisonOperator _ = Stack.Node
+  type FocalPoint Py.ComparisonOperator a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.DeleteStatement where
-  type FocalPoint Py.DeleteStatement a = BodyStruct a
+  type FocalPoint Py.DeleteStatement a = BodyStruct a [Stack.Node]
   scopeGraph _ = pure (Complete ([], []))
 
 instance ToScopeGraph Py.Dictionary where
-  type FocalPoint Py.Dictionary _ = Stack.Node
+  type FocalPoint Py.Dictionary a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.DictionaryComprehension where
-  type FocalPoint Py.DictionaryComprehension _ = Stack.Node
+  type FocalPoint Py.DictionaryComprehension a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.DictionarySplat where
-  type FocalPoint Py.DictionarySplat _ = Stack.Node
+  type FocalPoint Py.DictionarySplat a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.Expression where
-  type FocalPoint Py.Expression _ = Stack.Node
+  type FocalPoint Py.Expression a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.ElseClause where
-  type FocalPoint Py.ElseClause a = BodyStruct a
+  type FocalPoint Py.ElseClause a = BodyStruct a [Stack.Node]
   scopeGraph = onField @"body"
 
 instance ToScopeGraph Py.ElifClause where
-  type FocalPoint Py.ElifClause a = BodyStruct a
+  type FocalPoint Py.ElifClause a = BodyStruct a [Stack.Node]
   scopeGraph (Py.ElifClause _ body condition) = do
     _ <- scopeGraph condition
     scopeGraph body
 
 instance ToScopeGraph Py.Ellipsis where
-  type FocalPoint Py.Ellipsis a = BodyStruct a
+  type FocalPoint Py.Ellipsis a = BodyStruct a [Stack.Node]
   scopeGraph _ = pure (Complete ([], []))
 
 instance ToScopeGraph Py.ExceptClause where
-  type FocalPoint Py.ExceptClause a = BodyStruct a
+  type FocalPoint Py.ExceptClause a = BodyStruct a [Stack.Node]
   scopeGraph x = todo x
 
 -- fmap (either (const []) id) <$> todo x
 
 instance ToScopeGraph Py.ExecStatement where
-  type FocalPoint Py.ExecStatement a = BodyStruct a
+  type FocalPoint Py.ExecStatement a = BodyStruct a [Stack.Node]
   scopeGraph x = do
     todo x
 
 instance ToScopeGraph Py.ExpressionStatement where
-  type FocalPoint Py.ExpressionStatement a = BodyStruct a
+  type FocalPoint Py.ExpressionStatement a = BodyStruct a [Stack.Node]
   scopeGraph x = do
     todo x
 
 instance ToScopeGraph Py.ExpressionList where
-  type FocalPoint Py.ExpressionList a = BodyStruct a
+  type FocalPoint Py.ExpressionList a = BodyStruct a [Stack.Node]
   scopeGraph = todo
 
 instance ToScopeGraph Py.False where
-  type FocalPoint Py.False _ = Stack.Node
+  type FocalPoint Py.False a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.FinallyClause where
-  type FocalPoint Py.FinallyClause a = BodyStruct a
+  type FocalPoint Py.FinallyClause a = BodyStruct a [Stack.Node]
   scopeGraph = onField @"extraChildren"
 
 instance ToScopeGraph Py.Float where
-  type FocalPoint Py.Float _ = Stack.Node
+  type FocalPoint Py.Float a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.ForStatement where
-  type FocalPoint Py.ForStatement a = BodyStruct a
+  type FocalPoint Py.ForStatement a = BodyStruct a [Stack.Node]
   scopeGraph = todo
 
 instance ToScopeGraph Py.FunctionDefinition where
-  type FocalPoint Py.FunctionDefinition a = BodyStruct a
+  type FocalPoint Py.FunctionDefinition a = BodyStruct a [Stack.Node]
 
   scopeGraph
     Py.FunctionDefinition
@@ -391,21 +410,21 @@ instance ToScopeGraph Py.FunctionDefinition where
       pure (Complete ([], []))
 
 instance ToScopeGraph Py.FutureImportStatement where
-  type FocalPoint Py.FutureImportStatement a = BodyStruct a
+  type FocalPoint Py.FutureImportStatement a = BodyStruct a [Stack.Node]
   scopeGraph = todo
 
 instance ToScopeGraph Py.GeneratorExpression where
-  type FocalPoint Py.GeneratorExpression _ = Stack.Node
+  type FocalPoint Py.GeneratorExpression a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.Identifier where
-  type FocalPoint Py.Identifier _ = Stack.Node
+  type FocalPoint Py.Identifier a = BodyStruct a Stack.Node
   scopeGraph (Py.Identifier ann name) = do
     node <- refer (Name.name name) ScopeGraph.Identifier ann
-    pure (Complete node)
+    pure (Complete (noBindings node))
 
 instance ToScopeGraph Py.IfStatement where
-  type FocalPoint Py.IfStatement a = BodyStruct a
+  type FocalPoint Py.IfStatement a = BodyStruct a [Stack.Node]
   scopeGraph (Py.IfStatement _ alternative body condition) = do
     _ <- scopeGraph condition
     res <- scopeGraph body
@@ -415,15 +434,15 @@ instance ToScopeGraph Py.IfStatement where
 -- scopeGraph body <> (fmap fromEither <$> foldMap scopeGraph alternative)
 
 instance ToScopeGraph Py.GlobalStatement where
-  type FocalPoint Py.GlobalStatement a = BodyStruct a
+  type FocalPoint Py.GlobalStatement a = BodyStruct a [Stack.Node]
   scopeGraph = todo
 
 instance ToScopeGraph Py.Integer where
-  type FocalPoint Py.Integer _ = Stack.Node
+  type FocalPoint Py.Integer a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.ImportStatement where
-  type FocalPoint Py.ImportStatement a = BodyStruct a
+  type FocalPoint Py.ImportStatement a = BodyStruct a [Stack.Node]
   scopeGraph (Py.ImportStatement _ ((R1 (Py.DottedName _ names@((Py.Identifier ann definition) :| _))) :| [])) = do
     rootScope' <- rootScope
     ScopeGraph.CurrentScope previousScope <- currentScope
@@ -443,7 +462,7 @@ instance ToScopeGraph Py.ImportStatement where
   scopeGraph term = todo (show term)
 
 instance ToScopeGraph Py.ImportFromStatement where
-  type FocalPoint Py.ImportFromStatement a = BodyStruct a
+  type FocalPoint Py.ImportFromStatement a = BodyStruct a [Stack.Node]
   scopeGraph (Py.ImportFromStatement _ [] (L1 (Py.DottedName _ names)) (Just (Py.WildcardImport _ _))) = do
     let toName (Py.Identifier _ name) = Name.name name
     complete <* newEdge ScopeGraph.Import (toName <$> names)
@@ -482,35 +501,35 @@ instance ToScopeGraph Py.ImportFromStatement where
   scopeGraph term = todo term
 
 instance ToScopeGraph Py.Lambda where
-  type FocalPoint Py.Lambda _ = Stack.Node
+  type FocalPoint Py.Lambda a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.List where
-  type FocalPoint Py.List _ = Stack.Node
+  type FocalPoint Py.List a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.ListComprehension where
-  type FocalPoint Py.ListComprehension _ = Stack.Node
+  type FocalPoint Py.ListComprehension a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.ListSplat where
-  type FocalPoint Py.ListSplat _ = Stack.Node
+  type FocalPoint Py.ListSplat a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.NamedExpression where
-  type FocalPoint Py.NamedExpression _ = Stack.Node
+  type FocalPoint Py.NamedExpression a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.None where
-  type FocalPoint Py.None _ = Stack.Node
+  type FocalPoint Py.None a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.NonlocalStatement where
-  type FocalPoint Py.NonlocalStatement a = BodyStruct a
+  type FocalPoint Py.NonlocalStatement a = BodyStruct a [Stack.Node]
   scopeGraph = todo
 
 instance ToScopeGraph Py.Module where
-  type FocalPoint Py.Module _ = ()
+  type FocalPoint Py.Module a = BodyStruct a ()
   scopeGraph _term@(Py.Module ann stmts) = do
     rootScope' <- rootScope
 
@@ -525,10 +544,10 @@ instance ToScopeGraph Py.Module where
     ScopeGraph.CurrentScope currentName <- currentScope
     modify (Stack.addEdge (Stack.Declaration "__main__" Identifier ann) (Stack.Scope currentName) . Stack.overlay newGraph)
 
-    pure (Complete ())
+    pure (Complete (noBindings ()))
 
 instance ToScopeGraph Py.ReturnStatement where
-  type FocalPoint Py.ReturnStatement a = BodyStruct a
+  type FocalPoint Py.ReturnStatement a = BodyStruct a [Stack.Node]
   scopeGraph (Py.ReturnStatement _ maybeVals) = do
     let returnNode = Stack.Scope "R"
         res = Complete ([], [returnNode])
@@ -545,29 +564,29 @@ instance ToScopeGraph Py.ReturnStatement where
       Nothing -> pure res
 
 instance ToScopeGraph Py.True where
-  type FocalPoint Py.True _ = Stack.Node
+  type FocalPoint Py.True a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.NotOperator where
-  type FocalPoint Py.NotOperator _ = Stack.Node
+  type FocalPoint Py.NotOperator a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.Pair where
-  type FocalPoint Py.Pair _ = Stack.Node
+  type FocalPoint Py.Pair a = BodyStruct a Stack.Node
   scopeGraph = todo -- (Py.Pair _ value key) = scopeGraph key <> scopeGraph value
 
 instance ToScopeGraph Py.ParenthesizedExpression where
-  type FocalPoint Py.ParenthesizedExpression _ = Stack.Node
+  type FocalPoint Py.ParenthesizedExpression a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 --onField @"extraChildren"
 
 instance ToScopeGraph Py.PassStatement where
-  type FocalPoint Py.PassStatement a = BodyStruct a
+  type FocalPoint Py.PassStatement a = BodyStruct a [Stack.Node]
   scopeGraph _ = pure (Complete ([], []))
 
 instance ToScopeGraph Py.PrintStatement where
-  type FocalPoint Py.PrintStatement a = BodyStruct a
+  type FocalPoint Py.PrintStatement a = BodyStruct a [Stack.Node]
   scopeGraph (Py.PrintStatement _ args _chevron) = do
     mapM_ scopeGraph args
     pure (Complete ([], []))
@@ -575,39 +594,39 @@ instance ToScopeGraph Py.PrintStatement where
 --(Py.PrintStatement _ args _chevron) = foldMap scopeGraph args
 
 instance ToScopeGraph Py.PrimaryExpression where
-  type FocalPoint Py.PrimaryExpression _ = Stack.Node
+  type FocalPoint Py.PrimaryExpression a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.SimpleStatement where
-  type FocalPoint Py.SimpleStatement a = BodyStruct a
+  type FocalPoint Py.SimpleStatement a = BodyStruct a [Stack.Node]
   scopeGraph = todo
 
 instance ToScopeGraph Py.RaiseStatement where
-  type FocalPoint Py.RaiseStatement a = BodyStruct a
+  type FocalPoint Py.RaiseStatement a = BodyStruct a [Stack.Node]
   scopeGraph = todo
 
 instance ToScopeGraph Py.Set where
-  type FocalPoint Py.Set _ = Stack.Node
+  type FocalPoint Py.Set a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.SetComprehension where
-  type FocalPoint Py.SetComprehension _ = Stack.Node
+  type FocalPoint Py.SetComprehension a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.String where
-  type FocalPoint Py.String _ = Stack.Node
+  type FocalPoint Py.String a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.Subscript where
-  type FocalPoint Py.Subscript _ = Stack.Node
+  type FocalPoint Py.Subscript a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.Tuple where
-  type FocalPoint Py.Tuple _ = Stack.Node
+  type FocalPoint Py.Tuple a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 instance ToScopeGraph Py.TryStatement where
-  type FocalPoint Py.TryStatement a = BodyStruct a
+  type FocalPoint Py.TryStatement a = BodyStruct a [Stack.Node]
   scopeGraph (Py.TryStatement _ body elseClauses) = do
     res <- scopeGraph body
     reses <- mapM scopeGraph elseClauses
@@ -616,13 +635,13 @@ instance ToScopeGraph Py.TryStatement where
 --scopeGraph body <> (_tryStatement (foldMap scopeGraph elseClauses))
 
 instance ToScopeGraph Py.UnaryOperator where
-  type FocalPoint Py.UnaryOperator _ = Stack.Node
+  type FocalPoint Py.UnaryOperator a = BodyStruct a Stack.Node
   scopeGraph = todo
 
 --onField @"argument"
 
 instance ToScopeGraph Py.WhileStatement where
-  type FocalPoint Py.WhileStatement a = BodyStruct a
+  type FocalPoint Py.WhileStatement a = BodyStruct a [Stack.Node]
   scopeGraph Py.WhileStatement {alternative, body, condition} = do
     _ <- scopeGraph condition
     res <- scopeGraph body
@@ -632,9 +651,9 @@ instance ToScopeGraph Py.WhileStatement where
 --scopeGraph body <> foldMap scopeGraph alternative
 
 instance ToScopeGraph Py.WithStatement where
-  type FocalPoint Py.WithStatement a = BodyStruct a
+  type FocalPoint Py.WithStatement a = BodyStruct a [Stack.Node]
   scopeGraph = todo
 
 instance ToScopeGraph Py.Yield where
-  type FocalPoint Py.Yield _ = Stack.Node
+  type FocalPoint Py.Yield a = BodyStruct a Stack.Node
   scopeGraph = todo
