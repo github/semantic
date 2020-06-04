@@ -70,9 +70,9 @@ parseStackGraph blobs = do
           & P.id .~ nodeId node
           & P.name .~ nodeName node
           & P.line .~ nodeLine node
-          & P.kind .~ nodeKind node
           & P.maybe'span ?~ converting # nodeSpan node
-          & P.nodeType .~ nodeTypeToNodeType (Semantic.Api.StackGraph.nodeType node)
+          & P.syntaxType .~ nodeSyntaxType node
+          & P.nodeType .~ nodeNodeType node
 
         pathToPath :: SGPath -> StackGraphPath
         pathToPath path
@@ -84,14 +84,6 @@ parseStackGraph blobs = do
           & P.to .~ pathTo path
           & P.endingScopeStack .~ pathEndingScopeStack path
           & P.endingSymbolStack .~ pathEndingSymbolStack path
-
-        nodeTypeToNodeType :: SGNodeType -> NodeType
-        nodeTypeToNodeType = \case
-          RootScope     -> P.ROOT_SCOPE
-          JumpToScope   -> P.JUMP_TO_SCOPE
-          ExportedScope -> P.EXPORTED_SCOPE
-          Definition    -> P.DEFINITION
-          Reference     -> P.REFERENCE
 
 -- TODO: These are temporary, will replace with proper datatypes from the scope graph work.
 data TempStackGraph
@@ -114,16 +106,13 @@ data SGPath
 
 data SGNode
   = SGNode
-  { nodeId :: Int64
-  , nodeName :: Text
-  , nodeLine :: Text
-  , nodeKind :: Text
-  , nodeSpan :: Loc.Span
-  , nodeType :: SGNodeType
-  }
-  deriving (Eq, Show)
-
-data SGNodeType = RootScope | JumpToScope | ExportedScope | Definition | Reference
+      { nodeId :: Int64,
+        nodeName :: Text,
+        nodeLine :: Text,
+        nodeSyntaxType :: P.SyntaxType,
+        nodeSpan :: Loc.Span,
+        nodeNodeType :: P.NodeType
+      }
   deriving (Eq, Show)
 
 graphForBlob :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m TempStackGraph

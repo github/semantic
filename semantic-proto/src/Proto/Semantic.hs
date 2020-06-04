@@ -14,8 +14,9 @@ module Proto.Semantic (
         ParseTreeRequest(), ParseTreeSymbolResponse(), PingRequest(),
         PingResponse(), Position(), ReplacedTerm(), Span(),
         StackGraphFile(), StackGraphNode(), StackGraphPath(),
-        StackGraphRequest(), StackGraphResponse(), Symbol(), TermEdge(),
-        TermVertex()
+        StackGraphRequest(), StackGraphResponse(), Symbol(),
+        SyntaxType(..), SyntaxType(), SyntaxType'UnrecognizedValue,
+        TermEdge(), TermVertex()
     ) where
 import qualified Data.ProtoLens.Runtime.Control.DeepSeq as Control.DeepSeq
 import qualified Data.ProtoLens.Runtime.Data.ProtoLens.Prism as Data.ProtoLens.Prism
@@ -4578,16 +4579,16 @@ instance Control.DeepSeq.NFData StackGraphFile where
          * 'Proto.Semantic_Fields.id' @:: Lens' StackGraphNode Data.Int.Int64@
          * 'Proto.Semantic_Fields.name' @:: Lens' StackGraphNode Data.Text.Text@
          * 'Proto.Semantic_Fields.line' @:: Lens' StackGraphNode Data.Text.Text@
-         * 'Proto.Semantic_Fields.kind' @:: Lens' StackGraphNode Data.Text.Text@
          * 'Proto.Semantic_Fields.span' @:: Lens' StackGraphNode Span@
          * 'Proto.Semantic_Fields.maybe'span' @:: Lens' StackGraphNode (Prelude.Maybe Span)@
+         * 'Proto.Semantic_Fields.syntaxType' @:: Lens' StackGraphNode SyntaxType@
          * 'Proto.Semantic_Fields.nodeType' @:: Lens' StackGraphNode NodeType@ -}
 data StackGraphNode
   = StackGraphNode'_constructor {_StackGraphNode'id :: !Data.Int.Int64,
                                  _StackGraphNode'name :: !Data.Text.Text,
                                  _StackGraphNode'line :: !Data.Text.Text,
-                                 _StackGraphNode'kind :: !Data.Text.Text,
                                  _StackGraphNode'span :: !(Prelude.Maybe Span),
+                                 _StackGraphNode'syntaxType :: !SyntaxType,
                                  _StackGraphNode'nodeType :: !NodeType,
                                  _StackGraphNode'_unknownFields :: !Data.ProtoLens.FieldSet}
   deriving (Prelude.Eq, Prelude.Ord)
@@ -4617,13 +4618,6 @@ instance Data.ProtoLens.Field.HasField StackGraphNode "line" Data.Text.Text wher
            _StackGraphNode'line
            (\ x__ y__ -> x__ {_StackGraphNode'line = y__}))
         Prelude.id
-instance Data.ProtoLens.Field.HasField StackGraphNode "kind" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _StackGraphNode'kind
-           (\ x__ y__ -> x__ {_StackGraphNode'kind = y__}))
-        Prelude.id
 instance Data.ProtoLens.Field.HasField StackGraphNode "span" Span where
   fieldOf _
     = (Prelude..)
@@ -4637,6 +4631,13 @@ instance Data.ProtoLens.Field.HasField StackGraphNode "maybe'span" (Prelude.Mayb
         (Lens.Family2.Unchecked.lens
            _StackGraphNode'span
            (\ x__ y__ -> x__ {_StackGraphNode'span = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField StackGraphNode "syntaxType" SyntaxType where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _StackGraphNode'syntaxType
+           (\ x__ y__ -> x__ {_StackGraphNode'syntaxType = y__}))
         Prelude.id
 instance Data.ProtoLens.Field.HasField StackGraphNode "nodeType" NodeType where
   fieldOf _
@@ -4673,14 +4674,6 @@ instance Data.ProtoLens.Message StackGraphNode where
               (Data.ProtoLens.PlainField
                  Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"line")) ::
               Data.ProtoLens.FieldDescriptor StackGraphNode
-        kind__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "kind"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"kind")) ::
-              Data.ProtoLens.FieldDescriptor StackGraphNode
         span__field_descriptor
           = Data.ProtoLens.FieldDescriptor
               "span"
@@ -4688,6 +4681,15 @@ instance Data.ProtoLens.Message StackGraphNode where
                  Data.ProtoLens.FieldTypeDescriptor Span)
               (Data.ProtoLens.OptionalField
                  (Data.ProtoLens.Field.field @"maybe'span")) ::
+              Data.ProtoLens.FieldDescriptor StackGraphNode
+        syntaxType__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "syntax_type"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.EnumField ::
+                 Data.ProtoLens.FieldTypeDescriptor SyntaxType)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional
+                 (Data.ProtoLens.Field.field @"syntaxType")) ::
               Data.ProtoLens.FieldDescriptor StackGraphNode
         nodeType__field_descriptor
           = Data.ProtoLens.FieldDescriptor
@@ -4703,8 +4705,8 @@ instance Data.ProtoLens.Message StackGraphNode where
           [(Data.ProtoLens.Tag 1, id__field_descriptor),
            (Data.ProtoLens.Tag 2, name__field_descriptor),
            (Data.ProtoLens.Tag 3, line__field_descriptor),
-           (Data.ProtoLens.Tag 4, kind__field_descriptor),
-           (Data.ProtoLens.Tag 5, span__field_descriptor),
+           (Data.ProtoLens.Tag 4, span__field_descriptor),
+           (Data.ProtoLens.Tag 5, syntaxType__field_descriptor),
            (Data.ProtoLens.Tag 6, nodeType__field_descriptor)]
   unknownFields
     = Lens.Family2.Unchecked.lens
@@ -4715,8 +4717,8 @@ instance Data.ProtoLens.Message StackGraphNode where
         {_StackGraphNode'id = Data.ProtoLens.fieldDefault,
          _StackGraphNode'name = Data.ProtoLens.fieldDefault,
          _StackGraphNode'line = Data.ProtoLens.fieldDefault,
-         _StackGraphNode'kind = Data.ProtoLens.fieldDefault,
          _StackGraphNode'span = Prelude.Nothing,
+         _StackGraphNode'syntaxType = Data.ProtoLens.fieldDefault,
          _StackGraphNode'nodeType = Data.ProtoLens.fieldDefault,
          _StackGraphNode'_unknownFields = []}
   parseMessage
@@ -4774,23 +4776,21 @@ instance Data.ProtoLens.Message StackGraphNode where
                                 loop (Lens.Family2.set (Data.ProtoLens.Field.field @"line") y x)
                         34
                           -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "kind"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"kind") y x)
-                        42
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
                                            Data.ProtoLens.Encoding.Bytes.isolate
                                              (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
                                        "span"
                                 loop (Lens.Family2.set (Data.ProtoLens.Field.field @"span") y x)
+                        40
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          Prelude.toEnum
+                                          (Prelude.fmap
+                                             Prelude.fromIntegral
+                                             Data.ProtoLens.Encoding.Bytes.getVarInt))
+                                       "syntax_type"
+                                loop
+                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"syntaxType") y x)
                         48
                           -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
                                        (Prelude.fmap
@@ -4855,37 +4855,37 @@ instance Data.ProtoLens.Message StackGraphNode where
                                Data.Text.Encoding.encodeUtf8
                                _v))
                    ((Data.Monoid.<>)
-                      (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"kind") _x
-                       in
-                         if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                             Data.Monoid.mempty
-                         else
-                             (Data.Monoid.<>)
-                               (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
-                               ((Prelude..)
-                                  (\ bs
-                                     -> (Data.Monoid.<>)
-                                          (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                             (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                          (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                  Data.Text.Encoding.encodeUtf8
-                                  _v))
+                      (case
+                           Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'span") _x
+                       of
+                         Prelude.Nothing -> Data.Monoid.mempty
+                         (Prelude.Just _v)
+                           -> (Data.Monoid.<>)
+                                (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
+                                ((Prelude..)
+                                   (\ bs
+                                      -> (Data.Monoid.<>)
+                                           (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                              (Prelude.fromIntegral (Data.ByteString.length bs)))
+                                           (Data.ProtoLens.Encoding.Bytes.putBytes bs))
+                                   Data.ProtoLens.encodeMessage
+                                   _v))
                       ((Data.Monoid.<>)
-                         (case
-                              Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'span") _x
-                          of
-                            Prelude.Nothing -> Data.Monoid.mempty
-                            (Prelude.Just _v)
-                              -> (Data.Monoid.<>)
-                                   (Data.ProtoLens.Encoding.Bytes.putVarInt 42)
-                                   ((Prelude..)
-                                      (\ bs
-                                         -> (Data.Monoid.<>)
-                                              (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                                 (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                              (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                      Data.ProtoLens.encodeMessage
-                                      _v))
+                         (let
+                            _v
+                              = Lens.Family2.view (Data.ProtoLens.Field.field @"syntaxType") _x
+                          in
+                            if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                                Data.Monoid.mempty
+                            else
+                                (Data.Monoid.<>)
+                                  (Data.ProtoLens.Encoding.Bytes.putVarInt 40)
+                                  ((Prelude..)
+                                     ((Prelude..)
+                                        Data.ProtoLens.Encoding.Bytes.putVarInt
+                                        Prelude.fromIntegral)
+                                     Prelude.fromEnum
+                                     _v))
                          ((Data.Monoid.<>)
                             (let
                                _v = Lens.Family2.view (Data.ProtoLens.Field.field @"nodeType") _x
@@ -4915,9 +4915,9 @@ instance Control.DeepSeq.NFData StackGraphNode where
                    (Control.DeepSeq.deepseq
                       (_StackGraphNode'line x__)
                       (Control.DeepSeq.deepseq
-                         (_StackGraphNode'kind x__)
+                         (_StackGraphNode'span x__)
                          (Control.DeepSeq.deepseq
-                            (_StackGraphNode'span x__)
+                            (_StackGraphNode'syntaxType x__)
                             (Control.DeepSeq.deepseq (_StackGraphNode'nodeType x__) ()))))))
 {- | Fields :
      
@@ -5686,7 +5686,8 @@ instance Control.DeepSeq.NFData StackGraphResponse where
          * 'Proto.Semantic_Fields.maybe'span' @:: Lens' Symbol (Prelude.Maybe Span)@
          * 'Proto.Semantic_Fields.docs' @:: Lens' Symbol Docstring@
          * 'Proto.Semantic_Fields.maybe'docs' @:: Lens' Symbol (Prelude.Maybe Docstring)@
-         * 'Proto.Semantic_Fields.nodeType' @:: Lens' Symbol NodeType@ -}
+         * 'Proto.Semantic_Fields.nodeType' @:: Lens' Symbol NodeType@
+         * 'Proto.Semantic_Fields.syntaxType' @:: Lens' Symbol SyntaxType@ -}
 data Symbol
   = Symbol'_constructor {_Symbol'symbol :: !Data.Text.Text,
                          _Symbol'kind :: !Data.Text.Text,
@@ -5694,6 +5695,7 @@ data Symbol
                          _Symbol'span :: !(Prelude.Maybe Span),
                          _Symbol'docs :: !(Prelude.Maybe Docstring),
                          _Symbol'nodeType :: !NodeType,
+                         _Symbol'syntaxType :: !SyntaxType,
                          _Symbol'_unknownFields :: !Data.ProtoLens.FieldSet}
   deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Symbol where
@@ -5750,6 +5752,12 @@ instance Data.ProtoLens.Field.HasField Symbol "nodeType" NodeType where
         (Lens.Family2.Unchecked.lens
            _Symbol'nodeType (\ x__ y__ -> x__ {_Symbol'nodeType = y__}))
         Prelude.id
+instance Data.ProtoLens.Field.HasField Symbol "syntaxType" SyntaxType where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _Symbol'syntaxType (\ x__ y__ -> x__ {_Symbol'syntaxType = y__}))
+        Prelude.id
 instance Data.ProtoLens.Message Symbol where
   messageName _ = Data.Text.pack "github.semantic.Symbol"
   fieldsByTag
@@ -5803,6 +5811,15 @@ instance Data.ProtoLens.Message Symbol where
                  Data.ProtoLens.Optional
                  (Data.ProtoLens.Field.field @"nodeType")) ::
               Data.ProtoLens.FieldDescriptor Symbol
+        syntaxType__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "syntax_type"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.EnumField ::
+                 Data.ProtoLens.FieldTypeDescriptor SyntaxType)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional
+                 (Data.ProtoLens.Field.field @"syntaxType")) ::
+              Data.ProtoLens.FieldDescriptor Symbol
       in
         Data.Map.fromList
           [(Data.ProtoLens.Tag 1, symbol__field_descriptor),
@@ -5810,7 +5827,8 @@ instance Data.ProtoLens.Message Symbol where
            (Data.ProtoLens.Tag 3, line__field_descriptor),
            (Data.ProtoLens.Tag 4, span__field_descriptor),
            (Data.ProtoLens.Tag 5, docs__field_descriptor),
-           (Data.ProtoLens.Tag 6, nodeType__field_descriptor)]
+           (Data.ProtoLens.Tag 6, nodeType__field_descriptor),
+           (Data.ProtoLens.Tag 7, syntaxType__field_descriptor)]
   unknownFields
     = Lens.Family2.Unchecked.lens
         _Symbol'_unknownFields
@@ -5822,6 +5840,7 @@ instance Data.ProtoLens.Message Symbol where
          _Symbol'line = Data.ProtoLens.fieldDefault,
          _Symbol'span = Prelude.Nothing, _Symbol'docs = Prelude.Nothing,
          _Symbol'nodeType = Data.ProtoLens.fieldDefault,
+         _Symbol'syntaxType = Data.ProtoLens.fieldDefault,
          _Symbol'_unknownFields = []}
   parseMessage
     = let
@@ -5904,6 +5923,16 @@ instance Data.ProtoLens.Message Symbol where
                                        "node_type"
                                 loop
                                   (Lens.Family2.set (Data.ProtoLens.Field.field @"nodeType") y x)
+                        56
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          Prelude.toEnum
+                                          (Prelude.fmap
+                                             Prelude.fromIntegral
+                                             Data.ProtoLens.Encoding.Bytes.getVarInt))
+                                       "syntax_type"
+                                loop
+                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"syntaxType") y x)
                         wire
                           -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
                                         wire
@@ -6011,8 +6040,25 @@ instance Data.ProtoLens.Message Symbol where
                                            Prelude.fromIntegral)
                                         Prelude.fromEnum
                                         _v))
-                            (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                               (Lens.Family2.view Data.ProtoLens.unknownFields _x)))))))
+                            ((Data.Monoid.<>)
+                               (let
+                                  _v
+                                    = Lens.Family2.view
+                                        (Data.ProtoLens.Field.field @"syntaxType") _x
+                                in
+                                  if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                                      Data.Monoid.mempty
+                                  else
+                                      (Data.Monoid.<>)
+                                        (Data.ProtoLens.Encoding.Bytes.putVarInt 56)
+                                        ((Prelude..)
+                                           ((Prelude..)
+                                              Data.ProtoLens.Encoding.Bytes.putVarInt
+                                              Prelude.fromIntegral)
+                                           Prelude.fromEnum
+                                           _v))
+                               (Data.ProtoLens.Encoding.Wire.buildFieldSet
+                                  (Lens.Family2.view Data.ProtoLens.unknownFields _x))))))))
 instance Control.DeepSeq.NFData Symbol where
   rnf
     = \ x__
@@ -6028,7 +6074,117 @@ instance Control.DeepSeq.NFData Symbol where
                          (_Symbol'span x__)
                          (Control.DeepSeq.deepseq
                             (_Symbol'docs x__)
-                            (Control.DeepSeq.deepseq (_Symbol'nodeType x__) ()))))))
+                            (Control.DeepSeq.deepseq
+                               (_Symbol'nodeType x__)
+                               (Control.DeepSeq.deepseq (_Symbol'syntaxType x__) ())))))))
+newtype SyntaxType'UnrecognizedValue
+  = SyntaxType'UnrecognizedValue Data.Int.Int32
+  deriving (Prelude.Eq, Prelude.Ord, Prelude.Show)
+data SyntaxType
+  = UNKNOWN |
+    FUNCTION |
+    METHOD |
+    CLASS |
+    MODULE |
+    CALL |
+    TYPE |
+    INTERFACE |
+    IMPLEMENTATION |
+    SyntaxType'Unrecognized !SyntaxType'UnrecognizedValue
+  deriving (Prelude.Show, Prelude.Eq, Prelude.Ord)
+instance Data.ProtoLens.MessageEnum SyntaxType where
+  maybeToEnum 0 = Prelude.Just UNKNOWN
+  maybeToEnum 1 = Prelude.Just FUNCTION
+  maybeToEnum 2 = Prelude.Just METHOD
+  maybeToEnum 3 = Prelude.Just CLASS
+  maybeToEnum 4 = Prelude.Just MODULE
+  maybeToEnum 5 = Prelude.Just CALL
+  maybeToEnum 6 = Prelude.Just TYPE
+  maybeToEnum 7 = Prelude.Just INTERFACE
+  maybeToEnum 8 = Prelude.Just IMPLEMENTATION
+  maybeToEnum k
+    = Prelude.Just
+        (SyntaxType'Unrecognized
+           (SyntaxType'UnrecognizedValue (Prelude.fromIntegral k)))
+  showEnum UNKNOWN = "UNKNOWN"
+  showEnum FUNCTION = "FUNCTION"
+  showEnum METHOD = "METHOD"
+  showEnum CLASS = "CLASS"
+  showEnum MODULE = "MODULE"
+  showEnum CALL = "CALL"
+  showEnum TYPE = "TYPE"
+  showEnum INTERFACE = "INTERFACE"
+  showEnum IMPLEMENTATION = "IMPLEMENTATION"
+  showEnum (SyntaxType'Unrecognized (SyntaxType'UnrecognizedValue k))
+    = Prelude.show k
+  readEnum k
+    | (Prelude.==) k "UNKNOWN" = Prelude.Just UNKNOWN
+    | (Prelude.==) k "FUNCTION" = Prelude.Just FUNCTION
+    | (Prelude.==) k "METHOD" = Prelude.Just METHOD
+    | (Prelude.==) k "CLASS" = Prelude.Just CLASS
+    | (Prelude.==) k "MODULE" = Prelude.Just MODULE
+    | (Prelude.==) k "CALL" = Prelude.Just CALL
+    | (Prelude.==) k "TYPE" = Prelude.Just TYPE
+    | (Prelude.==) k "INTERFACE" = Prelude.Just INTERFACE
+    | (Prelude.==) k "IMPLEMENTATION" = Prelude.Just IMPLEMENTATION
+    | Prelude.otherwise
+    = (Prelude.>>=) (Text.Read.readMaybe k) Data.ProtoLens.maybeToEnum
+instance Prelude.Bounded SyntaxType where
+  minBound = UNKNOWN
+  maxBound = IMPLEMENTATION
+instance Prelude.Enum SyntaxType where
+  toEnum k__
+    = Prelude.maybe
+        (Prelude.error
+           ((Prelude.++)
+              "toEnum: unknown value for enum SyntaxType: " (Prelude.show k__)))
+        Prelude.id
+        (Data.ProtoLens.maybeToEnum k__)
+  fromEnum UNKNOWN = 0
+  fromEnum FUNCTION = 1
+  fromEnum METHOD = 2
+  fromEnum CLASS = 3
+  fromEnum MODULE = 4
+  fromEnum CALL = 5
+  fromEnum TYPE = 6
+  fromEnum INTERFACE = 7
+  fromEnum IMPLEMENTATION = 8
+  fromEnum (SyntaxType'Unrecognized (SyntaxType'UnrecognizedValue k))
+    = Prelude.fromIntegral k
+  succ IMPLEMENTATION
+    = Prelude.error
+        "SyntaxType.succ: bad argument IMPLEMENTATION. This value would be out of bounds."
+  succ UNKNOWN = FUNCTION
+  succ FUNCTION = METHOD
+  succ METHOD = CLASS
+  succ CLASS = MODULE
+  succ MODULE = CALL
+  succ CALL = TYPE
+  succ TYPE = INTERFACE
+  succ INTERFACE = IMPLEMENTATION
+  succ (SyntaxType'Unrecognized _)
+    = Prelude.error "SyntaxType.succ: bad argument: unrecognized value"
+  pred UNKNOWN
+    = Prelude.error
+        "SyntaxType.pred: bad argument UNKNOWN. This value would be out of bounds."
+  pred FUNCTION = UNKNOWN
+  pred METHOD = FUNCTION
+  pred CLASS = METHOD
+  pred MODULE = CLASS
+  pred CALL = MODULE
+  pred TYPE = CALL
+  pred INTERFACE = TYPE
+  pred IMPLEMENTATION = INTERFACE
+  pred (SyntaxType'Unrecognized _)
+    = Prelude.error "SyntaxType.pred: bad argument: unrecognized value"
+  enumFrom = Data.ProtoLens.Message.Enum.messageEnumFrom
+  enumFromTo = Data.ProtoLens.Message.Enum.messageEnumFromTo
+  enumFromThen = Data.ProtoLens.Message.Enum.messageEnumFromThen
+  enumFromThenTo = Data.ProtoLens.Message.Enum.messageEnumFromThenTo
+instance Data.ProtoLens.FieldDefault SyntaxType where
+  fieldDefault = UNKNOWN
+instance Control.DeepSeq.NFData SyntaxType where
+  rnf x__ = Prelude.seq x__ ()
 {- | Fields :
      
          * 'Proto.Semantic_Fields.source' @:: Lens' TermEdge Data.Int.Int32@

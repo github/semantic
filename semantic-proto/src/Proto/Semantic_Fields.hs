@@ -1,7 +1,6 @@
 {- This file was auto-generated from semantic.proto by the proto-lens-protoc program. -}
 {-# LANGUAGE ScopedTypeVariables, DataKinds, TypeFamilies, UndecidableInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleContexts, FlexibleInstances, PatternSynonyms, MagicHash, NoImplicitPrelude, DataKinds, BangPatterns, TypeApplications#-}
 {-# OPTIONS_GHC -Wno-unused-imports#-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-} -- Manually added for semantic's project settings
 {-# OPTIONS_GHC -Wno-duplicate-exports#-}
 {-# OPTIONS_GHC -Wno-dodgy-exports#-}
 module Proto.Semantic_Fields where
@@ -326,6 +325,12 @@ symbols ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "symbols" a) =>
   Lens.Family2.LensLike' f s a
 symbols = Data.ProtoLens.Field.field @"symbols"
+syntaxType ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "syntaxType" a) =>
+  Lens.Family2.LensLike' f s a
+syntaxType = Data.ProtoLens.Field.field @"syntaxType"
 target ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "target" a) =>

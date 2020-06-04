@@ -129,6 +129,7 @@ message Symbol {
   Span span = 4;
   Docstring docs = 5;
   NodeType node_type = 6;
+  SyntaxType syntax_type = 7;
 }
 
 message Docstring {
@@ -161,12 +162,24 @@ enum NodeType {
   REFERENCE = 4;
 }
 
+enum SyntaxType {
+  UNKNOWN = 0;
+  FUNCTION = 1;
+  METHOD = 2;
+  CLASS = 3;
+  MODULE = 4;
+  CALL = 5;
+  TYPE = 6;
+  INTERFACE = 7;
+  IMPLEMENTATION = 8;
+}
+
 message StackGraphNode {
   int64 id = 1;
   string name = 2;
   string line = 3;
-  string kind = 4;
-  Span span = 5;
+  Span span = 4;
+  SyntaxType syntax_type = 5;
   NodeType node_type = 6;
 }
 
