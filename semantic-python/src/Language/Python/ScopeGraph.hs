@@ -146,12 +146,6 @@ instance ToScopeGraph Py.Block where
         BodyStruct Loc
       fromEithers' bodyStructs = (fromEither . first fromEither . first fromEither . first fromEither) bodyStructs
 
--- foldM
---   ( \bodyStruct statement -> do
---       result <- scopeGraph statement
---       body
---   )
-
 instance ToScopeGraph Py.BreakStatement where
   type FocalPoint Py.BreakStatement a = BodyStruct a
   scopeGraph statement = todo statement
