@@ -21,6 +21,7 @@ import Data.List.NonEmpty (NonEmpty (..))
 import Data.Maybe (listToMaybe)
 import Data.Text as Text
 import qualified Language.Python.AST as Py
+import Proto.Semantic as P
 import Source.Loc
 import Source.Range
 import Source.Source as Source
@@ -59,7 +60,7 @@ keywordFunctionCall ::
   Range ->
   Text ->
   m ()
-keywordFunctionCall t loc range name = yieldTag name Function loc range Nothing >> gtags t
+keywordFunctionCall t loc range name = yieldTag name P.FUNCTION loc range Nothing >> gtags t
 
 instance ToTags Py.String where
   tags Py.String {extraChildren} = for_ extraChildren $ \x -> case x of
@@ -101,7 +102,7 @@ instance ToTags Py.FunctionDefinition where
       } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
-      yieldTag text Function ann (Range start end) docs >> gtags t
+      yieldTag text P.FUNCTION ann (Range start end) docs >> gtags t
 
 instance ToTags Py.ClassDefinition where
   tags
@@ -112,7 +113,7 @@ instance ToTags Py.ClassDefinition where
       } = do
       src <- ask @Source
       let docs = listToMaybe extraChildren >>= docComment src
-      yieldTag text Class ann (Range start end) docs >> gtags t
+      yieldTag text P.CLASS ann (Range start end) docs >> gtags t
 
 instance ToTags Py.Call where
   tags
@@ -127,9 +128,9 @@ instance ToTags Py.Call where
           Prj Py.Call {function = Py.PrimaryExpression expr'} -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
           Prj (Py.ParenthesizedExpression _ (Prj (Py.Expression (Prj (Py.PrimaryExpression expr'))))) -> match expr' -- Parenthesized expressions
           _ -> gtags t
-        yield name loc = yieldTag name Call loc byteRange Nothing >> gtags t
+        yield name loc = yieldTag name P.CALL loc byteRange Nothing >> gtags t
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> Maybe Text -> m ()
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> Loc -> Range -> Maybe Text -> m ()
 yieldTag name kind loc srcLineRange docs = do
   src <- ask @Source
   Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) docs)

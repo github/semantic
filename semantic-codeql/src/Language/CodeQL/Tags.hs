@@ -18,9 +18,9 @@ import Control.Effect.Writer
 import Data.Foldable (for_)
 import Data.Text (Text)
 import qualified Language.CodeQL.AST as CodeQL
+import Proto.Semantic as P
 import Source.Loc
 import Source.Source as Source
-import Proto.Semantic as P
 import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 

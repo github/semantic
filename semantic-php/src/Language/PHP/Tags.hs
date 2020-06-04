@@ -18,6 +18,7 @@ import Control.Effect.Reader
 import Control.Effect.Writer
 import Data.Text (Text)
 import qualified Language.PHP.AST as PHP
+import Proto.Semantic as P
 import Source.Loc
 import Source.Source as Source
 import Tags.Tag
@@ -54,7 +55,7 @@ gtags ::
   m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> Loc -> Range -> m ()
 yieldTag name kind loc srcLineRange = do
   src <- ask @Source
   Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
@@ -64,14 +65,14 @@ instance ToTags PHP.FunctionDefinition where
     t@PHP.FunctionDefinition
       { PHP.ann = Loc {byteRange},
         PHP.name = PHP.Name {text, ann}
-      } = yieldTag text Method ann byteRange >> gtags t
+      } = yieldTag text P.METHOD ann byteRange >> gtags t
 
 instance ToTags PHP.MethodDeclaration where
   tags
     t@PHP.MethodDeclaration
       { PHP.ann = Loc {byteRange},
         PHP.name = PHP.Name {text, ann}
-      } = yieldTag text Function ann byteRange >> gtags t
+      } = yieldTag text P.FUNCTION ann byteRange >> gtags t
 
 instance ToTags PHP.FunctionCallExpression where
   tags
@@ -80,7 +81,7 @@ instance ToTags PHP.FunctionCallExpression where
         PHP.function = func
       } = match func
       where
-        yield name loc = yieldTag name Call loc byteRange >> gtags t
+        yield name loc = yieldTag name P.CALL loc byteRange >> gtags t
         match expr = case expr of
           Prj PHP.VariableName {extraChildren = PHP.Name {text, ann}} -> yield text ann *> gtags t
           Prj PHP.QualifiedName {extraChildren = [Prj PHP.Name {text, ann}]} -> yield text ann *> gtags t
@@ -92,7 +93,7 @@ instance ToTags PHP.MemberCallExpression where
     t@PHP.MemberCallExpression
       { PHP.ann = Loc {byteRange},
         PHP.name = Prj PHP.Name {text, ann}
-      } = yieldTag text Call ann byteRange >> gtags t
+      } = yieldTag text P.CALL ann byteRange >> gtags t
   tags t = gtags t
 
 
