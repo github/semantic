@@ -201,9 +201,27 @@ instance ToScopeGraph Py.ClassDefinition where
       modify (Stack.addEdge declaration (Stack.PopSymbol "."))
       modify (Stack.addEdge (Stack.PopSymbol ".") (Stack.ClassMembers "CM"))
 
-      _res <- scopeGraph body
-      -- let callNode = Stack.PopSymbol "()"
-      undefined
+      -- TODO: Should we assert return nodes is empty here.
+      res <- scopeGraph body
+      case res of
+        Complete (bindings, _) -> do
+          for_ bindings $ \(node, statement) -> do
+            if isInstanceMember statement then
+              modify (Stack.addEdge (Stack.InstanceMembers "IM") node)
+            else pure ()
+          undefined
+        res -> pure res
+
+      -- for_ bindings $ \(node, statement) -> do
+      --   -- let callNode = Stack.PopSymbol "()"
+      --   undefined
+
+isInstanceMember :: (Py.SimpleStatement :+: Py.CompoundStatement) a -> Bool
+isInstanceMember statement = case statement of
+  L1 _ -> False
+  R1 (Py.CompoundStatement compoundStatement) -> case compoundStatement of
+    Prj (Py.FunctionDefinition {}) -> True
+    _ -> False
 
 instance ToScopeGraph Py.ConcatenatedString where
   type FocalPoint Py.ConcatenatedString _ = Stack.Node
