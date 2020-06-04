@@ -103,18 +103,11 @@ parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      languageModes <- languageModes
       renderer
         <-  flag  (parseTermBuilder TermSExpression)
                   (parseTermBuilder TermSExpression)
                   (  long "sexpression"
                   <> help "Output s-expression parse trees (default)")
-        <|> flag' (parseTermBuilder TermJSONTree)
-                  (  long "json"
-                  <> help "Output JSON parse trees")
-        <|> flag' (parseTermBuilder TermJSONGraph)
-                  (  long "json-graph"
-                  <> help "Output JSON adjacency list")
         <|> flag' (parseSymbolsBuilder JSON)
                   (  long "symbols"
                   <> long "json-symbols"
@@ -122,9 +115,6 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
         <|> flag' (parseSymbolsBuilder Proto)
                   (  long "proto-symbols"
                   <> help "Output protobufs symbol list")
-        <|> flag' (parseTermBuilder TermDotGraph)
-                  (  long "dot"
-                  <> help "Output DOT graph parse trees")
         <|> flag' (parseTermBuilder TermShow)
                   (  long "show"
                   <> help "Output using the Show instance (debug only, format subject to change without notice)")
@@ -133,7 +123,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                   <> help "Don't produce output, but show timing stats")
       filesOrStdin <- FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
-      pure $ Task.readBlobs filesOrStdin >>= runReader languageModes . renderer
+      pure $ Task.readBlobs filesOrStdin >>= renderer
 
 graphCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or from a top-level entry point module"))
@@ -167,23 +157,6 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <*> argument path (metavar "PATH")
     makeReadProjectRecursivelyTask language rootDir excludeDirs dir = Task.readProject rootDir dir language excludeDirs
     makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
-
-languageModes :: Parser Language.PerLanguageModes
-languageModes = Language.PerLanguageModes
-  <$> languageModeOption "python" "Python"
-  <*> languageModeOption "ruby" "Ruby"
-  <*> languageModeOption "go" "Go"
-  <*> languageModeOption "typescript" "TypeScript"
-  <*> languageModeOption "tsx" "TSX"
-  <*> languageModeOption "javascript" "JavaScript"
-  <*> languageModeOption "jsx" "JSX"
-  where
-    languageModeOption shortName fullName
-      = option auto (  long (shortName <> "-mode")
-                    <> help ("The AST representation to use for " <> fullName <> " sources")
-                    <> metavar "ALaCarte|Precise"
-                    <> value Language.Precise
-                    <> showDefault)
 
 filePathReader :: ReadM (File.File Language.Language)
 filePathReader = File.fromPath <$> path

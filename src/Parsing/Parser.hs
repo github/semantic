@@ -38,7 +38,6 @@ module Parsing.Parser
   -- * Canonical sets of parsers
 , aLaCarteParsers
 , preciseParsers
-, allParsers
 ) where
 
 import           Assigning.Assignment
@@ -262,37 +261,4 @@ preciseParsers = Map.fromList
   , tsxParserPrecise
   , typescriptParserPrecise
   , javaParser
-  ]
-
--- | The canonical set of all parsers for the passed per-language modes.
-allParsers
-  :: ( c GoALaCarte.Term
-     , c GoPrecise.Term
-     , c Java.Term
-     , c JSON.Term
-     , c PHPPrecise.Term
-     , c PythonALaCarte.Term
-     , c PythonPrecise.Term
-     , c CodeQLPrecise.Term
-     , c RubyALaCarte.Term
-     , c RubyPrecise.Term
-     , c TSXALaCarte.Term
-     , c TSXPrecise.Term
-     , c TypeScriptALaCarte.Term
-     , c TypeScriptPrecise.Term
-     )
-  => PerLanguageModes
-  -> Map Language (SomeParser c Loc)
-allParsers modes = Map.fromList
-  [ goParser modes
-  , javaParser
-  , javascriptParser modes
-  , jsonParser
-  , jsxParser modes
-  , phpParserPrecise
-  , pythonParser modes
-  , codeQLParserPrecise
-  , rubyParser modes
-  , tsxParser modes
-  , typescriptParser modes
   ]

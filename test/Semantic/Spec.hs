@@ -19,10 +19,6 @@ spec = do
   describe "parseBlob" $ do
     let methodsBlob = Blob.fromSource (Path.relFile "methods.rb") Ruby "def foo\nend\n"
 
-    it "returns error if given an unknown language (json)" $ do
-      output <- fmap runBuilder . runTaskOrDie . runReader defaultLanguageModes $ parseTermBuilder TermJSONTree [ setBlobLanguage Unknown methodsBlob ]
-      output `shouldBe` "{\"trees\":[{\"path\":\"methods.rb\",\"error\":\"NoLanguageForBlob (currentDir </> relPath \\\"methods.rb\\\")\",\"language\":\"Unknown\"}]}\n"
-
     it "throws if given an unknown language for sexpression output" $ do
       res <- runTaskWithOptions defaultOptions (runReader defaultLanguageModes (runParseWithConfig (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob])))
       case res of

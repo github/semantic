@@ -55,14 +55,10 @@ testForParseFixture (format, runParse, files, expected) =
 parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile)]
 parseFixtures =
   [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.relFile "test/fixtures/ruby/corpus/and-or.parseA.txt")
-  , ("json", run . parseTermBuilder TermJSONTree, path, prefix </> Path.file "parse-tree.json")
-  , ("json", run . parseTermBuilder TermJSONTree, path', prefix </> Path.file "parse-trees.json")
-  , ("json", run . parseTermBuilder TermJSONTree, [], prefix </> Path.file "parse-tree-empty.json")
   , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> Path.file "parse-tree.symbols.json")
   , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> Path.file "parse-tree.symbols.protobuf.bin")
   ]
   where path = [File (Path.absRel "test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby]
-        path' = [File (Path.absRel "test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby, File (Path.absRel"test/fixtures/ruby/corpus/and-or.B.rb") lowerBound Ruby]
         path'' = [File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
         prefix = Path.relDir "test/fixtures/cli"
         run = runReader defaultLanguageModes
