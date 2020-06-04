@@ -217,7 +217,6 @@ library
                      , Semantic.Api
                      , Semantic.Api.Bridge
                      , Semantic.Api.Diffs
-                     , Semantic.Api.LegacyTypes
                      , Semantic.Api.StackGraph
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
