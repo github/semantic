@@ -350,6 +350,8 @@ test-suite test
                      , Properties
   build-depends:       semantic
                      , semantic-json
+                     , semantic-tags ^>= 0
+                     , semantic-proto ^>= 0
                      , tree-sitter-json ^>= 0.7
                      , Glob ^>= 0.10.0
                      , hedgehog ^>= 1
