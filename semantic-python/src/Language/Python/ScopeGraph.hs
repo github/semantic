@@ -91,17 +91,11 @@ instance ToScopeGraph Py.AssertStatement where
 
 instance ToScopeGraph Py.Assignment where
   type FocalPoint Py.Assignment _ = Stack.Node
-  scopeGraph (Py.Assignment _ann (SingleIdentifier _t) _val _typ) = do
-    -- declare
-    --   t
-    --   Props.Declaration
-    --     { Props.kind = ScopeGraph.Assignment,
-    --       Props.relation = ScopeGraph.Default,
-    --       Props.associatedScope = Nothing,
-    --       Props.span = ann ^. span_
-    --     }
-    -- maybe complete scopeGraph val
-    todo ("Plz implement ScopeGraph.hs l110" :: String)
+  scopeGraph (Py.Assignment ann (SingleIdentifier identifier) val _typ) = do
+    -- TODO: What should we do with the type of an assignment?
+    -- TODO: What should we do with the right hand side of an assignment?
+    _ <- scopeGraph val
+    pure (Complete (Stack.Declaration identifier Scope.Identifier ann))
   scopeGraph x = todo x
 
 instance ToScopeGraph Py.Await where
