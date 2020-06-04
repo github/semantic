@@ -83,7 +83,7 @@ onField =
 
 -- ([(node_for_the_name, ast_for_the_decl)], ...)
 type ClassBodyBinder = Py.Assignment
-                    :+: Py.AugmentedAssignment 
+                    :+: Py.AugmentedAssignment
                     :+: Py.FunctionDefinition
                     :+: Py.ClassDefinition
                     :+: Py.DecoratedDefinition
@@ -115,6 +115,8 @@ instance ToScopeGraph Py.Assignment where
                            Complete (Left (Right (bindings, _)))  -> bindings
                            Complete (Right (Left (bindings, _)))  -> bindings
                            Complete (Right (Right (bindings, _))) -> bindings
+                           -- TODO: Don't drop Todos
+                           _ -> []
         decl = Stack.Declaration identifier Scope.Identifier ann
     pure (Complete ((decl,L1 asgn) : propagateThese, decl))
   scopeGraph x = todo x
@@ -207,20 +209,21 @@ instance ToScopeGraph Py.ClassDefinition where
 
       modify (Stack.addEdge declaration (Stack.PopSymbol "."))
       modify (Stack.addEdge (Stack.PopSymbol ".") (Stack.ClassMembers "CM"))
-      
+
       -- TODO: Should we assert return nodes is empty here.
       res <- scopeGraph body
       case res of
         Complete (bindings, _) -> do
-          for_ bindings $ \(node, statement) -> 
+          for_ bindings $ \(node, statement) ->
             if isInstanceMember statement then
               modify (Stack.addEdge (Stack.InstanceMembers "IM") node)
             else if isClassMember statement then
               modify (Stack.addEdge (Stack.ClassMembers "CM") node)
             else pure ()
           pure ()
-        res -> pure ()
-      
+        -- TODO: Don't drop Todos or log.
+        _ -> pure ()
+
       -- TODO: replace R1L1 with injection
       pure (Complete ([(declaration,R1 (R1 (R1 (L1 def))))], []))
 
