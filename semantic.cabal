@@ -397,6 +397,7 @@ benchmark benchmarks
                      , lens >= 4.17 && < 4.19
                      , semantic
                      , semantic-ast
+                     , semantic-proto
                      , semantic-source
 
 source-repository head
