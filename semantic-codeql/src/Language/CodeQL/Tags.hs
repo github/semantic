@@ -20,6 +20,7 @@ import Data.Text (Text)
 import qualified Language.CodeQL.AST as CodeQL
 import Source.Loc
 import Source.Source as Source
+import Proto.Semantic as P
 import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
@@ -54,7 +55,7 @@ gtags ::
   m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> Loc -> Range -> m ()
 yieldTag name kind loc srcLineRange = do
   src <- ask @Source
   Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
@@ -64,49 +65,49 @@ instance ToTags CodeQL.Module where
     t@CodeQL.Module
       { ann = Loc {byteRange},
         name = CodeQL.ModuleName {extraChildren = CodeQL.SimpleId {text, ann}}
-      } = yieldTag text Module ann byteRange >> gtags t
+      } = yieldTag text P.MODULE ann byteRange >> gtags t
 
 instance ToTags CodeQL.ClasslessPredicate where
   tags
     t@CodeQL.ClasslessPredicate
       { ann = Loc {byteRange},
         name = CodeQL.PredicateName {text, ann}
-      } = yieldTag text Function ann byteRange >> gtags t
+      } = yieldTag text P.FUNCTION ann byteRange >> gtags t
 
 instance ToTags CodeQL.AritylessPredicateExpr where
   tags
     t@CodeQL.AritylessPredicateExpr
       { ann = Loc {byteRange},
         name = CodeQL.LiteralId {text, ann}
-      } = yieldTag text Call ann byteRange >> gtags t
+      } = yieldTag text P.CALL ann byteRange >> gtags t
 
 instance ToTags CodeQL.Dataclass where
   tags
     t@CodeQL.Dataclass
       { ann = Loc {byteRange},
         name = CodeQL.ClassName {text, ann}
-      } = yieldTag text Class ann byteRange >> gtags t
+      } = yieldTag text P.CLASS ann byteRange >> gtags t
 
 instance ToTags CodeQL.MemberPredicate where
   tags
     t@CodeQL.MemberPredicate
       { ann = Loc {byteRange},
         name = CodeQL.PredicateName {text, ann}
-      } = yieldTag text Method ann byteRange >> gtags t
+      } = yieldTag text P.METHOD ann byteRange >> gtags t
 
 instance ToTags CodeQL.Datatype where
   tags
     t@CodeQL.Datatype
       { ann = Loc {byteRange},
         name = CodeQL.ClassName {text, ann}
-      } = yieldTag text Class ann byteRange >> gtags t
+      } = yieldTag text P.CLASS ann byteRange >> gtags t
 
 instance ToTags CodeQL.DatatypeBranch where
   tags
     t@CodeQL.DatatypeBranch
       { ann = Loc {byteRange},
         name = CodeQL.ClassName {text, ann}
-      } = yieldTag text Class ann byteRange >> gtags t
+      } = yieldTag text P.CLASS ann byteRange >> gtags t
 
 instance ToTags CodeQL.ClasslessPredicateCall where
   tags
@@ -122,7 +123,7 @@ instance ToTags CodeQL.QualifiedRhs where
       { ann = Loc {byteRange},
         name = expr
       } = case expr of
-      Just (Prj CodeQL.PredicateName {text, ann}) -> yieldTag text Call ann byteRange >> gtags t
+      Just (Prj CodeQL.PredicateName {text, ann}) -> yieldTag text P.CALL ann byteRange >> gtags t
       _ -> gtags t
 
 instance ToTags CodeQL.TypeExpr where
@@ -131,7 +132,7 @@ instance ToTags CodeQL.TypeExpr where
       { ann = Loc {byteRange},
         name = expr
       } = case expr of
-      Just (Prj CodeQL.ClassName {text, ann}) -> yieldTag text Type ann byteRange >> gtags t
+      Just (Prj CodeQL.ClassName {text, ann}) -> yieldTag text P.TYPE ann byteRange >> gtags t
       _ -> gtags t
 
 instance ToTags CodeQL.AddExpr
