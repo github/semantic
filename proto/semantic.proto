@@ -163,15 +163,14 @@ enum NodeType {
 }
 
 enum SyntaxType {
-  UNKNOWN = 0;
-  FUNCTION = 1;
-  METHOD = 2;
-  CLASS = 3;
-  MODULE = 4;
-  CALL = 5;
-  TYPE = 6;
-  INTERFACE = 7;
-  IMPLEMENTATION = 8;
+  FUNCTION = 0;
+  METHOD = 1;
+  CLASS = 2;
+  MODULE = 3;
+  CALL = 4;
+  TYPE = 5;
+  INTERFACE = 6;
+  IMPLEMENTATION = 7;
 }
 
 message StackGraphNode {

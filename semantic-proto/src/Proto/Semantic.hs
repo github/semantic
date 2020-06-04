@@ -6081,8 +6081,7 @@ newtype SyntaxType'UnrecognizedValue
   = SyntaxType'UnrecognizedValue Data.Int.Int32
   deriving (Prelude.Eq, Prelude.Ord, Prelude.Show)
 data SyntaxType
-  = UNKNOWN |
-    FUNCTION |
+  = FUNCTION |
     METHOD |
     CLASS |
     MODULE |
@@ -6093,20 +6092,18 @@ data SyntaxType
     SyntaxType'Unrecognized !SyntaxType'UnrecognizedValue
   deriving (Prelude.Show, Prelude.Eq, Prelude.Ord)
 instance Data.ProtoLens.MessageEnum SyntaxType where
-  maybeToEnum 0 = Prelude.Just UNKNOWN
-  maybeToEnum 1 = Prelude.Just FUNCTION
-  maybeToEnum 2 = Prelude.Just METHOD
-  maybeToEnum 3 = Prelude.Just CLASS
-  maybeToEnum 4 = Prelude.Just MODULE
-  maybeToEnum 5 = Prelude.Just CALL
-  maybeToEnum 6 = Prelude.Just TYPE
-  maybeToEnum 7 = Prelude.Just INTERFACE
-  maybeToEnum 8 = Prelude.Just IMPLEMENTATION
+  maybeToEnum 0 = Prelude.Just FUNCTION
+  maybeToEnum 1 = Prelude.Just METHOD
+  maybeToEnum 2 = Prelude.Just CLASS
+  maybeToEnum 3 = Prelude.Just MODULE
+  maybeToEnum 4 = Prelude.Just CALL
+  maybeToEnum 5 = Prelude.Just TYPE
+  maybeToEnum 6 = Prelude.Just INTERFACE
+  maybeToEnum 7 = Prelude.Just IMPLEMENTATION
   maybeToEnum k
     = Prelude.Just
         (SyntaxType'Unrecognized
            (SyntaxType'UnrecognizedValue (Prelude.fromIntegral k)))
-  showEnum UNKNOWN = "UNKNOWN"
   showEnum FUNCTION = "FUNCTION"
   showEnum METHOD = "METHOD"
   showEnum CLASS = "CLASS"
@@ -6118,7 +6115,6 @@ instance Data.ProtoLens.MessageEnum SyntaxType where
   showEnum (SyntaxType'Unrecognized (SyntaxType'UnrecognizedValue k))
     = Prelude.show k
   readEnum k
-    | (Prelude.==) k "UNKNOWN" = Prelude.Just UNKNOWN
     | (Prelude.==) k "FUNCTION" = Prelude.Just FUNCTION
     | (Prelude.==) k "METHOD" = Prelude.Just METHOD
     | (Prelude.==) k "CLASS" = Prelude.Just CLASS
@@ -6130,7 +6126,7 @@ instance Data.ProtoLens.MessageEnum SyntaxType where
     | Prelude.otherwise
     = (Prelude.>>=) (Text.Read.readMaybe k) Data.ProtoLens.maybeToEnum
 instance Prelude.Bounded SyntaxType where
-  minBound = UNKNOWN
+  minBound = FUNCTION
   maxBound = IMPLEMENTATION
 instance Prelude.Enum SyntaxType where
   toEnum k__
@@ -6140,21 +6136,19 @@ instance Prelude.Enum SyntaxType where
               "toEnum: unknown value for enum SyntaxType: " (Prelude.show k__)))
         Prelude.id
         (Data.ProtoLens.maybeToEnum k__)
-  fromEnum UNKNOWN = 0
-  fromEnum FUNCTION = 1
-  fromEnum METHOD = 2
-  fromEnum CLASS = 3
-  fromEnum MODULE = 4
-  fromEnum CALL = 5
-  fromEnum TYPE = 6
-  fromEnum INTERFACE = 7
-  fromEnum IMPLEMENTATION = 8
+  fromEnum FUNCTION = 0
+  fromEnum METHOD = 1
+  fromEnum CLASS = 2
+  fromEnum MODULE = 3
+  fromEnum CALL = 4
+  fromEnum TYPE = 5
+  fromEnum INTERFACE = 6
+  fromEnum IMPLEMENTATION = 7
   fromEnum (SyntaxType'Unrecognized (SyntaxType'UnrecognizedValue k))
     = Prelude.fromIntegral k
   succ IMPLEMENTATION
     = Prelude.error
         "SyntaxType.succ: bad argument IMPLEMENTATION. This value would be out of bounds."
-  succ UNKNOWN = FUNCTION
   succ FUNCTION = METHOD
   succ METHOD = CLASS
   succ CLASS = MODULE
@@ -6164,10 +6158,9 @@ instance Prelude.Enum SyntaxType where
   succ INTERFACE = IMPLEMENTATION
   succ (SyntaxType'Unrecognized _)
     = Prelude.error "SyntaxType.succ: bad argument: unrecognized value"
-  pred UNKNOWN
+  pred FUNCTION
     = Prelude.error
-        "SyntaxType.pred: bad argument UNKNOWN. This value would be out of bounds."
-  pred FUNCTION = UNKNOWN
+        "SyntaxType.pred: bad argument FUNCTION. This value would be out of bounds."
   pred METHOD = FUNCTION
   pred CLASS = METHOD
   pred MODULE = CLASS
@@ -6182,7 +6175,7 @@ instance Prelude.Enum SyntaxType where
   enumFromThen = Data.ProtoLens.Message.Enum.messageEnumFromThen
   enumFromThenTo = Data.ProtoLens.Message.Enum.messageEnumFromThenTo
 instance Data.ProtoLens.FieldDefault SyntaxType where
-  fieldDefault = UNKNOWN
+  fieldDefault = FUNCTION
 instance Control.DeepSeq.NFData SyntaxType where
   rnf x__ = Prelude.seq x__ ()
 {- | Fields :

@@ -859,7 +859,6 @@ instance ToJSON NodeType where
   toEncoding = toAesonEncoding
 
 instance FromJSONPB SyntaxType where
-  parseJSONPB (JSONPB.String "UNKNOWN") = pure UNKNOWN
   parseJSONPB (JSONPB.String "FUNCTION") = pure FUNCTION
   parseJSONPB (JSONPB.String "METHOD") = pure METHOD
   parseJSONPB (JSONPB.String "CLASS") = pure CLASS
