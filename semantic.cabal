@@ -214,9 +214,6 @@ library
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
-                     , Proto.Semantic
-                     , Proto.Semantic_Fields
-                     , Proto.Semantic_JSON
                      , Semantic.Api
                      , Semantic.Api.Bridge
                      , Semantic.Api.Diffs
@@ -274,8 +271,6 @@ library
                      , pretty-show ^>= 1.9.5
                      , profunctors ^>= 5.3
                      , proto-lens >= 0.5 && < 0.7
-                     , proto-lens-jsonpb
-                     , proto-lens-runtime >= 0.5 && <0.7
                      , reducers ^>= 3.12.3
                      , semantic-go ^>= 0
                      , semantic-java ^>= 0
@@ -284,6 +279,7 @@ library
                      , semantic-python ^>= 0
                      , semantic-codeql ^>= 0
                      , semantic-ruby ^>= 0
+                     , semantic-proto ^>= 0
                      , semantic-scope-graph ^>= 0
                      , semantic-tags ^>= 0
                      , semantic-tsx ^>= 0
@@ -381,6 +377,7 @@ test-suite parse-examples
                      , foldl ^>= 1.4.5
                      , lens >= 4.17 && < 4.19
                      , resourcet ^>= 1.2
+                     , semantic-proto ^>= 0
                      , streaming
                      , streaming-bytestring ^>= 0.1.6
                      , tasty
