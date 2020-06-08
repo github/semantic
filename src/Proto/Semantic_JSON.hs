@@ -607,12 +607,14 @@ instance FromJSONPB Symbol where
     line' <- obj .: "line"
     span' <- obj A..:? "span"
     docs' <- obj A..:? "docs"
+    nodeType' <- obj .: "nodeType"
     pure $ defMessage
       & P.symbol .~ symbol'
       & P.kind .~ kind'
       & P.line .~ line'
       & P.maybe'span .~ span'
       & P.maybe'docs .~ docs'
+      & P.nodeType .~ nodeType'
 
 instance ToJSONPB Symbol where
   toJSONPB x = object
@@ -621,6 +623,7 @@ instance ToJSONPB Symbol where
     , "line" .= (x^.line)
     , "span" .= (x^.maybe'span)
     , "docs" .= (x^.maybe'docs)
+    , "nodeType" .= (x^.nodeType)
     ]
   toEncodingPB x = pairs
     [ "symbol" .= (x^.symbol)
@@ -628,6 +631,7 @@ instance ToJSONPB Symbol where
     , "line" .= (x^.line)
     , "span" .= (x^.maybe'span)
     , "docs" .= (x^.maybe'docs)
+    , "nodeType" .= (x^.nodeType)
     ]
 
 instance FromJSON Symbol where
@@ -786,25 +790,6 @@ instance ToJSON StackGraphNode where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
-instance FromJSONPB StackGraphNode'NodeType where
-  parseJSONPB (JSONPB.String "ROOT_SCOPE") = pure StackGraphNode'ROOT_SCOPE
-  parseJSONPB (JSONPB.String "JUMP_TO_SCOPE") = pure StackGraphNode'JUMP_TO_SCOPE
-  parseJSONPB (JSONPB.String "EXPORTED_SCOPE") = pure StackGraphNode'EXPORTED_SCOPE
-  parseJSONPB (JSONPB.String "DEFINITION") = pure StackGraphNode'DEFINITION
-  parseJSONPB (JSONPB.String "REFERENCE") = pure StackGraphNode'REFERENCE
-  parseJSONPB x = typeMismatch "NodeType" x
-
-instance ToJSONPB StackGraphNode'NodeType where
-  toJSONPB x _ = A.String . T.toUpper . T.pack $ show x
-  toEncodingPB x _ = E.text . T.toUpper . T.pack  $ show x
-
-instance FromJSON StackGraphNode'NodeType where
-  parseJSON = parseJSONPB
-
-instance ToJSON StackGraphNode'NodeType where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
 instance FromJSONPB StackGraphPath where
   parseJSONPB = withObject "StackGraphPath" $ \obj -> do
     startingSymbolStack' <- obj .: "startingSymbolStack"
@@ -847,5 +832,24 @@ instance FromJSON StackGraphPath where
   parseJSON = parseJSONPB
 
 instance ToJSON StackGraphPath where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB NodeType where
+  parseJSONPB (JSONPB.String "ROOT_SCOPE") = pure ROOT_SCOPE
+  parseJSONPB (JSONPB.String "JUMP_TO_SCOPE") = pure JUMP_TO_SCOPE
+  parseJSONPB (JSONPB.String "EXPORTED_SCOPE") = pure EXPORTED_SCOPE
+  parseJSONPB (JSONPB.String "DEFINITION") = pure DEFINITION
+  parseJSONPB (JSONPB.String "REFERENCE") = pure REFERENCE
+  parseJSONPB x = typeMismatch "NodeType" x
+
+instance ToJSONPB NodeType where
+  toJSONPB x _ = A.String . T.toUpper . T.pack $ show x
+  toEncodingPB x _ = E.text . T.toUpper . T.pack  $ show x
+
+instance FromJSON NodeType where
+  parseJSON = parseJSONPB
+
+instance ToJSON NodeType where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding

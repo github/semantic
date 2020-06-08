@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -103,9 +104,21 @@ parseSymbols blobs = do
         tagToSymbol Tag{..} = defMessage
           & P.symbol .~ name
           & P.kind .~ pack (show kind)
+          & P.nodeType .~ nodeTypeForKind kind
           & P.line .~ line
           & P.maybe'span ?~ converting # Loc.span loc
           & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) docs
+
+        nodeTypeForKind :: Kind -> NodeType
+        nodeTypeForKind = \case
+          Function       -> DEFINITION
+          Method         -> DEFINITION
+          Class          -> DEFINITION
+          Module         -> DEFINITION
+          Interface      -> DEFINITION
+          Call           -> REFERENCE
+          Type           -> REFERENCE
+          Implementation -> REFERENCE
 
 tagsForBlob :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader PerLanguageModes) sig m) => Blob -> m [Tag]
 tagsForBlob blob = asks toTagsParsers >>= \p -> parseWith p (pure . tags symbolsToSummarize blob) blob

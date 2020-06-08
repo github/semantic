@@ -17,7 +17,7 @@ main
   >>= defaultMain . tests
   where
     parse = parseByteString @Rust.SourceFile @() tree_sitter_rust
-    excludeMacrosCorpus l = liftM (filter (f "expressions") ) $ liftM (filter (f "macros") ) l
+    excludeMacrosCorpus l = liftM (filter (f "expressions") ) l
       where f p bn = p /= (Path.toString . Path.takeBaseName) bn
 
 tests :: [TestTree] -> TestTree
