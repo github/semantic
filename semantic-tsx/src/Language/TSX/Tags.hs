@@ -20,6 +20,7 @@ import Control.Effect.Writer
 import Data.Foldable
 import Data.Text as Text
 import qualified Language.TSX.AST as Tsx
+import Proto.Semantic as P
 import Source.Loc
 import Source.Source as Source
 import Tags.Tag
@@ -43,22 +44,22 @@ class ToTags t where
 
 instance ToTags Tsx.Function where
   tags t@Tsx.Function {ann = Loc {byteRange}, name = Just (Parse.Success (Tsx.Identifier {text, ann}))} =
-    yieldTag text Function ann byteRange >> gtags t
+    yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Tsx.FunctionSignature where
   tags t@Tsx.FunctionSignature {ann = Loc {byteRange}, name = Parse.Success (Tsx.Identifier {text, ann})} =
-    yieldTag text Function ann byteRange >> gtags t
+    yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags Tsx.FunctionDeclaration where
   tags t@Tsx.FunctionDeclaration {ann = Loc {byteRange}, name = Parse.Success (Tsx.Identifier {text, ann})} =
-    yieldTag text Function ann byteRange >> gtags t
+    yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags Tsx.MethodDefinition where
   tags t@Tsx.MethodDefinition {ann = Loc {byteRange}, name} = case name of
-    EPrj Tsx.PropertyIdentifier {text, ann} -> yieldTag text Method ann byteRange >> gtags t
+    EPrj Tsx.PropertyIdentifier {text, ann} -> yieldTag text P.METHOD P.DEFINITION ann byteRange >> gtags t
     _ -> gtags t
 
 instance ToTags Tsx.Pair where
@@ -67,12 +68,12 @@ instance ToTags Tsx.Pair where
     (EPrj Tsx.PropertyIdentifier {text, ann}, Prj Tsx.ArrowFunction {}) -> yield text ann
     _ -> gtags t
     where
-      yield text loc = yieldTag text Function loc byteRange >> gtags t
+      yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags Tsx.ClassDeclaration where
   tags t@Tsx.ClassDeclaration {ann = Loc {byteRange}, name = Parse.Success (Tsx.TypeIdentifier {text, ann})} =
-    yieldTag text Class ann byteRange >> gtags t
+    yieldTag text P.CLASS P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags Tsx.CallExpression where
@@ -89,17 +90,17 @@ instance ToTags Tsx.CallExpression where
           Parse.Success x -> tags x
           Parse.Fail _ -> pure ()
         _ -> gtags t
-      yield name loc = yieldTag name Call loc byteRange >> gtags t
+      yield name loc = yieldTag name P.CALL P.REFERENCE loc byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags Tsx.Class where
   tags t@Tsx.Class {ann = Loc {byteRange}, name = Just (Parse.Success (Tsx.TypeIdentifier {text, ann}))} =
-    yieldTag text Class ann byteRange >> gtags t
+    yieldTag text P.CLASS P.DEFINITION ann byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Tsx.Module where
   tags t@Tsx.Module {ann = Loc {byteRange}, name} = case name of
-    EPrj Tsx.Identifier {text, ann} -> yieldTag text Module ann byteRange >> gtags t
+    EPrj Tsx.Identifier {text, ann} -> yieldTag text P.MODULE P.DEFINITION ann byteRange >> gtags t
     _ -> gtags t
 
 instance ToTags Tsx.VariableDeclarator where
@@ -109,7 +110,7 @@ instance ToTags Tsx.VariableDeclarator where
       (Prj Tsx.ArrowFunction {}, EPrj Tsx.Identifier {text, ann}) -> yield text ann
       _ -> gtags t
     where
-      yield text loc = yieldTag text Function loc byteRange >> gtags t
+      yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Tsx.AssignmentExpression where
@@ -121,7 +122,7 @@ instance ToTags Tsx.AssignmentExpression where
       (EPrj Tsx.MemberExpression {property = Parse.Success (Tsx.PropertyIdentifier {text, ann})}, Prj Tsx.ArrowFunction {}) -> yield text ann
       _ -> gtags t
     where
-      yield text loc = yieldTag text Function loc byteRange >> gtags t
+      yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
   tags _ = pure ()
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
@@ -145,11 +146,11 @@ gtags = traverse1_ @ToTags (const (pure ())) tags
 nameBlacklist :: [Text]
 nameBlacklist = ["require"]
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
-yieldTag name Call _ _ | name `elem` nameBlacklist = pure ()
-yieldTag name kind loc srcLineRange = do
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag name P.CALL _ _ _ | name `elem` nameBlacklist = pure ()
+yieldTag name kind ty loc srcLineRange = do
   src <- ask @Source
-  Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
+  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
 {- ORMOLU_DISABLE -}
 instance ToTags Tsx.AbstractClassDeclaration

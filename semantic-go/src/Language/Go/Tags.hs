@@ -17,6 +17,7 @@ import Control.Effect.Reader
 import Control.Effect.Writer
 import Data.Text as Text
 import qualified Language.Go.AST as Go
+import Proto.Semantic as P
 import Source.Loc
 import Source.Source as Source
 import Tags.Tag
@@ -43,7 +44,7 @@ instance ToTags Go.FunctionDeclaration where
     t@Go.FunctionDeclaration
       { ann = Loc {byteRange},
         name = Parse.Success (Go.Identifier {text, ann})
-      } = yieldTag text Function ann byteRange >> gtags t
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags Go.MethodDeclaration where
@@ -51,7 +52,7 @@ instance ToTags Go.MethodDeclaration where
     t@Go.MethodDeclaration
       { ann = Loc {byteRange},
         name = Parse.Success (Go.FieldIdentifier {text, ann})
-      } = yieldTag text Method ann byteRange >> gtags t
+      } = yieldTag text P.METHOD P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags Go.CallExpression where
@@ -67,7 +68,7 @@ instance ToTags Go.CallExpression where
           Prj Go.CallExpression {function = Parse.Success (Go.Expression e)} -> match e
           Prj Go.ParenthesizedExpression {extraChildren = Parse.Success (Go.Expression e)} -> match e
           _ -> gtags t
-        yield name loc = yieldTag name Call loc byteRange >> gtags t
+        yield name loc = yieldTag name P.CALL P.REFERENCE loc byteRange >> gtags t
   tags _ = pure ()
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
@@ -85,10 +86,10 @@ gtags ::
   m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
-yieldTag name kind loc srcLineRange = do
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag name kind ty loc srcLineRange = do
   src <- ask @Source
-  Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
+  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
 
 instance ToTags Go.ArgumentList
