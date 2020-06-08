@@ -25,6 +25,7 @@ import Control.Monad
 import Data.Foldable
 import Data.Text as Text
 import qualified Language.Ruby.AST as Rb
+import Proto.Semantic as P
 import Source.Loc
 import Source.Range as Range
 import Source.Source as Source
@@ -72,11 +73,11 @@ nameBlacklist =
     "lambda"
   ]
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
-yieldTag name Call _ _ | name `elem` nameBlacklist = pure ()
-yieldTag name kind loc srcLineRange = do
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag name P.CALL _ _ _ | name `elem` nameBlacklist = pure ()
+yieldTag name kind ty loc srcLineRange = do
   src <- ask @Source
-  Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
+  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
 instance ToTags Rb.Class where
   tags
@@ -94,7 +95,7 @@ instance ToTags Rb.Class where
           Prj Rb.Superclass {ann = Loc {byteRange = Range {end}}} : _ -> Range start end
           _ -> Range start (getEnd expr)
         getEnd = Range.end . byteRange . TS.gann
-        yield name loc = yieldTag name Class loc range' >> gtags t
+        yield name loc = yieldTag name P.CLASS P.DEFINITION loc range' >> gtags t
 
 instance ToTags Rb.SingletonClass where
   tags
@@ -112,7 +113,7 @@ instance ToTags Rb.SingletonClass where
           x : _ -> Range start (getStart x)
           _ -> range
         getStart = Range.start . byteRange . TS.gann
-        yield name loc = yieldTag name Class loc range' >> gtags t
+        yield name loc = yieldTag name P.CLASS P.DEFINITION loc range' >> gtags t
 
 instance ToTags Rb.Module where
   tags
@@ -131,7 +132,7 @@ instance ToTags Rb.Module where
           _ -> Range start (getEnd expr)
         getEnd = Range.end . byteRange . TS.gann
         getStart = Range.start . byteRange . TS.gann
-        yield name loc = yieldTag name Module loc range' >> gtags t
+        yield name loc = yieldTag name P.MODULE P.DEFINITION loc range' >> gtags t
 
 yieldMethodNameTag ::
   ( Has (State [Text]) sig m,
@@ -155,7 +156,7 @@ yieldMethodNameTag t range (Rb.MethodName expr) = enterScope True $ case expr of
         -- Prj Rb.Symbol { extraChildren = [Prj Rb.EscapeSequence { text = name }] } -> yield name
   _ -> gtags t
   where
-    yield name loc = yieldTag name Method loc range >> gtags t
+    yield name loc = yieldTag name P.METHOD P.DEFINITION loc range >> gtags t
 
 enterScope :: (Has (State [Text]) sig m) => Bool -> m () -> m ()
 enterScope createNew m = do
@@ -241,16 +242,16 @@ instance ToTags Rb.Lhs where
       Prj Rb.Operator {text, ann} -> yieldCall text ann byteRange
       _ -> gtags t
     -- These do check for locals before yielding a call tag
-    Prj (Rb.Variable (Prj Rb.Identifier {ann = loc@Loc {byteRange}, text})) -> yield text Call loc byteRange
-    Prj Rb.ScopeResolution {ann = loc@Loc {byteRange}, name = Prj Rb.Identifier {text}} -> yield text Call loc byteRange
-    Prj (Rb.Variable (Prj Rb.Constant { ann = loc@Loc { byteRange }, text })) -> yield text Call loc byteRange -- TODO: Should yield Constant
-    Prj Rb.ScopeResolution { ann = loc@Loc { byteRange }, name = Prj Rb.Constant { text } } -> yield text Call loc byteRange -- TODO: Should yield Constant
+    Prj (Rb.Variable (Prj Rb.Identifier {ann = loc@Loc {byteRange}, text})) -> yield text P.CALL loc byteRange
+    Prj Rb.ScopeResolution {ann = loc@Loc {byteRange}, name = Prj Rb.Identifier {text}} -> yield text P.CALL loc byteRange
+    Prj (Rb.Variable (Prj Rb.Constant { ann = loc@Loc { byteRange }, text })) -> yield text P.CALL loc byteRange -- TODO: Should yield Constant
+    Prj Rb.ScopeResolution { ann = loc@Loc { byteRange }, name = Prj Rb.Constant { text } } -> yield text P.CALL loc byteRange -- TODO: Should yield Constant
     _ -> gtags t
     where
-      yieldCall name loc range = yieldTag name Call loc range >> gtags t
+      yieldCall name loc range = yieldTag name P.CALL P.REFERENCE loc range >> gtags t
       yield name kind loc range = do
         locals <- get @[Text]
-        unless (name `elem` locals) $ yieldTag name kind loc range
+        unless (name `elem` locals) $ yieldTag name kind P.REFERENCE loc range
         gtags t
 
 -- TODO: Line of source produced here could be better.
@@ -260,18 +261,18 @@ instance ToTags Rb.MethodCall where
       { ann = Loc {byteRange = byteRange@Range {}},
         method = expr
       } = case expr of
-      Prj (Rb.Variable (Prj Rb.Identifier {text, ann})) -> yield text Call ann
-      Prj (Rb.Variable (Prj Rb.Constant {text, ann})) -> yield text Call ann -- TODO: Should yield Constant
-      Prj Rb.ScopeResolution {name = Prj Rb.Identifier {text, ann}} -> yield text Call ann
-      Prj Rb.ScopeResolution {name = Prj Rb.Constant {text, ann}} -> yield text Call ann -- TODO: Should yield Constant
+      Prj (Rb.Variable (Prj Rb.Identifier {text, ann})) -> yield text P.CALL ann
+      Prj (Rb.Variable (Prj Rb.Constant {text, ann})) -> yield text P.CALL ann -- TODO: Should yield Constant
+      Prj Rb.ScopeResolution {name = Prj Rb.Identifier {text, ann}} -> yield text P.CALL ann
+      Prj Rb.ScopeResolution {name = Prj Rb.Constant {text, ann}} -> yield text P.CALL ann -- TODO: Should yield Constant
       Prj Rb.Call {method} -> case method of
-        Prj Rb.Identifier {text, ann} -> yield text Call ann
-        Prj Rb.Constant {text, ann} -> yield text Call ann
-        Prj Rb.Operator {text, ann} -> yield text Call ann
+        Prj Rb.Identifier {text, ann} -> yield text P.CALL ann
+        Prj Rb.Constant {text, ann} -> yield text P.CALL ann
+        Prj Rb.Operator {text, ann} -> yield text P.CALL ann
         _ -> gtags t
       _ -> gtags t
       where
-        yield name kind loc = yieldTag name kind loc byteRange >> gtags t
+        yield name kind loc = yieldTag name kind P.REFERENCE loc byteRange >> gtags t
 
 instance ToTags Rb.Alias where
   tags
@@ -281,10 +282,10 @@ instance ToTags Rb.Alias where
         ann = Loc {byteRange}
       } = do
       case aliasExpr of
-        Prj Rb.Identifier {ann, text} -> yieldTag text Function ann byteRange
+        Prj Rb.Identifier {ann, text} -> yieldTag text P.FUNCTION P.DEFINITION ann byteRange
         _ -> tags aliasExpr
       case nameExpr of
-        Prj Rb.Identifier {ann, text} -> yieldTag text Call ann byteRange
+        Prj Rb.Identifier {ann, text} -> yieldTag text P.CALL P.REFERENCE ann byteRange
         _ -> tags nameExpr
       gtags t
 
@@ -295,7 +296,7 @@ instance ToTags Rb.Undef where
         ann = Loc {byteRange}
       } = for_ extraChildren $ \(Rb.MethodName expr) -> do
       case expr of
-        Prj Rb.Identifier {ann, text} -> yieldTag text Call ann byteRange
+        Prj Rb.Identifier {ann, text} -> yieldTag text P.CALL P.REFERENCE ann byteRange
         _ -> tags expr
       gtags t
 
