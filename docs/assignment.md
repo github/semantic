@@ -1,8 +1,8 @@
-_Note that this document describes a process that is now deprecated. For more information, see documentation on [adding a new language](https://github.com/github/semantic/blob/master/docs/adding-new-languages.md)._
+_Note that this document describes a process that is now deprecated. For more information, see documentation on [adding a new language](https://github.com/github/semantic/blob/development/docs/adding-new-languages.md)._
 
 ### What is Assignment?
 
-"Assignment" refers to the part of our system that parses parse trees. The step preceding assignment uses [`tree-sitter`](https://github.com/tree-sitter/tree-sitter) to parse source code and output rose trees labeled with symbols in the [language's grammar](https://github.com/github/semantic/blob/master/docs/grammar-development-guide.md) and source locations (represented as byte range and span). Assignment is a second layer of parsing required to get these ASTs in a shape appropriate for our Haskell project and to support the types of analyses we'd like to perform further along. Assignment represents a partial map from AST nodes onto another structure, typically terms.
+"Assignment" refers to the part of our system that parses parse trees. The step preceding assignment uses [`tree-sitter`](https://github.com/tree-sitter/tree-sitter) to parse source code and output rose trees labeled with symbols in the [language's grammar](https://github.com/github/semantic/blob/development/docs/grammar-development-guide.md) and source locations (represented as byte range and span). Assignment is a second layer of parsing required to get these ASTs in a shape appropriate for our Haskell project and to support the types of analyses we'd like to perform further along. Assignment represents a partial map from AST nodes onto another structure, typically terms.
 
 We do this for a few reasons:
 1. **Generalization:** this approach lets us reason about all languages in a standardized way. We can build necessary machinery to define the type of each specific language independently, while retaining the ability to share computations on the overlapping constructs (such as `if` statements).
@@ -11,10 +11,10 @@ We do this for a few reasons:
 ### Relevant files
 
 - [`Language.InsertSomeLanguage.Assignment`](https://github.com/github/semantic/tree/master/src/Language)
-- [`Assigning.Assignment`](https://github.com/github/semantic/blob/master/src/Assigning/Assignment.hs)
-- [`Data.Syntax`](https://github.com/github/semantic/blob/master/src/Data/Syntax.hs)
+- [`Assigning.Assignment`](https://github.com/github/semantic/blob/development/src/Assigning/Assignment.hs)
+- [`Data.Syntax`](https://github.com/github/semantic/blob/development/src/Data/Syntax.hs)
 - [`Data.Syntax.SomeSubsetOfLanguageFeatures`](https://github.com/github/semantic/tree/master/src/Data/Syntax)
-- [`Parsing.Parser`](https://github.com/github/semantic/blob/master/src/Parsing/Parser.hs)
+- [`Parsing.Parser`](https://github.com/github/semantic/blob/development/src/Parsing/Parser.hs)
 
 #### Relevant ghci commands
 

@@ -1,7 +1,7 @@
 # Configuration
 
 Semantic has a number of configurable parameters and options specified through
-the use of command-line flags or environment variables. See [Config.hs](https://github.com/github/semantic/blob/master/src/Semantic/Config.hs) for details.
+the use of command-line flags or environment variables. See [Config.hs](https://github.com/github/semantic/blob/development/src/Semantic/Config.hs) for details.
 
 ## Environment Variables
 

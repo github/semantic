@@ -161,14 +161,14 @@ Full docs for ghci can be found in the [user’s guide][ghci user’s guide].
 
 This script is also set up to store intermediate build products in a separate `dist-repl` dir to avoid colliding with normal builds.
 
-[`script/repl`]: https://github.com/github/semantic/blob/master/script/repl
+[`script/repl`]: https://github.com/github/semantic/blob/development/script/repl
 
 
 ### Configuration
 
 `ghci` can be configured with scripts containing Haskell statements and repl commands. By default, the `~/.ghc/ghci.conf` file will be loaded, as well as a `.ghci` file in the working directory, if any. We don’t currently provide such for use with `semantic`, but we do provide a [`.ghci.sample`][] file which we suggest copying to `~/.ghc/ghci.conf` for better typed holes, pretty-printing via `pretty-simple`, and a simple prompt.
 
-[`.ghci.sample`]: https://github.com/github/semantic/blob/master/.ghci.sample
+[`.ghci.sample`]: https://github.com/github/semantic/blob/development/.ghci.sample
 
 
 ### Managing history

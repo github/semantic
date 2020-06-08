@@ -2,10 +2,10 @@ name: Haskell CI
 
 on:
   # Trigger the workflow on push or pull request,
-  # but only for the master branch
+  # but only for the development branch
   push:
     branches:
-      - master
+      - development
   pull_request:
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
+      if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/development'
 
     - uses: actions/setup-haskell@v1
       name: Setup Haskell

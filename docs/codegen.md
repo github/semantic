@@ -17,16 +17,16 @@ The following diagram outlines the entire language support pipeline.
 
 1. **Ingest source code.** The input to our system is blob data on GitHub.
 2. **Write and generate tree-sitter grammar.** During parser generation, tree-sitter produces a `node-types.json` file that captures the structure of a language's grammar. Based on this JSON file, we're able to derive datatypes representing surface languages, and then use those datatypes to generically build ASTs.
-3. **Provide interface to the C source.** The FFI provides us a way to bridge tree-sitter to our Haskell library. For more information, see our docs on [adding a new language](https://github.com/github/semantic/blob/master/docs/adding-new-languages.md). 
+3. **Provide interface to the C source.** The FFI provides us a way to bridge tree-sitter to our Haskell library. For more information, see our docs on [adding a new language](https://github.com/github/semantic/blob/development/docs/adding-new-languages.md).
 4. **Automated AST generation via CodeGen APIs.** The CodeGen APIs live in the [`semantic-ast`](https://github.com/github/semantic/tree/715971067634f677bff8619add6490e03bb1825e/semantic-ast) package within [Semantic](https://github.com/github/semantic/tree/715971067634f677bff8619add6490e03bb1825e), and are explained as follows:
     - [**Deserialize.**](https://github.com/github/semantic/blob/715971067634f677bff8619add6490e03bb1825e/semantic-ast/src/AST/Deserialize.hs) First, we deserialize the `node-types.json` file for a given language into the desired shape of datatypes via parsing capabilities afforded by the [Aeson](http://hackage.haskell.org/package/aeson) library. There are four distinct types represented in the node-types.json file takes on: sums, products, named leaves and anonymous leaves.
     - [**Generate Syntax.**](https://github.com/github/semantic/blob/715971067634f677bff8619add6490e03bb1825e/semantic-ast/src/AST/GenerateSyntax.hs) We then use Template Haskell to auto-generate language-specific, strongly-typed datatypes that represent various language constructs at compile-time. This API exports the top-level function `astDeclarationsForLanguage` to auto-generate datatypes at compile-time, which is is invoked by a given language [AST](https://github.com/github/semantic/blob/715971067634f677bff8619add6490e03bb1825e/semantic-python/src/Language/Python/AST.hs) module.
     - [**Unmarshal.**](https://github.com/github/semantic/blob/715971067634f677bff8619add6490e03bb1825e/semantic-ast/src/AST/Unmarshal.hs) Unmarshaling is the runtime process of iterating over tree-sitter’s parse trees using its tree cursor API, and producing Haskell ASTs for the relevant nodes. We parse source code from tree-sitter and unmarshal the data we get to build these ASTs generically. This file exports the top-level function `parseByteString`, which takes source code and a language as arguments, and produces an AST.
 5. **Generate strongly-typed trees for a given language.** Finally, we create `semantic-[LANGUAGE]` packages (such as [this one](https://github.com/github/semantic/tree/715971067634f677bff8619add6490e03bb1825e/semantic-python) for Python). From here, we can call our CodeGen APIs to generate language-specific, strongly-typed trees via the following process:
-    1. `Language.[LANGUAGE].AST` calls `astDeclarationsForLanguage`, passing in the relevant language as the argument, and using the `getNodeTypesPath` function to access the tree-sitter generated `node-types.json` file. 
-    2. This triggers the generation of the exhaustive syntax types contained by that language. 
-    3. `Language.[LANGUAGE]` provides the semantic functionality for Python programs, and calls the unmarshal API. 
-    4. Finally, the unmarshaling process takes the source code input, and auto-generates a tree using the syntax nodes generated in step 2. 
+    1. `Language.[LANGUAGE].AST` calls `astDeclarationsForLanguage`, passing in the relevant language as the argument, and using the `getNodeTypesPath` function to access the tree-sitter generated `node-types.json` file.
+    2. This triggers the generation of the exhaustive syntax types contained by that language.
+    3. `Language.[LANGUAGE]` provides the semantic functionality for Python programs, and calls the unmarshal API.
+    4. Finally, the unmarshaling process takes the source code input, and auto-generates a tree using the syntax nodes generated in step 2.
 
 The remaining document provides more details on generating ASTs, inspecting datatypes, tests, and information on decisions pertaining to relevant APIs.
 
@@ -67,7 +67,7 @@ Right (Module {ann = (Span {start = Pos {line = 0, column = 0}, end = Pos {line 
 
 ## Inspecting auto-generated datatypes
 
-Datatypes are derived from a language and its `node-types.json` file using the `GenerateSyntax` API. These datatypes can be viewed in the REPL just as they would for any other datatype, using `:i` after loading the language-specific `AST.hs` module for a given language. 
+Datatypes are derived from a language and its `node-types.json` file using the `GenerateSyntax` API. These datatypes can be viewed in the REPL just as they would for any other datatype, using `:i` after loading the language-specific `AST.hs` module for a given language.
 
 ```
 :l semantic-python/src/Language/Python/AST.hs
@@ -103,7 +103,7 @@ Here is an example that describes the relationship between a Python identifier r
 |----------|--------------|------------|
 |Named leaf|<pre>{<br>"type": "identifier",<br>"named": true<br>}|<code>data TreeSitter.Python.AST.Identifier a<br>= TreeSitter.Python.AST.Identifier {TreeSitter.Python.AST.ann :: a,<br>TreeSitter.Python.AST.bytes :: text-1.2.3.1:Data.Text.Internal.Text} -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Show a => Show (TreeSitter.Python.AST.Identifier a) -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Ord a => Ord (TreeSitter.Python.AST.Identifier a) -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Eq a => Eq (TreeSitter.Python.AST.Identifier a) -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Traversable TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Functor TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Foldable TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance Unmarshal TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1<br>instance SymbolMatching TreeSitter.Python.AST.Identifier -- Defined at TreeSitter/Python/AST.hs:10:1|
 
-Annotations are captured by a polymorphic parameter `a` instead of range/span values. 
+Annotations are captured by a polymorphic parameter `a` instead of range/span values.
 
 [Examples](https://github.com/github/semantic/blob/715971067634f677bff8619add6490e03bb1825e/semantic-ast/src/AST/Grammar/Examples.hs) contains a set of pre-defined, hand-written datatypes for which Template Haskell is not used. Any datatypes among the node types defined here will be skipped when the splice is run, allowing customization of the representation of parts of the tree. While this gives us flexibility, we encourage that this is used sparingly, as it imposes extra maintenance burden, particularly when the grammar is changed. This may be used to e.g. parse literals into Haskell equivalents (e.g. parsing the textual contents of integer literals into `Integer`s), and may require defining `TS.UnmarshalAnn` or `TS.SymbolMatching` instances for (parts of) the custom datatypes, depending on where and how the datatype occurs in the generated tree, in addition to the usual `Foldable`, `Functor`, etc. instances provided for generated datatypes.
 
@@ -117,7 +117,7 @@ To run tests:
 
 ## Background and Motivation for CodeGen
 
-CodeGen automates the engineering effort historically required for adding a new language, which included writing a second [assignment](https://github.com/github/semantic/blob/715971067634f677bff8619add6490e03bb1825e/docs/assignment.md) grammar, along with manually defining [data types à la carte](http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf). 
+CodeGen automates the engineering effort historically required for adding a new language, which included writing a second [assignment](https://github.com/github/semantic/blob/715971067634f677bff8619add6490e03bb1825e/docs/assignment.md) grammar, along with manually defining [data types à la carte](http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf).
 
 CodeGen addresses the following challenges posed by the old system:
 
