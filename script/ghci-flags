@@ -59,6 +59,7 @@ function flags {
   echo "-isemantic-json/test"
   echo "-isemantic-parse/src"
   echo "-isemantic-php/src"
+  echo "-isemantic-proto/src"
   echo "-isemantic-python/src"
   echo "-isemantic-python/test"
   echo "-isemantic-ruby/src"
