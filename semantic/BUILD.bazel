@@ -105,3 +105,13 @@ haskell_library(
         "@stackage//:vector",
     ],
 )
+
+haskell_binary(
+    name = "exe",
+    srcs = glob(["app/**/*.hs"]),
+    src_strip_prefix = "app",
+    deps = [
+        ":base",
+        "//semantic:lib",
+    ],
+)
