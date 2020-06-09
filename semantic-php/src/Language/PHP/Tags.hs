@@ -165,7 +165,6 @@ instance ToTags PHP.NamespaceUseClause
 instance ToTags PHP.NamespaceUseDeclaration
 instance ToTags PHP.NamespaceUseGroup
 instance ToTags PHP.NamespaceUseGroupClause
-instance ToTags PHP.NewVariable
 instance ToTags PHP.Null
 instance ToTags PHP.ObjectCreationExpression
 instance ToTags PHP.OptionalType
