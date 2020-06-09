@@ -325,6 +325,7 @@ instance ToTags Rb.Undef where
         Prj Rb.Identifier {ann, text} -> yieldTag text P.CALL P.REFERENCE ann byteRange
         _ -> tags expr
       gtags t
+  tags _ = pure ()
 
 introduceLocals ::
   ( Has (Reader Source) sig m,
