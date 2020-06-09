@@ -21,4 +21,4 @@ import           Language.Haskell.TH.Syntax (runIO)
 import           Prelude hiding (Bool, Eq, Float, Integer, String)
 import qualified TreeSitter.QL as CodeQL (getNodeTypesPath, getTestCorpusDir, tree_sitter_ql)
 
-runIO CodeQL.getNodeTypesPath >>= astDeclarationsForLanguage CodeQL.tree_sitter_ql
+astDeclarationsForLanguage CodeQL.tree_sitter_ql "/Users/patrickt/src/semantic/vendor/codeql-node-types.json"

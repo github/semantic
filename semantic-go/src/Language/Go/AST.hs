@@ -20,4 +20,4 @@ import           AST.GenerateSyntax
 import           Language.Haskell.TH.Syntax (runIO)
 import qualified TreeSitter.Go as Go (getNodeTypesPath, getTestCorpusDir, tree_sitter_go)
 
-runIO Go.getNodeTypesPath >>= astDeclarationsForLanguage Go.tree_sitter_go
+astDeclarationsForLanguage Go.tree_sitter_go "/Users/patrickt/src/semantic/vendor/go-node-types.json"

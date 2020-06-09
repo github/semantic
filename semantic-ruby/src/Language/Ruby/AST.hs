@@ -20,4 +20,4 @@ import           AST.GenerateSyntax
 import           Language.Haskell.TH.Syntax (runIO)
 import qualified TreeSitter.Ruby as Ruby (getNodeTypesPath, getTestCorpusDir, tree_sitter_ruby)
 
-runIO Ruby.getNodeTypesPath >>= astDeclarationsForLanguage Ruby.tree_sitter_ruby
+astDeclarationsForLanguage Ruby.tree_sitter_ruby "/Users/patrickt/src/semantic/vendor/ruby-node-types.json"

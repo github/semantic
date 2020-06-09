@@ -20,4 +20,4 @@ import           AST.GenerateSyntax
 import           Language.Haskell.TH.Syntax (runIO)
 import qualified TreeSitter.TypeScript as TypeScript (getNodeTypesPath, getTestCorpusDir, tree_sitter_typescript)
 
-runIO TypeScript.getNodeTypesPath >>= astDeclarationsForLanguage TypeScript.tree_sitter_typescript
+astDeclarationsForLanguage TypeScript.tree_sitter_typescript "/Users/patrickt/src/semantic/vendor/typescript-node-types.json"

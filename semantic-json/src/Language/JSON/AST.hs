@@ -19,4 +19,4 @@ import           AST.GenerateSyntax
 import           Language.Haskell.TH.Syntax (runIO)
 import qualified TreeSitter.JSON as JSON (getNodeTypesPath, getTestCorpusDir, tree_sitter_json)
 
-runIO JSON.getNodeTypesPath >>= astDeclarationsForLanguage JSON.tree_sitter_json
+astDeclarationsForLanguage JSON.tree_sitter_json "/Users/patrickt/src/semantic/vendor/json-node-types.json"

@@ -20,4 +20,4 @@ import           AST.Token
 import           Language.Haskell.TH.Syntax (runIO)
 import qualified TreeSitter.Java as Java (getNodeTypesPath, getTestCorpusDir, tree_sitter_java)
 
-runIO Java.getNodeTypesPath >>= astDeclarationsForLanguage Java.tree_sitter_java
+astDeclarationsForLanguage Java.tree_sitter_java "/Users/patrickt/src/semantic/vendor/java-node-types.json"
