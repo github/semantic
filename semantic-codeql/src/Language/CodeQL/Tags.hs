@@ -108,6 +108,14 @@ instance ToTags CodeQL.DatatypeBranch where
         name = CodeQL.ClassName {text, ann}
       } = yieldTag text Class ann byteRange >> gtags t
 
+instance ToTags CodeQL.ClasslessPredicateCall where
+  tags
+    CodeQL.ClasslessPredicateCall
+      { extraChildren
+      } = for_ extraChildren $ \x -> case x of
+      Prj t@CodeQL.AritylessPredicateExpr {} -> tags t
+      _ -> pure ()
+
 instance ToTags CodeQL.QualifiedRhs where
   tags
     t@CodeQL.QualifiedRhs

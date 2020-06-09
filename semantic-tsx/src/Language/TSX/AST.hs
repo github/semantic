@@ -20,4 +20,4 @@ import           AST.GenerateSyntax
 import           Language.Haskell.TH.Syntax (runIO)
 import qualified TreeSitter.TSX as TSX (getNodeTypesPath, getTestCorpusDir, tree_sitter_tsx)
 
-runIO TSX.getNodeTypesPath >>= astDeclarationsForLanguage TSX.tree_sitter_tsx
+astDeclarationsForLanguage TSX.tree_sitter_tsx "/Users/patrickt/src/semantic/vendor/tsx-node-types.json"
