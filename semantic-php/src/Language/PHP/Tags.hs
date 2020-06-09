@@ -5,7 +5,6 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Language.PHP.Tags
   ( tags,
@@ -68,6 +67,7 @@ instance ToTags PHP.FunctionDefinition where
       { PHP.ann = Loc {byteRange},
         PHP.name = Parse.Success (PHP.Name {text, ann})
       } = yieldTag text P.METHOD P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags PHP.MethodDeclaration where
   tags
@@ -75,6 +75,7 @@ instance ToTags PHP.MethodDeclaration where
       { PHP.ann = Loc {byteRange},
         PHP.name = Parse.Success (PHP.Name {text, ann})
       } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags PHP.FunctionCallExpression where
   tags
