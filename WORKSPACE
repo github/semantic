@@ -50,6 +50,7 @@ stack_snapshot(
         "algebraic-graphs",
         "ansi-terminal",
         "array",
+        "async",
         "attoparsec",
         "bifunctors",
         "bytestring",

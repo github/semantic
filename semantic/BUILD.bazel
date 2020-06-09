@@ -48,6 +48,7 @@ haskell_library(
         "@stackage//:algebraic-graphs",
         "@stackage//:ansi-terminal",
         "@stackage//:array",
+        "@stackage//:async",
         "@stackage//:attoparsec",
         "@stackage//:bifunctors",
         "@stackage//:bytestring",
