@@ -21,6 +21,23 @@ haskell_toolchain_library(name = "base")
 
 haskell_toolchain_library(name = "ghc-prim")
 
+# TODO: move this and other useful variables to a shared entity
+# and load it with load()
+
+STANDARD_GHC_WARNINGS = [
+    "-Weverything",
+    "-Wno-missing-local-signatures",
+    "-Wno-missing-import-lists",
+    "-Wno-implicit-prelude",
+    "-Wno-safe",
+    "-Wno-unsafe",
+    "-Wno-name-shadowing",
+    "-Wno-monomorphism-restriction",
+    "-Wno-missed-specialisations",
+    "-Wno-all-missed-specialisations",
+    "-Wno-star-is-type",
+]
+
 # You can add your own libraries with haskell_library.
 haskell_library(
     name = "lib",
@@ -109,6 +126,7 @@ haskell_library(
 haskell_binary(
     name = "exe",
     srcs = glob(["app/**/*.hs"]),
+    compiler_flags = STANDARD_GHC_WARNINGS,
     src_strip_prefix = "app",
     deps = [
         ":base",
