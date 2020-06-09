@@ -29,6 +29,7 @@ haskell_library(
         "//semantic-analysis:lib",
         "//semantic-ast:lib",
         "//semantic-core:lib",
+        "//semantic-proto:lib",
         "//semantic-scope-graph:lib",
         "//semantic-source:lib",
         "//semantic-tags:lib",

@@ -90,6 +90,7 @@ stack_snapshot(
         "process",
         "profunctors",
         "proto-lens",
+        "proto-lens-jsonpb",
         "proto-lens-runtime",
         "recursion-schemes",
         "reducers",

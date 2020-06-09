@@ -26,6 +26,7 @@ haskell_library(
     src_strip_prefix = "src",
     deps = [
         ":base",
+        "//semantic-proto:lib",
         "//semantic-source:lib",
         "@stackage//:fused-effects",
         "@stackage//:text",
