@@ -607,12 +607,16 @@ instance FromJSONPB Symbol where
     line' <- obj .: "line"
     span' <- obj A..:? "span"
     docs' <- obj A..:? "docs"
+    nodeType' <- obj .: "nodeType"
+    syntaxType' <- obj .: "syntaxType"
     pure $ defMessage
       & P.symbol .~ symbol'
       & P.kind .~ kind'
       & P.line .~ line'
       & P.maybe'span .~ span'
       & P.maybe'docs .~ docs'
+      & P.nodeType .~ nodeType'
+      & P.syntaxType .~ syntaxType'
 
 instance ToJSONPB Symbol where
   toJSONPB x = object
@@ -621,6 +625,8 @@ instance ToJSONPB Symbol where
     , "line" .= (x^.line)
     , "span" .= (x^.maybe'span)
     , "docs" .= (x^.maybe'docs)
+    , "nodeType" .= (x^.nodeType)
+    , "syntaxType" .= (x^.syntaxType)
     ]
   toEncodingPB x = pairs
     [ "symbol" .= (x^.symbol)
@@ -628,6 +634,8 @@ instance ToJSONPB Symbol where
     , "line" .= (x^.line)
     , "span" .= (x^.maybe'span)
     , "docs" .= (x^.maybe'docs)
+    , "nodeType" .= (x^.nodeType)
+    , "syntaxType" .= (x^.syntaxType)
     ]
 
 instance FromJSON Symbol where
@@ -750,15 +758,15 @@ instance FromJSONPB StackGraphNode where
     id' <- obj .: "id"
     name' <- obj .: "name"
     line' <- obj .: "line"
-    kind' <- obj .: "kind"
     span' <- obj A..:? "span"
+    syntaxType' <- obj .: "syntaxType"
     nodeType' <- obj .: "nodeType"
     pure $ defMessage
       & P.id .~ id'
       & P.name .~ name'
       & P.line .~ line'
-      & P.kind .~ kind'
       & P.maybe'span .~ span'
+      & P.syntaxType .~ syntaxType'
       & P.nodeType .~ nodeType'
 
 instance ToJSONPB StackGraphNode where
@@ -766,16 +774,16 @@ instance ToJSONPB StackGraphNode where
     [ "id" .= (x^.id)
     , "name" .= (x^.name)
     , "line" .= (x^.line)
-    , "kind" .= (x^.kind)
     , "span" .= (x^.maybe'span)
+    , "syntaxType" .= (x^.syntaxType)
     , "nodeType" .= (x^.nodeType)
     ]
   toEncodingPB x = pairs
     [ "id" .= (x^.id)
     , "name" .= (x^.name)
     , "line" .= (x^.line)
-    , "kind" .= (x^.kind)
     , "span" .= (x^.maybe'span)
+    , "syntaxType" .= (x^.syntaxType)
     , "nodeType" .= (x^.nodeType)
     ]
 
@@ -783,25 +791,6 @@ instance FromJSON StackGraphNode where
   parseJSON = parseJSONPB
 
 instance ToJSON StackGraphNode where
-  toJSON = toAesonValue
-  toEncoding = toAesonEncoding
-
-instance FromJSONPB StackGraphNode'NodeType where
-  parseJSONPB (JSONPB.String "ROOT_SCOPE") = pure StackGraphNode'ROOT_SCOPE
-  parseJSONPB (JSONPB.String "JUMP_TO_SCOPE") = pure StackGraphNode'JUMP_TO_SCOPE
-  parseJSONPB (JSONPB.String "EXPORTED_SCOPE") = pure StackGraphNode'EXPORTED_SCOPE
-  parseJSONPB (JSONPB.String "DEFINITION") = pure StackGraphNode'DEFINITION
-  parseJSONPB (JSONPB.String "REFERENCE") = pure StackGraphNode'REFERENCE
-  parseJSONPB x = typeMismatch "NodeType" x
-
-instance ToJSONPB StackGraphNode'NodeType where
-  toJSONPB x _ = A.String . T.toUpper . T.pack $ show x
-  toEncodingPB x _ = E.text . T.toUpper . T.pack  $ show x
-
-instance FromJSON StackGraphNode'NodeType where
-  parseJSON = parseJSONPB
-
-instance ToJSON StackGraphNode'NodeType where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
@@ -847,5 +836,46 @@ instance FromJSON StackGraphPath where
   parseJSON = parseJSONPB
 
 instance ToJSON StackGraphPath where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB NodeType where
+  parseJSONPB (JSONPB.String "ROOT_SCOPE") = pure ROOT_SCOPE
+  parseJSONPB (JSONPB.String "JUMP_TO_SCOPE") = pure JUMP_TO_SCOPE
+  parseJSONPB (JSONPB.String "EXPORTED_SCOPE") = pure EXPORTED_SCOPE
+  parseJSONPB (JSONPB.String "DEFINITION") = pure DEFINITION
+  parseJSONPB (JSONPB.String "REFERENCE") = pure REFERENCE
+  parseJSONPB x = typeMismatch "NodeType" x
+
+instance ToJSONPB NodeType where
+  toJSONPB x _ = A.String . T.toUpper . T.pack $ show x
+  toEncodingPB x _ = E.text . T.toUpper . T.pack  $ show x
+
+instance FromJSON NodeType where
+  parseJSON = parseJSONPB
+
+instance ToJSON NodeType where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB SyntaxType where
+  parseJSONPB (JSONPB.String "FUNCTION") = pure FUNCTION
+  parseJSONPB (JSONPB.String "METHOD") = pure METHOD
+  parseJSONPB (JSONPB.String "CLASS") = pure CLASS
+  parseJSONPB (JSONPB.String "MODULE") = pure MODULE
+  parseJSONPB (JSONPB.String "CALL") = pure CALL
+  parseJSONPB (JSONPB.String "TYPE") = pure TYPE
+  parseJSONPB (JSONPB.String "INTERFACE") = pure INTERFACE
+  parseJSONPB (JSONPB.String "IMPLEMENTATION") = pure IMPLEMENTATION
+  parseJSONPB x = typeMismatch "SyntaxType" x
+
+instance ToJSONPB SyntaxType where
+  toJSONPB x _ = A.String . T.toUpper . T.pack $ show x
+  toEncodingPB x _ = E.text . T.toUpper . T.pack  $ show x
+
+instance FromJSON SyntaxType where
+  parseJSON = parseJSONPB
+
+instance ToJSON SyntaxType where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding

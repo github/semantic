@@ -1,33 +1,16 @@
-module Tags.Tag
-( Tag(..)
-, Kind(..)
-) where
+module Tags.Tag (Tag (..)) where
 
 import Data.Text (Text)
+import Proto.Semantic as P
 import Source.Loc
 
-data Tag = Tag
-  { name :: Text
-  , kind :: Kind
-  , loc  :: Loc
-  , line :: Text
-  , docs :: Maybe Text
-  }
+data Tag
+  = Tag
+      { tagName :: Text,
+        tagSyntaxType :: P.SyntaxType,
+        tagNodeType :: P.NodeType,
+        tagLoc :: Loc,
+        tagLine :: Text,
+        tagDocs :: Maybe Text
+      }
   deriving (Eq, Show)
-
-data Kind
-  -- Definitions
-  = Function
-  | Method
-  | Class
-  | Module
-  -- References
-  | Call
-  | Type
-  -- Just as Call is to Class and Function, Implementation is to Interface.
-  -- This suggests that perhaps we should have an Instantiation kind that
-  -- we use for Class.
-  | Interface
-  | Implementation
-  -- Constant -- TODO: New kind for constant references
-  deriving (Bounded, Enum, Eq, Show)

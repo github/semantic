@@ -1,16 +1,16 @@
 cabal-version:       2.4
 
-name:                semantic-tsx
+name:                semantic-rust
 version:             0.0.0.0
-synopsis:            Semantic support for TSX.
-description:         Semantic support for TSX using the semantic-core intermediate language.
-homepage:            https://github.com/github/semantic/tree/master/semantic-tsx#readme
+synopsis:            Semantic support for Rust
+description:         Semantic support for Rust.
+homepage:            https://github.com/github/semantic/tree/master/semantic-rust#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
 license-file:        LICENSE
-author:              The Semantic authors
+author:              The Semantic authors, Alexei Pastuchov
 maintainer:          opensource+semantic@github.com
-copyright:           (c) 2019 GitHub, Inc.
+copyright:           (c) 2020 GitHub, Inc.
 category:            Language
 build-type:          Simple
 stability:           alpha
@@ -32,7 +32,7 @@ common haskell
                      , template-haskell ^>= 2.15
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.9
-                     , tree-sitter-tsx ^>= 0.5.0.1
+                     , tree-sitter-rust ^>= 0.1.0.0
 
   ghc-options:
     -Weverything
@@ -52,24 +52,37 @@ common haskell
 library
   import: haskell
   exposed-modules:
-    Language.TSX
-    Language.TSX.AST
-    Language.TSX.Grammar
-    Language.TSX.Tags
-  hs-source-dirs: src
+    Language.Rust
+    Language.Rust.AST
+    Language.Rust.Grammar
+    Language.Rust.Tags
+  hs-source-dirs:      src
 
 test-suite test
   import: haskell
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test
-  main-is:          PreciseTest.hs
+  main-is:          Test.hs
   build-depends:    base
                   , bytestring ^>= 0.10.8.2
-                  , hedgehog >= 0.6 && <2
                   , pathtype ^>= 0.8.1
                   , semantic-ast
-                  , semantic-tsx
+                  , semantic-rust
                   , tasty
-                  , tasty-hedgehog
                   , tasty-hunit
                   , text
+
+  ghc-options:
+    -Weverything
+    -Wno-missing-local-signatures
+    -Wno-missing-import-lists
+    -Wno-implicit-prelude
+    -Wno-safe
+    -Wno-unsafe
+    -Wno-name-shadowing
+    -Wno-monomorphism-restriction
+    -Wno-missed-specialisations
+    -Wno-all-missed-specialisations
+    -Wno-star-is-type
+  if (impl(ghc >= 8.8))
+    ghc-options: -Wno-missing-deriving-strategies

@@ -1,5 +1,6 @@
 module Tags.Tagging.Precise
 ( Tags
+, Tag(..)
 , ToTags(..)
 , yield
 , runTagging
@@ -26,7 +27,7 @@ class ToTags t where
 
 yield :: Has (Writer Tags) sig m => Tag -> m ()
 yield = tell . Endo . (:) . modSpan toOneIndexed where
-  modSpan f t@Tag{ loc = l } = t { loc = l { span = f (span l) } }
+  modSpan f t@Tag{ tagLoc = l } = t { tagLoc = l { span = f (span l) } }
   toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
 
 runTagging :: Source -> ReaderC Source (WriterC Tags Identity) () -> [Tag]

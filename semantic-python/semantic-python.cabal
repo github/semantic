@@ -27,6 +27,7 @@ common haskell
                      , semantic-analysis ^>= 0
                      , semantic-ast
                      , semantic-core ^>= 0.0
+                     , semantic-proto ^>= 0
                      , semantic-source ^>= 0.1.0
                      , semantic-tags ^>= 0.0
                      , semantic-scope-graph ^>= 0.0

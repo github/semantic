@@ -128,6 +128,8 @@ message Symbol {
   string line = 3;
   Span span = 4;
   Docstring docs = 5;
+  NodeType node_type = 6;
+  SyntaxType syntax_type = 7;
 }
 
 message Docstring {
@@ -152,19 +154,31 @@ message StackGraphFile {
   repeated ParseError errors = 5;
 }
 
+enum NodeType {
+  ROOT_SCOPE = 0;
+  JUMP_TO_SCOPE = 1;
+  EXPORTED_SCOPE = 2;
+  DEFINITION = 3;
+  REFERENCE = 4;
+}
+
+enum SyntaxType {
+  FUNCTION = 0;
+  METHOD = 1;
+  CLASS = 2;
+  MODULE = 3;
+  CALL = 4;
+  TYPE = 5;
+  INTERFACE = 6;
+  IMPLEMENTATION = 7;
+}
+
 message StackGraphNode {
   int64 id = 1;
   string name = 2;
   string line = 3;
-  string kind = 4;
-  Span span = 5;
-  enum NodeType {
-    ROOT_SCOPE = 0;
-    JUMP_TO_SCOPE = 1;
-    EXPORTED_SCOPE = 2;
-    DEFINITION = 3;
-    REFERENCE = 4;
-  }
+  Span span = 4;
+  SyntaxType syntax_type = 5;
   NodeType node_type = 6;
 }
 
