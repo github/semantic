@@ -1,6 +1,7 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
@@ -320,12 +321,16 @@ instance ToTags Rb.Undef where
     t@Rb.Undef
       { extraChildren,
         ann = Loc {byteRange}
-      } = for_ extraChildren $ \(Parse.Success (Rb.MethodName expr)) -> do
-      case expr of
-        Prj Rb.Identifier {ann, text} -> yieldTag text P.CALL P.REFERENCE ann byteRange
-        _ -> tags expr
+      } = do
+      for_ extraChildren $
+        \case
+          Parse.Success (Rb.MethodName expr) -> do
+            case expr of
+              Prj Rb.Identifier {ann, text} -> yieldTag text P.CALL P.REFERENCE ann byteRange
+              _ -> tags expr
+          Parse.Fail _ -> pure ()
       gtags t
-  tags _ = pure ()
+
 
 introduceLocals ::
   ( Has (Reader Source) sig m,
