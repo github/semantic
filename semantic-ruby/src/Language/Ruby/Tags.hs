@@ -7,7 +7,6 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
-{-# HLINT ignore "Reduce duplication" #-}
 
 module Language.Ruby.Tags
   ( ToTags (..),
