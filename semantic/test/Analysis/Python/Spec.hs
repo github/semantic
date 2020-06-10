@@ -6,10 +6,12 @@ import           Data.Abstract.Value.Concrete
 import qualified Data.Language as Language
 import qualified Language.Python.Term as Python
 import           Source.Loc
+import qualified System.Path as Path
+import qualified System.Path.Bazel as Path
 import           SpecHelpers
 
 
-spec :: (?session :: TaskSession) => Spec
+spec :: (?session :: TaskSession, Path.HasBazel) => Spec
 spec = do
   describe "Python" $ do
     it "imports" $ do
@@ -70,5 +72,5 @@ spec = do
         other -> expectationFailure (show other)
 
   where
-    fixtures = "test/fixtures/python/analysis/"
+    fixtures = Path.toString (Path.bazelDir "test/fixtures/python/analysis/") <> "/"
     evaluate = evaluateProject @'Language.Python @(Python.Term Loc) ?session Proxy . map (fixtures <>)

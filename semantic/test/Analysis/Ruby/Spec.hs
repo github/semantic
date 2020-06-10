@@ -16,10 +16,11 @@ import qualified Language.Ruby.Term as Ruby
 import           Source.Loc
 import           SpecHelpers
 import qualified System.Path as Path
+import qualified System.Path.Bazel as Path
 
 
 
-spec :: (?session :: TaskSession) =>  Spec
+spec :: (?session :: TaskSession, Path.HasBazel) =>  Spec
 spec = do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
@@ -104,5 +105,5 @@ spec = do
         other -> expectationFailure (show other)
 
   where
-    fixtures = "test/fixtures/ruby/analysis/"
+    fixtures = Path.toString (Path.bazelDir "test/fixtures/ruby/analysis/") <> "/"
     evaluate = evaluateProject @'Language.Ruby @(Ruby.Term Loc) ?session Proxy . map (fixtures <>)

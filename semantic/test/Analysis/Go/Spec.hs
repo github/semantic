@@ -6,8 +6,12 @@ import qualified Data.Language as Language
 import qualified Language.Go.Term as Go
 import           Source.Loc
 import           SpecHelpers
+import qualified System.Path as Path
+import qualified System.Path.Bazel as Path
 
-spec :: (?session :: TaskSession) => Spec
+-- TODO: use path types here
+
+spec :: (?session :: TaskSession, Path.HasBazel) => Spec
 spec = do
   describe "Go" $ do
     it "imports and wildcard imports" $ do
@@ -31,5 +35,5 @@ spec = do
         other -> expectationFailure (show other)
 
   where
-    fixtures = "test/fixtures/go/analysis/"
+    fixtures = Path.toString (Path.bazelDir "test/fixtures/go/analysis/") <> "/"
     evaluate = evaluateProject @'Language.Go @(Go.Term Loc) ?session Proxy . map (fixtures <>)

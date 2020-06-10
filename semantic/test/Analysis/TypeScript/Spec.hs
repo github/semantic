@@ -23,8 +23,9 @@ import qualified Language.TypeScript.Term as TypeScript
 import           Source.Loc
 import           SpecHelpers
 import qualified System.Path as Path
+import qualified System.Path.Bazel as Path
 
-spec :: (?session :: TaskSession) => Spec
+spec :: (?session :: TaskSession, Path.HasBazel) => Spec
 spec = do
   describe "TypeScript" $ do
     it "qualified export from" $ do
@@ -182,7 +183,7 @@ spec = do
       res `shouldBe` expected
 
   where
-    fixtures = "test/fixtures/typescript/analysis/"
+    fixtures = Path.toString (Path.bazelDir "test/fixtures/typescript/analysis/") <> "/"
     evaluate = evaluateProject @'Language.TypeScript @(TypeScript.Term Loc) ?session Proxy . map (fixtures <>)
 
 type TypeScriptEvalError = BaseError (EvalError (TypeScript.Term Loc) Precise (Concrete.Value (TypeScript.Term Loc) Precise))

@@ -31,13 +31,14 @@ import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
 import qualified Semantic.Stat.Spec
 import qualified Bazel.Runfiles as Bazel
+import qualified System.Path.Bazel as Path
 import Semantic.Config (defaultOptions, optionsLogLevel)
 import Semantic.Task (withOptions, TaskSession(..))
 import Test.Hspec
 import Test.Tasty as Tasty
 import Test.Tasty.Hspec as Tasty
 
-tests :: (?session :: TaskSession) => [TestTree]
+tests :: (?session :: TaskSession, Path.HasBazel) => [TestTree]
 tests =
   [ Data.Language.Spec.testTree
   , Data.Scientific.Spec.testTree
@@ -50,7 +51,7 @@ tests =
 
 -- We can't bring this out of the IO monad until we divest
 -- from hspec, since testSpec operates in IO.
-allTests :: (?session :: TaskSession, ?runfiles :: Bazel.Runfiles) => IO TestTree
+allTests :: (?session :: TaskSession, Path.HasBazel) => IO TestTree
 allTests = do
   asTastySpecs <- Tasty.testSpecs legacySpecs
   let allSpecs = tests <> asTastySpecs
@@ -62,7 +63,7 @@ allTests = do
 -- documentation: "hspec and tasty serve similar purposes; consider
 -- using one or the other.") Instead, create a new TestTree value
 -- in your spec module and add it to the above 'tests' list.
-legacySpecs :: (?session :: TaskSession, ?runfiles :: Bazel.Runfiles) => Spec
+legacySpecs :: (?session :: TaskSession, Path.HasBazel) => Spec
 legacySpecs = parallel $ do
   describe "Analysis.Go" Analysis.Go.Spec.spec
   describe "Analysis.PHP" Analysis.PHP.Spec.spec
