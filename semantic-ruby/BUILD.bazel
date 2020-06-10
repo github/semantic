@@ -23,6 +23,7 @@ haskell_toolchain_library(name = "base")
 haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
+    extra_srcs = ["//vendor:ruby-node-types.json"],
     src_strip_prefix = "src",
     deps = [
         ":base",

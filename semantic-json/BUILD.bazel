@@ -23,7 +23,7 @@ haskell_toolchain_library(name = "base")
 haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
-    src_strip_prefix = "src",
+    extra_srcs = ["//vendor:json-node-types.json"],
     deps = [
         ":base",
         "//semantic-analysis:lib",
