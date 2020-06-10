@@ -138,7 +138,14 @@ haskell_test(
     compiler_flags = STANDARD_GHC_WARNINGS + [
         "-XStrictData",
     ],
-    data = glob(include = ["test/fixtures/**/*.json"]),
+    data = glob(include = [
+        "test/fixtures/**/*.json",
+        "test/fixtures/go/**/*.go",
+        "test/fixtures/python/**/*.py",
+        "test/fixtures/ruby/**/*.rb",
+        "test/fixtures/javascript/**/*.js",
+        "test/fixtures/typescript/**/*.ts",
+    ]),
     src_strip_prefix = "test",
     deps = semantic_common_dependencies + [
         ":base",
