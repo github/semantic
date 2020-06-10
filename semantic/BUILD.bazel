@@ -137,8 +137,8 @@ haskell_test(
     ),
     compiler_flags = STANDARD_GHC_WARNINGS + [
         "-XStrictData",
-        "-Wno-missing-deriving-strategies",
     ],
+    data = glob(include = ["test/fixtures/**/*.json"]),
     src_strip_prefix = "test",
     deps = semantic_common_dependencies + [
         ":base",
@@ -148,6 +148,7 @@ haskell_test(
         "//semantic-tags:lib",
         "@stackage//:Glob",
         "@stackage//:HUnit",
+        "@stackage//:bazel-runfiles",
         "@stackage//:bifunctors",
         "@stackage//:hedgehog",
         "@stackage//:hspec",

@@ -53,6 +53,7 @@ stack_snapshot(
         "array",
         "async",
         "attoparsec",
+        "bazel-runfiles",
         "bifunctors",
         "bytestring",
         "containers",
