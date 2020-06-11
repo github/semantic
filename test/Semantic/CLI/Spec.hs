@@ -19,8 +19,7 @@ import Test.Tasty.Golden
 
 testTree :: TestTree
 testTree = testGroup "Semantic.CLI"
-  [ testGroup "parseDiffBuilder" $ fmap testForDiffFixture diffFixtures
-  , testGroup "parseTermBuilder" $ fmap testForParseFixture parseFixtures
+  [ testGroup "parseTermBuilder" $ fmap testForParseFixture parseFixtures
   ]
 
 -- We provide this function to the golden tests so as to have better
@@ -62,11 +61,3 @@ parseFixtures =
         path'' = [File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
         prefix = Path.relDir "test/fixtures/cli"
         run = runReader defaultLanguageModes
-
-diffFixtures :: [(String, [BlobPair] -> ParseC TaskC Builder, [(File Language, File Language)], Path.RelFile)]
-diffFixtures =
-  [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> Path.file "diff-tree.json")
-  , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, Path.relFile "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
-  ]
-  where pathMode = [(File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby, File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.B.rb") lowerBound Ruby)]
-        prefix = Path.relDir "test/fixtures/cli"

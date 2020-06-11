@@ -92,9 +92,7 @@ library
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
-                     , Analysis.Decorator
                      , Analysis.HasTextElement
-                     , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
@@ -141,11 +139,9 @@ library
                      , Data.Abstract.Value.Concrete
                      , Data.Abstract.Value.Type
                      -- General datatype definitions & generic algorithms
-                     , Data.Algebra
                      , Data.AST
                      , Data.Blob
                      , Data.Blob.IO
-                     , Data.Diff
                      , Data.Duration
                      , Data.Edit
                      , Data.Error
@@ -156,13 +152,13 @@ library
                      , Data.Handle
                      , Data.History
                      , Data.ImportPath
-                     , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Maybe.Exts
                      , Data.Quieterm
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
+                     , Data.Term
                      -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment
@@ -172,13 +168,6 @@ library
                      , Data.Syntax.Literal
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
-                     , Data.Term
-                     -- Diffing algorithms & interpretation thereof
-                     , Diffing.Algorithm
-                     , Diffing.Algorithm.RWS
-                     , Diffing.Algorithm.RWS.FeatureVector
-                     , Diffing.Algorithm.SES
-                     , Diffing.Interpreter
                      -- Language-specific grammar/syntax types, & assignments
                      , Language.Go.Assignment
                      , Language.Go.Syntax
@@ -208,15 +197,11 @@ library
                      -- Parser glue
                      , Parsing.Parser
                      , Parsing.TreeSitter
-                     -- Rendering formats
-                     , Rendering.Graph
-                     , Rendering.JSON
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.Analysis
                      -- API
                      , Semantic.Api
                      , Semantic.Api.Bridge
-                     , Semantic.Api.Diffs
                      , Semantic.Api.StackGraph
                      , Semantic.Api.Symbols
                      , Semantic.Api.Terms
@@ -322,7 +307,6 @@ test-suite test
                      , Control.Abstract.Evaluator.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Abstract.Name.Spec
-                     , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Graph.Spec
@@ -331,9 +315,6 @@ test-suite test
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec
                      , Data.Term.Spec
-                     , Diffing.Algorithm.RWS.Spec
-                     , Diffing.Algorithm.SES.Spec
-                     , Diffing.Interpreter.Spec
                      , Graphing.Calls.Spec
                      , Integration.Spec
                      , Numeric.Spec

@@ -23,10 +23,6 @@ message ParseTreeSymbolResponse {
   repeated File files = 1;
 }
 
-message ParseTreeGraphResponse {
-  repeated ParseTreeFileGraph files = 1;
-}
-
 message StackGraphRequest {
   repeated Blob blobs = 1;
 }
@@ -35,77 +31,8 @@ message StackGraphResponse {
   repeated StackGraphFile files = 1;
 }
 
-message ParseTreeFileGraph {
-  string path = 1;
-  string language = 2;
-  repeated TermVertex vertices = 3;
-  repeated TermEdge edges = 4;
-  repeated ParseError errors = 5;
-}
-
-message TermEdge {
-  int32 source = 1;
-  int32 target = 2;
-}
-
-message TermVertex {
-  int32 vertex_id = 1;
-  string term = 2;
-  Span span = 3;
-}
-
 message ParseError {
   string error = 1;
-}
-
-message DiffTreeGraphResponse {
-  repeated DiffTreeFileGraph files = 1;
-}
-
-message DiffTreeFileGraph {
-  string path = 1;
-  string language = 2;
-  repeated DiffTreeVertex vertices = 3;
-  repeated DiffTreeEdge edges = 4;
-  repeated ParseError errors = 5;
-}
-
-message DiffTreeEdge {
-  int32 source = 1;
-  int32 target = 2;
-}
-
-message DiffTreeVertex {
-  int32 diff_vertex_id = 1;
-  oneof diff_term {
-    DeletedTerm deleted = 2;
-    InsertedTerm inserted = 3;
-    ReplacedTerm replaced = 4;
-    MergedTerm merged = 5;
-  }
-}
-
-message DeletedTerm {
-  string term = 1;
-  Span span = 2;
-}
-
-message InsertedTerm {
-  string term = 1;
-  Span span = 2;
-}
-
-message ReplacedTerm {
-  string before_term = 1;
-  Span before_span = 2;
-  string after_term = 3;
-  Span after_span = 4;
-}
-
-message MergedTerm {
-  string term = 1;
-  Span before_span = 2;
-  Span after_span = 3;
 }
 
 message Blob {

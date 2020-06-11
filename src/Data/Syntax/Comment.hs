@@ -8,14 +8,12 @@ module Data.Syntax.Comment (module Data.Syntax.Comment) where
 import Data.Abstract.Evaluatable
 import Data.Functor.Classes.Generic
 import Data.Hashable.Lifted
-import Data.JSON.Fields
 import Data.Text (Text)
-import Diffing.Algorithm
 import GHC.Generics (Generic1)
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: Text }
-  deriving (Diffable, Foldable, Functor, Generic1, Hashable1, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Foldable, Functor, Generic1, Hashable1, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
@@ -31,7 +29,7 @@ instance Evaluatable Comment where
 
 -- | HashBang line (e.g. `#!/usr/bin/env node`)
 newtype HashBang a = HashBang { value :: Text }
-  deriving (Diffable, Foldable, Functor, Generic1, Hashable1, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Foldable, Functor, Generic1, Hashable1, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 HashBang where liftEq = genericLiftEq
 instance Ord1 HashBang where liftCompare = genericLiftCompare

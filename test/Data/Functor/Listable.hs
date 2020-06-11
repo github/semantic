@@ -19,7 +19,6 @@ module Data.Functor.Listable
 import qualified Analysis.Name as Name
 import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
-import Data.Diff
 import Data.Edit
 import qualified Data.Language as Language
 import Data.List.NonEmpty
@@ -54,13 +53,6 @@ class Listable2 l where
 -- | A suitable definition of 'tiers' for 'Listable2' type constructors parameterized by 'Listable' types.
 tiers2 :: (Listable a, Listable b, Listable2 l) => [Tier (l a b)]
 tiers2 = liftTiers2 tiers tiers
-
-
-class Listable3 l where
-  liftTiers3 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier (l a b c)]
-
-tiers3 :: (Listable3 l, Listable a, Listable b, Listable c) => [Tier (l a b c)]
-tiers3 = liftTiers3 tiers tiers tiers
 
 
 -- | Lifts a unary constructor to a list of tiers, given a list of tiers for its argument.
@@ -136,24 +128,8 @@ instance Listable1 f => Listable1 (Term f) where
 instance (Listable1 f, Listable a) => Listable (Term f a) where
   tiers = tiers1
 
-
-instance (Listable1 syntax) => Listable3 (DiffF syntax) where
-  liftTiers3 ann1Tiers ann2Tiers recurTiers
-    =  liftCons1 (liftTiers2 (liftTiers2 ann1Tiers recurTiers) (liftTiers2 ann2Tiers recurTiers)) Patch
-    \/ liftCons1 (liftTiers2 (liftTiers2 ann1Tiers ann2Tiers) recurTiers) Merge
-
-instance (Listable1 syntax, Listable ann1, Listable ann2, Listable recur) => Listable (DiffF syntax ann1 ann2 recur) where
-  tiers = tiers3
-
 instance Listable AccessControl where
   tiers = cons0 Public \/ cons0 Protected \/ cons0 Private
-
-instance Listable1 f => Listable2 (Diff f) where
-  liftTiers2 annTiers1 annTiers2 = go where go = liftCons1 (liftTiers3 annTiers1 annTiers2 go) Diff
-
-instance (Listable1 syntax, Listable ann1, Listable ann2) => Listable (Diff syntax ann1 ann2) where
-  tiers = tiers2
-
 
 instance Listable2 Edit where
   liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Compare

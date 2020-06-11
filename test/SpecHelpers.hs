@@ -5,7 +5,6 @@
 module SpecHelpers
 ( module X
 , runBuilder
-, diffFilePaths
 , parseFilePath
 , readFilePathPair
 , runTaskOrDie
@@ -90,13 +89,6 @@ instance Lower X.Span where
 
 runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
-
--- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffFilePaths :: TaskSession -> Path.RelFile -> Path.RelFile -> IO ByteString
-diffFilePaths session p1 p2 = do
-  blobs <- readFilePathPair p1 p2
-  builder <- runTask session (runParse (configTreeSitterParseTimeout (config session)) (parseDiffBuilder DiffSExpression [ blobs ]))
-  either (die . displayException) (pure . runBuilder) builder
 
 -- | Returns an s-expression parse tree for the specified path.
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)

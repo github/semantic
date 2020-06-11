@@ -7,8 +7,6 @@ module Language.Python.Term
 import Control.Lens.Lens
 import Data.Abstract.Declarations
 import Data.Abstract.FreeVariables
-import Data.Aeson (ToJSON)
-import Data.Bifunctor
 import Data.Bitraversable
 import Data.Coerce
 import Data.Foldable (fold)
@@ -24,7 +22,6 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import Data.Traversable
-import Diffing.Interpreter
 import Language.Python.Syntax as Python.Syntax
 import Source.Loc
 import Source.Span
@@ -112,7 +109,7 @@ type Syntax =
 
 
 newtype Term ann = Term { getTerm :: Term.TermF (Sum.Sum Syntax) ann (Term ann) }
-  deriving (Eq, Declarations, FreeVariables, Ord, Show, ToJSON)
+  deriving (Eq, Declarations, FreeVariables, Ord, Show)
 
 instance Term.IsTerm Term where
   type Syntax Term = Sum.Sum Syntax
@@ -135,9 +132,6 @@ instance Syntax.HasErrors Term where
   getErrors = cata $ \ (Term.In Loc{..} syntax) ->
     maybe (fold syntax) (pure . Syntax.unError span) (Sum.project syntax)
 
-
-instance DiffTerms Term where
-  diffTermPair = diffTermPair . bimap (cata Term.Term) (cata Term.Term)
 
 type instance Base (Term ann) = Term.TermF (Sum.Sum Syntax) ann
 
