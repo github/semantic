@@ -98,6 +98,23 @@ withScope scope action = do
   put (CurrentScope s)
   pure x
 
+inNewScope :: ScopeGraphEff sig m => m a -> m (Name, a)
+inNewScope action = do
+  name <- Name.gensym
+  val <- withScope name action
+
+  pure (name, val)
+
+pathfully :: ScopeGraphEff sig m => (a -> m (Maybe Node, b)) -> [a] -> m [b]
+pathfully fun things = do
+  things' <- (mapM fun things)
+  let (nodes, bs) = unzip things'
+
+  forM_ (zip nodes (drop nodes)) $ \(parent, child) ->
+    modify (addEdge parent child)
+
+  pure bs
+
 declare :: ScopeGraphEff sig m => Name -> Kind -> Loc -> m Stack.Node
 declare n kind loc = do
   let declNode = Stack.Declaration n kind loc
