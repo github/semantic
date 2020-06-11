@@ -10,6 +10,7 @@ module Language.Go.Tags
 where
 
 import AST.Element
+import qualified AST.Parse as Parse
 import AST.Token
 import AST.Traversable1
 import Control.Effect.Reader
@@ -42,30 +43,33 @@ instance ToTags Go.FunctionDeclaration where
   tags
     t@Go.FunctionDeclaration
       { ann = Loc {byteRange},
-        name = Go.Identifier {text, ann}
+        name = Parse.Success (Go.Identifier {text, ann})
       } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Go.MethodDeclaration where
   tags
     t@Go.MethodDeclaration
       { ann = Loc {byteRange},
-        name = Go.FieldIdentifier {text, ann}
+        name = Parse.Success (Go.FieldIdentifier {text, ann})
       } = yieldTag text P.METHOD P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Go.CallExpression where
   tags
     t@Go.CallExpression
       { ann = Loc {byteRange},
-        function = Go.Expression expr
+        function = Parse.Success (Go.Expression expr)
       } = match expr
       where
         match expr = case expr of
-          Prj Go.SelectorExpression {field = Go.FieldIdentifier {text, ann}} -> yield text ann
+          Prj Go.SelectorExpression {field = Parse.Success (Go.FieldIdentifier {text, ann})} -> yield text ann
           Prj Go.Identifier {text, ann} -> yield text ann
-          Prj Go.CallExpression {function = Go.Expression e} -> match e
-          Prj Go.ParenthesizedExpression {extraChildren = Go.Expression e} -> match e
+          Prj Go.CallExpression {function = Parse.Success (Go.Expression e)} -> match e
+          Prj Go.ParenthesizedExpression {extraChildren = Parse.Success (Go.Expression e)} -> match e
           _ -> gtags t
         yield name loc = yieldTag name P.CALL P.REFERENCE loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l

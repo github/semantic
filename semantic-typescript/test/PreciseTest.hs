@@ -1,10 +1,10 @@
 {-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications #-}
 module Main (main) where
 
-import           AST.Test
+import           TreeSitter.TypeScript
+import           AST.TestHelpers
 import           AST.Unmarshal
 import qualified Language.TypeScript.AST as Ts
-import           Language.TypeScript.Grammar
 import qualified System.Path as Path
 import           Test.Tasty
 

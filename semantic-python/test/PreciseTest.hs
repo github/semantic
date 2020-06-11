@@ -3,9 +3,9 @@ module Main (main) where
 
 import qualified System.Path as Path
 import           Test.Tasty
+import           TreeSitter.Python
 import qualified Language.Python.AST as Py
-import           Language.Python.Grammar
-import           AST.Test
+import           AST.TestHelpers
 import           AST.Unmarshal
 
 main :: IO ()

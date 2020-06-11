@@ -1,12 +1,12 @@
 {-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications #-}
 module Main (main) where
 
-import qualified System.Path as Path
-import           Test.Tasty
+import           AST.TestHelpers
+import           AST.Unmarshal
 import qualified Language.CodeQL.AST as CodeQL
 import           Language.CodeQL.Grammar
-import           AST.Test
-import           AST.Unmarshal
+import qualified System.Path as Path
+import           Test.Tasty
 
 main :: IO ()
 main
