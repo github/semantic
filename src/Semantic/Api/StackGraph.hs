@@ -535,6 +535,8 @@ isScope :: Stack.Tagged Stack.Node -> Bool
 isScope (node Stack.:# _) = case node of
   Stack.Scope {} -> True
   Stack.InternalScope {} -> True
+  Stack.ClassMembers {} -> True
+  Stack.InstanceMembers {} -> True
   _ -> False
 
 isJumpToScope :: Stack.Tagged Stack.Node -> Bool

@@ -29,5 +29,5 @@ instance Tags.ToTags Term where
   tags src = Tags.runTagging src . TsxTags.tags . getTerm
 
 instance ToScopeGraph Term where
-  type FocalPoint Term = ()
+  type FocalPoint Term _ = ()
   scopeGraph _ = todo "Implement scope graph for TSX"

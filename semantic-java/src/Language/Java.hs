@@ -28,5 +28,5 @@ instance Tags.ToTags Term where
   tags src = Tags.runTagging src . JavaTags.tags . getTerm
 
 instance ToScopeGraph Term where
-  type FocalPoint Term = ()
+  type FocalPoint Term _ = ()
   scopeGraph _ = todo "Implement scope graphs for Java"

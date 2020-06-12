@@ -28,5 +28,5 @@ instance Tags.ToTags Term where
   tags _ _ = []
 
 instance ToScopeGraph Term where
-  type FocalPoint Term = ()
+  type FocalPoint Term _ = ()
   scopeGraph _ = todo "TODO: No scope graph possible for JSON."

@@ -28,5 +28,5 @@ instance Tags.ToTags Term where
   tags src = Tags.runTagging src . CodeQLTags.tags . getTerm
 
 instance ToScopeGraph Term where
-  type FocalPoint Term = ()
+  type FocalPoint Term _ = ()
   scopeGraph _ = todo "Implement stack graphs for CodeQL"

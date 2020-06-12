@@ -22,12 +22,12 @@ import Data.Typeable
 import Source.Loc
 
 class Typeable t => ToScopeGraph t where
-  type FocalPoint (t :: * -> *)
+  type FocalPoint (t :: * -> *) (a :: *)
   scopeGraph ::
     ( ScopeGraphEff sig m
     ) =>
     t Loc ->
-    m (Result (FocalPoint t))
+    m (Result (FocalPoint t Loc))
 
 data Result a
   = Complete a
@@ -45,6 +45,13 @@ instance Semigroup a => Semigroup (Result a) where
   Complete _ <> b = b
 
 instance Monoid a => Monoid (Result a) where mempty = Complete mempty
+
+instance Applicative Result where
+  Complete a <*> Complete b = Complete (a b)
+  Todo a <*> Todo b = Todo (a <> b)
+  (Todo a) <*> _ = Todo a
+  _ <*> (Todo b) = Todo b
+  pure = Complete
 
 todo :: (Show a, Applicative m) => a -> m (Result b)
 todo = pure . Todo . pure . show

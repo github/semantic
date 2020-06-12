@@ -28,5 +28,5 @@ instance Tags.ToTags Term where
   tags src = Tags.runTagging src . GoTags.tags . getTerm
 
 instance ToScopeGraph Term where
-  type FocalPoint Term = ()
+  type FocalPoint Term _ = ()
   scopeGraph _ = todo "Implement scope graphs for Go"
