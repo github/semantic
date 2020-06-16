@@ -120,13 +120,13 @@ test-suite stack-graph
   main-is: StackTest.hs
   ghc-options: -threaded
 
-  build-depends: base
-               , semantic-python
-               , semantic-scope-graph
-               , bytestring
-               , pathtype
-               , tasty
-               , tasty-hunit
+  -- build-depends: base
+  --              , semantic-python
+  --             --  , semantic-scope-graph
+  --              , bytestring
+  --              , pathtype
+  --              , tasty
+  --              , tasty-hunit
 
 test-suite test
   import: haskell
