@@ -109,7 +109,7 @@ cabal v2-test
 cabal v2-run semantic -- --help
 ```
 
- `stack` as a build tool is not officially supported; there is an unofficial [`stack.yaml`](https://gist.github.com/jkachmar/f200caee83280f1f25e9cfa2dd2b16bb) available, though we cannot make guarantees as to its stability.
+ `stack` as a build tool is not officially supported; there is [unofficial `stack.yaml` support](https://github.com/jkachmar/semantic-stack-yaml) available, though we cannot make guarantees as to its stability.
 
 [nix]: https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html
 [ghcup]: https://www.haskell.org/ghcup/

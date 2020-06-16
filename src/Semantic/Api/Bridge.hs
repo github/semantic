@@ -19,6 +19,7 @@ import qualified Data.Language                 as Data
 import           Data.ProtoLens                 ( defMessage )
 import qualified Data.Text                     as T
 import           Data.Text.Lens
+<<<<<<< HEAD
 import qualified Proto.Semantic                as API
 import qualified Proto.Semantic_Fields         as P
 import qualified Semantic.Api.LegacyTypes      as Legacy
@@ -29,6 +30,13 @@ import qualified Source.Source                 as Source
                                                 )
 import qualified Source.Span                   as Source
 import qualified System.Path                   as Path
+=======
+import qualified Proto.Semantic as API
+import           Proto.Semantic_Fields as P hiding (to)
+import qualified Source.Source as Source (fromText, toText, totalSpan)
+import qualified Source.Span as Source
+import qualified System.Path as Path
+>>>>>>> origin/master
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
 -- This is suitable for types such as 'Pos' which are representationally equivalent
@@ -84,6 +92,7 @@ instance APIConvert API.Span Source.Span where
         <$> (span ^. P.maybe'start >>= preview bridging)
         <*> (span ^. P.maybe'end >>= preview bridging)
 
+<<<<<<< HEAD
 instance APIConvert Legacy.Span Source.Span where
   converting = prism' toAPI fromAPI   where
     toAPI Source.Span {..} = Legacy.Span (bridging #? start) (bridging #? end)
@@ -92,6 +101,8 @@ instance APIConvert Legacy.Span Source.Span where
         <$> (start >>= preview bridging)
         <*> (end >>= preview bridging)
 
+=======
+>>>>>>> origin/master
 instance APIBridge T.Text Data.Language where
   bridging = iso Data.textToLanguage Data.languageToText
 

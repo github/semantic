@@ -54,6 +54,7 @@ library
     , process
     , semantic-analysis
     , semantic-source    ^>= 0.1.0
+    , semantic-ast       ^>= 0.1.0.0
     , semilattices
     , streaming
     , streaming-bytestring

@@ -11,12 +11,14 @@ module Language.Java.Tags
 where
 
 import AST.Element
+import qualified AST.Parse as Parse
 import AST.Token
 import AST.Traversable1
 import Control.Effect.Reader
 import Control.Effect.Writer
 import Data.Foldable
 import qualified Language.Java.AST as Java
+import Proto.Semantic as P
 import Source.Loc
 import Source.Range
 import Source.Source as Source
@@ -49,7 +51,7 @@ instance ToTags Java.MethodDeclaration where
   tags
     t@Java.MethodDeclaration
       { ann = Loc {byteRange = range},
-        name = Java.Identifier {text, ann},
+        name = Parse.Success (Java.Identifier {text, ann}),
         body
       } = do
       src <- ask @Source
@@ -58,11 +60,13 @@ instance ToTags Java.MethodDeclaration where
               src
               range
                 { end = case body of
-                    Just Java.Block {ann = Loc Range {end} _} -> end
+                    Just (Parse.Success (Java.Block {ann = Loc Range {end} _})) -> end
                     Nothing -> end range
+                    Just (Parse.Fail _) -> end range
                 }
-      Tags.yield (Tag text Method ann line Nothing)
+      Tags.yield (Tag text P.METHOD P.DEFINITION ann line Nothing)
       gtags t
+  tags _ = pure ()
 
 -- TODO: we can coalesce a lot of these instances given proper use of HasField
 -- to do the equivalent of type-generic pattern-matching.
@@ -71,39 +75,42 @@ instance ToTags Java.ClassDeclaration where
   tags
     t@Java.ClassDeclaration
       { ann = Loc {byteRange = Range {start}},
-        name = Java.Identifier {text, ann},
-        body = Java.ClassBody {ann = Loc Range {start = end} _}
+        name = Parse.Success (Java.Identifier {text, ann}),
+        body = Parse.Success (Java.ClassBody {ann = Loc Range {start = end} _})
       } = do
       src <- ask @Source
-      Tags.yield (Tag text Class ann (Tags.firstLine src (Range start end)) Nothing)
+      Tags.yield (Tag text P.CLASS P.DEFINITION ann (Tags.firstLine src (Range start end)) Nothing)
       gtags t
+  tags _ = pure ()
 
 instance ToTags Java.MethodInvocation where
   tags
     t@Java.MethodInvocation
       { ann = Loc {byteRange = range},
-        name = Java.Identifier {text, ann}
+        name = Parse.Success (Java.Identifier {text, ann})
       } = do
       src <- ask @Source
-      Tags.yield (Tag text Call ann (Tags.firstLine src range) Nothing)
+      Tags.yield (Tag text P.CALL P.REFERENCE ann (Tags.firstLine src range) Nothing)
       gtags t
+  tags _ = pure ()
 
 instance ToTags Java.InterfaceDeclaration where
   tags
     t@Java.InterfaceDeclaration
       { ann = Loc {byteRange},
-        name = Java.Identifier {text, ann}
+        name = Parse.Success (Java.Identifier {text, ann})
       } = do
       src <- ask @Source
-      Tags.yield (Tag text Interface ann (Tags.firstLine src byteRange) Nothing)
+      Tags.yield (Tag text P.INTERFACE P.DEFINITION ann (Tags.firstLine src byteRange) Nothing)
       gtags t
+  tags _ = pure ()
 
 instance ToTags Java.InterfaceTypeList where
   tags t@Java.InterfaceTypeList {extraChildren = interfaces} = do
     src <- ask @Source
     for_ interfaces $ \x -> case x of
-      Java.Type (Prj (Java.UnannotatedType (Prj (Java.SimpleType (Prj Java.TypeIdentifier {ann = loc@Loc {byteRange = range}, text = name}))))) ->
-        Tags.yield (Tag name Implementation loc (Tags.firstLine src range) Nothing)
+      Parse.Success (Java.Type (Prj (Java.UnannotatedType (Prj (Java.SimpleType (Prj Java.TypeIdentifier {ann = loc@Loc {byteRange = range}, text = name})))))) ->
+        Tags.yield (Tag name P.IMPLEMENTATION P.REFERENCE loc (Tags.firstLine src range) Nothing)
       _ -> pure ()
     gtags t
 

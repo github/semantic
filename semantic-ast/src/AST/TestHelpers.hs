@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module AST.Test
+module AST.TestHelpers
   ( CorpusExample(..)
   , readCorpusFiles
   , readCorpusFiles'
@@ -10,6 +10,7 @@ module AST.Test
 import           Control.Applicative
 import           Control.Monad
 import           Data.Attoparsec.ByteString.Char8
+import           Data.Attoparsec.ByteString.Char8 as Attoparsec
 import           Data.ByteString (ByteString, readFile)
 import           Data.ByteString.Char8 (pack, unpack)
 import           Data.Either
@@ -76,7 +77,7 @@ exampleParser = do
   code <- manyTill anyChar outputSepParser
   _out <- manyTill anyChar (choice [endOfInput, char '=' $> ()])
   pure (CorpusExample name (pack code))
-  where outputSepParser = choice [string "\n---\n", string "\r\n---\r\n"]
+  where outputSepParser = (Attoparsec.take 3) *> (Attoparsec.char '-') *> endOfLine
 
 exampleNameParser :: Parser String
 exampleNameParser = do

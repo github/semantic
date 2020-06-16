@@ -33,6 +33,8 @@ module Control.Effect.ScopeGraph
     reference,
     refer,
     Has,
+    ensureAST,
+    ParseError(..)
   )
 where
 
@@ -44,6 +46,7 @@ import Control.Effect.Reader
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
 import qualified Control.Effect.ScopeGraph.Properties.Reference as Props.Reference
 import Control.Effect.State
+import Control.Effect.Error
 import Control.Lens
 import Data.List.NonEmpty
 import qualified Data.List.NonEmpty as NonEmpty
@@ -59,6 +62,7 @@ import Scope.Types
 import Source.Loc
 import Source.Span
 import qualified Stack.Graph as Stack
+import qualified AST.Parse as Parse
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
@@ -71,8 +75,16 @@ type ScopeGraphEff sig m =
     Has (State (CurrentScope Name)) sig m,
     Has (Reader Stack.Node) sig m, -- The root node of the module.
     Has (Reader Module.ModuleInfo) sig m,
+    Has (Throw ParseError) sig m,
     Has Fresh sig m
   )
+
+newtype ParseError = ParseError { unParseError :: String }
+  deriving (Eq, Ord, Show)
+
+ensureAST :: ScopeGraphEff sig m => Parse.Err a -> m a
+ensureAST (Parse.Fail error) = throwError (ParseError error)
+ensureAST (Parse.Success term) = pure term
 
 graphInProgress :: ScopeGraphEff sig m => m (ScopeGraph Name)
 graphInProgress = get

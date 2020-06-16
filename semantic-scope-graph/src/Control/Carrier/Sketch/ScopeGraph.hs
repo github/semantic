@@ -25,6 +25,7 @@ import qualified Analysis.Name as Name
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Strict
+import           Control.Carrier.Error.Either
 import           Control.Effect.ScopeGraph
 import           Data.Module (ModuleInfo)
 import qualified Data.ScopeGraph as ScopeGraph
@@ -38,16 +39,18 @@ type SketchC addr m
   ( StateC (CurrentScope Name)
   ( ReaderC Stack.Node
   ( ReaderC ModuleInfo
+  ( ErrorC ParseError
   ( FreshC m
-  )))))
+  ))))))
 
 runSketch ::
   (Functor m)
   => ModuleInfo
   -> SketchC Name m a
-  -> m (Stack.Graph Stack.Node, (ScopeGraph Name, a))
+  -> m (Either ParseError (Stack.Graph Stack.Node, (ScopeGraph Name, a)))
 runSketch minfo go
   = evalFresh 1
+  . runError
   . runReader minfo
   . runReader (Stack.Scope rootname)
   . evalState (CurrentScope rootname)

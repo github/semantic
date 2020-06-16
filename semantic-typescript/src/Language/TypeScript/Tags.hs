@@ -1,6 +1,9 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
@@ -12,6 +15,7 @@ module Language.TypeScript.Tags
 where
 
 import AST.Element
+import qualified AST.Parse as Parse
 import AST.Token
 import AST.Traversable1
 import Control.Effect.Reader
@@ -19,12 +23,13 @@ import Control.Effect.Writer
 import Data.Foldable
 import Data.Text as Text
 import qualified Language.TypeScript.AST as Ts
+import Proto.Semantic as P
 import Source.Loc
 import Source.Source as Source
 import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
-class ToTags t where
+class ToTags (t :: * -> *) where
   tags ::
     ( Has (Reader Source) sig m,
       Has (Writer Tags.Tags) sig m
@@ -41,80 +46,88 @@ class ToTags t where
   tags = gtags
 
 instance ToTags Ts.Function where
-  tags t@Ts.Function {ann = Loc {byteRange}, name = Just Ts.Identifier {text, ann}} =
-    yieldTag text Function ann byteRange >> gtags t
+  tags t@Ts.Function {ann = Loc {byteRange}, name = Just (Parse.Success Ts.Identifier {text, ann})} =
+    yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Ts.FunctionSignature where
-  tags t@Ts.FunctionSignature {ann = Loc {byteRange}, name = Ts.Identifier {text, ann}} =
-    yieldTag text Function ann byteRange >> gtags t
+  tags t@Ts.FunctionSignature {ann = Loc {byteRange}, name = Parse.Success (Ts.Identifier {text, ann})} =
+    yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
 
 instance ToTags Ts.FunctionDeclaration where
-  tags t@Ts.FunctionDeclaration {ann = Loc {byteRange}, name = Ts.Identifier {text, ann}} =
-    yieldTag text Function ann byteRange >> gtags t
+  tags t@Ts.FunctionDeclaration {ann = Loc {byteRange}, name = Parse.Success (Ts.Identifier {text, ann})} =
+    yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Ts.MethodDefinition where
   tags t@Ts.MethodDefinition {ann = Loc {byteRange}, name} = case name of
-    Prj Ts.PropertyIdentifier {text, ann} -> yieldTag text Method ann byteRange >> gtags t
+    Parse.Success (Prj Ts.PropertyIdentifier {text, ann}) -> yieldTag text P.METHOD P.DEFINITION ann byteRange >> gtags t
     _ -> gtags t
 
 instance ToTags Ts.Pair where
-  tags t@Ts.Pair {ann = Loc {byteRange}, key, value = Ts.Expression expr} = case (key, expr) of
+  tags t@Ts.Pair {ann = Loc {byteRange}, key = Parse.Success key, value = Parse.Success (Ts.Expression expr)} = case (key, expr) of
     (Prj Ts.PropertyIdentifier {text, ann}, Prj Ts.Function {}) -> yield text ann
     (Prj Ts.PropertyIdentifier {text, ann}, Prj Ts.ArrowFunction {}) -> yield text ann
     _ -> gtags t
     where
-      yield text loc = yieldTag text Function loc byteRange >> gtags t
+      yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Ts.ClassDeclaration where
-  tags t@Ts.ClassDeclaration {ann = Loc {byteRange}, name = Ts.TypeIdentifier {text, ann}} =
-    yieldTag text Class ann byteRange >> gtags t
+  tags t@Ts.ClassDeclaration {ann = Loc {byteRange}, name = Parse.Success (Ts.TypeIdentifier {text, ann})} =
+    yieldTag text P.CLASS P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Ts.CallExpression where
-  tags t@Ts.CallExpression {ann = Loc {byteRange}, function = Ts.Expression expr} = match expr
+  tags t@Ts.CallExpression {ann = Loc {byteRange}, function = Parse.Success (Ts.Expression expr)} = match expr
     where
       match expr = case expr of
         Prj Ts.Identifier {text, ann} -> yield text ann
-        Prj Ts.NewExpression {constructor = Prj Ts.Identifier {text, ann}} -> yield text ann
-        Prj Ts.CallExpression {function = Ts.Expression expr} -> match expr
-        Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}} -> yield text ann
-        Prj Ts.Function {name = Just Ts.Identifier {text, ann}} -> yield text ann
+        Prj Ts.NewExpression {constructor = EPrj Ts.Identifier {text, ann}} -> yield text ann
+        Prj Ts.CallExpression {function = Parse.Success (Ts.Expression expr)} -> match expr
+        Prj Ts.MemberExpression {property = Parse.Success (Ts.PropertyIdentifier {text, ann})} -> yield text ann
+        Prj Ts.Function {name = Just (Parse.Success (Ts.Identifier {text, ann}))} -> yield text ann
         Prj Ts.ParenthesizedExpression {extraChildren} -> for_ extraChildren $ \x -> case x of
-          Prj (Ts.Expression expr) -> match expr
-          _ -> tags x
+          EPrj (Ts.Expression expr) -> match expr
+          Parse.Success x -> tags x
+          Parse.Fail _ -> pure ()
         _ -> gtags t
-      yield name loc = yieldTag name Call loc byteRange >> gtags t
+      yield name loc = yieldTag name P.CALL P.REFERENCE loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Ts.Class where
-  tags t@Ts.Class {ann = Loc {byteRange}, name = Just Ts.TypeIdentifier {text, ann}} =
-    yieldTag text Class ann byteRange >> gtags t
+  tags t@Ts.Class {ann = Loc {byteRange}, name = Just (Parse.Success Ts.TypeIdentifier {text, ann})} =
+    yieldTag text P.CLASS P.DEFINITION ann byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Ts.Module where
   tags t@Ts.Module {ann = Loc {byteRange}, name} = case name of
-    Prj Ts.Identifier {text, ann} -> yieldTag text Module ann byteRange >> gtags t
+    Parse.Success (Prj Ts.Identifier {text, ann}) -> yieldTag text P.MODULE P.DEFINITION ann byteRange >> gtags t
     _ -> gtags t
 
 instance ToTags Ts.VariableDeclarator where
-  tags t@Ts.VariableDeclarator {ann = Loc {byteRange}, name, value = Just (Ts.Expression expr)} =
+  tags t@Ts.VariableDeclarator {ann = Loc {byteRange}, name, value = Just (Parse.Success (Ts.Expression expr))} =
     case (expr, name) of
-      (Prj Ts.Function {}, Prj Ts.Identifier {text, ann}) -> yield text ann
-      (Prj Ts.ArrowFunction {}, Prj Ts.Identifier {text, ann}) -> yield text ann
+      (Prj Ts.Function {}, Parse.Success (Prj Ts.Identifier {text, ann})) -> yield text ann
+      (Prj Ts.ArrowFunction {}, Parse.Success (Prj Ts.Identifier {text, ann})) -> yield text ann
       _ -> gtags t
     where
-      yield text loc = yieldTag text Function loc byteRange >> gtags t
+      yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
   tags t = gtags t
 
 instance ToTags Ts.AssignmentExpression where
-  tags t@Ts.AssignmentExpression {ann = Loc {byteRange}, left, right = (Ts.Expression expr)} =
+  tags t@Ts.AssignmentExpression {ann = Loc {byteRange}, left, right = Parse.Success (Ts.Expression expr)} =
     case (left, expr) of
-      (Prj Ts.Identifier {text, ann}, Prj Ts.Function {}) -> yield text ann
-      (Prj Ts.Identifier {text, ann}, Prj Ts.ArrowFunction {}) -> yield text ann
-      (Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}}, Prj Ts.Function {}) -> yield text ann
-      (Prj Ts.MemberExpression {property = Ts.PropertyIdentifier {text, ann}}, Prj Ts.ArrowFunction {}) -> yield text ann
+      (Parse.Success (Prj Ts.Identifier {text, ann}), Prj Ts.Function {}) -> yield text ann
+      (Parse.Success (Prj Ts.Identifier {text, ann}), Prj Ts.ArrowFunction {}) -> yield text ann
+      (EPrj Ts.MemberExpression {property = Parse.Success (Ts.PropertyIdentifier {text, ann})}, Prj Ts.Function {}) -> yield text ann
+      (EPrj Ts.MemberExpression {property = Parse.Success (Ts.PropertyIdentifier {text, ann})}, Prj Ts.ArrowFunction {}) -> yield text ann
       _ -> gtags t
     where
-      yield text loc = yieldTag text Function loc byteRange >> gtags t
+      yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
+  tags _ = pure ()
 
 instance (ToTags l, ToTags r) => ToTags (l :+: r) where
   tags (L1 l) = tags l
@@ -137,11 +150,11 @@ gtags = traverse1_ @ToTags (const (pure ())) tags
 nameBlacklist :: [Text]
 nameBlacklist = ["require"]
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> Kind -> Loc -> Range -> m ()
-yieldTag name Call _ _ | name `elem` nameBlacklist = pure ()
-yieldTag name kind loc srcLineRange = do
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag name P.CALL _ _ _ | name `elem` nameBlacklist = pure ()
+yieldTag name kind ty loc srcLineRange = do
   src <- ask @Source
-  Tags.yield (Tag name kind loc (Tags.firstLine src srcLineRange) Nothing)
+  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
 {- ORMOLU_DISABLE -}
 instance ToTags Ts.AbstractClassDeclaration

@@ -144,37 +144,26 @@ parseStackGraph blobs = do
             & P.paths
             .~ fmap pathToPath (scopeGraphPaths graph)
         nodeToNode :: SGNode -> StackGraphNode
-        nodeToNode node =
-          defMessage
-            & P.id
-            .~ nodeId node
-            & P.name
-            .~ nodeName node
-            & P.line
-            .~ nodeLine node
-            & P.kind
-            .~ nodeKind node
-            & P.maybe'span
-            .~ fmap (converting #) (nodeSpan node) -- converting #? nodeSpan node
-            & P.nodeType
-            .~ nodeTypeToNodeType (Semantic.Api.StackGraph.nodeType node)
+        nodeToNode node
+          = defMessage
+          & P.id .~ nodeId node
+          & P.name .~ nodeName node
+          & P.line .~ nodeLine node
+          & P.maybe'span ?~ converting # nodeSpan node
+          & P.syntaxType .~ nodeSyntaxType node
+          & P.nodeType .~ nodeNodeType node
+
         pathToPath :: SGPath -> StackGraphPath
-        pathToPath path =
-          defMessage
-            & P.startingSymbolStack
-            .~ pathStartingSymbolStack path
-            & P.startingScopeStackSize
-            .~ pathStartingScopeStackSize path
-            & P.from
-            .~ pathFrom path
-            & P.edges
-            .~ pathEdges path
-            & P.to
-            .~ pathTo path
-            & P.endingScopeStack
-            .~ pathEndingScopeStack path
-            & P.endingSymbolStack
-            .~ pathEndingSymbolStack path
+        pathToPath path
+          = defMessage
+          & P.startingSymbolStack .~ pathStartingSymbolStack path
+          & P.startingScopeStackSize .~ pathStartingScopeStackSize path
+          & P.from .~ pathFrom path
+          & P.edges .~ pathEdges path
+          & P.to .~ pathTo path
+          & P.endingScopeStack .~ pathEndingScopeStack path
+          & P.endingSymbolStack .~ pathEndingSymbolStack path
+
         nodeTypeToNodeType :: SGNodeType -> StackGraphNode'NodeType
         nodeTypeToNodeType = \case
           RootScope -> P.StackGraphNode'ROOT_SCOPE
@@ -204,9 +193,9 @@ data SGNode = SGNode
   { nodeId :: Int64,
     nodeName :: Text,
     nodeLine :: Text,
-    nodeKind :: Text,
-    nodeSpan :: Maybe Loc.Span,
-    nodeType :: SGNodeType
+    nodeSpan :: Loc.Span,
+    nodeSyntaxType :: P.SyntaxType,
+    nodeNodeType :: P.NodeType
   }
   deriving (Eq, Show)
 

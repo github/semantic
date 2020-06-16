@@ -43,11 +43,12 @@ library
     AST.GenerateSyntax
     AST.Grammar.TH
     AST.Marshal.JSON
+    AST.Parse
     AST.Token
     AST.Traversable1
     AST.Traversable1.Class
     AST.Unmarshal
-    AST.Test
+    AST.TestHelpers
 
 
   -- other-modules:
@@ -69,14 +70,14 @@ library
                      , tree-sitter-python   ^>= 0.9.0.1
                      , text                 ^>= 1.2.3.1
                      , unordered-containers ^>= 0.2.10
-                     , hedgehog >= 0.6 && <2
-                     , pathtype ^>= 0.8.1
-                     , Glob
-                     , attoparsec
-                     , text
-                     , tasty
-                     , tasty-hedgehog
-                     , tasty-hunit
+                     , hedgehog              >= 0.6 && <2
+                     , pathtype             ^>= 0.8.1
+                     , Glob                 ^>= 0.10.0
+                     , attoparsec           ^>= 0.13.2.2
+                     , text                 ^>= 1.2.3
+                     , tasty                ^>= 1.2.3
+                     , tasty-hedgehog       ^>= 1.0.0.1
+                     , tasty-hunit          ^>= 0.10.0.2
 
   hs-source-dirs:      src
   default-language:    Haskell2010
