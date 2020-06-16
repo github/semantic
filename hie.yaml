@@ -1,4 +1,6 @@
 cradle:
+  none:
+  - path: "./semantic-source/test/Doctest.hs"
   cabal:
   - path: "./semantic-core/src"
     component: lib:semantic-core
@@ -38,7 +40,7 @@ cradle:
     component: lib:semantic-proto
   - path: "./semantic-php/src"
     component: lib:semantic-php
-  - path: "./semantic-core/test"
+  - path: "./semantic-core/test/src"
     component: test:semantic-core
   - path: "./semantic-go/test"
     component: test:semantic-go
