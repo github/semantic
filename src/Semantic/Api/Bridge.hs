@@ -21,7 +21,7 @@ import qualified Data.Text                     as T
 import           Data.Text.Lens
 import qualified Proto.Semantic                as API
 import qualified Proto.Semantic_Fields         as P
-import qualified Semantic.Api.LegacyTypes      as Legacy
+-- import qualified Semantic.Api.LegacyTypes      as Legacy
 import qualified Source.Source                 as Source
                                                 ( fromText
                                                 , toText
@@ -59,10 +59,10 @@ class APIConvert api native | api -> native where
 rev #? item = item ^? re rev
 infixr 8 #?
 
-instance APIBridge Legacy.Position Source.Pos where
-  bridging = iso fromAPI toAPI   where
-    toAPI Source.Pos {..} = Legacy.Position line column
-    fromAPI Legacy.Position {..} = Source.Pos line column
+-- instance APIBridge Legacy.Position Source.Pos where
+--   bridging = iso fromAPI toAPI   where
+--     toAPI Source.Pos {..} = Legacy.Position line column
+--     fromAPI Legacy.Position {..} = Source.Pos line column
 
 instance APIBridge API.Position Source.Pos where
   bridging = iso fromAPI toAPI   where
@@ -84,16 +84,14 @@ instance APIConvert API.Span Source.Span where
         <$> (span ^. P.maybe'start >>= preview bridging)
         <*> (span ^. P.maybe'end >>= preview bridging)
 
-instance APIConvert Legacy.Span Source.Span where
-  converting = prism' toAPI fromAPI   where
-    toAPI Source.Span {..} = Legacy.Span (bridging #? start) (bridging #? end)
-    fromAPI Legacy.Span {..} =
-      Source.Span
-        <$> (start >>= preview bridging)
-        <*> (end >>= preview bridging)
+-- instance APIConvert Legacy.Span Source.Span where
+--   converting = prism' toAPI fromAPI   where
+--     toAPI Source.Span {..} = Legacy.Span (bridging #? start) (bridging #? end)
+--     fromAPI Legacy.Span {..} =
+--       Source.Span
+--         <$> (start >>= preview bridging)
+--         <*> (end >>= preview bridging)
 
-=======
->>>>>>> origin/master
 instance APIBridge T.Text Data.Language where
   bridging = iso Data.textToLanguage Data.languageToText
 
