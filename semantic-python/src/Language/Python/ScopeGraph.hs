@@ -54,6 +54,7 @@ import Source.Loc (Loc)
 import Source.Span (Pos (..), point)
 import qualified Stack.Graph as Stack
 import Control.Monad ((<=<))
+import qualified Proto.Semantic as P
 
 
 -- Utility function to avoid a dependency. Alternatively, we could import
@@ -209,7 +210,7 @@ instance ToScopeGraph Py.ClassDefinition where
       let name' = Name.name name
 
       CurrentScope currentScope' <- currentScope
-      let declaration = (Stack.Declaration name' ScopeGraph.Class ann)
+      let declaration = (Stack.Declaration name' P.CLASS ann)
       modify (Stack.addEdge (Stack.Scope currentScope') declaration)
       modify (Stack.addEdge declaration (Stack.PopSymbol "()"))
 
@@ -365,7 +366,7 @@ instance ToScopeGraph Py.FunctionDefinition where
       let name' = Name.name name
 
       CurrentScope currentScope' <- currentScope
-      let declaration = (Stack.Declaration name' ScopeGraph.Function ann)
+      let declaration = (Stack.Declaration name' P.FUNCTION ann)
       modify (Stack.addEdge (Stack.Scope currentScope') declaration)
       modify (Stack.addEdge declaration (Stack.PopSymbol "()"))
 
