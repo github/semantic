@@ -16,7 +16,7 @@ module Scope.Graph.Convert
   )
 where
 
-import Control.Effect.ScopeGraph
+import Control.Effect.StackGraph
 import Data.List.NonEmpty
 import Data.Typeable
 import Source.Loc
@@ -24,7 +24,7 @@ import Source.Loc
 class Typeable t => ToScopeGraph t where
   type FocalPoint (t :: * -> *) (a :: *)
   scopeGraph ::
-    ( ScopeGraphEff sig m
+    ( StackGraphEff sig m
     ) =>
     t Loc ->
     m (Result (FocalPoint t Loc))

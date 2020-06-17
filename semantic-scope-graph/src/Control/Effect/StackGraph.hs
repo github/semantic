@@ -3,18 +3,18 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 -- | The ScopeGraph effect is used to build up a scope graph over
 -- the lifetime of a monadic computation. The name is meant to evoke
 -- physically sketching the hierarchical outline of a graph.
-module Control.Effect.ScopeGraph
+module Control.Effect.StackGraph
   ( ScopeGraph,
-    ScopeGraphEff,
+    StackGraphEff,
     declare,
     addDeclarations,
     -- Scope Manipulation
@@ -35,20 +35,23 @@ module Control.Effect.ScopeGraph
     refer,
     Has,
     ensureAST,
-    ParseError(..),
-    Tagged
+    ParseError (..),
+    Tagged,
   )
 where
 
+import qualified AST.Parse as Parse
 import Analysis.Name (Name)
 import qualified Analysis.Name as Name
 import Control.Algebra
-import Control.Effect.Fresh
-import Control.Effect.Reader
-import qualified Control.Effect.ScopeGraph.Properties.Reference as Props
-import qualified Control.Effect.ScopeGraph.Properties.Reference as Props.Reference
-import Control.Effect.State
 import Control.Effect.Error
+import Control.Effect.Exception
+import Control.Effect.Fresh
+import Control.Effect.Labelled
+import Control.Effect.Reader
+import qualified Control.Effect.StackGraph.Properties.Reference as Props
+import qualified Control.Effect.StackGraph.Properties.Reference as Props.Reference
+import Control.Effect.State
 import Control.Lens
 import Data.List.NonEmpty
 import qualified Data.List.NonEmpty as NonEmpty
@@ -57,6 +60,7 @@ import qualified Data.ScopeGraph as ScopeGraph
 import Data.Semilattice.Lower
 import Data.Text (Text)
 import GHC.Records
+import qualified Proto.Semantic as P
 import Scope.Graph.AdjacencyList (ScopeGraph)
 import qualified Scope.Graph.AdjacencyList as AdjacencyList
 import qualified Scope.Reference as Reference
@@ -64,10 +68,6 @@ import Scope.Types
 import Source.Loc
 import Source.Span
 import qualified Stack.Graph as Stack
-import qualified AST.Parse as Parse
-import Control.Effect.Exception
-import qualified Proto.Semantic as P
-import Control.Effect.Labelled
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
@@ -76,7 +76,7 @@ maybeM f = maybe f pure
 
 data Tagged
 
-type ScopeGraphEff sig m =
+type StackGraphEff sig m =
   ( Has (State (ScopeGraph Name)) sig m,
     Has (State (Stack.Graph Stack.Node)) sig m,
     Has (State (CurrentScope Name)) sig m,
@@ -87,27 +87,27 @@ type ScopeGraphEff sig m =
     HasLabelled Tagged Fresh sig m
   )
 
-newtype ParseError = ParseError { unParseError :: String }
+newtype ParseError = ParseError {unParseError :: String}
   deriving (Eq, Ord, Show, Exception)
 
-ensureAST :: ScopeGraphEff sig m => Parse.Err a -> m a
+ensureAST :: StackGraphEff sig m => Parse.Err a -> m a
 ensureAST (Parse.Fail error) = throwError (ParseError error)
 ensureAST (Parse.Success term) = pure term
 
-graphInProgress :: ScopeGraphEff sig m => m (ScopeGraph Name)
+graphInProgress :: StackGraphEff sig m => m (ScopeGraph Name)
 graphInProgress = get
 
-currentScope :: ScopeGraphEff sig m => m (CurrentScope Name)
+currentScope :: StackGraphEff sig m => m (CurrentScope Name)
 currentScope = get @(CurrentScope Name)
 
-rootScope :: ScopeGraphEff sig m => m Stack.Node
+rootScope :: StackGraphEff sig m => m Stack.Node
 rootScope = ask @Stack.Node
 
-putCurrentScope :: ScopeGraphEff sig m => Name -> m ()
+putCurrentScope :: StackGraphEff sig m => Name -> m ()
 putCurrentScope = put . CurrentScope
 
 withScope ::
-  ScopeGraphEff sig m =>
+  StackGraphEff sig m =>
   Name ->
   m a ->
   m a
@@ -118,36 +118,36 @@ withScope scope action = do
   put (CurrentScope s)
   pure x
 
-declare :: ScopeGraphEff sig m => Name -> P.SyntaxType -> Loc -> m Stack.Node
+declare :: StackGraphEff sig m => Name -> P.SyntaxType -> Loc -> m Stack.Node
 declare n kind loc = do
   let declNode = Stack.Declaration n kind loc
   -- ToDo: generate a unique id for the node in the graph
   pure declNode
 
-refer :: ScopeGraphEff sig m => Name -> P.SyntaxType -> Loc -> m Stack.Node
+refer :: StackGraphEff sig m => Name -> P.SyntaxType -> Loc -> m Stack.Node
 refer n kind loc = do
   let nameNode = Stack.Reference n kind loc
   -- ToDo: generate a unique id for the node in the graph
   return nameNode
 
-addBottomScope :: ScopeGraphEff sig m => m Stack.Node
+addBottomScope :: StackGraphEff sig m => m Stack.Node
 addBottomScope = do
   CurrentScope s <- get @(CurrentScope Name)
   modify (Stack.addEdge (Stack.BottomScope s) (Stack.Scope s))
   pure (Stack.BottomScope s)
 
-addTopScope :: ScopeGraphEff sig m => m Stack.Node
+addTopScope :: StackGraphEff sig m => m Stack.Node
 addTopScope = do
   CurrentScope s <- get @(CurrentScope Name)
   modify (Stack.addEdge (Stack.TopScope s) (Stack.Scope s))
   pure (Stack.TopScope s)
 
-connectScopes :: ScopeGraphEff sig m => Stack.Node -> Stack.Node -> m ()
+connectScopes :: StackGraphEff sig m => Stack.Node -> Stack.Node -> m ()
 connectScopes scopeA existingScope = do
   modify (Stack.addEdge scopeA existingScope)
 
 -- | Establish a reference to a prior declaration.
-reference :: forall sig m. ScopeGraphEff sig m => Text -> Text -> Props.Reference -> m ()
+reference :: forall sig m. StackGraphEff sig m => Text -> Text -> Props.Reference -> m ()
 reference n decl props = do
   CurrentScope current <- currentScope
   old <- graphInProgress
@@ -163,12 +163,12 @@ reference n decl props = do
           old
   put new
 
-newScope :: forall sig m. ScopeGraphEff sig m => Name -> m Name
+newScope :: forall sig m. StackGraphEff sig m => Name -> m Name
 newScope currentScope = do
   name <- Name.gensym
   name <$ modify (Stack.newScope name currentScope)
 
-addDeclarations :: ScopeGraphEff sig m => NonEmpty (Name, P.SyntaxType, Loc) -> m (Stack.Graph Stack.Node)
+addDeclarations :: StackGraphEff sig m => NonEmpty (Name, P.SyntaxType, Loc) -> m (Stack.Graph Stack.Node)
 addDeclarations names = do
   let graph' =
         foldr
@@ -190,16 +190,16 @@ addDeclarations names = do
   pure graph'''''
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
-newEdge :: ScopeGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
+newEdge :: StackGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
 newEdge label address = do
   CurrentScope current <- currentScope
   modify (ScopeGraph.addImportEdge label (toList address) current)
 
-lookupScope :: ScopeGraphEff sig m => Name -> m (ScopeGraph.Scope Name)
+lookupScope :: StackGraphEff sig m => Name -> m (ScopeGraph.Scope Name)
 lookupScope address = maybeM undefined . ScopeGraph.lookupScope address =<< get
 
 -- | Inserts a reference.
-newReference :: ScopeGraphEff sig m => Name -> Props.Reference -> m ()
+newReference :: StackGraphEff sig m => Name -> Props.Reference -> m ()
 newReference name props = do
   CurrentScope currentAddress <- currentScope
   scope <- lookupScope currentAddress
@@ -225,7 +225,7 @@ newReference name props = do
             )
         )
 
-declareFunction :: forall sig m. ScopeGraphEff sig m => Maybe Name -> P.SyntaxType -> Loc -> m (Stack.Node, Name)
+declareFunction :: forall sig m. StackGraphEff sig m => Maybe Name -> P.SyntaxType -> Loc -> m (Stack.Node, Name)
 declareFunction name kind loc = do
   CurrentScope currentScope' <- currentScope
   associatedScope <- newScope currentScope'
@@ -233,7 +233,7 @@ declareFunction name kind loc = do
   pure (node, associatedScope)
 
 declareMaybeName ::
-  ScopeGraphEff sig m =>
+  StackGraphEff sig m =>
   Maybe Name ->
   P.SyntaxType ->
   Loc ->
@@ -245,7 +245,7 @@ declareMaybeName maybeName kind loc = do
       name <- Name.gensym
       declare name kind loc
 
-declareParameter :: ScopeGraphEff sig m => Name -> Int -> P.SyntaxType -> Loc -> m Stack.Node
+declareParameter :: StackGraphEff sig m => Name -> Int -> P.SyntaxType -> Loc -> m Stack.Node
 declareParameter n ix kind loc = do
   declNode <- declare n kind loc
   nameNode <- refer n kind loc

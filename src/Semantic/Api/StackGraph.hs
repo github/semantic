@@ -1,10 +1,10 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE DeriveAnyClass #-}
 
 module Semantic.Api.StackGraph
   ( parseStackGraph,
@@ -16,12 +16,13 @@ module Semantic.Api.StackGraph
   )
 where
 
+import qualified AST.Parse as Parse
 import qualified Algebra.Graph as Graph
 import qualified Analysis.File as File
 import qualified Analysis.Name as Name
 import Control.Carrier.Parse.Measured
 import Control.Carrier.Reader
-import qualified Control.Carrier.Sketch.ScopeGraph as ScopeGraph
+import qualified Control.Carrier.StackGraph as ScopeGraph
 import Control.Effect.Error
 import Control.Exception
 import Control.Lens hiding ((|>))
@@ -59,7 +60,6 @@ import Source.Loc as Loc
 import qualified Stack.Graph as Stack
 import qualified Stack.Path as Path
 import qualified System.Path as SystemPath
-import qualified AST.Parse as Parse
 
 parseStackGraphBuilder ::
   ( Effect sig,
@@ -146,26 +146,24 @@ parseStackGraph blobs = do
             & P.paths
             .~ fmap pathToPath (scopeGraphPaths graph)
         nodeToNode :: SGNode -> StackGraphNode
-        nodeToNode node
-          = defMessage
-          & P.id .~ nodeId node
-          & P.name .~ nodeName node
-          & P.line .~ nodeLine node
-          & P.maybe'span ?~ converting # nodeSpan node
-          & P.syntaxType .~ nodeSyntaxType node
-          & P.nodeType .~ nodeNodeType node
-
+        nodeToNode node =
+          defMessage
+            & P.id .~ nodeId node
+            & P.name .~ nodeName node
+            & P.line .~ nodeLine node
+            & P.maybe'span ?~ converting # nodeSpan node
+            & P.syntaxType .~ nodeSyntaxType node
+            & P.nodeType .~ nodeNodeType node
         pathToPath :: SGPath -> StackGraphPath
-        pathToPath path
-          = defMessage
-          & P.startingSymbolStack .~ pathStartingSymbolStack path
-          & P.startingScopeStackSize .~ pathStartingScopeStackSize path
-          & P.from .~ pathFrom path
-          & P.edges .~ pathEdges path
-          & P.to .~ pathTo path
-          & P.endingScopeStack .~ pathEndingScopeStack path
-          & P.endingSymbolStack .~ pathEndingSymbolStack path
-
+        pathToPath path =
+          defMessage
+            & P.startingSymbolStack .~ pathStartingSymbolStack path
+            & P.startingScopeStackSize .~ pathStartingScopeStackSize path
+            & P.from .~ pathFrom path
+            & P.edges .~ pathEdges path
+            & P.to .~ pathTo path
+            & P.endingScopeStack .~ pathEndingScopeStack path
+            & P.endingSymbolStack .~ pathEndingSymbolStack path
         nodeTypeToNodeType :: SGNodeType -> P.NodeType
         nodeTypeToNodeType = \case
           RootScope -> P.ROOT_SCOPE
@@ -211,9 +209,10 @@ graphForBlob ::
 graphForBlob blob =
   parseWith
     toStackGraphParsers
-    (\term -> do
-      eitherStackGraph <- ScopeGraph.runSketch lowerBound . Graph.scopeGraph $ term
-      either throw (pure . fst) eitherStackGraph)
+    ( \term -> do
+        eitherStackGraph <- ScopeGraph.runStackGraph lowerBound . Graph.scopeGraph $ term
+        either throw (pure . fst) eitherStackGraph
+    )
     blob
   where
     toStackGraphParsers :: Map Language (Parser.SomeParser Graph.ToScopeGraph Loc)

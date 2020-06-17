@@ -68,10 +68,10 @@ import qualified Data.Map.Strict as Map
 import Data.Maybe
 import Data.Semilattice.Lower
 import Data.Set (Set)
+import qualified Proto.Semantic as P
 import qualified Scope.Types as Scope
 import Source.Loc
 import Source.Span
-import qualified Proto.Semantic as P
 
 type Symbol = Name
 
