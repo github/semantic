@@ -385,7 +385,7 @@ instance ToScopeGraph Py.FunctionDefinition where
       -- Add the formal parameters scope pointing to each of the parameter nodes
       let formalParametersScope = Stack.Scope (Name.name "FormalParameters")
       for_ (zip [0 ..] parameterMs) $ \(ix, (pos, parameter)) -> do
-        paramNode <- declareParameter parameter ix ScopeGraph.Parameter pos
+        paramNode <- declareParameter parameter ix P.UNKNOWN_SYNTAX pos
         modify (Stack.addEdge formalParametersScope paramNode)
 
       -- Add the parent scope pointing to the formal parameters node
@@ -409,7 +409,7 @@ instance ToScopeGraph Py.FunctionDefinition where
       (functionNameNode, _associatedScope) <-
         declareFunction
           (Just name')
-          ScopeGraph.Function
+          P.FUNCTION
           ann
 
       modify (Stack.addEdge functionNameNode callNode)
@@ -427,7 +427,7 @@ instance ToScopeGraph Py.GeneratorExpression where
 instance ToScopeGraph Py.Identifier where
   type FocalPoint Py.Identifier a = BodyStruct a Stack.Node
   scopeGraph (Py.Identifier ann name) = do
-    node <- refer (Name.name name) ScopeGraph.Identifier ann
+    node <- refer (Name.name name) P.UNKNOWN_SYNTAX ann
     pure (Complete (noBindings node))
 
 instance ToScopeGraph Py.IfStatement where
@@ -457,9 +457,9 @@ instance ToScopeGraph Py.ImportStatement where
     name <- Name.gensym
 
     names <- mapM ensureAST eNames
-    let names' = (\(Py.Identifier ann name) -> (Name.name name, Identifier, ann)) <$> names
+    let names' = (\(Py.Identifier ann name) -> (Name.name name, P.UNKNOWN_SYNTAX, ann)) <$> names
     childGraph <- addDeclarations names'
-    let childGraph' = Stack.addEdge (Stack.Scope name) (Stack.Declaration (Name.name definition) Identifier ann) childGraph
+    let childGraph' = Stack.addEdge (Stack.Scope name) (Stack.Declaration (Name.name definition) P.UNKNOWN_SYNTAX ann) childGraph
     let childGraph'' = Stack.addEdge ((\(name, kind, ann) -> Stack.Reference name kind ann) (NonEmpty.head names')) rootScope' childGraph'
 
     modify (Stack.addEdge (Stack.Scope name) (Stack.Scope previousScope) . Stack.overlay childGraph'')
@@ -544,14 +544,14 @@ instance ToScopeGraph Py.Module where
 
     putCurrentScope "__main__"
 
-    modify (Stack.addEdge rootScope' (Stack.Declaration "__main__" Identifier ann))
+    modify (Stack.addEdge rootScope' (Stack.Declaration "__main__" P.INTERFACE ann))
 
     _ <- mapM (scopeGraph <=< ensureAST) stmts
 
     newGraph <- get @(Stack.Graph Stack.Node)
 
     ScopeGraph.CurrentScope currentName <- currentScope
-    modify (Stack.addEdge (Stack.Declaration "__main__" Identifier ann) (Stack.Scope currentName) . Stack.overlay newGraph)
+    modify (Stack.addEdge (Stack.Declaration "__main__" P.INTERFACE ann) (Stack.Scope currentName) . Stack.overlay newGraph)
 
     pure (Complete (noBindings ()))
 
