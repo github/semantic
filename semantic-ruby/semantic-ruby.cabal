@@ -85,7 +85,7 @@ executable benchmarks
                      , gauge ^>= 0.2.5
                      , bytestring
                      , Glob
-                     , lens >= 4.17 && < 4.19
+                     , lens >= 4.17 && < 4.20
                      , pathtype ^>= 0.8.1
                      , semantic-ruby
 
