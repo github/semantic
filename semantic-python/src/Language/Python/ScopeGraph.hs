@@ -134,16 +134,16 @@ instance ToScopeGraph Py.Assignment where
     -- TODO: What should we do with the type of an assignment?
     -- TODO: What should we do with the right hand side of an assignment?
     res <- scopeGraph val
-    undefined
-    -- let propagateThese = case res of
-    --                        Complete (Left (Left (bindings, _)))   -> bindings
-    --                        Complete (Left (Right (bindings, _)))  -> bindings
-    --                        Complete (Right (Left (bindings, _)))  -> bindings
-    --                        Complete (Right (Right (bindings, _))) -> bindings
-    --                        -- TODO: Don't drop Todos
-    --                        _ -> []
-    --     decl = Stack.Declaration identifier Scope.Identifier ann
-    -- pure (Complete ((decl,L1 asgn) : propagateThese, decl))
+    let propagateThese = case res of
+                           Complete (Left (bindings, _))   -> bindings
+                           Complete (Right (Left (bindings, _)))  -> bindings
+                           Complete (Right (Left (bindings, _)))  -> bindings
+                           Complete (Right (Right (Left (bindings, _)))) -> bindings
+                           Complete (Right (Right (Right (bindings, _)))) -> bindings
+                           -- TODO: Don't drop Todos
+                           _ -> []
+        decl = Stack.Declaration identifier P.UNKNOWN_SYNTAX ann
+    pure (Complete ((decl,L1 asgn) : propagateThese, decl))
   scopeGraph x = todo x
 
 instance ToScopeGraph Py.Await where
