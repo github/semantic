@@ -213,7 +213,7 @@ graphForBlob blob =
     toStackGraphParsers
     (\term -> do
       eitherStackGraph <- ScopeGraph.runSketch lowerBound . Graph.scopeGraph $ term
-      either throwError (pure . fst) eitherStackGraph)
+      either throw (pure . fst) eitherStackGraph)
     blob
   where
     toStackGraphParsers :: Map Language (Parser.SomeParser Graph.ToScopeGraph Loc)
