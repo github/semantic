@@ -39,11 +39,6 @@ source-repository-package
 
 source-repository-package
   type: git
-  location: https://github.com/fused-effects/fused-effects.git
-  tag: a3518b31193d9a53fe8f0a61b2132298964ffc48
-
-source-repository-package
-  type: git
   location: https://github.com/tree-sitter/haskell-tree-sitter.git
   tag: 7698d999a85b34d95dd85a75aee0ff94d4a67335
   subdir: tree-sitter-typescript
