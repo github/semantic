@@ -57,10 +57,24 @@ import Control.Monad ((<=<))
 import qualified Proto.Semantic as P
 
 
--- Utility function to avoid a dependency. Alternatively, we could import
--- Data.Either.Utils from MissingH or Data.Either.Extra from extra
-fromEither :: Either a a -> a
-fromEither = either id id
+
+
+
+
+class FlattenEithers a r where
+  flattenEithers :: a -> r
+
+instance (FlattenEithers a r, FlattenEithers b r) => FlattenEithers (Either a b) r where
+  flattenEithers (Left x) = flattenEithers x
+  flattenEithers (Right y) = flattenEithers y
+
+instance FlattenEithers (BodyStruct a b) (BodyStruct a b) where
+  flattenEithers = id
+
+
+
+
+
 
 -- This typeclass is internal-only, though it shares the same interface
 -- as the one defined in semantic-scope-graph. The somewhat-unconventional
@@ -158,26 +172,9 @@ instance ToScopeGraph Py.Block where
   type FocalPoint Py.Block a = BodyStruct a [Stack.Node]
   scopeGraph (Py.Block _ statements) = do
     whatev <- mapM (scopeGraph <=< ensureAST) statements
-    undefined
-    -- let results = sequenceA whatev
-    -- let res' = fmap (fmap fromEithers') results
-    -- pure $ fmap (foldr (\oldBody (newBindings, newNodes) -> (newBindings <> fst oldBody, newNodes <> snd oldBody)) mempty) (res' :: Result [BodyStruct Loc [Stack.Node]])
-    -- where
-    --   fromEithers' ::
-    --     Either
-    --       ( Either
-    --           ( Either
-    --               (Either (BodyStruct Loc b) (BodyStruct Loc b))
-    --               (Either (BodyStruct Loc b) (BodyStruct Loc b))
-    --           )
-    --           ( Either
-    --               (Either (BodyStruct Loc b) (BodyStruct Loc b))
-    --               (Either (BodyStruct Loc b) (BodyStruct Loc b))
-    --           )
-    --       )
-    --       (BodyStruct Loc b) ->
-    --     BodyStruct Loc b
-    --   fromEithers' bodyStructs = (fromEither . first fromEither . first fromEither . first fromEither) bodyStructs
+    let results = sequenceA whatev
+    let res' = fmap (fmap flattenEithers) results
+    pure $ fmap (foldr (\oldBody (newBindings, newNodes) -> (newBindings <> fst oldBody, newNodes <> snd oldBody)) mempty) (res' :: Result [BodyStruct Loc [Stack.Node]])
 
 instance ToScopeGraph Py.BreakStatement where
   type FocalPoint Py.BreakStatement a = BodyStruct a [Stack.Node]
@@ -313,8 +310,6 @@ instance ToScopeGraph Py.ExceptClause where
   type FocalPoint Py.ExceptClause a = BodyStruct a [Stack.Node]
   scopeGraph x = todo x
 
--- fmap (either (const []) id) <$> todo x
-
 instance ToScopeGraph Py.ExecStatement where
   type FocalPoint Py.ExecStatement a = BodyStruct a [Stack.Node]
   scopeGraph x = do
@@ -326,11 +321,9 @@ instance ToScopeGraph Py.ExpressionStatement where
     statements <- mapM ensureAST eStatements
     bindings <- for statements $ \stmt -> do
       res <- scopeGraph stmt
-      undefined
-      -- let flattenEithers = fst . fromEither . bimap fromEither fromEither
-      -- case res of
-      --   Complete r -> pure (flattenEithers r)
-      --   _ -> pure []
+      case res of
+        Complete r -> pure (fst (flattenEithers r :: BodyStruct Loc Stack.Node))
+        _ -> pure []
     pure (Complete (concat (toList bindings), []))
 
 instance ToScopeGraph Py.ExpressionList where
@@ -436,9 +429,7 @@ instance ToScopeGraph Py.IfStatement where
     _ <- scopeGraph condition
     res <- scopeGraph body
     reses <- mapM (scopeGraph <=< ensureAST) alternative
-    pure (res <> mconcat (map (fmap fromEither) reses))
-
--- scopeGraph body <> (fmap fromEither <$> foldMap scopeGraph alternative)
+    pure (res <> mconcat (map (fmap flattenEithers) reses))
 
 instance ToScopeGraph Py.GlobalStatement where
   type FocalPoint Py.GlobalStatement a = BodyStruct a [Stack.Node]
@@ -607,12 +598,7 @@ instance ToScopeGraph Py.PrimaryExpression where
 instance ToScopeGraph Py.SimpleStatement where
   type FocalPoint Py.SimpleStatement a = BodyStruct a [Stack.Node]
   scopeGraph (Py.SimpleStatement stmt) =
-    undefined
-    -- fmap (either (either (either id fromEither)
-    --                      (either fromEither fromEither))
-    --              (either (either fromEither fromEither)
-    --                      (either fromEither fromEither)))
-    --   <$> (scopeGraph stmt)
+    fmap flattenEithers <$> scopeGraph stmt
 
 instance ToScopeGraph Py.RaiseStatement where
   type FocalPoint Py.RaiseStatement a = BodyStruct a [Stack.Node]
@@ -645,15 +631,11 @@ instance ToScopeGraph Py.TryStatement where
     res <- scopeGraph body
     elseClauses <- mapM ensureAST eClauses
     reses <- mapM scopeGraph elseClauses
-    pure (res <> mconcat (map (fmap (either id fromEither)) (toList reses)))
-
---scopeGraph body <> (_tryStatement (foldMap scopeGraph elseClauses))
+    pure (res <> mconcat (map (fmap flattenEithers) (toList reses)))
 
 instance ToScopeGraph Py.UnaryOperator where
   type FocalPoint Py.UnaryOperator a = BodyStruct a Stack.Node
   scopeGraph = todo
-
---onField @"argument"
 
 instance ToScopeGraph Py.WhileStatement where
   type FocalPoint Py.WhileStatement a = BodyStruct a [Stack.Node]
