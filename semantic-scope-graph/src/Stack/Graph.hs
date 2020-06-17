@@ -34,14 +34,12 @@ module Stack.Graph
 
     -- * Smart constructors
     scope,
-    newScope,
     declaration,
     reference,
     popSymbol,
     pushSymbol,
     root,
     topScope,
-    bottomScope,
 
     -- * Predicates
     isRoot,
@@ -86,7 +84,7 @@ data Node
   | Scope {symbol :: Symbol}
   | JumpToScope
   | IgnoreScope
-  | BottomScope {symbol :: Symbol}
+  | BottomScope (Tagged Node)
   | TopScope {symbol :: Symbol}
   | InstanceMembers {symbol :: Symbol}
   | ClassMembers {symbol :: Symbol}
@@ -132,12 +130,11 @@ instance Lower a => Lower (Graph a) where
 fromLinearNodes :: [a] -> Graph a
 fromLinearNodes n = Class.edges $ zip (init n) (drop 1 n)
 
-scope, popSymbol, pushSymbol, topScope, bottomScope :: Symbol -> Graph Node
+scope, popSymbol, pushSymbol, topScope :: Symbol -> Graph Node
 scope = Class.vertex . Scope
 popSymbol = Class.vertex . PopSymbol
 pushSymbol = Class.vertex . PushSymbol
 topScope = Class.vertex . TopScope
-bottomScope = Class.vertex . BottomScope
 
 declaration :: Symbol -> P.SyntaxType -> Loc -> Graph Node
 declaration symbol kind = Class.vertex . Declaration symbol kind
@@ -178,10 +175,6 @@ Graph left >>- Graph right = Graph (Algebraic.connect left right)
 
 singleton :: Node -> Graph Node
 singleton = Class.vertex
-
-newScope :: Name -> Name -> Graph Node -> Graph Node
-newScope name currentScope graph =
-  addEdge (Scope name) (Scope currentScope) graph
 
 simplify :: Ord a => Graph a -> Graph a
 simplify = Graph . Algebraic.simplify . unGraph

@@ -205,7 +205,7 @@ data SGNodeType = Scope | RootScope | JumpToScope | Definition | Reference
 graphForBlob ::
   (Effect sig, Has (Error SomeException) sig m, Has Parse sig m) =>
   Blob ->
-  m (Stack.Graph Stack.Node)
+  m (Stack.Graph (Tagged Stack.Node))
 graphForBlob blob =
   parseWith
     toStackGraphParsers

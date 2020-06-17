@@ -38,7 +38,7 @@ nodeAttributes (node :# idx) = case node of
   JumpToScope -> ["shape" := "circle", "label" := "JUMP"]
   IgnoreScope -> ["shape" := "rect", "label" := "IGNORE", "color" := "purple"]
   TopScope s -> ["shape" := "circle", "label" := "filled", "label" := sym s, "fillcolor" := "yellow", "fontcolor" := "white"]
-  BottomScope s -> ["shape" := "circle", "label" := "filled", "label" := sym s, "fillcolor" := "purple", "fontcolor" := "white"]
+  BottomScope s -> ["shape" := "circle", "label" := "filled", "label" := show s, "fillcolor" := "purple", "fontcolor" := "white"]
   InstanceMembers s -> ["shape" := "circle", "label" := "filled", "label" := ("IM: " <> sym s), "fillcolor" := "purple", "fontcolor" := "white"]
   ClassMembers s -> ["shape" := "circle", "label" := "filled", "label" := ("CM: " <> sym s), "fillcolor" := "purple", "fontcolor" := "white"]
   SelfScope s -> ["shape" := "circle", "label" := "filled", "label" := ("Self: " <> sym s), "fillcolor" := "purple", "fontcolor" := "white"]

@@ -21,17 +21,19 @@ module Control.Effect.StackGraph
     currentScope,
     rootScope,
     putCurrentScope,
-    newEdge,
-    newReference,
+    popSymbol,
     newScope,
+    selfScope,
+    scope,
+    internalScope,
+    instanceMemberScope,
+    classMemberScope,
     addBottomScope,
     addTopScope,
-    connectScopes,
     withScope,
     declareFunction,
     declareMaybeName,
     declareParameter,
-    reference,
     refer,
     Has,
     ensureAST,
@@ -49,10 +51,10 @@ import Control.Effect.Exception
 import Control.Effect.Fresh
 import Control.Effect.Labelled
 import Control.Effect.Reader
-import qualified Control.Effect.StackGraph.Properties.Reference as Props
-import qualified Control.Effect.StackGraph.Properties.Reference as Props.Reference
 import Control.Effect.State
 import Control.Lens
+import Data.Foldable
+import Data.Functor.Tagged hiding (taggedM)
 import Data.List.NonEmpty
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Module as Module
@@ -74,13 +76,11 @@ maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
 {-# INLINE maybeM #-}
 
-data Tagged
-
 type StackGraphEff sig m =
   ( Has (State (ScopeGraph Name)) sig m,
-    Has (State (Stack.Graph Stack.Node)) sig m,
-    Has (State (CurrentScope Name)) sig m,
-    Has (Reader Stack.Node) sig m, -- The root node of the module.
+    Has (State (Stack.Graph (Tagged Stack.Node))) sig m,
+    Has (State (CurrentScope (Tagged Stack.Node))) sig m,
+    Has (Reader (Tagged Stack.Node)) sig m, -- The root node of the module.
     Has (Reader Module.ModuleInfo) sig m,
     Has (Throw ParseError) sig m,
     Has Fresh sig m, -- gensyming names for anonymous functions
@@ -94,138 +94,165 @@ ensureAST :: StackGraphEff sig m => Parse.Err a -> m a
 ensureAST (Parse.Fail error) = throwError (ParseError error)
 ensureAST (Parse.Success term) = pure term
 
-graphInProgress :: StackGraphEff sig m => m (ScopeGraph Name)
-graphInProgress = get
+currentScope :: StackGraphEff sig m => m (CurrentScope (Tagged Stack.Node))
+currentScope = get @(CurrentScope (Tagged Stack.Node))
 
-currentScope :: StackGraphEff sig m => m (CurrentScope Name)
-currentScope = get @(CurrentScope Name)
+rootScope :: StackGraphEff sig m => m (Tagged Stack.Node)
+rootScope = ask @(Tagged Stack.Node)
 
-rootScope :: StackGraphEff sig m => m Stack.Node
-rootScope = ask @Stack.Node
-
-putCurrentScope :: StackGraphEff sig m => Name -> m ()
+putCurrentScope :: StackGraphEff sig m => Tagged Stack.Node -> m ()
 putCurrentScope = put . CurrentScope
 
 withScope ::
   StackGraphEff sig m =>
-  Name ->
+  Tagged Stack.Node ->
   m a ->
   m a
 withScope scope action = do
-  CurrentScope s <- get @(CurrentScope Name)
+  CurrentScope s <- get @(CurrentScope (Tagged Stack.Node))
   put (CurrentScope scope)
   x <- action
   put (CurrentScope s)
   pure x
 
-declare :: StackGraphEff sig m => Name -> P.SyntaxType -> Loc -> m Stack.Node
+declare :: StackGraphEff sig m => Name -> P.SyntaxType -> Loc -> m (Tagged Stack.Node)
 declare n kind loc = do
   let declNode = Stack.Declaration n kind loc
-  -- ToDo: generate a unique id for the node in the graph
-  pure declNode
+  taggedM declNode
 
-refer :: StackGraphEff sig m => Name -> P.SyntaxType -> Loc -> m Stack.Node
+refer :: StackGraphEff sig m => Name -> P.SyntaxType -> Loc -> m (Tagged Stack.Node)
 refer n kind loc = do
   let nameNode = Stack.Reference n kind loc
-  -- ToDo: generate a unique id for the node in the graph
-  return nameNode
+  taggedM nameNode
 
-addBottomScope :: StackGraphEff sig m => m Stack.Node
+jumpTo :: StackGraphEff sig m => m (Tagged Stack.Node)
+jumpTo = taggedM Stack.JumpToScope
+
+bottomScope :: StackGraphEff sig m => Tagged Stack.Node -> m (Tagged Stack.Node)
+bottomScope = taggedM . Stack.BottomScope
+
+topScope :: StackGraphEff sig m => Tagged Stack.Node -> m (Tagged Stack.Node)
+topScope = taggedM . Stack.BottomScope
+
+scope :: StackGraphEff sig m => Name -> m (Tagged Stack.Node)
+scope = taggedM . Stack.Scope
+
+popSymbol :: StackGraphEff sig m => Name -> m (Tagged Stack.Node)
+popSymbol = taggedM . Stack.PopSymbol
+
+selfScope :: StackGraphEff sig m => Name -> m (Tagged Stack.Node)
+selfScope = taggedM . Stack.SelfScope
+
+instanceMemberScope :: StackGraphEff sig m => Name -> m (Tagged Stack.Node)
+instanceMemberScope = taggedM . Stack.InstanceMembers
+
+classMemberScope :: StackGraphEff sig m => Name -> m (Tagged Stack.Node)
+classMemberScope = taggedM . Stack.ClassMembers
+
+internalScope :: StackGraphEff sig m => Name -> m (Tagged Stack.Node)
+internalScope = taggedM . Stack.InternalScope
+
+taggedM :: HasLabelled Tagged Fresh sig m => a -> m (Tagged a)
+taggedM a = (a :#) . fromIntegral <$> runUnderLabel @Tagged fresh
+
+addBottomScope :: StackGraphEff sig m => m (Tagged Stack.Node)
 addBottomScope = do
-  CurrentScope s <- get @(CurrentScope Name)
-  modify (Stack.addEdge (Stack.BottomScope s) (Stack.Scope s))
-  pure (Stack.BottomScope s)
+  CurrentScope s <- get @(CurrentScope (Tagged Stack.Node))
+  bottomScopeNode <- bottomScope s
+  modify (Stack.addEdge bottomScopeNode s)
+  pure bottomScopeNode
 
-addTopScope :: StackGraphEff sig m => m Stack.Node
+addTopScope :: StackGraphEff sig m => m (Tagged Stack.Node)
 addTopScope = do
-  CurrentScope s <- get @(CurrentScope Name)
-  modify (Stack.addEdge (Stack.TopScope s) (Stack.Scope s))
-  pure (Stack.TopScope s)
+  CurrentScope s <- get @(CurrentScope (Tagged Stack.Node))
+  topScopeNode <- topScope s
+  modify (Stack.addEdge topScopeNode s)
+  pure topScopeNode
 
-connectScopes :: StackGraphEff sig m => Stack.Node -> Stack.Node -> m ()
-connectScopes scopeA existingScope = do
-  modify (Stack.addEdge scopeA existingScope)
-
--- | Establish a reference to a prior declaration.
-reference :: forall sig m. StackGraphEff sig m => Text -> Text -> Props.Reference -> m ()
-reference n decl props = do
-  CurrentScope current <- currentScope
-  old <- graphInProgress
-  info <- ask
-  let new =
-        ScopeGraph.reference
-          (ScopeGraph.Reference (Name.name n))
-          info
-          (Props.Reference.span props)
-          (Props.Reference.kind props)
-          (ScopeGraph.Declaration (Name.name decl))
-          current
-          old
-  put new
-
-newScope :: forall sig m. StackGraphEff sig m => Name -> m Name
+newScope :: forall sig m. StackGraphEff sig m => Tagged Stack.Node -> m (Tagged Stack.Node)
 newScope currentScope = do
   name <- Name.gensym
-  name <$ modify (Stack.newScope name currentScope)
+  scope' <- scope name
+  scope' <$ modify (Stack.addEdge scope' currentScope)
 
-addDeclarations :: StackGraphEff sig m => NonEmpty (Name, P.SyntaxType, Loc) -> m (Stack.Graph Stack.Node)
+addDeclarations :: StackGraphEff sig m => NonEmpty (Name, P.SyntaxType, Loc) -> m (Stack.Graph (Tagged Stack.Node), Tagged Stack.Node)
 addDeclarations names = do
-  let graph' =
-        foldr
-          ( \(name, kind, loc) graph ->
-              Stack.addEdge (Stack.Declaration name kind loc) (Stack.PopSymbol ".") graph
-          )
-          mempty
-          (NonEmpty.init names)
-      graph'' = (Stack.addEdge (Stack.PopSymbol ".") ((\(name, kind, loc) -> (Stack.Declaration name kind loc)) (NonEmpty.last names)) graph')
-      graph''' =
-        foldr
-          ( \(name, kind, loc) graph ->
-              Stack.addEdge (Stack.Reference name kind loc) (Stack.PushSymbol ".") graph
-          )
-          mempty
-          (NonEmpty.init $ NonEmpty.reverse names)
-      graph'''' = Stack.overlay graph'' (Stack.addEdge (Stack.PushSymbol ".") ((\(name, kind, loc) -> (Stack.Reference name kind loc)) (NonEmpty.head names)) graph''')
-      graph''''' = (\(name, kind, loc) -> Stack.addEdge (Stack.Declaration name kind loc) (Stack.Reference name kind loc) graph'''') (NonEmpty.last names)
-  pure graph'''''
+  -- Given foo.bar.baz or baz
+  -- Construct Declaration foo . Declaration bar or Nothing
+  (graph', maybeLastMemberNode) <-
+    foldrM
+      ( \(name, kind, loc) (graph, _) -> do
+          declaration <- declare name kind loc
+          memberNode <- popSymbol "."
+          pure (Stack.addEdge declaration memberNode graph, Just memberNode)
+      )
+      (mempty, Nothing)
+      (NonEmpty.init names)
+
+  -- If there was a lastMemberNode, construct an edge from it to baz.
+  lastDeclaration <- ((\(name, kind, loc) -> (declare name kind loc)) (NonEmpty.last names))
+  let graph'' = maybe graph' (\lastMemberNode -> Stack.addEdge lastMemberNode lastDeclaration graph') maybeLastMemberNode
+
+  -- Given foo.bar.baz
+  -- Construct references too foo.bar.baz
+  references <- mapM (\(name, kind, loc) -> refer name kind loc) (NonEmpty.reverse names)
+
+  -- Construct a Reference baz . Reference bar graph
+  (graph''', maybeInitMemberNode) <-
+    foldrM
+      ( \reference (graph, _) -> do
+          memberNode <- popSymbol "."
+          pure (Stack.addEdge reference memberNode graph, Just memberNode)
+      )
+      (mempty, Nothing)
+      (NonEmpty.init references)
+
+  -- Let initialReference = foo
+  -- Construct Reference baz . Reference bar . Reference foo and overlay it onto graph'' if maybeInitMemberNode exists.
+  let initialReference = (NonEmpty.last references)
+  let graph'''' = maybe graph'' (\initMemberNode -> Stack.overlay graph'' (Stack.addEdge initMemberNode initialReference graph''')) maybeInitMemberNode
+
+  -- Construct an edge between the last declaration and its corresponding reference
+  let lastReference = NonEmpty.head references
+  let graph''''' = Stack.addEdge lastDeclaration lastReference graph''''
+  pure (graph''''', initialReference)
 
 -- | Takes an edge label and a list of names and inserts an import edge to a hole.
-newEdge :: StackGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
-newEdge label address = do
-  CurrentScope current <- currentScope
-  modify (ScopeGraph.addImportEdge label (toList address) current)
-
-lookupScope :: StackGraphEff sig m => Name -> m (ScopeGraph.Scope Name)
-lookupScope address = maybeM undefined . ScopeGraph.lookupScope address =<< get
+-- newEdge :: StackGraphEff sig m => ScopeGraph.EdgeLabel -> NonEmpty Name -> m ()
+-- newEdge label address = do
+--   CurrentScope current <- currentScope
+-- modify (ScopeGraph.addImportEdge label (toList address) current)
+-- lookupScope :: StackGraphEff sig m => Name -> m (ScopeGraph.Scope Name)
+-- lookupScope address = maybeM undefined . ScopeGraph.lookupScope address =<< get
 
 -- | Inserts a reference.
-newReference :: StackGraphEff sig m => Name -> Props.Reference -> m ()
-newReference name props = do
-  CurrentScope currentAddress <- currentScope
-  scope <- lookupScope currentAddress
+-- newReference :: StackGraphEff sig m => Name -> Props.Reference -> m ()
+-- newReference name props = do
+--   CurrentScope currentAddress <- currentScope
+--   scope <- lookupScope currentAddress
 
-  let refProps = Reference.ReferenceInfo (props ^. span_) (Props.Reference.kind props) lowerBound
-      insertRef' :: ScopeGraph.Path Name -> ScopeGraph.ScopeGraph Name -> ScopeGraph.ScopeGraph Name
-      insertRef' path scopeGraph =
-        let scope' = (ScopeGraph.insertReference (Reference.Reference name) lowerBound (Props.Reference.span props) (getField @"kind" props) path) scope
-         in (ScopeGraph.insertScope currentAddress scope' scopeGraph)
-  scopeGraph <- get @(ScopeGraph.ScopeGraph Name)
-  case AdjacencyList.findPath (const Nothing) (ScopeGraph.Declaration name) currentAddress scopeGraph of
-    -- If a path to a declaration is found, insert a reference into the current scope.
-    Just path -> modify (insertRef' path)
-    -- If no path is found, insert a reference with a hole into the current scope.
-    Nothing ->
-      modify
-        ( ScopeGraph.insertScope
-            currentAddress
-            ( ScopeGraph.newReference
-                (Reference.Reference name)
-                refProps
-                scope
-            )
-        )
+-- let refProps = Reference.ReferenceInfo (props ^. span_) (Props.Reference.kind props) lowerBound
+--     insertRef' :: ScopeGraph.Path Name -> ScopeGraph.ScopeGraph Name -> ScopeGraph.ScopeGraph Name
+--     insertRef' path scopeGraph =
+--       let scope' = (ScopeGraph.insertReference (Reference.Reference name) lowerBound (Props.Reference.span props) (getField @"kind" props) path) scope
+--        in (ScopeGraph.insertScope currentAddress scope' scopeGraph)
+-- scopeGraph <- get @(ScopeGraph.ScopeGraph Name)
+-- case AdjacencyList.findPath (const Nothing) (ScopeGraph.Declaration name) currentAddress scopeGraph of
+--   -- If a path to a declaration is found, insert a reference into the current scope.
+--   Just path -> modify (insertRef' path)
+--   -- If no path is found, insert a reference with a hole into the current scope.
+--   Nothing ->
+--     modify
+--       ( ScopeGraph.insertScope
+--           currentAddress
+--           ( ScopeGraph.newReference
+--               (Reference.Reference name)
+--               refProps
+--               scope
+--           )
+--       )
 
-declareFunction :: forall sig m. StackGraphEff sig m => Maybe Name -> P.SyntaxType -> Loc -> m (Stack.Node, Name)
+declareFunction :: forall sig m. StackGraphEff sig m => Maybe Name -> P.SyntaxType -> Loc -> m (Tagged Stack.Node, Tagged Stack.Node)
 declareFunction name kind loc = do
   CurrentScope currentScope' <- currentScope
   associatedScope <- newScope currentScope'
@@ -237,7 +264,7 @@ declareMaybeName ::
   Maybe Name ->
   P.SyntaxType ->
   Loc ->
-  m Stack.Node
+  m (Tagged Stack.Node)
 declareMaybeName maybeName kind loc = do
   case maybeName of
     Just name -> declare name kind loc
@@ -245,12 +272,12 @@ declareMaybeName maybeName kind loc = do
       name <- Name.gensym
       declare name kind loc
 
-declareParameter :: StackGraphEff sig m => Name -> Int -> P.SyntaxType -> Loc -> m Stack.Node
+declareParameter :: StackGraphEff sig m => Name -> Int -> P.SyntaxType -> Loc -> m (Tagged Stack.Node)
 declareParameter n ix kind loc = do
   declNode <- declare n kind loc
   nameNode <- refer n kind loc
   indexNode <- refer (Name.nameI ix) kind loc
-  let jumpNode = Stack.JumpToScope
+  jumpNode <- jumpTo
   modify (Stack.addEdge declNode nameNode)
   modify (Stack.addEdge declNode indexNode)
   modify (Stack.addEdge nameNode jumpNode)
