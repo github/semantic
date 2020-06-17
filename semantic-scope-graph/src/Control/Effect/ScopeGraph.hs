@@ -7,6 +7,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 -- | The ScopeGraph effect is used to build up a scope graph over
 -- the lifetime of a monadic computation. The name is meant to evoke
@@ -34,7 +35,8 @@ module Control.Effect.ScopeGraph
     refer,
     Has,
     ensureAST,
-    ParseError(..)
+    ParseError(..),
+    Tagged
   )
 where
 
@@ -65,11 +67,14 @@ import qualified Stack.Graph as Stack
 import qualified AST.Parse as Parse
 import Control.Effect.Exception
 import qualified Proto.Semantic as P
+import Control.Effect.Labelled
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
 {-# INLINE maybeM #-}
+
+data Tagged
 
 type ScopeGraphEff sig m =
   ( Has (State (ScopeGraph Name)) sig m,
@@ -78,7 +83,8 @@ type ScopeGraphEff sig m =
     Has (Reader Stack.Node) sig m, -- The root node of the module.
     Has (Reader Module.ModuleInfo) sig m,
     Has (Throw ParseError) sig m,
-    Has Fresh sig m
+    Has Fresh sig m, -- gensyming names for anonymous functions
+    HasLabelled Tagged Fresh sig m
   )
 
 newtype ParseError = ParseError { unParseError :: String }
