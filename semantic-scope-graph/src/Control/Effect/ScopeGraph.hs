@@ -82,7 +82,7 @@ type ScopeGraphEff sig m =
   )
 
 newtype ParseError = ParseError { unParseError :: String }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Exception)
 
 ensureAST :: ScopeGraphEff sig m => Parse.Err a -> m a
 ensureAST (Parse.Fail error) = throwError (ParseError error)
