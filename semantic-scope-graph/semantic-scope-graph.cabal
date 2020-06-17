@@ -46,6 +46,7 @@ library
     , containers
     , comonad
     , fused-effects      ^>= 1.0
+    , fused-effects-exceptions ^>= 1.0.0.0
     , generic-monoid
     , generic-lens
     , hashable
@@ -55,6 +56,7 @@ library
     , semantic-analysis
     , semantic-source    ^>= 0.1.0
     , semantic-ast       ^>= 0.1.0.0
+    , semantic-proto       ^>= 0
     , semilattices
     , streaming
     , streaming-bytestring
