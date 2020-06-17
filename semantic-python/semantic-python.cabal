@@ -62,7 +62,7 @@ library
     Language.Python.Grammar
     Language.Python.Failure
     Language.Python.Patterns
-    Language.Python.ScopeGraph
+    Language.Python.StackGraph
     Language.Python.Tags
   hs-source-dirs: src
   build-depends: lens ^>= 4.18

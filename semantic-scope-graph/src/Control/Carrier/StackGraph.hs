@@ -23,9 +23,12 @@ where
 
 import Analysis.Name (Name)
 import qualified Analysis.Name as Name
+import Control.Carrier.Error.Either
 import Control.Carrier.Fresh.Strict
 import Control.Carrier.Reader
 import Control.Carrier.State.Strict
+import Control.Effect.Labelled
+import qualified Control.Effect.StackGraph as StackGraph
 import Control.Effect.StackGraph
 import Data.Module (ModuleInfo)
 import qualified Data.ScopeGraph as ScopeGraph
@@ -44,7 +47,11 @@ type StackGraphC addr m =
                 Stack.Node
                 ( ReaderC
                     ModuleInfo
-                    ( FreshC m
+                    ( ErrorC
+                        ParseError
+                        ( FreshC
+                            (Labelled StackGraph.Tagged FreshC m)
+                        )
                     )
                 )
             )
@@ -55,9 +62,12 @@ runStackGraph ::
   (Functor m) =>
   ModuleInfo ->
   StackGraphC Name m a ->
-  m (Stack.Graph Stack.Node, (ScopeGraph Name, a))
+  m (Either ParseError (Stack.Graph Stack.Node, (ScopeGraph Name, a)))
 runStackGraph minfo go =
-  evalFresh 1
+  evalFresh 0
+    . runLabelled
+    . evalFresh 1
+    . runError
     . runReader minfo
     . runReader (Stack.Scope rootname)
     . evalState (CurrentScope rootname)
