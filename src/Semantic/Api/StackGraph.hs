@@ -4,6 +4,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
 
 module Semantic.Api.StackGraph
   ( parseStackGraph,
@@ -58,6 +59,7 @@ import Source.Loc as Loc
 import qualified Stack.Graph as Stack
 import qualified Stack.Path as Path
 import qualified System.Path as SystemPath
+import qualified AST.Parse as Parse
 
 parseStackGraphBuilder ::
   ( Effect sig,
@@ -164,13 +166,13 @@ parseStackGraph blobs = do
           & P.endingScopeStack .~ pathEndingScopeStack path
           & P.endingSymbolStack .~ pathEndingSymbolStack path
 
-        nodeTypeToNodeType :: SGNodeType -> StackGraphNode'NodeType
+        nodeTypeToNodeType :: SGNodeType -> P.NodeType
         nodeTypeToNodeType = \case
-          RootScope -> P.StackGraphNode'ROOT_SCOPE
-          JumpToScope -> P.StackGraphNode'JUMP_TO_SCOPE
-          Definition -> P.StackGraphNode'DEFINITION
-          Reference -> P.StackGraphNode'REFERENCE
-          Scope -> P.StackGraphNode'EXPORTED_SCOPE
+          RootScope -> P.ROOT_SCOPE
+          JumpToScope -> P.JUMP_TO_SCOPE
+          Definition -> P.DEFINITION
+          Reference -> P.REFERENCE
+          Scope -> P.EXPORTED_SCOPE
 
 -- TODO: These are temporary, will replace with proper datatypes from the scope graph work.
 data TempStackGraph = TempStackGraph
@@ -209,7 +211,9 @@ graphForBlob ::
 graphForBlob blob =
   parseWith
     toStackGraphParsers
-    (fmap fst . ScopeGraph.runSketch lowerBound . Graph.scopeGraph)
+    (\term -> do
+      eitherStackGraph <- ScopeGraph.runSketch lowerBound . Graph.scopeGraph $ term
+      either throwError (pure . fst) eitherStackGraph)
     blob
   where
     toStackGraphParsers :: Map Language (Parser.SomeParser Graph.ToScopeGraph Loc)
@@ -231,9 +235,9 @@ toSGNode (node :# tag) = case node of
         { nodeId = tag,
           nodeName = Name.formatName symbol,
           nodeLine = "",
-          nodeKind = Text.pack $ show kind,
-          nodeSpan = Just (Loc.span loc),
-          Semantic.Api.StackGraph.nodeType = Definition
+          nodeSyntaxType = kind,
+          nodeSpan = Loc.span loc,
+          nodeNodeType = Definition
         }
   Stack.Reference symbol kind loc ->
     Just $
@@ -241,29 +245,9 @@ toSGNode (node :# tag) = case node of
         { nodeId = tag,
           nodeName = Name.formatName symbol,
           nodeLine = "",
-          nodeKind = Text.pack $ show kind,
+          nodeSyntaxType = Text.pack $ show kind,
           nodeSpan = Just (Loc.span loc),
-          Semantic.Api.StackGraph.nodeType = Reference
-        }
-  Stack.JumpToScope ->
-    Just $
-      SGNode
-        { nodeId = tag,
-          nodeName = Name.formatName "JUMP",
-          nodeLine = "",
-          nodeKind = "",
-          nodeSpan = Nothing,
-          Semantic.Api.StackGraph.nodeType = JumpToScope
-        }
-  Stack.Root symbol ->
-    Just $
-      SGNode
-        { nodeId = tag,
-          nodeName = Name.formatName symbol,
-          nodeLine = "",
-          nodeKind = "",
-          nodeSpan = Nothing,
-          Semantic.Api.StackGraph.nodeType = RootScope
+          nodeNodeType = Reference
         }
   Stack.Scope symbol ->
     Just $
@@ -271,9 +255,9 @@ toSGNode (node :# tag) = case node of
         { nodeId = tag,
           nodeName = Name.formatName symbol,
           nodeLine = "",
-          nodeKind = "",
+          nodeSyntaxType = "",
           nodeSpan = Nothing,
-          Semantic.Api.StackGraph.nodeType = Scope
+          nodeNodeType = Scope
         }
   _ -> Nothing
 
