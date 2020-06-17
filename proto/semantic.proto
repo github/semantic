@@ -155,22 +155,24 @@ message StackGraphFile {
 }
 
 enum NodeType {
-  ROOT_SCOPE = 0;
-  JUMP_TO_SCOPE = 1;
-  EXPORTED_SCOPE = 2;
-  DEFINITION = 3;
-  REFERENCE = 4;
+  UNKNOWN_NODE = 0;
+  ROOT_SCOPE = 1;
+  JUMP_TO_SCOPE = 2;
+  EXPORTED_SCOPE = 3;
+  DEFINITION = 4;
+  REFERENCE = 5;
 }
 
 enum SyntaxType {
-  FUNCTION = 0;
-  METHOD = 1;
-  CLASS = 2;
-  MODULE = 3;
-  CALL = 4;
-  TYPE = 5;
-  INTERFACE = 6;
-  IMPLEMENTATION = 7;
+  UNKNOWN_SYNTAX = 0;
+  FUNCTION = 1;
+  METHOD = 2;
+  CLASS = 3;
+  MODULE = 4;
+  CALL = 5;
+  TYPE = 6;
+  INTERFACE = 7;
+  IMPLEMENTATION = 8;
 }
 
 message StackGraphNode {

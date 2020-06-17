@@ -840,6 +840,7 @@ instance ToJSON StackGraphPath where
   toEncoding = toAesonEncoding
 
 instance FromJSONPB NodeType where
+  parseJSONPB (JSONPB.String "UNKNOWN_NODE") = pure UNKNOWN_NODE
   parseJSONPB (JSONPB.String "ROOT_SCOPE") = pure ROOT_SCOPE
   parseJSONPB (JSONPB.String "JUMP_TO_SCOPE") = pure JUMP_TO_SCOPE
   parseJSONPB (JSONPB.String "EXPORTED_SCOPE") = pure EXPORTED_SCOPE
@@ -859,6 +860,7 @@ instance ToJSON NodeType where
   toEncoding = toAesonEncoding
 
 instance FromJSONPB SyntaxType where
+  parseJSONPB (JSONPB.String "UNKNOWN_SYNTAX") = pure UNKNOWN_SYNTAX
   parseJSONPB (JSONPB.String "FUNCTION") = pure FUNCTION
   parseJSONPB (JSONPB.String "METHOD") = pure METHOD
   parseJSONPB (JSONPB.String "CLASS") = pure CLASS
