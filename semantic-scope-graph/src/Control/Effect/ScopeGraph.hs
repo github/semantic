@@ -63,6 +63,8 @@ import Source.Loc
 import Source.Span
 import qualified Stack.Graph as Stack
 import qualified AST.Parse as Parse
+import Control.Effect.Exception
+import qualified Proto.Semantic as P
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
@@ -110,13 +112,13 @@ withScope scope action = do
   put (CurrentScope s)
   pure x
 
-declare :: ScopeGraphEff sig m => Name -> Kind -> Loc -> m Stack.Node
+declare :: ScopeGraphEff sig m => Name -> P.SyntaxType -> Loc -> m Stack.Node
 declare n kind loc = do
   let declNode = Stack.Declaration n kind loc
   -- ToDo: generate a unique id for the node in the graph
   pure declNode
 
-refer :: ScopeGraphEff sig m => Name -> Kind -> Loc -> m Stack.Node
+refer :: ScopeGraphEff sig m => Name -> P.SyntaxType -> Loc -> m Stack.Node
 refer n kind loc = do
   let nameNode = Stack.Reference n kind loc
   -- ToDo: generate a unique id for the node in the graph
@@ -160,7 +162,7 @@ newScope currentScope = do
   name <- Name.gensym
   name <$ modify (Stack.newScope name currentScope)
 
-addDeclarations :: ScopeGraphEff sig m => NonEmpty (Name, Kind, Loc) -> m (Stack.Graph Stack.Node)
+addDeclarations :: ScopeGraphEff sig m => NonEmpty (Name, P.SyntaxType, Loc) -> m (Stack.Graph Stack.Node)
 addDeclarations names = do
   let graph' =
         foldr
@@ -217,7 +219,7 @@ newReference name props = do
             )
         )
 
-declareFunction :: forall sig m. ScopeGraphEff sig m => Maybe Name -> Kind -> Loc -> m (Stack.Node, Name)
+declareFunction :: forall sig m. ScopeGraphEff sig m => Maybe Name -> P.SyntaxType -> Loc -> m (Stack.Node, Name)
 declareFunction name kind loc = do
   CurrentScope currentScope' <- currentScope
   associatedScope <- newScope currentScope'
@@ -227,7 +229,7 @@ declareFunction name kind loc = do
 declareMaybeName ::
   ScopeGraphEff sig m =>
   Maybe Name ->
-  Kind ->
+  P.SyntaxType ->
   Loc ->
   m Stack.Node
 declareMaybeName maybeName kind loc = do
@@ -237,7 +239,7 @@ declareMaybeName maybeName kind loc = do
       name <- Name.gensym
       declare name kind loc
 
-declareParameter :: ScopeGraphEff sig m => Name -> Int -> Kind -> Loc -> m Stack.Node
+declareParameter :: ScopeGraphEff sig m => Name -> Int -> P.SyntaxType -> Loc -> m Stack.Node
 declareParameter n ix kind loc = do
   declNode <- declare n kind loc
   nameNode <- refer n kind loc
