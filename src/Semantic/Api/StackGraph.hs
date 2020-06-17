@@ -237,7 +237,7 @@ toSGNode (node :# tag) = case node of
           nodeLine = "",
           nodeSyntaxType = kind,
           nodeSpan = Loc.span loc,
-          nodeNodeType = Definition
+          nodeNodeType = P.DEFINITION
         }
   Stack.Reference symbol kind loc ->
     Just $
@@ -245,20 +245,20 @@ toSGNode (node :# tag) = case node of
         { nodeId = tag,
           nodeName = Name.formatName symbol,
           nodeLine = "",
-          nodeSyntaxType = Text.pack $ show kind,
-          nodeSpan = Just (Loc.span loc),
-          nodeNodeType = Reference
+          nodeSyntaxType = kind,
+          nodeSpan = Loc.span loc,
+          nodeNodeType = P.REFERENCE
         }
-  Stack.Scope symbol ->
-    Just $
-      SGNode
-        { nodeId = tag,
-          nodeName = Name.formatName symbol,
-          nodeLine = "",
-          nodeSyntaxType = "",
-          nodeSpan = Nothing,
-          nodeNodeType = Scope
-        }
+  -- Stack.Scope symbol ->
+  --   Just $
+  --     SGNode
+  --       { nodeId = tag,
+  --         nodeName = Name.formatName symbol,
+  --         nodeLine = "",
+  --         nodeSyntaxType = "",
+  --         nodeSpan = Nothing,
+  --         nodeNodeType = Scope
+  --       }
   _ -> Nothing
 
 toPaths :: Stack.Graph Stack.Node -> [SGPath]
