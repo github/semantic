@@ -1,5 +1,5 @@
 {- This file was auto-generated from semantic.proto by the proto-lens-protoc program. -}
-{-# LANGUAGE ScopedTypeVariables, DataKinds, TypeFamilies, UndecidableInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleContexts, FlexibleInstances, PatternSynonyms, MagicHash, NoImplicitPrelude, DataKinds, BangPatterns, TypeApplications, OverloadedStrings, DerivingStrategies#-}
+{-# LANGUAGE ScopedTypeVariables, DataKinds, TypeFamilies, UndecidableInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleContexts, FlexibleInstances, PatternSynonyms, MagicHash, NoImplicitPrelude, DataKinds, BangPatterns, TypeApplications#-}
 {-# OPTIONS_GHC -Wno-unused-imports#-}
 {-# OPTIONS_GHC -Wno-duplicate-exports#-}
 {-# OPTIONS_GHC -Wno-dodgy-exports#-}
@@ -53,7 +53,7 @@ data Blob
                        _Blob'path :: !Data.Text.Text,
                        _Blob'language :: !Data.Text.Text,
                        _Blob'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Blob where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -262,7 +262,7 @@ data DeletedTerm
   = DeletedTerm'_constructor {_DeletedTerm'term :: !Data.Text.Text,
                               _DeletedTerm'span :: !(Prelude.Maybe Span),
                               _DeletedTerm'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show DeletedTerm where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -422,7 +422,7 @@ data DiffTreeEdge
   = DiffTreeEdge'_constructor {_DiffTreeEdge'source :: !Data.Int.Int32,
                                _DiffTreeEdge'target :: !Data.Int.Int32,
                                _DiffTreeEdge'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show DiffTreeEdge where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -571,7 +571,7 @@ data DiffTreeFileGraph
                                     _DiffTreeFileGraph'edges :: !(Data.Vector.Vector DiffTreeEdge),
                                     _DiffTreeFileGraph'errors :: !(Data.Vector.Vector ParseError),
                                     _DiffTreeFileGraph'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show DiffTreeFileGraph where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -937,7 +937,7 @@ instance Control.DeepSeq.NFData DiffTreeFileGraph where
 data DiffTreeGraphResponse
   = DiffTreeGraphResponse'_constructor {_DiffTreeGraphResponse'files :: !(Data.Vector.Vector DiffTreeFileGraph),
                                         _DiffTreeGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show DiffTreeGraphResponse where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1075,7 +1075,7 @@ data DiffTreeVertex
   = DiffTreeVertex'_constructor {_DiffTreeVertex'diffVertexId :: !Data.Int.Int32,
                                  _DiffTreeVertex'diffTerm :: !(Prelude.Maybe DiffTreeVertex'DiffTerm),
                                  _DiffTreeVertex'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show DiffTreeVertex where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1087,7 +1087,7 @@ data DiffTreeVertex'DiffTerm
     DiffTreeVertex'Inserted !InsertedTerm |
     DiffTreeVertex'Replaced !ReplacedTerm |
     DiffTreeVertex'Merged !MergedTerm
-  deriving stock (Prelude.Show, Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Show, Prelude.Eq, Prelude.Ord)
 instance Data.ProtoLens.Field.HasField DiffTreeVertex "diffVertexId" Data.Int.Int32 where
   fieldOf _
     = (Prelude..)
@@ -1465,7 +1465,7 @@ _DiffTreeVertex'Merged
 data Docstring
   = Docstring'_constructor {_Docstring'docstring :: !Data.Text.Text,
                             _Docstring'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Docstring where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1589,7 +1589,7 @@ data File
                        _File'errors :: !(Data.Vector.Vector ParseError),
                        _File'blobOid :: !Data.Text.Text,
                        _File'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show File where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1929,7 +1929,7 @@ data InsertedTerm
   = InsertedTerm'_constructor {_InsertedTerm'term :: !Data.Text.Text,
                                _InsertedTerm'span :: !(Prelude.Maybe Span),
                                _InsertedTerm'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show InsertedTerm where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -2093,7 +2093,7 @@ data MergedTerm
                              _MergedTerm'beforeSpan :: !(Prelude.Maybe Span),
                              _MergedTerm'afterSpan :: !(Prelude.Maybe Span),
                              _MergedTerm'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show MergedTerm where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -2302,28 +2302,25 @@ instance Control.DeepSeq.NFData MergedTerm where
                    (Control.DeepSeq.deepseq (_MergedTerm'afterSpan x__) ())))
 newtype NodeType'UnrecognizedValue
   = NodeType'UnrecognizedValue Data.Int.Int32
-  deriving stock (Prelude.Eq, Prelude.Ord, Prelude.Show)
+  deriving (Prelude.Eq, Prelude.Ord, Prelude.Show)
 data NodeType
-  = UNKNOWN_NODE |
-    ROOT_SCOPE |
+  = ROOT_SCOPE |
     JUMP_TO_SCOPE |
     EXPORTED_SCOPE |
     DEFINITION |
     REFERENCE |
     NodeType'Unrecognized !NodeType'UnrecognizedValue
-  deriving stock (Prelude.Show, Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Show, Prelude.Eq, Prelude.Ord)
 instance Data.ProtoLens.MessageEnum NodeType where
-  maybeToEnum 0 = Prelude.Just UNKNOWN_NODE
-  maybeToEnum 1 = Prelude.Just ROOT_SCOPE
-  maybeToEnum 2 = Prelude.Just JUMP_TO_SCOPE
-  maybeToEnum 3 = Prelude.Just EXPORTED_SCOPE
-  maybeToEnum 4 = Prelude.Just DEFINITION
-  maybeToEnum 5 = Prelude.Just REFERENCE
+  maybeToEnum 0 = Prelude.Just ROOT_SCOPE
+  maybeToEnum 1 = Prelude.Just JUMP_TO_SCOPE
+  maybeToEnum 2 = Prelude.Just EXPORTED_SCOPE
+  maybeToEnum 3 = Prelude.Just DEFINITION
+  maybeToEnum 4 = Prelude.Just REFERENCE
   maybeToEnum k
     = Prelude.Just
         (NodeType'Unrecognized
            (NodeType'UnrecognizedValue (Prelude.fromIntegral k)))
-  showEnum UNKNOWN_NODE = "UNKNOWN_NODE"
   showEnum ROOT_SCOPE = "ROOT_SCOPE"
   showEnum JUMP_TO_SCOPE = "JUMP_TO_SCOPE"
   showEnum EXPORTED_SCOPE = "EXPORTED_SCOPE"
@@ -2332,7 +2329,6 @@ instance Data.ProtoLens.MessageEnum NodeType where
   showEnum (NodeType'Unrecognized (NodeType'UnrecognizedValue k))
     = Prelude.show k
   readEnum k
-    | (Prelude.==) k "UNKNOWN_NODE" = Prelude.Just UNKNOWN_NODE
     | (Prelude.==) k "ROOT_SCOPE" = Prelude.Just ROOT_SCOPE
     | (Prelude.==) k "JUMP_TO_SCOPE" = Prelude.Just JUMP_TO_SCOPE
     | (Prelude.==) k "EXPORTED_SCOPE" = Prelude.Just EXPORTED_SCOPE
@@ -2341,7 +2337,7 @@ instance Data.ProtoLens.MessageEnum NodeType where
     | Prelude.otherwise
     = (Prelude.>>=) (Text.Read.readMaybe k) Data.ProtoLens.maybeToEnum
 instance Prelude.Bounded NodeType where
-  minBound = UNKNOWN_NODE
+  minBound = ROOT_SCOPE
   maxBound = REFERENCE
 instance Prelude.Enum NodeType where
   toEnum k__
@@ -2351,28 +2347,25 @@ instance Prelude.Enum NodeType where
               "toEnum: unknown value for enum NodeType: " (Prelude.show k__)))
         Prelude.id
         (Data.ProtoLens.maybeToEnum k__)
-  fromEnum UNKNOWN_NODE = 0
-  fromEnum ROOT_SCOPE = 1
-  fromEnum JUMP_TO_SCOPE = 2
-  fromEnum EXPORTED_SCOPE = 3
-  fromEnum DEFINITION = 4
-  fromEnum REFERENCE = 5
+  fromEnum ROOT_SCOPE = 0
+  fromEnum JUMP_TO_SCOPE = 1
+  fromEnum EXPORTED_SCOPE = 2
+  fromEnum DEFINITION = 3
+  fromEnum REFERENCE = 4
   fromEnum (NodeType'Unrecognized (NodeType'UnrecognizedValue k))
     = Prelude.fromIntegral k
   succ REFERENCE
     = Prelude.error
         "NodeType.succ: bad argument REFERENCE. This value would be out of bounds."
-  succ UNKNOWN_NODE = ROOT_SCOPE
   succ ROOT_SCOPE = JUMP_TO_SCOPE
   succ JUMP_TO_SCOPE = EXPORTED_SCOPE
   succ EXPORTED_SCOPE = DEFINITION
   succ DEFINITION = REFERENCE
   succ (NodeType'Unrecognized _)
     = Prelude.error "NodeType.succ: bad argument: unrecognized value"
-  pred UNKNOWN_NODE
+  pred ROOT_SCOPE
     = Prelude.error
-        "NodeType.pred: bad argument UNKNOWN_NODE. This value would be out of bounds."
-  pred ROOT_SCOPE = UNKNOWN_NODE
+        "NodeType.pred: bad argument ROOT_SCOPE. This value would be out of bounds."
   pred JUMP_TO_SCOPE = ROOT_SCOPE
   pred EXPORTED_SCOPE = JUMP_TO_SCOPE
   pred DEFINITION = EXPORTED_SCOPE
@@ -2384,7 +2377,7 @@ instance Prelude.Enum NodeType where
   enumFromThen = Data.ProtoLens.Message.Enum.messageEnumFromThen
   enumFromThenTo = Data.ProtoLens.Message.Enum.messageEnumFromThenTo
 instance Data.ProtoLens.FieldDefault NodeType where
-  fieldDefault = UNKNOWN_NODE
+  fieldDefault = ROOT_SCOPE
 instance Control.DeepSeq.NFData NodeType where
   rnf x__ = Prelude.seq x__ ()
 {- | Fields :
@@ -2393,7 +2386,7 @@ instance Control.DeepSeq.NFData NodeType where
 data ParseError
   = ParseError'_constructor {_ParseError'error :: !Data.Text.Text,
                              _ParseError'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ParseError where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -2515,7 +2508,7 @@ data ParseTreeFileGraph
                                      _ParseTreeFileGraph'edges :: !(Data.Vector.Vector TermEdge),
                                      _ParseTreeFileGraph'errors :: !(Data.Vector.Vector ParseError),
                                      _ParseTreeFileGraph'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ParseTreeFileGraph where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -2881,7 +2874,7 @@ instance Control.DeepSeq.NFData ParseTreeFileGraph where
 data ParseTreeGraphResponse
   = ParseTreeGraphResponse'_constructor {_ParseTreeGraphResponse'files :: !(Data.Vector.Vector ParseTreeFileGraph),
                                          _ParseTreeGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ParseTreeGraphResponse where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -3010,7 +3003,7 @@ instance Control.DeepSeq.NFData ParseTreeGraphResponse where
 data ParseTreeRequest
   = ParseTreeRequest'_constructor {_ParseTreeRequest'blobs :: !(Data.Vector.Vector Blob),
                                    _ParseTreeRequest'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ParseTreeRequest where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -3138,7 +3131,7 @@ instance Control.DeepSeq.NFData ParseTreeRequest where
 data ParseTreeSymbolResponse
   = ParseTreeSymbolResponse'_constructor {_ParseTreeSymbolResponse'files :: !(Data.Vector.Vector File),
                                           _ParseTreeSymbolResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ParseTreeSymbolResponse where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -3266,7 +3259,7 @@ instance Control.DeepSeq.NFData ParseTreeSymbolResponse where
 data PingRequest
   = PingRequest'_constructor {_PingRequest'service :: !Data.Text.Text,
                               _PingRequest'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show PingRequest where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -3385,7 +3378,7 @@ data PingResponse
                                _PingResponse'timestamp :: !Data.Text.Text,
                                _PingResponse'sha :: !Data.Text.Text,
                                _PingResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show PingResponse where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -3646,7 +3639,7 @@ data Position
   = Position'_constructor {_Position'line :: !Data.Int.Int32,
                            _Position'column :: !Data.Int.Int32,
                            _Position'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Position where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -3788,7 +3781,7 @@ data ReplacedTerm
                                _ReplacedTerm'afterTerm :: !Data.Text.Text,
                                _ReplacedTerm'afterSpan :: !(Prelude.Maybe Span),
                                _ReplacedTerm'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ReplacedTerm where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -4060,7 +4053,7 @@ data Span
   = Span'_constructor {_Span'start :: !(Prelude.Maybe Position),
                        _Span'end :: !(Prelude.Maybe Position),
                        _Span'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Span where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -4227,7 +4220,7 @@ data StackGraphFile
                                  _StackGraphFile'paths :: !(Data.Vector.Vector StackGraphPath),
                                  _StackGraphFile'errors :: !(Data.Vector.Vector ParseError),
                                  _StackGraphFile'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphFile where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -4598,7 +4591,7 @@ data StackGraphNode
                                  _StackGraphNode'syntaxType :: !SyntaxType,
                                  _StackGraphNode'nodeType :: !NodeType,
                                  _StackGraphNode'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphNode where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -4947,7 +4940,7 @@ data StackGraphPath
                                  _StackGraphPath'endingScopeStack :: !(Data.Vector.Unboxed.Vector Data.Int.Int64),
                                  _StackGraphPath'endingSymbolStack :: !(Data.Vector.Vector Data.Text.Text),
                                  _StackGraphPath'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphPath where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -5435,7 +5428,7 @@ instance Control.DeepSeq.NFData StackGraphPath where
 data StackGraphRequest
   = StackGraphRequest'_constructor {_StackGraphRequest'blobs :: !(Data.Vector.Vector Blob),
                                     _StackGraphRequest'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphRequest where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -5563,7 +5556,7 @@ instance Control.DeepSeq.NFData StackGraphRequest where
 data StackGraphResponse
   = StackGraphResponse'_constructor {_StackGraphResponse'files :: !(Data.Vector.Vector StackGraphFile),
                                      _StackGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphResponse where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -5704,7 +5697,7 @@ data Symbol
                          _Symbol'nodeType :: !NodeType,
                          _Symbol'syntaxType :: !SyntaxType,
                          _Symbol'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Symbol where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -6086,10 +6079,9 @@ instance Control.DeepSeq.NFData Symbol where
                                (Control.DeepSeq.deepseq (_Symbol'syntaxType x__) ())))))))
 newtype SyntaxType'UnrecognizedValue
   = SyntaxType'UnrecognizedValue Data.Int.Int32
-  deriving stock (Prelude.Eq, Prelude.Ord, Prelude.Show)
+  deriving (Prelude.Eq, Prelude.Ord, Prelude.Show)
 data SyntaxType
-  = UNKNOWN_SYNTAX |
-    FUNCTION |
+  = FUNCTION |
     METHOD |
     CLASS |
     MODULE |
@@ -6098,22 +6090,20 @@ data SyntaxType
     INTERFACE |
     IMPLEMENTATION |
     SyntaxType'Unrecognized !SyntaxType'UnrecognizedValue
-  deriving stock (Prelude.Show, Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Show, Prelude.Eq, Prelude.Ord)
 instance Data.ProtoLens.MessageEnum SyntaxType where
-  maybeToEnum 0 = Prelude.Just UNKNOWN_SYNTAX
-  maybeToEnum 1 = Prelude.Just FUNCTION
-  maybeToEnum 2 = Prelude.Just METHOD
-  maybeToEnum 3 = Prelude.Just CLASS
-  maybeToEnum 4 = Prelude.Just MODULE
-  maybeToEnum 5 = Prelude.Just CALL
-  maybeToEnum 6 = Prelude.Just TYPE
-  maybeToEnum 7 = Prelude.Just INTERFACE
-  maybeToEnum 8 = Prelude.Just IMPLEMENTATION
+  maybeToEnum 0 = Prelude.Just FUNCTION
+  maybeToEnum 1 = Prelude.Just METHOD
+  maybeToEnum 2 = Prelude.Just CLASS
+  maybeToEnum 3 = Prelude.Just MODULE
+  maybeToEnum 4 = Prelude.Just CALL
+  maybeToEnum 5 = Prelude.Just TYPE
+  maybeToEnum 6 = Prelude.Just INTERFACE
+  maybeToEnum 7 = Prelude.Just IMPLEMENTATION
   maybeToEnum k
     = Prelude.Just
         (SyntaxType'Unrecognized
            (SyntaxType'UnrecognizedValue (Prelude.fromIntegral k)))
-  showEnum UNKNOWN_SYNTAX = "UNKNOWN_SYNTAX"
   showEnum FUNCTION = "FUNCTION"
   showEnum METHOD = "METHOD"
   showEnum CLASS = "CLASS"
@@ -6125,7 +6115,6 @@ instance Data.ProtoLens.MessageEnum SyntaxType where
   showEnum (SyntaxType'Unrecognized (SyntaxType'UnrecognizedValue k))
     = Prelude.show k
   readEnum k
-    | (Prelude.==) k "UNKNOWN_SYNTAX" = Prelude.Just UNKNOWN_SYNTAX
     | (Prelude.==) k "FUNCTION" = Prelude.Just FUNCTION
     | (Prelude.==) k "METHOD" = Prelude.Just METHOD
     | (Prelude.==) k "CLASS" = Prelude.Just CLASS
@@ -6137,7 +6126,7 @@ instance Data.ProtoLens.MessageEnum SyntaxType where
     | Prelude.otherwise
     = (Prelude.>>=) (Text.Read.readMaybe k) Data.ProtoLens.maybeToEnum
 instance Prelude.Bounded SyntaxType where
-  minBound = UNKNOWN_SYNTAX
+  minBound = FUNCTION
   maxBound = IMPLEMENTATION
 instance Prelude.Enum SyntaxType where
   toEnum k__
@@ -6147,21 +6136,19 @@ instance Prelude.Enum SyntaxType where
               "toEnum: unknown value for enum SyntaxType: " (Prelude.show k__)))
         Prelude.id
         (Data.ProtoLens.maybeToEnum k__)
-  fromEnum UNKNOWN_SYNTAX = 0
-  fromEnum FUNCTION = 1
-  fromEnum METHOD = 2
-  fromEnum CLASS = 3
-  fromEnum MODULE = 4
-  fromEnum CALL = 5
-  fromEnum TYPE = 6
-  fromEnum INTERFACE = 7
-  fromEnum IMPLEMENTATION = 8
+  fromEnum FUNCTION = 0
+  fromEnum METHOD = 1
+  fromEnum CLASS = 2
+  fromEnum MODULE = 3
+  fromEnum CALL = 4
+  fromEnum TYPE = 5
+  fromEnum INTERFACE = 6
+  fromEnum IMPLEMENTATION = 7
   fromEnum (SyntaxType'Unrecognized (SyntaxType'UnrecognizedValue k))
     = Prelude.fromIntegral k
   succ IMPLEMENTATION
     = Prelude.error
         "SyntaxType.succ: bad argument IMPLEMENTATION. This value would be out of bounds."
-  succ UNKNOWN_SYNTAX = FUNCTION
   succ FUNCTION = METHOD
   succ METHOD = CLASS
   succ CLASS = MODULE
@@ -6171,10 +6158,9 @@ instance Prelude.Enum SyntaxType where
   succ INTERFACE = IMPLEMENTATION
   succ (SyntaxType'Unrecognized _)
     = Prelude.error "SyntaxType.succ: bad argument: unrecognized value"
-  pred UNKNOWN_SYNTAX
+  pred FUNCTION
     = Prelude.error
-        "SyntaxType.pred: bad argument UNKNOWN_SYNTAX. This value would be out of bounds."
-  pred FUNCTION = UNKNOWN_SYNTAX
+        "SyntaxType.pred: bad argument FUNCTION. This value would be out of bounds."
   pred METHOD = FUNCTION
   pred CLASS = METHOD
   pred MODULE = CLASS
@@ -6189,7 +6175,7 @@ instance Prelude.Enum SyntaxType where
   enumFromThen = Data.ProtoLens.Message.Enum.messageEnumFromThen
   enumFromThenTo = Data.ProtoLens.Message.Enum.messageEnumFromThenTo
 instance Data.ProtoLens.FieldDefault SyntaxType where
-  fieldDefault = UNKNOWN_SYNTAX
+  fieldDefault = FUNCTION
 instance Control.DeepSeq.NFData SyntaxType where
   rnf x__ = Prelude.seq x__ ()
 {- | Fields :
@@ -6200,7 +6186,7 @@ data TermEdge
   = TermEdge'_constructor {_TermEdge'source :: !Data.Int.Int32,
                            _TermEdge'target :: !Data.Int.Int32,
                            _TermEdge'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show TermEdge where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -6340,7 +6326,7 @@ data TermVertex
                              _TermVertex'term :: !Data.Text.Text,
                              _TermVertex'span :: !(Prelude.Maybe Span),
                              _TermVertex'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
+  deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show TermVertex where
   showsPrec _ __x __s
     = Prelude.showChar
