@@ -101,8 +101,8 @@ newtype InvalidProtoException = InvalidProtoException String
 newtype InvalidJSONException = InvalidJSONException String
   deriving (Eq, Show, Exception)
 
--- | Read JSON-encoded data from a 'Handle'. Throws
--- 'InvalidJSONException' on parse failure.
+-- | Read Proto-encoded data from a 'Handle'. Throws
+-- 'InvalidProtoException ' on parse failure.
 readFromHandle ::
   forall a m. (Message a, MonadIO m) => Handle 'IO.ReadMode -> m a
 readFromHandle (ReadHandle h) = do

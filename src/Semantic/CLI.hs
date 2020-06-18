@@ -176,8 +176,8 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
             )
       filesOrStdin <-
         FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
-          <|> pure (FilesFromJSON stdin)
           <|> pure (FilesFromHandle stdin)
+          <|> pure (FilesFromJSON stdin)
       pure $ Task.readBlobs filesOrStdin >>= runReader languageModes . renderer
 
 graphCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
