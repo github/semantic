@@ -77,8 +77,7 @@ maybeM f = maybe f pure
 {-# INLINE maybeM #-}
 
 type StackGraphEff sig m =
-  ( Has (State (ScopeGraph Name)) sig m,
-    Has (State (Stack.Graph (Tagged Stack.Node))) sig m,
+  ( Has (State (Stack.Graph (Tagged Stack.Node))) sig m,
     Has (State (CurrentScope (Tagged Stack.Node))) sig m,
     Has (Reader (Tagged Stack.Node)) sig m, -- The root node of the module.
     Has (Reader Module.ModuleInfo) sig m,

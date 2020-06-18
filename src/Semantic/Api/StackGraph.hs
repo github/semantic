@@ -218,11 +218,10 @@ graphForBlob blob =
     toStackGraphParsers :: Map Language (Parser.SomeParser Graph.ToScopeGraph Loc)
     toStackGraphParsers = Parser.preciseParsers
 
-stackGraphToTempStackGraph :: Stack.Graph Stack.Node -> TempStackGraph
+stackGraphToTempStackGraph :: Stack.Graph (Tagged Stack.Node) -> TempStackGraph
 stackGraphToTempStackGraph graph =
-  let graph' = Stack.tagGraphUniquely graph
-      nodes =
-        Maybe.catMaybes $ toSGNode <$> Graph.vertexList (Stack.unGraph graph')
+  let nodes =
+        Maybe.catMaybes $ toSGNode <$> Graph.vertexList (Stack.unGraph graph)
       paths = toPaths graph
    in TempStackGraph {scopeGraphNodes = nodes, scopeGraphPaths = paths}
 
@@ -260,12 +259,12 @@ toSGNode (node :# tag) = case node of
   --       }
   _ -> Nothing
 
-toPaths :: Stack.Graph Stack.Node -> [SGPath]
+toPaths :: Stack.Graph (Tagged Stack.Node) -> [SGPath]
 toPaths graph =
   let mainNodes =
         Set.filter
           isMainNode
-          (Stack.vertexSet (Stack.tagGraphUniquely graph))
+          (Stack.vertexSet graph)
       currentPaths = flip Set.map mainNodes $ \taggedNode@(node Stack.:# _) ->
         let path =
               Path.Path
@@ -287,11 +286,11 @@ toPaths graph =
    in toSGPath <$> reducePaths' graph (toList currentPaths)
 
 reducePaths' ::
-  Foldable t => Stack.Graph Stack.Node -> t Path.Path -> [Path.Path]
+  Foldable t => Stack.Graph (Tagged Stack.Node) -> t Path.Path -> [Path.Path]
 reducePaths' graph initialPaths = runST $ do
   currentPathsRef <- newSTRef (toList initialPaths)
   pathsRef <- newSTRef []
-  graphRef <- newSTRef (Stack.tagGraphUniquely graph)
+  graphRef <- newSTRef graph
   go currentPathsRef pathsRef graphRef
   readSTRef pathsRef
   where

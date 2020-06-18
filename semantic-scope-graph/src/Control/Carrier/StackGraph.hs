@@ -38,20 +38,17 @@ import qualified Stack.Graph as Stack
 
 type StackGraphC addr m =
   StateC
-    (ScopeGraph Name)
+    (Stack.Graph (Tagged Stack.Node))
     ( StateC
-        (Stack.Graph Stack.Node)
-        ( StateC
-            (CurrentScope Name)
+        (CurrentScope (Tagged Stack.Node))
+        ( ReaderC
+            (Tagged Stack.Node)
             ( ReaderC
-                Stack.Node
-                ( ReaderC
-                    ModuleInfo
-                    ( ErrorC
-                        ParseError
-                        ( FreshC
-                            (Labelled StackGraph.Tagged FreshC m)
-                        )
+                ModuleInfo
+                ( ErrorC
+                    ParseError
+                    ( FreshC
+                        (Labelled Tagged FreshC m)
                     )
                 )
             )
@@ -62,19 +59,18 @@ runStackGraph ::
   (Functor m) =>
   ModuleInfo ->
   StackGraphC Name m a ->
-  m (Either ParseError (Stack.Graph Stack.Node, (ScopeGraph Name, a)))
+  m (Either ParseError (Stack.Graph (Tagged Stack.Node), a))
 runStackGraph minfo go =
-  evalFresh 0
+  evalFresh 1
     . runLabelled
     . evalFresh 1
     . runError
     . runReader minfo
-    . runReader (Stack.Scope rootname)
-    . evalState (CurrentScope rootname)
-    . runState @(Stack.Graph Stack.Node) initialStackGraph
-    . runState @(ScopeGraph Name) initialGraph
+    . runReader rootNode
+    . evalState (CurrentScope rootNode)
+    . runState @(Stack.Graph (Tagged Stack.Node)) initialStackGraph
     $ go
   where
     rootname = Name.nameI 0
-    initialGraph = ScopeGraph.insertScope rootname lowerBound lowerBound
-    initialStackGraph = Stack.scope rootname
+    rootNode = ((Stack.Scope rootname) Stack.:# 0)
+    initialStackGraph = Stack.vertex rootNode
