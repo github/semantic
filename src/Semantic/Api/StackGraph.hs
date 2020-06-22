@@ -151,7 +151,7 @@ parseStackGraph blobs = do
             & P.id .~ nodeId node
             & P.name .~ nodeName node
             & P.line .~ nodeLine node
-            & P.maybe'span ?~ converting # nodeSpan node
+            & P.span .~ converting # nodeSpan node
             & P.syntaxType .~ nodeSyntaxType node
             & P.nodeType .~ nodeNodeType node
         pathToPath :: SGPath -> StackGraphPath
