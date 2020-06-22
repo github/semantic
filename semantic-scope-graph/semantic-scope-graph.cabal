@@ -56,7 +56,7 @@ library
     , semantic-analysis
     , semantic-source    ^>= 0.1.0
     , semantic-ast       ^>= 0.1.0.0
-    , semantic-proto       ^>= 0
+    , semantic-proto
     , semilattices
     , streaming
     , streaming-bytestring

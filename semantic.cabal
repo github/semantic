@@ -266,7 +266,7 @@ library
                      , prettyprinter >= 1.2 && < 2
                      , pretty-show ^>= 1.9.5
                      , profunctors ^>= 5.3
-                     , proto-lens >= 0.5 && < 0.7
+                     , proto-lens >= 0.7 && < 0.8
                      , reducers ^>= 3.12.3
                      , semantic-go ^>= 0
                      , semantic-java ^>= 0
@@ -275,7 +275,7 @@ library
                      , semantic-python ^>= 0
                      , semantic-codeql ^>= 0
                      , semantic-ruby ^>= 0
-                     , semantic-proto ^>= 0
+                     , semantic-proto
                      , semantic-scope-graph ^>= 0
                      , semantic-tags ^>= 0
                      , semantic-tsx ^>= 0
@@ -350,7 +350,7 @@ test-suite test
   build-depends:       semantic
                      , semantic-json
                      , semantic-tags ^>= 0
-                     , semantic-proto ^>= 0
+                     , semantic-proto
                      , tree-sitter-json ^>= 0.7
                      , Glob ^>= 0.10.0
                      , hedgehog ^>= 1
@@ -376,7 +376,7 @@ test-suite parse-examples
                      , foldl ^>= 1.4.5
                      , lens >= 4.17 && < 4.19
                      , resourcet ^>= 1.2
-                     , semantic-proto ^>= 0
+                     , semantic-proto
                      , streaming
                      , streaming-bytestring ^>= 0.1.6
                      , tasty

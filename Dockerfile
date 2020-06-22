@@ -1,7 +1,7 @@
 # Put protoc and twirp tooling in its own image
 FROM haskell:8.8.1 as haskell
 RUN cabal v2-update && \
-  cabal v2-install proto-lens-protoc-0.6.0.0
+  cabal v2-install proto-lens-protoc
 RUN which proto-lens-protoc
 
 FROM golang:1.13-stretch AS protoc

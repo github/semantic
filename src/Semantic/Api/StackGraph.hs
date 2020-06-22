@@ -164,13 +164,6 @@ parseStackGraph blobs = do
             & P.to .~ pathTo path
             & P.endingScopeStack .~ pathEndingScopeStack path
             & P.endingSymbolStack .~ pathEndingSymbolStack path
-        nodeTypeToNodeType :: SGNodeType -> P.NodeType
-        nodeTypeToNodeType = \case
-          RootScope -> P.ROOT_SCOPE
-          JumpToScope -> P.JUMP_TO_SCOPE
-          Definition -> P.DEFINITION
-          Reference -> P.REFERENCE
-          Scope -> P.EXPORTED_SCOPE
 
 -- TODO: These are temporary, will replace with proper datatypes from the scope graph work.
 data TempStackGraph = TempStackGraph

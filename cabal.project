@@ -20,14 +20,14 @@ packages: .
           semantic-tsx
           semantic-typescript
 
--- Packages brought in from other repos instead of hackage
--- ATTENTION: remember to update cabal.project.ci when bumping SHAs here!
-source-repository-package
-  type: git
-  location: https://github.com/tclem/proto-lens-jsonpb
-  tag: 5d40444be689bef1e12cbe38da0261283775ec64
-
 source-repository-package
   type: git
   location: https://github.com/antitypical/fused-syntax.git
   tag: d11e14581217590a5c67f79cbaeee35ac8acee6a
+
+-- Packages brought in from other repos instead of hackage
+-- ATTENTION: remember to update cabal.project.ci when bumping SHAs here!
+source-repository-package
+  type: git
+  location: https://github.com/joshvera/proto-lens-jsonpb
+  tag: b140909b027e01533307f8ae6180db136c8c778a
