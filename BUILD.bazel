@@ -1,0 +1,14 @@
+# Set all target’s visibility in this package to "public".
+package(default_visibility = ["//visibility:public"])
+
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_repl",
+)
+
+haskell_repl(
+    name = "hie-bios",
+    collect_data = False,
+    deps = ["//semantic:lib"],
+)

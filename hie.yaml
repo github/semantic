@@ -1,37 +1,3 @@
----
 cradle:
-  cabal:
-  - path: "./semantic-core/src"
-    component: lib:semantic-core
-  - path: "./semantic-ast/src"
-    component: lib:semantic-ast
-  - path: "./semantic-go/src"
-    component: lib:semantic-go
-  - path: "./semantic-java/src"
-    component: lib:semantic-java
-  - path: "./semantic-codeql/src"
-    component: lib:semantic-codeql
-  - path: "./semantic-analysis/src"
-    component: lib:semantic-analysis
-  - path: "./semantic-scope-graph/src"
-    component: lib:semantic-scope-graph
-  - path: "./semantic-json/src"
-    component: lib:semantic-json
-  - path: "./semantic-typescript/src"
-    component: lib:semantic-typescript
-  - path: "./semantic-source/src"
-    component: lib:semantic-source
-  - path: "./semantic-tags/src"
-    component: lib:semantic-tags
-  - path: "./semantic/src"
-    component: lib:semantic
-  - path: "./semantic-parse/src"
-    component: lib:semantic-parse
-  - path: "./semantic-ruby/src"
-    component: lib:semantic-ruby
-  - path: "./semantic-python/src"
-    component: lib:semantic-python
-  - path: "./semantic-tsx/src"
-    component: lib:semantic-tsx
-  - path: "./semantic-php/src"
-    component: lib:semantic-php
+  bios:
+    program: ".hie-bios.sh"
