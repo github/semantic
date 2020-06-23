@@ -2,6 +2,10 @@
 
 STANDARD_GHC_WARNINGS = [
     "-O0",
+    "-v1",
+    "-j8",
+    "-fdiagnostics-color=always",
+    "-ferror-spans",
     "-Weverything",
     "-Wno-missing-local-signatures",
     "-Wno-missing-import-lists",
