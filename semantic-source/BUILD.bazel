@@ -65,15 +65,4 @@ haskell_test(
     ],
 )
 
-haskell_doctest(
-    name = "doctest-lib",
-    modules = ["Source.Range"],  # exclude Baz and succeed
-    visibility = ["//visibility:public"],
-    deps = [":lib-b"],
-)
-
-haskell_doctest(
-    name = "doctest",
-    modules = ["Source.Range"],
-    deps = [":doctest-lib"],
-)
+# TODO: reenable doctests

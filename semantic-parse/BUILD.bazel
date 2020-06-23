@@ -1,0 +1,38 @@
+# Set all target’s visibility in this package to "public".
+package(default_visibility = ["//visibility:public"])
+
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_toolchain_library",
+)
+load(
+    "//:build/common.bzl",
+    "STANDARD_GHC_WARNINGS",
+)
+
+# haskell_toolchain_library can access builtin GHC packages
+# and assign them a bazel target name, so that they
+# can be referenced as dependencies.
+haskell_toolchain_library(name = "base")
+
+# Doesn't build right now.
+
+# haskell_binary(
+#     name = "exe",
+#     srcs = ["app/Main.hs"],
+#     compiler_flags = STANDARD_GHC_WARNINGS,
+#     deps = [
+#         ":base",
+#         "//semantic-ast:lib",
+#         "//semantic-python:lib",
+#         "//semantic-source:lib",
+#         "@stackage//:aeson",
+#         "@stackage//:aeson-pretty",
+#         "@stackage//:bytestring",
+#         "@stackage//:optparse-applicative",
+#         "@stackage//:pretty-simple",
+#         "@stackage//:text",
+#     ],
+# )
