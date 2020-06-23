@@ -26,7 +26,7 @@ load(
 )
 
 # Download a GHC binary distribution from haskell.org and register it as a toolchain.
-rules_haskell_toolchains(version = "8.8.1")
+rules_haskell_toolchains(version = "8.8.3")
 
 load(
     "@rules_haskell//haskell:cabal.bzl",
