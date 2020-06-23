@@ -28,7 +28,6 @@ haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS,
-    src_strip_prefix = "src",
     deps = [
         ":base",
         "//semantic-proto:lib",

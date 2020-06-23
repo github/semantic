@@ -59,7 +59,6 @@ haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + ["-XStrictData"],
-    src_strip_prefix = "src",
     deps = semantic_common_dependencies + [
         ":base",
         ":ghc-prim",
@@ -119,7 +118,6 @@ haskell_binary(
     name = "exe",
     srcs = glob(["app/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + ["-XStrictData"],
-    src_strip_prefix = "app",
     deps = [
         ":base",
         "//semantic:lib",
@@ -146,7 +144,6 @@ haskell_test(
         "test/fixtures/javascript/**/*.js",
         "test/fixtures/typescript/**/*.ts",
     ]),
-    src_strip_prefix = "test",
     deps = semantic_common_dependencies + [
         ":base",
         "//semantic:lib",

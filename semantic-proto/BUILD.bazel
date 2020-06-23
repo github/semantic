@@ -23,7 +23,6 @@ haskell_toolchain_library(name = "base")
 haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
-    src_strip_prefix = "src",
     deps = [
         ":base",
         "@stackage//:aeson",

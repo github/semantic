@@ -32,7 +32,6 @@ haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + ["-XOverloadedStrings"],
-    src_strip_prefix = "src",
     deps = [
         ":base",
         "@stackage//:aeson",
@@ -55,7 +54,6 @@ haskell_test(
         "test/Test.hs",
     ],
     compiler_flags = STANDARD_GHC_WARNINGS,
-    src_strip_prefix = "test",
     deps = [
         ":base",
         ":lib",

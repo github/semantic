@@ -28,7 +28,6 @@ haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS,
-    src_strip_prefix = "src",
     deps = [
         ":base",
         "//semantic-analysis:lib",
@@ -53,7 +52,6 @@ haskell_test(
         "test/Source/Test.hs",
     ]),
     compiler_flags = STANDARD_GHC_WARNINGS,
-    src_strip_prefix = "test",
     deps = [
         ":base",
         ":lib",
