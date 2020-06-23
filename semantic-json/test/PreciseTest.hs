@@ -1,7 +1,9 @@
-{-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 module Main (main) where
 
-import           AST.Test
+import           AST.TestHelpers
 import           AST.Unmarshal
 import qualified Language.JSON.AST as JSON
 import           Language.JSON.Grammar
@@ -14,7 +16,7 @@ main
   >>= readCorpusFiles'
   >>= traverse (testCorpus parse)
   >>= defaultMain . tests
-  where parse = parseByteString @JSON.Document @() tree_sitter_json
+  where parse = parseByteString @(JSON.Document) @() tree_sitter_json
 
 tests :: [TestTree] -> TestTree
 tests = testGroup "tree-sitter-json corpus tests"

@@ -1,4 +1,8 @@
-{-# LANGUAGE DataKinds, DeriveGeneric, DeriveTraversable, KindSignatures #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE  KindSignatures #-}
+
 module AST.Token
 ( Token(..)
 ) where

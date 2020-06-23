@@ -1,10 +1,10 @@
 {-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications #-}
 module Main (main) where
 
-import           AST.Test
+import           TreeSitter.Ruby
+import           AST.TestHelpers
 import           AST.Unmarshal
 import qualified Language.Ruby.AST as Rb
-import           Language.Ruby.Grammar
 import qualified System.Path as Path
 import           Test.Tasty
 

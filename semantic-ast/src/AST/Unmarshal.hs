@@ -27,6 +27,8 @@ module AST.Unmarshal
 , GHasAnn(..)
 ) where
 
+import           AST.Token as TS
+import           AST.Parse
 import           Control.Algebra (send)
 import           Control.Carrier.Reader hiding (asks)
 import           Control.Exception
@@ -35,6 +37,7 @@ import           Data.ByteString (ByteString)
 import qualified Data.ByteString as B
 import           Data.Coerce
 import           Data.Foldable (toList)
+import           Data.Functor.Identity
 import qualified Data.IntMap as IntMap
 import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Proxy
@@ -55,7 +58,6 @@ import           TreeSitter.Cursor as TS
 import           TreeSitter.Language as TS
 import           TreeSitter.Node as TS
 import           TreeSitter.Parser as TS
-import           AST.Token as TS
 import           TreeSitter.Tree as TS
 
 asks :: Has (Reader r) sig m => (r -> r') -> m r'
@@ -152,6 +154,11 @@ class SymbolMatching t => Unmarshal t where
 instance (Unmarshal f, Unmarshal g) => Unmarshal (f :+: g) where
   matchers = fmap (fmap (hoist L1)) matchers <> fmap (fmap (hoist R1)) matchers
 
+instance (Applicative shape, Unmarshal f) => Unmarshal (shape :.: f) where
+  matchers = let base = matchers @f in fmap (fmap promote) base
+    where
+      promote (Match f) = Match (fmap (fmap (Comp1 . pure)) f)
+
 instance Unmarshal t => Unmarshal (Rec1 t) where
   matchers = coerce (matchers @t)
 
@@ -206,16 +213,25 @@ pointToPos (TSPoint line column) = Pos (fromIntegral line) (fromIntegral column)
 class UnmarshalField t where
   unmarshalField
     :: ( Unmarshal f
-       , UnmarshalAnn a
+       , UnmarshalAnn ann
        )
     => String -- ^ datatype name
     -> String -- ^ field name
     -> [Node] -- ^ nodes
-    -> MatchM (t (f a))
+    -> MatchM (t (f ann))
+
+instance UnmarshalField Err where
+  unmarshalField _ _ [] = pure $ Fail "No items provided to unmarshalField."
+  unmarshalField _ _ [x] = Success <$> unmarshalNode x
+  unmarshalField d f _ = pure $ Fail ("type '" <> d <> "' expected zero or one nodes in field '" <> f <> "' but got multiple")
 
 instance UnmarshalField Maybe where
   unmarshalField _ _ []  = pure Nothing
   unmarshalField _ _ [x] = Just <$> unmarshalNode x
+  unmarshalField d f _   = liftIO . throwIO . UnmarshalError $ "type '" <> d <> "' expected zero or one nodes in field '" <> f <> "' but got multiple"
+
+instance UnmarshalField Identity where
+  unmarshalField _ _ [x] = Identity <$> unmarshalNode x
   unmarshalField d f _   = liftIO . throwIO . UnmarshalError $ "type '" <> d <> "' expected zero or one nodes in field '" <> f <> "' but got multiple"
 
 instance UnmarshalField [] where
@@ -232,11 +248,11 @@ instance UnmarshalField NonEmpty where
     pure $ head' :| tail'
   unmarshalField d f [] = liftIO . throwIO . UnmarshalError $ "type '" <> d <> "' expected one or more nodes in field '" <> f <> "' but got zero"
 
-class SymbolMatching (a :: * -> *) where
-  matchedSymbols :: Proxy a -> [Int]
+class SymbolMatching (sym :: * -> *) where
+  matchedSymbols :: Proxy sym -> [Int]
 
   -- | Provide error message describing the node symbol vs. the symbols this can match
-  showFailure :: Proxy a -> Node -> String
+  showFailure :: Proxy sym -> Node -> String
 
 instance SymbolMatching f => SymbolMatching (M1 i c f) where
   matchedSymbols _ = matchedSymbols (Proxy @f)
@@ -253,6 +269,10 @@ instance (KnownNat n, KnownSymbol sym) => SymbolMatching (Token sym n) where
 instance (SymbolMatching f, SymbolMatching g) => SymbolMatching (f :+: g) where
   matchedSymbols _ = matchedSymbols (Proxy @f) <> matchedSymbols (Proxy @g)
   showFailure _ = sep <$> showFailure (Proxy @f) <*> showFailure (Proxy @g)
+
+instance SymbolMatching f => SymbolMatching (shape :.: f) where
+  matchedSymbols _ = matchedSymbols (Proxy @f)
+  showFailure _ = showFailure (Proxy @f)
 
 sep :: String -> String -> String
 sep a b = a ++ ". " ++ b
@@ -300,21 +320,24 @@ newtype FieldName = FieldName { getFieldName :: String }
 --   Sum types are constructed by using the current node’s symbol to select the corresponding constructor deterministically.
 class GUnmarshal f where
   gunmarshalNode
-    :: UnmarshalAnn a
+    :: UnmarshalAnn ann
     => Node
-    -> MatchM (f a)
+    -> MatchM (f ann)
 
 instance (Datatype d, GUnmarshalData f) => GUnmarshal (M1 D d f) where
   gunmarshalNode = go (gunmarshalNode' (datatypeName @d undefined)) where
-    go :: (Node -> MatchM (f a)) -> Node -> MatchM (M1 i c f a)
+    go :: (Node -> MatchM (f ann)) -> Node -> MatchM (M1 i c f ann)
     go = coerce
+
+instance (GUnmarshal f, Applicative shape) => GUnmarshal (shape :.: f) where
+  gunmarshalNode = fmap (Comp1 . pure) . gunmarshalNode @f
 
 class GUnmarshalData f where
   gunmarshalNode'
-    :: UnmarshalAnn a
+    :: UnmarshalAnn ann
     => String
     -> Node
-    -> MatchM (f a)
+    -> MatchM (f ann)
 
 instance GUnmarshalData f => GUnmarshalData (M1 i c f) where
   gunmarshalNode' = go gunmarshalNode' where
@@ -350,11 +373,11 @@ instance (GUnmarshalProduct f, GUnmarshalProduct g) => GUnmarshalData (f :*: g) 
 -- | Generically unmarshal products
 class GUnmarshalProduct f where
   gunmarshalProductNode
-    :: UnmarshalAnn a
+    :: UnmarshalAnn ann
     => String
     -> Node
     -> Fields
-    -> MatchM (f a)
+    -> MatchM (f ann)
 
 -- Product structure
 instance (GUnmarshalProduct f, GUnmarshalProduct g) => GUnmarshalProduct (f :*: g) where
@@ -391,15 +414,15 @@ instance (Unmarshal t, Selector c) => GUnmarshalProduct (M1 S c (Rec1 t)) where
     fieldName = selName @c undefined
 
 
-class GHasAnn a t where
-  gann :: t a -> a
+class GHasAnn ann t where
+  gann :: t ann -> ann
 
-instance GHasAnn a f => GHasAnn a (M1 i c f) where
+instance GHasAnn ann f => GHasAnn ann (M1 i c f) where
   gann = gann . unM1
 
-instance (GHasAnn a l, GHasAnn a r) => GHasAnn a (l :+: r) where
+instance (GHasAnn ann l, GHasAnn ann r) => GHasAnn ann (l :+: r) where
   gann (L1 l) = gann l
   gann (R1 r) = gann r
 
-instance {-# OVERLAPPABLE #-} HasField "ann" (t a) a => GHasAnn a t where
+instance {-# OVERLAPPABLE #-} HasField "ann" (t ann) ann => GHasAnn ann t where
   gann = getField @"ann"

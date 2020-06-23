@@ -10,11 +10,11 @@ import           Analysis.Concrete (Concrete (..))
 import           Control.Algebra
 import           Control.Monad
 import           Control.Monad.Trans.Resource (ResourceT, runResourceT)
-import           Core.Core (Core)
-import qualified Core.Core as Core
-import           Core.Name (Name)
-import qualified Core.Parser
-import qualified Core.Pretty
+-- import           Core.Core (Core)
+-- import qualified Core.Core as Core
+-- import           Core.Name (Name)
+-- import qualified Core.Parser
+-- import qualified Core.Pretty
 import           Data.ByteString.Char8 (ByteString)
 import qualified Data.ByteString.Char8 as ByteString
 import qualified Data.ByteString.Streaming.Char8 as ByteStream

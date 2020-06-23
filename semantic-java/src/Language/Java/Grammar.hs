@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+
 module Language.Java.Grammar
 ( tree_sitter_java
 , Grammar(..)

@@ -6,17 +6,23 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
+
 module Language.JSON.AST
 ( module Language.JSON.AST
 , JSON.getTestCorpusDir
 ) where
 
-import           Prelude hiding (String)
 import           AST.GenerateSyntax
 import           Language.Haskell.TH.Syntax (runIO)
+import           Prelude hiding (String)
 import qualified TreeSitter.JSON as JSON (getNodeTypesPath, getTestCorpusDir, tree_sitter_json)
 
 astDeclarationsForLanguage JSON.tree_sitter_json "/Users/patrickt/src/semantic/vendor/json-node-types.json"

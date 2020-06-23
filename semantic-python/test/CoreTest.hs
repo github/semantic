@@ -13,11 +13,11 @@ import           Control.Carrier.Fail.Either
 import           Control.Carrier.Reader
 import           Control.Monad hiding (fail)
 import           Control.Monad.IO.Class
-import           Core.Core
-import qualified Core.Eval as Eval
-import           Core.Name
-import qualified Core.Parser
-import           Core.Pretty
+-- import           Core.Core
+-- import qualified Core.Eval as Eval
+-- import           Core.Name
+-- import qualified Core.Parser
+-- import           Core.Pretty
 import qualified Data.ByteString.Char8 as ByteString
 import           Data.Foldable
 import           Data.Function
@@ -27,7 +27,7 @@ import qualified Data.Map as Map
 import           Data.Maybe
 import           Data.Text (Text)
 import           GHC.Stack
-import qualified Language.Python.Core as Py
+-- import qualified Language.Python.Core as Py
 import           Language.Python.Failure
 import           Prelude hiding (fail)
 import           Source.Span
@@ -45,7 +45,7 @@ import qualified AST.Unmarshal as TS
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
-import qualified Directive
+-- import qualified Directive
 import           Instances ()
 
 parsePrelude :: IO (Term (Ann Span :+: Core) Name)

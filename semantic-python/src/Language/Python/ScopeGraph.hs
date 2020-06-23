@@ -17,12 +17,17 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
+-- NOTE: This file needs to be updated to accommodate new AST shapes.
+-- A portion of instances have been updated to include the Err functor; 
+-- remaining instances are to be updated once this is stable.
+
 module Language.Python.ScopeGraph
   ( scopeGraphModule
   ) where
 
 import qualified Analysis.Name as Name
 import           AST.Element
+import qualified AST.Parse as Parse
 import           Control.Effect.ScopeGraph
 import qualified Control.Effect.ScopeGraph.Properties.Declaration as Props
 import qualified Control.Effect.ScopeGraph.Properties.Function as Props
@@ -92,7 +97,7 @@ scopeGraphModule = getAp . scopeGraph
 instance ToScopeGraph Py.AssertStatement where scopeGraph = onChildren
 
 instance ToScopeGraph Py.Assignment where
-  scopeGraph (Py.Assignment ann (SingleIdentifier t) val _typ) = do
+  scopeGraph (Py.Assignment ann (Parse.Success (SingleIdentifier t)) val _typ) = do
     declare t Props.Declaration
       { Props.kind     = ScopeGraph.Assignment
       , Props.relation = ScopeGraph.Default
@@ -121,12 +126,12 @@ instance ToScopeGraph Py.BreakStatement where scopeGraph = mempty
 
 instance ToScopeGraph Py.Call where
   scopeGraph Py.Call
-    { function
-    , arguments = L1 Py.ArgumentList { extraChildren = args }
+    { function = Parse.Success f
+    , arguments = Parse.Success (L1 Py.ArgumentList { extraChildren = args })
     } = do
-      result <- scopeGraph function
+      result <- scopeGraph f
       let scopeGraphArg = \case
-            Prj expr -> scopeGraph @Py.Expression expr
+            EPrj expr -> scopeGraph @Py.Expression expr
             other    -> todo other
       args <- traverse scopeGraphArg args
       pure (result <> mconcat args)
@@ -160,7 +165,7 @@ deriving instance ToScopeGraph Py.Expression
 instance ToScopeGraph Py.ElseClause where scopeGraph = onField @"body"
 
 instance ToScopeGraph Py.ElifClause where
-  scopeGraph (Py.ElifClause _ body condition) = scopeGraph condition <> scopeGraph body
+  scopeGraph (Py.ElifClause _ (Parse.Success body) (Parse.Success condition)) = scopeGraph condition <> scopeGraph body
 
 instance ToScopeGraph Py.Ellipsis where scopeGraph = mempty
 
@@ -183,9 +188,9 @@ instance ToScopeGraph Py.ForStatement where scopeGraph = todo
 instance ToScopeGraph Py.FunctionDefinition where
   scopeGraph Py.FunctionDefinition
     { ann
-    , name       = Py.Identifier _ann1 name
-    , parameters = Py.Parameters _ann2 parameters
-    , body
+    , name       = Parse.Success (Py.Identifier _ann1 name)
+    , parameters = Parse.Success (Py.Parameters _ann2 parameters)
+    , body = Parse.Success b
     } = do
     (_, associatedScope) <- declareFunction (Just $ Name.name name) Props.Function
       { Props.kind = ScopeGraph.Function
@@ -207,7 +212,7 @@ instance ToScopeGraph Py.FunctionDefinition where
           let parameters' = catMaybes parameterMs
           paramDeclarations <- for parameters' $ \(pos, parameter) ->
             complete <* declare parameter (set span_ (pos^.span_) declProps)
-          bodyResult <- scopeGraph body
+          bodyResult <- scopeGraph b
           pure (mconcat paramDeclarations <> bodyResult)
 
 instance ToScopeGraph Py.FutureImportStatement where scopeGraph = todo
@@ -221,7 +226,7 @@ instance ToScopeGraph Py.Identifier where
     complete
 
 instance ToScopeGraph Py.IfStatement where
-  scopeGraph (Py.IfStatement _ alternative body condition)
+  scopeGraph (Py.IfStatement _ alternative (Parse.Success body) (Parse.Success condition))
     = scopeGraph condition
     <> scopeGraph body
     <> foldMap scopeGraph alternative
