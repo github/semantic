@@ -13,6 +13,10 @@ load(
     "haskell_cabal_binary",
     "haskell_cabal_library",
 )
+load(
+    "//:build/common.bzl",
+    "STANDARD_GHC_WARNINGS",
+)
 
 # haskell_toolchain_library can access builtin GHC packages
 # and assign them a bazel target name, so that they
@@ -23,8 +27,7 @@ haskell_toolchain_library(name = "base")
 haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
-    compiler_flags = ["-XOverloadedStrings"],
-    src_strip_prefix = "src",
+    compiler_flags = STANDARD_GHC_WARNINGS + ["-XOverloadedStrings"],
     deps = [
         ":base",
         "//semantic-analysis:lib",

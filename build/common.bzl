@@ -1,6 +1,7 @@
 # This file lets us share warnings and such across the project
 
 STANDARD_GHC_WARNINGS = [
+    "-O0",
     "-Weverything",
     "-Wno-missing-local-signatures",
     "-Wno-missing-import-lists",
