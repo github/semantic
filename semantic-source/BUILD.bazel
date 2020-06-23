@@ -54,6 +54,7 @@ haskell_test(
         "test/Source/Test.hs",
         "test/Test.hs",
     ],
+    compiler_flags = STANDARD_GHC_WARNINGS,
     src_strip_prefix = "test",
     deps = [
         ":base",
