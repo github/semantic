@@ -19,3 +19,7 @@ STANDARD_GHC_WARNINGS = [
     "-Wno-star-is-type",
     "-Wno-missing-deriving-strategies",
 ]
+
+STANDARD_EXECUTABLE_FLAGS = [
+    "-threaded",
+]

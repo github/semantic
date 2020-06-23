@@ -16,6 +16,7 @@ load(
 )
 load(
     "//:build/common.bzl",
+    "STANDARD_EXECUTABLE_FLAGS",
     "STANDARD_GHC_WARNINGS",
 )
 
@@ -117,7 +118,7 @@ haskell_library(
 haskell_binary(
     name = "exe",
     srcs = glob(["app/**/*.hs"]),
-    compiler_flags = STANDARD_GHC_WARNINGS + ["-XStrictData"],
+    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + ["-XStrictData"],
     deps = [
         ":base",
         "//semantic:lib",
@@ -133,7 +134,7 @@ haskell_test(
             "test/Examples.hs",
         ],
     ),
-    compiler_flags = STANDARD_GHC_WARNINGS + [
+    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + [
         "-XStrictData",
     ],
     data = glob(include = [
