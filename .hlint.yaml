@@ -59,6 +59,7 @@
     name: Reduce duplication
     within:
       - Semantic.Util
+      - Language.Ruby.Tags
 
 # hlint has issues with QuantifiedConstraints (see https://github.com/ndmitchell/hlint/issues/759)
 # Once the above is fixed, we can drop this error.
