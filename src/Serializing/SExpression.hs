@@ -11,7 +11,6 @@ module Serializing.SExpression
 
 import Analysis.ConstructorName
 import Data.ByteString.Builder
-import Data.Edit
 import Data.Functor.Foldable
 import Data.Term
 
