@@ -31,7 +31,6 @@ import           Data.Aeson
 import           Data.Bifunctor
 import qualified Data.ByteString.Lazy as BL
 import           Data.Edit
-import           Data.JSON.Fields
 import           Data.Maybe.Exts
 import           Data.Module
 import           Data.List  (stripPrefix)
@@ -99,9 +98,6 @@ pathKeyForBlobPair :: BlobPair -> FilePath
 pathKeyForBlobPair = mergeEdit combine . bimap blobFilePath blobFilePath where
    combine before after | before == after = after
                         | otherwise       = before <> " -> " <> after
-
-instance ToJSONFields Blob where
-  toJSONFields p = [ "path" .=  blobFilePath p, "language" .= blobLanguage p]
 
 decodeBlobPairs :: BL.ByteString -> Either String [BlobPair]
 decodeBlobPairs = fmap blobs <$> eitherDecode

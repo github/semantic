@@ -17,7 +17,7 @@ stability:           alpha
 extra-source-files:  README.md
 
 tested-with:
-  GHC == 8.6.5
+  GHC == 8.8.3
 
 common common
   default-language: Haskell2010
