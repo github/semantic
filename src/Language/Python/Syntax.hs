@@ -30,9 +30,7 @@ import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import           Data.JSON.Fields
 import qualified Data.Language as Language
-import           Diffing.Algorithm
 import           Source.Span
 import qualified System.Path as Path
 
@@ -104,7 +102,7 @@ resolvePythonModules q = do
       maybeM (throwResolutionError $ NotFoundError (Path.absRel path) searchPaths Language.Python) modulePath
 
 data Alias a = Alias { aliasValue :: a, aliasName :: a}
-  deriving (Generic1, Diffable, Foldable, FreeVariables1, Functor, Hashable1, ToJSONFields1, Traversable)
+  deriving (Generic1, Foldable, FreeVariables1, Functor, Hashable1, Traversable)
 
 instance Eq1 Alias where liftEq = genericLiftEq
 instance Ord1 Alias where liftCompare = genericLiftCompare
@@ -120,14 +118,14 @@ instance Evaluatable Alias where
 --
 -- If the list of symbols is empty copy everything to the calling environment.
 data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![a] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Traversable)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 newtype FutureImport a = FutureImport { futureImportSymbols :: [a] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Traversable)
 
 instance Eq1 FutureImport where liftEq = genericLiftEq
 instance Ord1 FutureImport where liftCompare = genericLiftCompare
@@ -199,7 +197,7 @@ instance Evaluatable Import where
     unit
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Foldable, FreeVariables1, Functor, Generic1, Traversable)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
@@ -242,7 +240,7 @@ instance Evaluatable QualifiedImport where
         fun (Map.singleton moduleScope moduleFrame)
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Traversable)
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
@@ -272,7 +270,7 @@ instance Evaluatable QualifiedAliasedImport where
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Traversable)
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
 instance Ord1 Ellipsis where liftCompare = genericLiftCompare
@@ -282,7 +280,7 @@ instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Ellipsis
 
 data Redirect a = Redirect { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Traversable)
 
 instance Eq1 Redirect where liftEq = genericLiftEq
 instance Ord1 Redirect where liftCompare = genericLiftCompare

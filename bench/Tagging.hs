@@ -9,7 +9,7 @@ import           Control.Carrier.Reader
 import           Control.Exception (throwIO)
 import           Control.Monad
 import           Data.Foldable
-import           Data.Language (PerLanguageModes (..), aLaCarteLanguageModes, preciseLanguageModes)
+import           Data.Language (PerLanguageModes (..), preciseLanguageModes)
 import           Gauge
 import           System.FilePath.Glob
 import qualified System.Path as Path
@@ -32,21 +32,18 @@ benchmarks = bgroup "tagging"
 pythonBenchmarks :: Benchmark
 pythonBenchmarks = bgroup "python"
   [ bench "precise" $ runTagging preciseLanguageModes pyDir "*.py"
-  , bench "a la carte" $ runTagging aLaCarteLanguageModes pyDir "*.py"
   ]
   where pyDir = Path.relDir "tmp/python-examples/keras/keras"
 
 goBenchmarks :: Benchmark
 goBenchmarks = bgroup "go"
   [ bench "precise" $ runTagging preciseLanguageModes dir "*.go"
-  , bench "a la carte" $ runTagging aLaCarteLanguageModes dir "*.go"
   ]
   where dir = Path.relDir "tmp/go-examples/go/src/database/sql"
 
 rubyBenchmarks :: Benchmark
 rubyBenchmarks = bgroup "ruby"
   [ bench "precise" $ runTagging preciseLanguageModes dir "*.rb"
-  , bench "a la carte" $ runTagging aLaCarteLanguageModes dir "*.rb"
   ]
   where dir = Path.relDir "tmp/ruby-examples/ruby_spec/command_line"
 

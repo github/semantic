@@ -3,23 +3,16 @@
 module Semantic.CLI (main) where
 
 import qualified Analysis.File as File
-import           Analysis.Project
 import qualified Control.Carrier.Parse.Measured as Parse
-import           Control.Carrier.Reader
 import           Control.Exception
-import           Control.Monad.IO.Class
-import           Data.Blob.IO
-import           Data.Either
 import qualified Data.Flag as Flag
 import           Data.Foldable
 import           Data.Handle
 import qualified Data.Language as Language
 import           Data.List (intercalate)
-import           Data.Maybe.Exts
 import           Options.Applicative hiding (style)
 import           Semantic.Api hiding (File)
 import           Semantic.Config
-import qualified Semantic.Graph as Graph
 import qualified Semantic.Task as Task
 import           Semantic.Task.Files
 import           Semantic.Telemetry
@@ -83,38 +76,19 @@ optionsParser = do
 
 argumentsParser :: Parser (Parse.ParseC Task.TaskC ())
 argumentsParser = do
-  subparser <- hsubparser (diffCommand <> parseCommand <> graphCommand)
+  subparser <- hsubparser parseCommand
   output <- ToPath <$> pathOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
   pure $ subparser >>= Task.write output
-
-diffCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
-diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
-  where
-    diffArgumentsParser = do
-      renderer <- flag  (parseDiffBuilder DiffSExpression) (parseDiffBuilder DiffSExpression) (long "sexpression" <> help "Output s-expression diff tree (default)")
-              <|> flag'                                    (parseDiffBuilder DiffJSONTree)    (long "json"        <> help "Output JSON diff trees")
-              <|> flag'                                    (parseDiffBuilder DiffJSONGraph)   (long "json-graph"  <> help "Output JSON diff trees")
-              <|> flag'                                    (parseDiffBuilder DiffDotGraph)    (long "dot"         <> help "Output the diff as a DOT graph")
-              <|> flag'                                    (parseDiffBuilder DiffShow)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      filesOrStdin <- Right <$> some ((,) <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
-      pure $ Task.readBlobPairs filesOrStdin >>= runReader Language.aLaCarteLanguageModes . renderer
 
 parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      languageModes <- languageModes
       renderer
         <-  flag  (parseTermBuilder TermSExpression)
                   (parseTermBuilder TermSExpression)
                   (  long "sexpression"
                   <> help "Output s-expression parse trees (default)")
-        <|> flag' (parseTermBuilder TermJSONTree)
-                  (  long "json"
-                  <> help "Output JSON parse trees")
-        <|> flag' (parseTermBuilder TermJSONGraph)
-                  (  long "json-graph"
-                  <> help "Output JSON adjacency list")
         <|> flag' (parseSymbolsBuilder JSON)
                   (  long "symbols"
                   <> long "json-symbols"
@@ -122,9 +96,6 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
         <|> flag' (parseSymbolsBuilder Proto)
                   (  long "proto-symbols"
                   <> help "Output protobufs symbol list")
-        <|> flag' (parseTermBuilder TermDotGraph)
-                  (  long "dot"
-                  <> help "Output DOT graph parse trees")
         <|> flag' (parseTermBuilder TermShow)
                   (  long "show"
                   <> help "Output using the Show instance (debug only, format subject to change without notice)")
@@ -133,57 +104,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                   <> help "Don't produce output, but show timing stats")
       filesOrStdin <- FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
                   <|> pure (FilesFromHandle stdin)
-      pure $ Task.readBlobs filesOrStdin >>= runReader languageModes . renderer
-
-graphCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
-graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or from a top-level entry point module"))
-  where
-    graphArgumentsParser = makeGraphTask
-      <$> graphType
-      <*> switch (long "packages" <> help "Include a vertex for the package, with edges from it to each module")
-      <*> serializer
-      <*> (readProjectRecursively <|> readProjectFromPaths)
-    graphType =  flag  Graph.ImportGraph Graph.ImportGraph (long "imports" <> help "Compute an import graph (default)")
-             <|> flag'                   Graph.CallGraph   (long "calls"   <> help "Compute a call graph")
-    serializer =  flag (Task.serialize (DOT Graph.style)) (Task.serialize (DOT Graph.style)) (long "dot"  <> help "Output in DOT graph format (default)")
-              <|> flag'                                   (Task.serialize JSON)              (long "json" <> help "Output JSON graph")
-              <|> flag'                                   (Task.serialize Show)              (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
-    readProjectFromPaths = makeReadProjectFromPathsTask
-      <$> (   Just <$> some (strArgument (metavar "FILES..."))
-          <|> flag' Nothing (long "stdin" <> help "Read a list of newline-separated paths to analyze from stdin."))
-    makeReadProjectFromPathsTask maybePaths = do
-      strPaths <- maybeM (liftIO (many getLine)) maybePaths
-      let paths = rights (Path.parse <$> strPaths)
-      blobs <- traverse readBlobFromPath paths
-      case paths of
-        (x:_) -> pure $! Project (Path.takeDirectory x) blobs (Language.forPath x) mempty
-        _     -> pure $! Project (Path.toAbsRel Path.rootDir) mempty Language.Unknown mempty
-
-    allLanguages = intercalate "|" . fmap show $ [Language.Go .. maxBound]
-    readProjectRecursively = makeReadProjectRecursivelyTask
-      <$> option auto (long "language" <> help "The language for the analysis." <> metavar allLanguages)
-      <*> optional (pathOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
-      <*> many (pathOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
-      <*> argument path (metavar "PATH")
-    makeReadProjectRecursivelyTask language rootDir excludeDirs dir = Task.readProject rootDir dir language excludeDirs
-    makeGraphTask graphType includePackages serializer projectTask = projectTask >>= Graph.runGraph graphType includePackages >>= serializer
-
-languageModes :: Parser Language.PerLanguageModes
-languageModes = Language.PerLanguageModes
-  <$> languageModeOption "python" "Python"
-  <*> languageModeOption "ruby" "Ruby"
-  <*> languageModeOption "go" "Go"
-  <*> languageModeOption "typescript" "TypeScript"
-  <*> languageModeOption "tsx" "TSX"
-  <*> languageModeOption "javascript" "JavaScript"
-  <*> languageModeOption "jsx" "JSX"
-  where
-    languageModeOption shortName fullName
-      = option auto (  long (shortName <> "-mode")
-                    <> help ("The AST representation to use for " <> fullName <> " sources")
-                    <> metavar "ALaCarte|Precise"
-                    <> value Language.Precise
-                    <> showDefault)
+      pure $ Task.readBlobs filesOrStdin >>= renderer
 
 filePathReader :: ReadM (File.File Language.Language)
 filePathReader = File.fromPath <$> path

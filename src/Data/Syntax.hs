@@ -17,12 +17,14 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Data.Syntax (module Data.Syntax) where
 
+
 import qualified Assigning.Assignment as Assignment
 import           Control.Abstract.Heap (deref, lookupSlot)
 import           Control.Abstract.ScopeGraph (Declaration (..), Reference (..), reference)
 import           Data.Abstract.Evaluatable hiding (Empty, Error)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Aeson as Aeson (ToJSON (..), object)
+import           Data.Aeson ((.=))
 import           Data.Bifunctor
 import qualified Data.Error as Error
 import           Data.Foldable
@@ -33,7 +35,6 @@ import           Data.Functor.Foldable (cata)
 import           Data.Hashable
 import           Data.Hashable.Lifted
 import           Data.Ix
-import           Data.JSON.Fields
 import           Data.List.NonEmpty (NonEmpty (..), nonEmpty)
 import           Data.Proxy
 import           Data.Semigroup (sconcat)
@@ -41,7 +42,6 @@ import qualified Data.Set as Set
 import           Data.Sum
 import           Data.Term
 import           Data.Text (Text)
-import           Diffing.Algorithm
 import           GHC.Generics
 import           GHC.Stack
 import           GHC.TypeLits
@@ -143,7 +143,7 @@ instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) whe
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier { name :: Name }
-  deriving (Diffable, Foldable, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Foldable, Functor, Generic1, Hashable1, Traversable)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
@@ -169,7 +169,7 @@ instance Declarations1 Identifier where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Traversable)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
@@ -182,7 +182,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Traversable)
 
 instance Eq1 Empty where liftEq = genericLiftEq
 instance Ord1 Empty where liftCompare = genericLiftCompare
@@ -193,7 +193,7 @@ instance Evaluatable Empty where
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Declarations1, Diffable, Foldable, FreeVariables1, Functor, Generic1, Hashable1, ToJSONFields1, Traversable)
+  deriving (Declarations1, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
@@ -257,16 +257,11 @@ instance (Error :< fs, Apply Foldable fs, Apply Functor fs) => HasErrors (Term (
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Foldable, FreeVariables1, Functor, Generic1, ToJSONFields1, Traversable)
+  deriving (Foldable, FreeVariables1, Functor, Generic1, Traversable)
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
-
-instance Diffable Context where
-  subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
-
-  equivalentBySubterm = Just . contextSubject
 
 instance Hashable1 Context where liftHashWithSalt = foldl
 

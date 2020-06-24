@@ -18,80 +18,42 @@ Run `semantic --help` for complete list of up-to-date options.
 
 #### Parse
 ```
-Usage: semantic parse ([--sexpression] | [--json] | [--json-graph] | [--symbols]
-                      | [--dot] | [--show] | [--quiet]) [FILES...]
+Usage: semantic parse [--sexpression | (--json-symbols|--symbols) |
+                        --proto-symbols | --show | --quiet] [FILES...]
   Generate parse trees for path(s)
 
 Available options:
   --sexpression            Output s-expression parse trees (default)
-  --json                   Output JSON parse trees
-  --json-graph             Output JSON adjacency list
-  --symbols                Output JSON symbol list
-  --dot                    Output DOT graph parse trees
+  --json-symbols,--symbols Output JSON symbol list
+  --proto-symbols          Output protobufs symbol list
   --show                   Output using the Show instance (debug only, format
                            subject to change without notice)
   --quiet                  Don't produce output, but show timing stats
+  -h,--help                Show this help text
    ```
-
-#### Diff
-```
-Usage: semantic diff ([--sexpression] | [--json] | [--json-graph] |
-                     [--dot] | [--show]) [FILE_A] [FILE_B]
-  Compute changes between paths
-
-Available options:
-  --sexpression            Output s-expression diff tree (default)
-  --json                   Output JSON diff trees
-  --json-graph             Output JSON diff trees
-  --dot                    Output the diff as a DOT graph
-  --show                   Output using the Show instance (debug only, format
-                           subject to change without notice)
-  ```
-
-#### Graph
-```
-Usage: semantic graph ([--imports] | [--calls]) [--packages] ([--dot] | [--json]
-                      | [--show]) ([--root DIR] [--exclude-dir DIR]
-                      DIR:LANGUAGE | FILE | --language ARG (FILES... | --stdin))
-  Compute a graph for a directory or from a top-level entry point module
-
-Available options:
-  --imports                Compute an import graph (default)
-  --calls                  Compute a call graph
-  --packages               Include a vertex for the package, with edges from it
-                           to each module
-  --dot                    Output in DOT graph format (default)
-  --json                   Output JSON graph
-  --show                   Output using the Show instance (debug only, format
-                           subject to change without notice)
-  --root DIR               Root directory of project. Optional, defaults to
-                           entry file/directory.
-  --exclude-dir DIR        Exclude a directory (e.g. vendor)
-  --language ARG           The language for the analysis.
-  --stdin                  Read a list of newline-separated paths to analyze
-                           from stdin.
-```
 
 ## Language support
 
-| Priority | Language       | Parse | Assign | Diff  | Symbols | Import graph | Call graph | Control flow graph |
-| :---:    | :------------- | :---: | :---:  | :---: | :---:   | :---:        | :---:      | :---:              |
-| 1        | Ruby           | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
-| 2        | JavaScript     | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
-| 3        | TypeScript     | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
-| 4        | Python         | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
-| 5        | Go             | ✅    | ✅     | ✅    | ✅      | ✅           | 🚧         |                    |
-|          | PHP            | 🚧    | 🚧     | 🚧    | 🚧      |              |            |                    |
-|          | Java           | 🚧    | N/A    | 🚧    | ✅      |              |            |                    |
-|          | JSON           | ✅    | N/A    | ✅    | N/A     | N/A          | N/A        |                    |
-|          | JSX            | ✅    | ✅     | ✅    |         |              |            |                    |
-|          | Haskell        | 🚧    | 🚧     | 🚧    | 🚧      |              |            |                    |
-|          | Markdown       | 🚧    | 🚧     | 🚧    | N/A     | N/A          | N/A        | &nbsp;             |
-|          | CodeQL         | ✅    | N/A    | 🚧    | ✅      |              |            |                    |
+| Language       | Parse | AST Symbols† | Stack graphs |
+| :------------- | :---: | :---:        | :---:        |
+| Ruby           | ✅    | ✅           | |
+| JavaScript     | ✅    | ✅           | |
+| TypeScript     | ✅    | ✅           | 🚧 |
+| Python         | ✅    | ✅           | 🚧 |
+| Go             | ✅    | ✅           | |
+| PHP            | ✅    | ✅           | |
+| Java           | 🚧    | ✅           | |
+| JSON           | ✅    | ⬜️           | ⬜️ |
+| JSX            | ✅    | ✅           | |
+| TSX            | ✅    | ✅           | |
+| CodeQL         | ✅    | ✅           | |
+| Haskell        | 🚧    | 🚧           | |
 
+† Used for [code navigation](https://help.github.com/en/github/managing-files-in-a-repository/navigating-code-on-github) on github.com.
 * ✅ — Supported
 * 🔶 — Partial support
 * 🚧 — Under development
+* ⬜ - N/A ️
 
 
 ## Development

@@ -24,13 +24,11 @@ module Data.Term
 ) where
 
 import           Control.Lens.Lens
-import           Data.Aeson
 import           Data.Bifoldable
 import           Data.Bifunctor
 import           Data.Bitraversable
 import           Data.Functor.Classes
 import           Data.Functor.Foldable
-import           Data.JSON.Fields
 import           Data.Sum
 import qualified Data.Sum as Sum
 import           GHC.Generics (Generic1)
@@ -141,21 +139,6 @@ instance Ord1 f => Ord2 (TermF f) where
 
 instance (Ord1 f, Ord a) => Ord1 (TermF f a) where
   liftCompare = liftCompare2 compare
-
-instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where
-  toJSON = object . toJSONFields
-  toEncoding = pairs . mconcat . toJSONFields
-
-instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Term f a) where
-  toJSONFields = toJSONFields . unTerm
-
-instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a b) where
-  toJSONFields (In a f) = toJSONFields1 f <> toJSONFields a
-
-instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (TermF f a b) where
-  toJSON = object . toJSONFields
-  toEncoding = pairs . mconcat . toJSONFields
-
 
 class IsTerm term where
   type Syntax term :: * -> *
