@@ -89,7 +89,6 @@ library
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Tracing
-                     , Analysis.ConstructorName
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
                      , Control.Abstract.Context
@@ -260,7 +259,6 @@ test-suite test
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Graph.Spec
-                     , Data.Mergeable
                      , Data.Language.Spec
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec
