@@ -37,6 +37,7 @@ common haskell
                      , tree-sitter ^>= 0.9
                      , tree-sitter-python ^>= 0.9.0.2
                      , containers
+                     , pathtype ^>= 0.8
   ghc-options:
     -Weverything
     -Wno-missing-local-signatures

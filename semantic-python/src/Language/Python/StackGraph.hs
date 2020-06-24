@@ -32,7 +32,7 @@ import AST.Element
 import AST.Element
 import qualified AST.Parse as Parse
 import qualified Analysis.Name as Name
-import Control.Effect.StackGraph
+import Control.Effect.Reader
 import Control.Effect.StackGraph
 import Control.Effect.State
 import Control.Monad ((<=<))
@@ -40,6 +40,8 @@ import Data.Bifunctor
 import Data.Foldable
 import Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as NonEmpty
+import Data.Module (ModuleInfo)
+import qualified Data.Module as Module
 import qualified Data.ScopeGraph as ScopeGraph
 import qualified Data.Text as Text
 import Data.Traversable
@@ -53,6 +55,7 @@ import Scope.Types as Scope
 import Source.Loc (Loc)
 import Source.Span (Pos (..), point)
 import qualified Stack.Graph as Stack
+import qualified System.Path as Path
 
 class FlattenEithers a r where
   flattenEithers :: a -> r
@@ -528,12 +531,14 @@ instance ToScopeGraph Py.Module where
     rootScope' <- rootScope
 
     -- TODO: Can probably be a newNodeWithName function
-    moduleScope <- scope (Name.name "__main__")
+    moduleInfo <- ask @ModuleInfo
+    let moduleName = Name.name . Text.pack . Path.toString . Path.takeBaseName $ Module.modulePath moduleInfo
+    moduleScope <- scope moduleName
     CurrentScope currentScope' <- currentScope
     modify (Stack.addEdge moduleScope currentScope')
     putCurrentScope moduleScope
 
-    declaration <- declare "__main__" P.INTERFACE ann
+    declaration <- declare moduleName P.INTERFACE ann
     modify (Stack.addEdge rootScope' declaration)
 
     _ <- mapM (scopeGraph <=< ensureAST) stmts

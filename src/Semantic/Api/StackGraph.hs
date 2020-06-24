@@ -36,6 +36,8 @@ import Data.Int
 import Data.Language
 import Data.Map.Strict (Map)
 import qualified Data.Maybe as Maybe
+import Data.Module (ModuleInfo)
+import qualified Data.Module as Module
 import Data.ProtoLens (defMessage)
 import Data.STRef
 import Data.Semilattice.Lower
@@ -203,7 +205,8 @@ graphForBlob blob =
   parseWith
     toStackGraphParsers
     ( \term -> do
-        eitherStackGraph <- ScopeGraph.runStackGraph lowerBound . Graph.scopeGraph $ term
+        let moduleInfo = Module.moduleInfo $ moduleForBlob Nothing blob term
+        eitherStackGraph <- ScopeGraph.runStackGraph moduleInfo . Graph.scopeGraph $ term
         either throw (pure . fst) eitherStackGraph
     )
     blob
