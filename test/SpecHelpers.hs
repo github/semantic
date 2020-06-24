@@ -23,9 +23,6 @@ import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
 import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Reader as X
-import           Control.Carrier.Resumable.Either
-import           Control.Carrier.State.Strict
-import qualified Control.Carrier.Trace.Ignoring as Trace.Ignoring
 import           Control.Exception (displayException)
 import           Control.Monad as X
 import           Data.Blob as X
@@ -43,7 +40,6 @@ import           Data.Monoid as X (First (..), Last (..), Monoid (..))
 import           Data.Proxy as X
 import           Data.Semigroup as X (Semigroup (..))
 import           Data.Semilattice.Lower as X
-import           Data.Sum as Sum
 import           Data.Term as X
 import           Data.Traversable as X (for)
 import           Debug.Trace as X (traceM, traceShowM)
@@ -63,7 +59,6 @@ import           Test.Hspec as X (Spec, SpecWith, around, context, describe, it,
 import           Test.Hspec.Expectations as X
 import           Test.Hspec.LeanCheck as X
 import           Test.LeanCheck as X
-import           Unsafe.Coerce (unsafeCoerce)
 
 instance Lower X.Span where
   lowerBound = Source.Span.point (Pos 1 1)

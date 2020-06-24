@@ -123,9 +123,7 @@ tsxSkips = Path.relFile <$>
 
 typescriptSkips :: [Path.RelFile]
 typescriptSkips = Path.relFile <$>
-  [
-  -- Parse errors
-  , "npm/node_modules/slide/lib/async-map-ordered.js"
+  [ "npm/node_modules/slide/lib/async-map-ordered.js"
   ]
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree

@@ -61,27 +61,6 @@ liftCons1 tiers f = mapT f tiers `addWeight` 1
 liftCons2 :: [Tier a] -> [Tier b] -> (a -> b -> c) -> [Tier c]
 liftCons2 tiers1 tiers2 f = mapT (uncurry f) (liftTiers2 tiers1 tiers2) `addWeight` 1
 
--- | Lifts a ternary constructor to a list of tiers, given lists of tiers for its arguments.
---
---   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
-liftCons3 :: [Tier a] -> [Tier b] -> [Tier c] -> (a -> b -> c -> d) -> [Tier d]
-liftCons3 tiers1 tiers2 tiers3 f = mapT (uncurry3 f) (tiers1 >< tiers2 >< tiers3) `addWeight` 1
-  where uncurry3 f (a, (b, c)) = f a b c
-
--- | Lifts a quaternary constructor to a list of tiers, given lists of tiers for its arguments.
---
---   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
-liftCons4 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier d] -> (a -> b -> c -> d -> e) -> [Tier e]
-liftCons4 tiers1 tiers2 tiers3 tiers4 f = mapT (uncurry4 f) (tiers1 >< tiers2 >< tiers3 >< tiers4) `addWeight` 1
-  where uncurry4 f (a, (b, (c, d))) = f a b c d
-
--- | Lifts a senary constructor to a list of tiers, given lists of tiers for its arguments.
---
---   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
-liftCons6 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier d] -> [Tier e] -> [Tier f] -> (a -> b -> c -> d -> e -> f -> g) -> [Tier g]
-liftCons6 tiers1 tiers2 tiers3 tiers4 tiers5 tiers6 f = mapT (uncurry6 f) (tiers1 >< tiers2 >< tiers3 >< tiers4 >< tiers5 >< tiers6) `addWeight` 1
-  where uncurry6 g (a, (b, (c, (d, (e, f))))) = g a b c d e f
-
 -- Instances
 
 instance Listable1 Maybe where

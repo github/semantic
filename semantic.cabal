@@ -209,6 +209,7 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  ghc-options:         -Werror
   other-modules:       Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Graph.Spec
@@ -267,8 +268,7 @@ benchmark benchmarks
   hs-source-dirs:      bench
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
-  other-modules:       Evaluation
-                     , Tagging
+  other-modules:       Tagging
   ghc-options:         -static
   build-depends:       base
                      , algebraic-graphs
