@@ -159,40 +159,6 @@ library
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      , Data.Term
-                     -- À la carte syntax types
-                     , Data.Syntax
-                     , Data.Syntax.Comment
-                     , Data.Syntax.Declaration
-                     , Data.Syntax.Directive
-                     , Data.Syntax.Expression
-                     , Data.Syntax.Literal
-                     , Data.Syntax.Statement
-                     , Data.Syntax.Type
-                     -- Language-specific grammar/syntax types, & assignments
-                     , Language.Go.Assignment
-                     , Language.Go.Syntax
-                     , Language.Go.Term
-                     , Language.Go.Type
-                     , Language.Ruby.Assignment
-                     , Language.Ruby.Syntax
-                     , Language.Ruby.Term
-                     , Language.TSX.Assignment
-                     , Language.TSX.Syntax
-                     , Language.TSX.Syntax.JSX
-                     , Language.TSX.Term
-                     , Language.TypeScript.Assignment
-                     , Language.TypeScript.Resolution
-                     , Language.TypeScript.Syntax
-                     , Language.TypeScript.Syntax.Import
-                     , Language.TypeScript.Syntax.JavaScript
-                     , Language.TypeScript.Syntax.TypeScript
-                     , Language.TypeScript.Syntax.Types
-                     , Language.TypeScript.Term
-                     , Language.PHP.Syntax
-                     , Language.PHP.Term
-                     , Language.Python.Assignment
-                     , Language.Python.Syntax
-                     , Language.Python.Term
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.Parser
