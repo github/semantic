@@ -16,9 +16,9 @@ module Semantic.Util
 import Prelude hiding (readFile)
 
 import           Analysis.File
-import           Control.Abstract
 import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Resumable.Either (SomeError (..))
+import           Control.Effect.Reader
 import           Control.Exception hiding (evaluate)
 import           Control.Monad
 import qualified Data.Language as Language

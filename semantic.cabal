@@ -82,26 +82,7 @@ common executable-flags
 library
   import:              haskell, dependencies
   hs-source-dirs:      src
-  exposed-modules:
-                     -- Analyses & term annotations
-                       Analysis.Abstract.Caching.FlowInsensitive
-                     , Analysis.Abstract.Caching.FlowSensitive
-                     , Analysis.Abstract.Collecting
-                     , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Tracing
-                     -- Control structures & interfaces for abstract interpretation
-                     , Control.Abstract
-                     , Control.Abstract.Context
-                     , Control.Abstract.Evaluator
-                     , Control.Abstract.Heap
-                     , Control.Abstract.Hole
-                     , Control.Abstract.Modules
-                     , Control.Abstract.Primitive
-                     , Control.Abstract.Roots
-                     , Control.Abstract.ScopeGraph
-                     , Control.Abstract.Value
-                     -- Carriers
-                     , Control.Carrier.Parse.Measured
+  exposed-modules:     Control.Carrier.Parse.Measured
                      , Control.Carrier.Parse.Simple
                      -- Effects
                      , Control.Effect.Interpose
@@ -109,27 +90,6 @@ library
                      , Control.Effect.REPL
                      , Control.Effect.Sum.Project
                      , Control.Effect.Timeout
-                     -- Datatypes for abstract interpretation
-                     , Data.Abstract.Address.Hole
-                     , Data.Abstract.Address.Monovariant
-                     , Data.Abstract.Address.Precise
-                     , Data.Abstract.BaseError
-                     , Data.Abstract.Declarations
-                     , Data.Abstract.Evaluatable
-                     , Data.Abstract.FreeVariables
-                     , Data.Abstract.AccessControls.Class
-                     , Data.Abstract.AccessControls.Instances
-                     , Data.Abstract.Heap
-                     , Data.Abstract.Live
-                     , Data.Abstract.Module
-                     , Data.Abstract.ModuleTable
-                     , Data.Abstract.Number
-                     , Data.Abstract.Package
-                     , Data.Abstract.Path
-                     , Data.Abstract.ScopeGraph
-                     , Data.Abstract.Value.Abstract
-                     , Data.Abstract.Value.Concrete
-                     , Data.Abstract.Value.Type
                      -- General datatype definitions & generic algorithms
                      , Data.AST
                      , Data.Blob
@@ -142,11 +102,9 @@ library
                      , Data.Graph.Algebraic
                      , Data.Handle
                      , Data.History
-                     , Data.ImportPath
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Maybe.Exts
-                     , Data.Quieterm
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      , Data.Term
@@ -154,8 +112,6 @@ library
                      -- Parser glue
                      , Parsing.Parser
                      , Parsing.TreeSitter
-                     -- High-level flow & operational functionality (logging, stats, etc.)
-                     , Semantic.Analysis
                      -- API
                      , Semantic.Api
                      , Semantic.Api.Bridge
@@ -253,10 +209,7 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Control.Abstract.Evaluator.Spec
-                     , Data.Abstract.Path.Spec
-                     , Data.Abstract.Name.Spec
-                     , Data.Functor.Classes.Generic.Spec
+  other-modules:       Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Graph.Spec
                      , Data.Language.Spec

@@ -2,9 +2,6 @@
 
 module Main (allTests, legacySpecs, main, tests) where
 
-import qualified Control.Abstract.Evaluator.Spec
-import qualified Data.Abstract.Name.Spec
-import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Graph.Spec
 import qualified Data.Language.Spec
@@ -51,10 +48,7 @@ allTests = do
 -- in your spec module and add it to the above 'tests' list.
 legacySpecs :: Spec
 legacySpecs = parallel $ do
-  describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
   describe "Data.Graph" Data.Graph.Spec.spec
-  describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
-  describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
   describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
   describe "Tags.Spec" Tags.Spec.spec
   describe "Semantic" Semantic.Spec.spec

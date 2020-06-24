@@ -16,7 +16,6 @@ module Data.Functor.Listable
 ) where
 
 import qualified Analysis.Name as Name
-import Data.Abstract.ScopeGraph (AccessControl(..))
 import Data.Bifunctor.Join
 import Data.Edit
 import qualified Data.Language as Language
@@ -122,9 +121,6 @@ instance Listable1 f => Listable1 (Term f) where
 
 instance (Listable1 f, Listable a) => Listable (Term f a) where
   tiers = tiers1
-
-instance Listable AccessControl where
-  tiers = cons0 Public \/ cons0 Protected \/ cons0 Private
 
 instance Listable2 Edit where
   liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Compare
