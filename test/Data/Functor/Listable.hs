@@ -21,7 +21,6 @@ import Data.Edit
 import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Text as T (Text, pack)
-import Data.Sum
 import Source.Loc
 import Source.Span
 import Test.LeanCheck
@@ -32,11 +31,6 @@ type Tier a = [a]
 class Listable1 l where
   -- | The tiers for @l :: * -> *@, parameterized by the tiers for @a :: *@.
   liftTiers :: [Tier a] -> [Tier (l a)]
-
--- | A suitable definition of 'tiers' for 'Listable1' type constructors parameterized by 'Listable' types.
-tiers1 :: (Listable a, Listable1 l) => [Tier (l a)]
-tiers1 = liftTiers tiers
-
 
 -- | Lifting of 'Listable' to @* -> * -> *@.
 class Listable2 l where
@@ -89,16 +83,6 @@ instance Listable2 Edit where
 
 instance (Listable a, Listable b) => Listable (Edit a b) where
   tiers = tiers2
-
-
-instance (Listable1 f, Listable1 (Sum (g ': fs))) => Listable1 (Sum (f ': g ': fs)) where
-  liftTiers tiers = (inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Sum (g ': fs) a)]) tiers))
-
-instance Listable1 f => Listable1 (Sum '[f]) where
-  liftTiers tiers = inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
-
-instance (Listable1 (Sum fs), Listable a) => Listable (Sum fs a) where
-  tiers = tiers1
 
 
 instance Listable Name.Name where

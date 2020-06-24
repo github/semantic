@@ -59,7 +59,6 @@ common dependencies
                      , fused-effects-resumable ^>= 0.1
                      , hashable >= 1.2.7 && < 1.4
                      , tree-sitter ^>= 0.9.0.1
-                     , mtl ^>= 2.2.2
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
                      , process ^>= 1.6.3.0
@@ -206,7 +205,6 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  ghc-options:         -Werror
   other-modules:       Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Graph.Spec

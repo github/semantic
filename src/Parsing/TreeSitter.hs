@@ -23,7 +23,6 @@ import           Data.Duration
 import           Data.Maybe.Exts
 import           Source.Loc
 import qualified Source.Source as Source
-import           Source.Span
 import qualified System.Timeout as System
 
 import qualified TreeSitter.Cursor as TS
