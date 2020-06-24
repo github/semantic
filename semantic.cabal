@@ -98,7 +98,6 @@ library
                      , Control.Abstract.Hole
                      , Control.Abstract.Modules
                      , Control.Abstract.Primitive
-                     , Control.Abstract.PythonPackage
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
