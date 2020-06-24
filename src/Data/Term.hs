@@ -23,6 +23,8 @@ module Data.Term
 , injectTerm
 ) where
 
+-- TODO remove this??
+
 import           Control.Lens.Lens
 import           Data.Bifoldable
 import           Data.Bifunctor

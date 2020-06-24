@@ -7,9 +7,7 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-exported-signatures -Wno-partial-type-signatures -O0 #-}
 module Semantic.Util
-  ( evaluateProject'
-  , justEvaluating
-  , mergeErrors
+  ( mergeErrors
   , reassociate
   , parseFile
   , parseFileQuiet
@@ -18,79 +16,19 @@ module Semantic.Util
 import Prelude hiding (readFile)
 
 import           Analysis.File
-import           Analysis.Project
-import           Control.Abstract
-import           Control.Carrier.Fresh.Strict
-import           Control.Carrier.Lift
 import           Control.Carrier.Parse.Simple
-import           Control.Carrier.Reader
 import           Control.Carrier.Resumable.Either (SomeError (..))
-import           Control.Carrier.State.Strict
-import           Control.Carrier.Trace.Printing
+import           Control.Effect.Reader
 import           Control.Exception hiding (evaluate)
-import           Control.Lens.Getter
 import           Control.Monad
-import           Data.Abstract.Address.Precise as Precise
-import           Data.Abstract.Evaluatable
-import           Data.Abstract.Module
-import qualified Data.Abstract.ModuleTable as ModuleTable
-import           Data.Abstract.Package
-import           Data.Abstract.Value.Concrete as Concrete
-import           Data.Blob.IO
-import           Data.Graph.Algebraic (topologicalSort)
 import qualified Data.Language as Language
-import           Data.List (uncons)
-import           Data.Maybe
 import           Data.Sum
 import           Parsing.Parser
-import           Semantic.Analysis
 import           Semantic.Config
-import           Semantic.Graph
 import           Semantic.Task
-import           Source.Span (HasSpan (..), Pos (..), point)
+import           Source.Span (Pos (..), point)
 import           System.Exit (die)
-import           System.FilePath.Posix (takeDirectory)
 import qualified System.Path as Path
-
-justEvaluating :: Evaluator term Precise (Value term Precise) _ result
-               -> IO ( Heap Precise Precise (Value term Precise),
-                     ( ScopeGraph Precise
-                     , Either (SomeError (Sum _)) result)
-                     )
-justEvaluating
-  = runM
-  . runEvaluator
-  . raiseHandler runTrace
-  . runHeap
-  . runScopeGraph
-  . raiseHandler (fmap snd . runFresh 0)
-  . fmap reassociate
-  . runLoadError
-  . runUnspecialized
-  . runScopeError
-  . runHeapError
-  . runEvalError
-  . runResolutionError
-  . runAddressError
-  . runValueError
-
--- Evaluate a project consisting of the listed paths.
-evaluateProject' session proxy parser paths = do
-  let lang = Language.reflect proxy
-  res <- runTask session $ asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout $ do
-    blobs <- catMaybes <$> traverse readBlobFromFile (fileForPath <$> paths)
-    package <- fmap snd <$> parsePackage parser (Project (Path.absRel $ takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
-    modules <- topologicalSort <$> runImportGraphToModules proxy package
-    trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-    pure (package, modules)
-  (package, modules) <- either (die . displayException) pure res
-  let initialSpan = point (Pos 1 1)
-  pure (runModuleTable
-       (runModules (ModuleTable.modulePaths (packageModules package))
-       (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (evalState initialSpan)
-       (raiseHandler (runReader initialSpan)
-       (evaluate proxy (runDomainEffects (evalTerm (withTermSpans (^. span_)))) modules))))))
 
 parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
 parseFile      parser = runTask'     . (parse parser <=< readBlob . fileForPath)

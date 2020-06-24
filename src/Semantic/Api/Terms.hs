@@ -23,12 +23,8 @@ import Control.Monad.IO.Class
 import Data.Blob
 import Data.ByteString.Builder
 import Data.Either
-import Data.Functor.Classes
-import Data.Functor.Foldable
 import Data.Language
 import Data.Map.Strict (Map)
-import Data.Quieterm
-import Data.Term
 import qualified Language.CodeQL as CodeQL
 import qualified Language.Go as Go
 import qualified Language.JSON as JSON
@@ -42,7 +38,6 @@ import Parsing.Parser
 import Semantic.Config
 import Semantic.Task
 import Serializing.Format hiding (JSON)
-import qualified Serializing.SExpression as SExpr
 import qualified Serializing.SExpression.Precise as SExpr.Precise (serializeSExpression)
 import Source.Loc
 
@@ -107,10 +102,6 @@ instance ShowTermBy 'Precise TSX.Term where
 instance ShowTermBy 'Precise TypeScript.Term where
   showTermBy = serialize Show . void . TypeScript.getTerm
 
-instance (Recursive (term Loc), Show1 syntax, Base (term Loc) ~ TermF syntax Loc) => ShowTermBy 'ALaCarte term where
-  showTermBy = serialize Show . quieterm
-
-
 sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)
 sexprTermParsers = preciseParsers
 
@@ -149,6 +140,3 @@ instance SExprTermBy 'Precise TSX.Term where
 
 instance SExprTermBy 'Precise TypeScript.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . TypeScript.getTerm
-
-instance (Recursive (term Loc), SExpr.ToSExpression (Base (term Loc))) => SExprTermBy 'ALaCarte term where
-  sexprTermBy = SExpr.serializeSExpression ByConstructorName

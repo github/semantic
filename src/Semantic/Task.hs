@@ -68,7 +68,7 @@ import           Semantic.Distribute
 import           Semantic.Resolution
 import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
-import           Serializing.Format hiding (Options)
+import           Serializing.Format
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskC

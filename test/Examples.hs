@@ -69,12 +69,6 @@ goFileSkips = Path.relPath <$>
   , "moby/vendor/golang.org/x/text/unicode/norm/tables9.0.0.go"
   , "moby/vendor/golang.org/x/text/unicode/norm/tables10.0.0.go"
 
-  -- Assignment timeouts
-  , "go/src/cmd/compile/internal/gc/constFold_test.go"
-  , "go/src/cmd/compile/internal/gc/testdata/arithConst.go"
-  , "moby/vendor/github.com/docker/swarmkit/api/types.pb.go"
-  , "moby/vendor/github.com/docker/swarmkit/api/control.pb.go"
-
   -- Parser timeouts
   , "moby/vendor/github.com/ugorji/go/codec/fast-path.generated.go"
 
@@ -86,9 +80,6 @@ goFileSkips = Path.relPath <$>
   , "go/src/cmd/vet/testdata/testingpkg/tests_test.go"
   , "moby/vendor/github.com/beorn7/perks/quantile/stream.go" -- Unhandled identifier character: 'ƒ'
 
-  -- A la carte struggles on these
-  , "src/cmd/go/testdata/src/notest/hello.go" -- a la carte chokes on ParseError
-  , "go/src/cmd/asm/internal/asm/parse.go" -- a la carte spans are off on line 1124
   ]
 
 goDirSkips :: [Path.RelDir]
@@ -101,12 +92,7 @@ goDirSkips = Path.relDir <$>
   ]
 
 pythonFileSkips :: [Path.RelFile]
-pythonFileSkips = Path.relPath <$>
-  [
-  -- Assignment doesn't handle f-strings
-    "thealgorithms/analysis/compression_analysis/psnr.py"
-  , "thealgorithms/maths/greater_common_divisor.py"
-  ]
+pythonFileSkips = []
 
 rubySkips :: [Path.RelFile]
 rubySkips = Path.relFile <$>
@@ -137,22 +123,7 @@ tsxSkips = Path.relFile <$>
 
 typescriptSkips :: [Path.RelFile]
 typescriptSkips = Path.relFile <$>
-  [
-  -- Assignment timeouts
-    "npm/node_modules/request/node_modules/http-signature/node_modules/sshpk/node_modules/tweetnacl/nacl-fast.js"
-  , "npm/node_modules/cli-table2/test/cell-test.js"
-  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/regenerator.min.js"
-  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/ajv.bundle.js"
-  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/ajv.min.js"
-  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/nodent.min.js"
-  , "npm/node_modules/bluebird/js/browser/bluebird.js"
-  , "npm/node_modules/bluebird/js/browser/bluebird.min.js"
-  , "npm/node_modules/bluebird/js/browser/bluebird.core.js"
-  , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
-  , "npm/node_modules/cli-table2/node_modules/lodash/index.js"
-
-  -- Parse errors
-  , "npm/node_modules/slide/lib/async-map-ordered.js"
+  [ "npm/node_modules/slide/lib/async-map-ordered.js"
   ]
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree

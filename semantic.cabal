@@ -82,34 +82,7 @@ common executable-flags
 library
   import:              haskell, dependencies
   hs-source-dirs:      src
-  exposed-modules:
-                     -- Analyses & term annotations
-                       Analysis.Abstract.Caching.FlowInsensitive
-                     , Analysis.Abstract.Caching.FlowSensitive
-                     , Analysis.Abstract.Collecting
-                     , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Graph
-                     , Analysis.Abstract.Tracing
-                     , Analysis.ConstructorName
-                     , Analysis.CyclomaticComplexity
-                     , Analysis.HasTextElement
-                     -- Semantic assignment
-                     , Assigning.Assignment
-                     , Assigning.Assignment.Table
-                     -- Control structures & interfaces for abstract interpretation
-                     , Control.Abstract
-                     , Control.Abstract.Context
-                     , Control.Abstract.Evaluator
-                     , Control.Abstract.Heap
-                     , Control.Abstract.Hole
-                     , Control.Abstract.Modules
-                     , Control.Abstract.Primitive
-                     , Control.Abstract.PythonPackage
-                     , Control.Abstract.Roots
-                     , Control.Abstract.ScopeGraph
-                     , Control.Abstract.Value
-                     -- Carriers
-                     , Control.Carrier.Parse.Measured
+  exposed-modules:     Control.Carrier.Parse.Measured
                      , Control.Carrier.Parse.Simple
                      -- Effects
                      , Control.Effect.Interpose
@@ -117,27 +90,6 @@ library
                      , Control.Effect.REPL
                      , Control.Effect.Sum.Project
                      , Control.Effect.Timeout
-                     -- Datatypes for abstract interpretation
-                     , Data.Abstract.Address.Hole
-                     , Data.Abstract.Address.Monovariant
-                     , Data.Abstract.Address.Precise
-                     , Data.Abstract.BaseError
-                     , Data.Abstract.Declarations
-                     , Data.Abstract.Evaluatable
-                     , Data.Abstract.FreeVariables
-                     , Data.Abstract.AccessControls.Class
-                     , Data.Abstract.AccessControls.Instances
-                     , Data.Abstract.Heap
-                     , Data.Abstract.Live
-                     , Data.Abstract.Module
-                     , Data.Abstract.ModuleTable
-                     , Data.Abstract.Number
-                     , Data.Abstract.Package
-                     , Data.Abstract.Path
-                     , Data.Abstract.ScopeGraph
-                     , Data.Abstract.Value.Abstract
-                     , Data.Abstract.Value.Concrete
-                     , Data.Abstract.Value.Type
                      -- General datatype definitions & generic algorithms
                      , Data.AST
                      , Data.Blob
@@ -148,57 +100,18 @@ library
                      , Data.Flag
                      , Data.Functor.Classes.Generic
                      , Data.Graph.Algebraic
-                     , Data.Graph.ControlFlowVertex
                      , Data.Handle
                      , Data.History
-                     , Data.ImportPath
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Maybe.Exts
-                     , Data.Quieterm
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      , Data.Term
-                     -- À la carte syntax types
-                     , Data.Syntax
-                     , Data.Syntax.Comment
-                     , Data.Syntax.Declaration
-                     , Data.Syntax.Directive
-                     , Data.Syntax.Expression
-                     , Data.Syntax.Literal
-                     , Data.Syntax.Statement
-                     , Data.Syntax.Type
-                     -- Language-specific grammar/syntax types, & assignments
-                     , Language.Go.Assignment
-                     , Language.Go.Syntax
-                     , Language.Go.Term
-                     , Language.Go.Type
-                     , Language.Ruby.Assignment
-                     , Language.Ruby.Syntax
-                     , Language.Ruby.Term
-                     , Language.TSX.Assignment
-                     , Language.TSX.Syntax
-                     , Language.TSX.Syntax.JSX
-                     , Language.TSX.Term
-                     , Language.TypeScript.Assignment
-                     , Language.TypeScript.Resolution
-                     , Language.TypeScript.Syntax
-                     , Language.TypeScript.Syntax.Import
-                     , Language.TypeScript.Syntax.JavaScript
-                     , Language.TypeScript.Syntax.TypeScript
-                     , Language.TypeScript.Syntax.Types
-                     , Language.TypeScript.Term
-                     , Language.PHP.Syntax
-                     , Language.PHP.Term
-                     , Language.Python.Assignment
-                     , Language.Python.Syntax
-                     , Language.Python.Term
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.Parser
                      , Parsing.TreeSitter
-                     -- High-level flow & operational functionality (logging, stats, etc.)
-                     , Semantic.Analysis
                      -- API
                      , Semantic.Api
                      , Semantic.Api.Bridge
@@ -209,7 +122,6 @@ library
                      , Semantic.Config
                      , Semantic.Distribute
                      , Semantic.Env
-                     , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Resolution
                      , Semantic.Task
@@ -224,7 +136,6 @@ library
                      , Semantic.Version
                      -- Serialization
                      , Serializing.Format
-                     , Serializing.SExpression
                      , Serializing.SExpression.Precise
                      -- Custom Prelude
   autogen-modules:     Paths_semantic
@@ -298,24 +209,13 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Analysis.Go.Spec
-                     , Analysis.PHP.Spec
-                     , Analysis.Python.Spec
-                     , Analysis.Ruby.Spec
-                     , Analysis.TypeScript.Spec
-                     , Assigning.Assignment.Spec
-                     , Control.Abstract.Evaluator.Spec
-                     , Data.Abstract.Path.Spec
-                     , Data.Abstract.Name.Spec
-                     , Data.Functor.Classes.Generic.Spec
+  ghc-options:         -Werror
+  other-modules:       Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Graph.Spec
-                     , Data.Mergeable
                      , Data.Language.Spec
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec
-                     , Data.Term.Spec
-                     , Graphing.Calls.Spec
                      , Integration.Spec
                      , Numeric.Spec
                      , Parsing.Spec
@@ -368,8 +268,7 @@ benchmark benchmarks
   hs-source-dirs:      bench
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
-  other-modules:       Evaluation
-                     , Tagging
+  other-modules:       Tagging
   ghc-options:         -static
   build-depends:       base
                      , algebraic-graphs
