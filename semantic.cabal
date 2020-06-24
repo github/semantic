@@ -90,8 +90,6 @@ library
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
-                     , Analysis.CyclomaticComplexity
-                     , Analysis.HasTextElement
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
                      , Control.Abstract.Context
@@ -170,7 +168,6 @@ library
                      , Semantic.Config
                      , Semantic.Distribute
                      , Semantic.Env
-                     , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Resolution
                      , Semantic.Task
@@ -185,7 +182,6 @@ library
                      , Semantic.Version
                      -- Serialization
                      , Serializing.Format
-                     , Serializing.SExpression
                      , Serializing.SExpression.Precise
                      -- Custom Prelude
   autogen-modules:     Paths_semantic
