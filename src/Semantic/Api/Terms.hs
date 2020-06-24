@@ -42,7 +42,6 @@ import Parsing.Parser
 import Semantic.Config
 import Semantic.Task
 import Serializing.Format hiding (JSON)
-import qualified Serializing.SExpression as SExpr
 import qualified Serializing.SExpression.Precise as SExpr.Precise (serializeSExpression)
 import Source.Loc
 
@@ -149,6 +148,3 @@ instance SExprTermBy 'Precise TSX.Term where
 
 instance SExprTermBy 'Precise TypeScript.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . TypeScript.getTerm
-
-instance (Recursive (term Loc), SExpr.ToSExpression (Base (term Loc))) => SExprTermBy 'ALaCarte term where
-  sexprTermBy = SExpr.serializeSExpression ByConstructorName

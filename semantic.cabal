@@ -182,7 +182,6 @@ library
                      , Semantic.Version
                      -- Serialization
                      , Serializing.Format
-                     , Serializing.SExpression
                      , Serializing.SExpression.Precise
                      -- Custom Prelude
   autogen-modules:     Paths_semantic

@@ -18,7 +18,7 @@ import           Semantic.Task.Files
 import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
-import           Serializing.Format hiding (Options)
+import           Serializing.Format
 import           System.Exit (die)
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
