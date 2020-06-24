@@ -17,7 +17,6 @@ module Control.Carrier.Parse.Simple
 , module Control.Effect.Parse
 ) where
 
-import qualified Assigning.Assignment as Assignment
 import           Control.Algebra
 import           Control.Carrier.Reader
 import           Control.Effect.Error
@@ -58,9 +57,6 @@ runParser timeout blob@Blob{..} parser = case parser of
   UnmarshalParser language ->
     parseToPreciseAST timeout timeout language blob
       >>= either (throwError . SomeException) pure
-
-  AssignmentParser    parser assignment ->
-    runParser timeout blob parser >>= either (throwError . toException) pure . Assignment.assign    blobSource assignment
 
 newtype ParseFailure = ParseFailure String
   deriving (Show)

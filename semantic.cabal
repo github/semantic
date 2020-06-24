@@ -88,7 +88,6 @@ library
                      , Analysis.Abstract.Caching.FlowSensitive
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Graph
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
@@ -145,7 +144,6 @@ library
                      , Data.Flag
                      , Data.Functor.Classes.Generic
                      , Data.Graph.Algebraic
-                     , Data.Graph.ControlFlowVertex
                      , Data.Handle
                      , Data.History
                      , Data.ImportPath
@@ -277,7 +275,6 @@ test-suite test
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec
                      , Data.Term.Spec
-                     , Graphing.Calls.Spec
                      , Integration.Spec
                      , Numeric.Spec
                      , Parsing.Spec

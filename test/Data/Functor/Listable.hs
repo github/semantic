@@ -22,10 +22,6 @@ import Data.Bifunctor.Join
 import Data.Edit
 import qualified Data.Language as Language
 import Data.List.NonEmpty
-import qualified Data.Syntax as Syntax
-import qualified Data.Syntax.Comment as Comment
-import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Statement as Statement
 import Data.Term
 import Data.Text as T (Text, pack)
 import Data.Sum
@@ -147,38 +143,6 @@ instance Listable1 f => Listable1 (Sum '[f]) where
 instance (Listable1 (Sum fs), Listable a) => Listable (Sum fs a) where
   tiers = tiers1
 
-
-instance Listable1 Comment.Comment where
-  liftTiers _ = cons1 Comment.Comment
-
-instance Listable1 Declaration.Function where
-  liftTiers tiers = liftCons4 (liftTiers tiers) tiers (liftTiers tiers) tiers Declaration.Function
-
-instance Listable1 Declaration.Method where
-  liftTiers tiers' = liftCons6 (liftTiers tiers') tiers' tiers' (liftTiers tiers') tiers' tiers Declaration.Method
-
-instance Listable1 Statement.If where
-  liftTiers tiers = liftCons3 tiers tiers tiers Statement.If
-
-instance Listable1 Syntax.Context where
-  liftTiers tiers = liftCons2 (liftTiers tiers) tiers Syntax.Context
-
-instance Listable1 Syntax.Empty where
-  liftTiers _ = cons0 Syntax.Empty
-
-instance Listable1 Syntax.Identifier where
-  liftTiers _ = cons1 Syntax.Identifier
-
-type ListableSyntax = Sum
-  '[ Comment.Comment
-   , Declaration.Function
-   , Declaration.Method
-   , Statement.If
-   , Syntax.Context
-   , Syntax.Empty
-   , Syntax.Identifier
-   , []
-   ]
 
 instance Listable Name.Name where
   tiers = cons1 Name.name
