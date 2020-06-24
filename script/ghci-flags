@@ -38,10 +38,10 @@ function flags {
   echo "-hidir $build_products_dir"
   echo "-stubdir $build_products_dir"
 
-  if [ -d "$build_dir/semantic-0.10.0.0/build/autogen" ]
-  then add_autogen_includes "$build_dir/semantic-0.10.0.0/build/autogen"
-  elif [ -d "$build_dir/semantic-0.10.0.0/noopt/build/autogen" ]
-  then add_autogen_includes "$build_dir/semantic-0.10.0.0/noopt/build/autogen"
+  if [ -d "$build_dir/semantic-0.11.0.0/build/autogen" ]
+  then add_autogen_includes "$build_dir/semantic-0.11.0.0/build/autogen"
+  elif [ -d "$build_dir/semantic-0.11.0.0/noopt/build/autogen" ]
+  then add_autogen_includes "$build_dir/semantic-0.11.0.0/noopt/build/autogen"
   fi
 
   echo "-optP-Wno-macro-redefined"

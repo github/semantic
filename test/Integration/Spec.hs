@@ -28,19 +28,11 @@ testsForLanguage language = do
   localOption (mkTimeout 3000000) $ testGroup (Path.toString language) $ fmap testForExample items
 {-# NOINLINE testsForLanguage #-}
 
-data Example = DiffExample Path.RelFile Path.RelFile Path.RelFile
-             | ParseExample Path.RelFile Path.RelFile
+data Example = ParseExample Path.RelFile Path.RelFile
              deriving (Eq, Show)
 
 testForExample :: (?session :: TaskSession) => Example -> TestTree
-testForExample = \case
-  DiffExample fileA fileB diffOutput ->
-    goldenVsStringDiff
-      ("diffs " <> Path.toString diffOutput)
-      (\ref new -> ["git", "diff", ref, new])
-      (Path.toString diffOutput)
-      (BL.fromStrict <$> diffFilePaths ?session fileA fileB)
-  ParseExample file parseOutput ->
+testForExample (ParseExample file parseOutput) =
     goldenVsStringDiff
       ("parses " <> Path.toString parseOutput)
       (\ref new -> ["git", "diff", ref, new])
@@ -65,17 +57,12 @@ examples directory = do
   bs <- globFor "*.B.*"
   sExpAs <- globFor "*.parseA.txt"
   sExpBs <- globFor "*.parseB.txt"
-  sExpDiffsAB <- globFor "*.diffA-B.txt"
-  sExpDiffsBA <- globFor "*.diffB-A.txt"
 
-  let exampleDiff lefts rights out name = DiffExample (lookupNormalized name lefts) (lookupNormalized name rights) out
   let exampleParse files out name = ParseExample (lookupNormalized name files) out
 
   let keys = (normalizeName <$> as) `union` (normalizeName <$> bs)
   pure $ merge [ getExamples (exampleParse as) sExpAs keys
-               , getExamples (exampleParse bs) sExpBs keys
-               , getExamples (exampleDiff as bs) sExpDiffsAB keys
-               , getExamples (exampleDiff bs as) sExpDiffsBA keys ]
+               , getExamples (exampleParse bs) sExpBs keys ]
   where
     merge = concat . transpose
     -- Only returns examples if they exist

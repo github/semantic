@@ -19,8 +19,7 @@ import Test.Tasty.Golden
 
 testTree :: TestTree
 testTree = testGroup "Semantic.CLI"
-  [ testGroup "parseDiffBuilder" $ fmap testForDiffFixture diffFixtures
-  , testGroup "parseTermBuilder" $ fmap testForParseFixture parseFixtures
+  [ testGroup "parseTermBuilder" $ fmap testForParseFixture parseFixtures
   ]
 
 -- We provide this function to the golden tests so as to have better
@@ -36,14 +35,6 @@ renderDiff ref new = unsafePerformIO $ do
     else ["git", "diff", ref, new]
 {-# NOINLINE renderDiff #-}
 
-testForDiffFixture :: (String, [BlobPair] -> ParseC TaskC Builder, [(File Language, File Language)], Path.RelFile) -> TestTree
-testForDiffFixture (diffRenderer, runDiff, files, expected) =
-  goldenVsStringDiff
-    ("diff fixture renders to " <> diffRenderer <> " " <> show files)
-    renderDiff
-    (Path.toString expected)
-    (fmap toLazyByteString . runTaskOrDie $ readBlobPairs (Right files) >>= runDiff)
-
 testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile) -> TestTree
 testForParseFixture (format, runParse, files, expected) =
   goldenVsStringDiff
@@ -55,22 +46,10 @@ testForParseFixture (format, runParse, files, expected) =
 parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile)]
 parseFixtures =
   [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.relFile "test/fixtures/ruby/corpus/and-or.parseA.txt")
-  , ("json", run . parseTermBuilder TermJSONTree, path, prefix </> Path.file "parse-tree.json")
-  , ("json", run . parseTermBuilder TermJSONTree, path', prefix </> Path.file "parse-trees.json")
-  , ("json", run . parseTermBuilder TermJSONTree, [], prefix </> Path.file "parse-tree-empty.json")
   , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> Path.file "parse-tree.symbols.json")
   , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> Path.file "parse-tree.symbols.protobuf.bin")
   ]
   where path = [File (Path.absRel "test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby]
-        path' = [File (Path.absRel "test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby, File (Path.absRel"test/fixtures/ruby/corpus/and-or.B.rb") lowerBound Ruby]
         path'' = [File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
         prefix = Path.relDir "test/fixtures/cli"
         run = runReader defaultLanguageModes
-
-diffFixtures :: [(String, [BlobPair] -> ParseC TaskC Builder, [(File Language, File Language)], Path.RelFile)]
-diffFixtures =
-  [ ("json diff", parseDiffBuilder DiffJSONTree, pathMode, prefix </> Path.file "diff-tree.json")
-  , ("s-expression diff", parseDiffBuilder DiffSExpression, pathMode, Path.relFile "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
-  ]
-  where pathMode = [(File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby, File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.B.rb") lowerBound Ruby)]
-        prefix = Path.relDir "test/fixtures/cli"

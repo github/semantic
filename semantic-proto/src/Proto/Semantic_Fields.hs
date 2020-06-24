@@ -27,30 +27,6 @@ import qualified Data.ProtoLens.Runtime.Data.Vector as Data.Vector
 import qualified Data.ProtoLens.Runtime.Data.Vector.Generic as Data.Vector.Generic
 import qualified Data.ProtoLens.Runtime.Data.Vector.Unboxed as Data.Vector.Unboxed
 import qualified Data.ProtoLens.Runtime.Text.Read as Text.Read
-afterSpan ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "afterSpan" a) =>
-  Lens.Family2.LensLike' f s a
-afterSpan = Data.ProtoLens.Field.field @"afterSpan"
-afterTerm ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "afterTerm" a) =>
-  Lens.Family2.LensLike' f s a
-afterTerm = Data.ProtoLens.Field.field @"afterTerm"
-beforeSpan ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "beforeSpan" a) =>
-  Lens.Family2.LensLike' f s a
-beforeSpan = Data.ProtoLens.Field.field @"beforeSpan"
-beforeTerm ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "beforeTerm" a) =>
-  Lens.Family2.LensLike' f s a
-beforeTerm = Data.ProtoLens.Field.field @"beforeTerm"
 blobOid ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "blobOid" a) =>
@@ -71,17 +47,6 @@ content ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "content" a) =>
   Lens.Family2.LensLike' f s a
 content = Data.ProtoLens.Field.field @"content"
-deleted ::
-  forall f s a.
-  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "deleted" a) =>
-  Lens.Family2.LensLike' f s a
-deleted = Data.ProtoLens.Field.field @"deleted"
-diffVertexId ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "diffVertexId" a) =>
-  Lens.Family2.LensLike' f s a
-diffVertexId = Data.ProtoLens.Field.field @"diffVertexId"
 docs ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "docs" a) =>
@@ -146,12 +111,6 @@ id ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "id" a) =>
   Lens.Family2.LensLike' f s a
 id = Data.ProtoLens.Field.field @"id"
-inserted ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "inserted" a) =>
-  Lens.Family2.LensLike' f s a
-inserted = Data.ProtoLens.Field.field @"inserted"
 kind ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "kind" a) =>
@@ -168,30 +127,6 @@ line ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "line" a) =>
   Lens.Family2.LensLike' f s a
 line = Data.ProtoLens.Field.field @"line"
-maybe'afterSpan ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "maybe'afterSpan" a) =>
-  Lens.Family2.LensLike' f s a
-maybe'afterSpan = Data.ProtoLens.Field.field @"maybe'afterSpan"
-maybe'beforeSpan ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "maybe'beforeSpan" a) =>
-  Lens.Family2.LensLike' f s a
-maybe'beforeSpan = Data.ProtoLens.Field.field @"maybe'beforeSpan"
-maybe'deleted ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "maybe'deleted" a) =>
-  Lens.Family2.LensLike' f s a
-maybe'deleted = Data.ProtoLens.Field.field @"maybe'deleted"
-maybe'diffTerm ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "maybe'diffTerm" a) =>
-  Lens.Family2.LensLike' f s a
-maybe'diffTerm = Data.ProtoLens.Field.field @"maybe'diffTerm"
 maybe'docs ::
   forall f s a.
   (Prelude.Functor f,
@@ -204,24 +139,6 @@ maybe'end ::
    Data.ProtoLens.Field.HasField s "maybe'end" a) =>
   Lens.Family2.LensLike' f s a
 maybe'end = Data.ProtoLens.Field.field @"maybe'end"
-maybe'inserted ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "maybe'inserted" a) =>
-  Lens.Family2.LensLike' f s a
-maybe'inserted = Data.ProtoLens.Field.field @"maybe'inserted"
-maybe'merged ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "maybe'merged" a) =>
-  Lens.Family2.LensLike' f s a
-maybe'merged = Data.ProtoLens.Field.field @"maybe'merged"
-maybe'replaced ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "maybe'replaced" a) =>
-  Lens.Family2.LensLike' f s a
-maybe'replaced = Data.ProtoLens.Field.field @"maybe'replaced"
 maybe'span ::
   forall f s a.
   (Prelude.Functor f,
@@ -234,11 +151,6 @@ maybe'start ::
    Data.ProtoLens.Field.HasField s "maybe'start" a) =>
   Lens.Family2.LensLike' f s a
 maybe'start = Data.ProtoLens.Field.field @"maybe'start"
-merged ::
-  forall f s a.
-  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "merged" a) =>
-  Lens.Family2.LensLike' f s a
-merged = Data.ProtoLens.Field.field @"merged"
 name ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "name" a) =>
@@ -265,12 +177,6 @@ paths ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "paths" a) =>
   Lens.Family2.LensLike' f s a
 paths = Data.ProtoLens.Field.field @"paths"
-replaced ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "replaced" a) =>
-  Lens.Family2.LensLike' f s a
-replaced = Data.ProtoLens.Field.field @"replaced"
 service ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "service" a) =>
@@ -281,11 +187,6 @@ sha ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "sha" a) =>
   Lens.Family2.LensLike' f s a
 sha = Data.ProtoLens.Field.field @"sha"
-source ::
-  forall f s a.
-  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "source" a) =>
-  Lens.Family2.LensLike' f s a
-source = Data.ProtoLens.Field.field @"source"
 span ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "span" a) =>
@@ -331,16 +232,6 @@ syntaxType ::
    Data.ProtoLens.Field.HasField s "syntaxType" a) =>
   Lens.Family2.LensLike' f s a
 syntaxType = Data.ProtoLens.Field.field @"syntaxType"
-target ::
-  forall f s a.
-  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "target" a) =>
-  Lens.Family2.LensLike' f s a
-target = Data.ProtoLens.Field.field @"target"
-term ::
-  forall f s a.
-  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "term" a) =>
-  Lens.Family2.LensLike' f s a
-term = Data.ProtoLens.Field.field @"term"
 timestamp ::
   forall f s a.
   (Prelude.Functor f,
@@ -358,12 +249,6 @@ vec'blobs ::
    Data.ProtoLens.Field.HasField s "vec'blobs" a) =>
   Lens.Family2.LensLike' f s a
 vec'blobs = Data.ProtoLens.Field.field @"vec'blobs"
-vec'edges ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "vec'edges" a) =>
-  Lens.Family2.LensLike' f s a
-vec'edges = Data.ProtoLens.Field.field @"vec'edges"
 vec'endingScopeStack ::
   forall f s a.
   (Prelude.Functor f,
@@ -415,21 +300,3 @@ vec'symbols ::
    Data.ProtoLens.Field.HasField s "vec'symbols" a) =>
   Lens.Family2.LensLike' f s a
 vec'symbols = Data.ProtoLens.Field.field @"vec'symbols"
-vec'vertices ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "vec'vertices" a) =>
-  Lens.Family2.LensLike' f s a
-vec'vertices = Data.ProtoLens.Field.field @"vec'vertices"
-vertexId ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "vertexId" a) =>
-  Lens.Family2.LensLike' f s a
-vertexId = Data.ProtoLens.Field.field @"vertexId"
-vertices ::
-  forall f s a.
-  (Prelude.Functor f,
-   Data.ProtoLens.Field.HasField s "vertices" a) =>
-  Lens.Family2.LensLike' f s a
-vertices = Data.ProtoLens.Field.field @"vertices"

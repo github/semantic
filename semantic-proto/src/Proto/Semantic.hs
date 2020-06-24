@@ -4,19 +4,13 @@
 {-# OPTIONS_GHC -Wno-duplicate-exports#-}
 {-# OPTIONS_GHC -Wno-dodgy-exports#-}
 module Proto.Semantic (
-        Blob(), DeletedTerm(), DiffTreeEdge(), DiffTreeFileGraph(),
-        DiffTreeGraphResponse(), DiffTreeVertex(),
-        DiffTreeVertex'DiffTerm(..), _DiffTreeVertex'Deleted,
-        _DiffTreeVertex'Inserted, _DiffTreeVertex'Replaced,
-        _DiffTreeVertex'Merged, Docstring(), File(), InsertedTerm(),
-        MergedTerm(), NodeType(..), NodeType(), NodeType'UnrecognizedValue,
-        ParseError(), ParseTreeFileGraph(), ParseTreeGraphResponse(),
-        ParseTreeRequest(), ParseTreeSymbolResponse(), PingRequest(),
-        PingResponse(), Position(), ReplacedTerm(), Span(),
-        StackGraphFile(), StackGraphNode(), StackGraphPath(),
-        StackGraphRequest(), StackGraphResponse(), Symbol(),
-        SyntaxType(..), SyntaxType(), SyntaxType'UnrecognizedValue,
-        TermEdge(), TermVertex()
+        Blob(), Docstring(), File(), NodeType(..), NodeType(),
+        NodeType'UnrecognizedValue, ParseError(), ParseTreeRequest(),
+        ParseTreeSymbolResponse(), PingRequest(), PingResponse(),
+        Position(), Span(), StackGraphFile(), StackGraphNode(),
+        StackGraphPath(), StackGraphRequest(), StackGraphResponse(),
+        Symbol(), SyntaxType(..), SyntaxType(),
+        SyntaxType'UnrecognizedValue
     ) where
 import qualified Data.ProtoLens.Runtime.Control.DeepSeq as Control.DeepSeq
 import qualified Data.ProtoLens.Runtime.Data.ProtoLens.Prism as Data.ProtoLens.Prism
@@ -260,1248 +254,6 @@ instance Control.DeepSeq.NFData Blob where
                 (Control.DeepSeq.deepseq
                    (_Blob'path x__)
                    (Control.DeepSeq.deepseq (_Blob'language x__) ())))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.term' @:: Lens' DeletedTerm Data.Text.Text@
-         * 'Proto.Semantic_Fields.span' @:: Lens' DeletedTerm Span@
-         * 'Proto.Semantic_Fields.maybe'span' @:: Lens' DeletedTerm (Prelude.Maybe Span)@ -}
-data DeletedTerm
-  = DeletedTerm'_constructor {_DeletedTerm'term :: !Data.Text.Text,
-                              _DeletedTerm'span :: !(Prelude.Maybe Span),
-                              _DeletedTerm'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show DeletedTerm where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField DeletedTerm "term" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DeletedTerm'term (\ x__ y__ -> x__ {_DeletedTerm'term = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField DeletedTerm "span" Span where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DeletedTerm'span (\ x__ y__ -> x__ {_DeletedTerm'span = y__}))
-        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
-instance Data.ProtoLens.Field.HasField DeletedTerm "maybe'span" (Prelude.Maybe Span) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DeletedTerm'span (\ x__ y__ -> x__ {_DeletedTerm'span = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message DeletedTerm where
-  messageName _ = Data.Text.pack "github.semantic.DeletedTerm"
-  packedMessageDescriptor _
-    = "\n\
-      \\vDeletedTerm\DC2\DC2\n\
-      \\EOTterm\CAN\SOH \SOH(\tR\EOTterm\DC2)\n\
-      \\EOTspan\CAN\STX \SOH(\v2\NAK.github.semantic.SpanR\EOTspan"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        term__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "term"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"term")) ::
-              Data.ProtoLens.FieldDescriptor DeletedTerm
-        span__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "span"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor Span)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'span")) ::
-              Data.ProtoLens.FieldDescriptor DeletedTerm
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, term__field_descriptor),
-           (Data.ProtoLens.Tag 2, span__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _DeletedTerm'_unknownFields
-        (\ x__ y__ -> x__ {_DeletedTerm'_unknownFields = y__})
-  defMessage
-    = DeletedTerm'_constructor
-        {_DeletedTerm'term = Data.ProtoLens.fieldDefault,
-         _DeletedTerm'span = Prelude.Nothing,
-         _DeletedTerm'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          DeletedTerm -> Data.ProtoLens.Encoding.Bytes.Parser DeletedTerm
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "term"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"term") y x)
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "span"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"span") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "DeletedTerm"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"term") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                      ((Prelude..)
-                         (\ bs
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                         Data.Text.Encoding.encodeUtf8
-                         _v))
-             ((Data.Monoid.<>)
-                (case
-                     Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'span") _x
-                 of
-                   Prelude.Nothing -> Data.Monoid.mempty
-                   (Prelude.Just _v)
-                     -> (Data.Monoid.<>)
-                          (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                          ((Prelude..)
-                             (\ bs
-                                -> (Data.Monoid.<>)
-                                     (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                        (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                     (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                             Data.ProtoLens.encodeMessage
-                             _v))
-                (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                   (Lens.Family2.view Data.ProtoLens.unknownFields _x)))
-instance Control.DeepSeq.NFData DeletedTerm where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_DeletedTerm'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_DeletedTerm'term x__)
-                (Control.DeepSeq.deepseq (_DeletedTerm'span x__) ()))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.source' @:: Lens' DiffTreeEdge Data.Int.Int32@
-         * 'Proto.Semantic_Fields.target' @:: Lens' DiffTreeEdge Data.Int.Int32@ -}
-data DiffTreeEdge
-  = DiffTreeEdge'_constructor {_DiffTreeEdge'source :: !Data.Int.Int32,
-                               _DiffTreeEdge'target :: !Data.Int.Int32,
-                               _DiffTreeEdge'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show DiffTreeEdge where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField DiffTreeEdge "source" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeEdge'source
-           (\ x__ y__ -> x__ {_DiffTreeEdge'source = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField DiffTreeEdge "target" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeEdge'target
-           (\ x__ y__ -> x__ {_DiffTreeEdge'target = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message DiffTreeEdge where
-  messageName _ = Data.Text.pack "github.semantic.DiffTreeEdge"
-  packedMessageDescriptor _
-    = "\n\
-      \\fDiffTreeEdge\DC2\SYN\n\
-      \\ACKsource\CAN\SOH \SOH(\ENQR\ACKsource\DC2\SYN\n\
-      \\ACKtarget\CAN\STX \SOH(\ENQR\ACKtarget"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        source__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "source"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"source")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeEdge
-        target__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "target"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"target")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeEdge
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, source__field_descriptor),
-           (Data.ProtoLens.Tag 2, target__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _DiffTreeEdge'_unknownFields
-        (\ x__ y__ -> x__ {_DiffTreeEdge'_unknownFields = y__})
-  defMessage
-    = DiffTreeEdge'_constructor
-        {_DiffTreeEdge'source = Data.ProtoLens.fieldDefault,
-         _DiffTreeEdge'target = Data.ProtoLens.fieldDefault,
-         _DiffTreeEdge'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          DiffTreeEdge -> Data.ProtoLens.Encoding.Bytes.Parser DiffTreeEdge
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        8 -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "source"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"source") y x)
-                        16
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "target"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"target") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "DiffTreeEdge"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let
-                _v = Lens.Family2.view (Data.ProtoLens.Field.field @"source") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 8)
-                      ((Prelude..)
-                         Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
-             ((Data.Monoid.<>)
-                (let
-                   _v = Lens.Family2.view (Data.ProtoLens.Field.field @"target") _x
-                 in
-                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                       Data.Monoid.mempty
-                   else
-                       (Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.putVarInt 16)
-                         ((Prelude..)
-                            Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
-                (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                   (Lens.Family2.view Data.ProtoLens.unknownFields _x)))
-instance Control.DeepSeq.NFData DiffTreeEdge where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_DiffTreeEdge'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_DiffTreeEdge'source x__)
-                (Control.DeepSeq.deepseq (_DiffTreeEdge'target x__) ()))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.path' @:: Lens' DiffTreeFileGraph Data.Text.Text@
-         * 'Proto.Semantic_Fields.language' @:: Lens' DiffTreeFileGraph Data.Text.Text@
-         * 'Proto.Semantic_Fields.vertices' @:: Lens' DiffTreeFileGraph [DiffTreeVertex]@
-         * 'Proto.Semantic_Fields.vec'vertices' @:: Lens' DiffTreeFileGraph (Data.Vector.Vector DiffTreeVertex)@
-         * 'Proto.Semantic_Fields.edges' @:: Lens' DiffTreeFileGraph [DiffTreeEdge]@
-         * 'Proto.Semantic_Fields.vec'edges' @:: Lens' DiffTreeFileGraph (Data.Vector.Vector DiffTreeEdge)@
-         * 'Proto.Semantic_Fields.errors' @:: Lens' DiffTreeFileGraph [ParseError]@
-         * 'Proto.Semantic_Fields.vec'errors' @:: Lens' DiffTreeFileGraph (Data.Vector.Vector ParseError)@ -}
-data DiffTreeFileGraph
-  = DiffTreeFileGraph'_constructor {_DiffTreeFileGraph'path :: !Data.Text.Text,
-                                    _DiffTreeFileGraph'language :: !Data.Text.Text,
-                                    _DiffTreeFileGraph'vertices :: !(Data.Vector.Vector DiffTreeVertex),
-                                    _DiffTreeFileGraph'edges :: !(Data.Vector.Vector DiffTreeEdge),
-                                    _DiffTreeFileGraph'errors :: !(Data.Vector.Vector ParseError),
-                                    _DiffTreeFileGraph'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show DiffTreeFileGraph where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField DiffTreeFileGraph "path" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeFileGraph'path
-           (\ x__ y__ -> x__ {_DiffTreeFileGraph'path = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField DiffTreeFileGraph "language" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeFileGraph'language
-           (\ x__ y__ -> x__ {_DiffTreeFileGraph'language = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField DiffTreeFileGraph "vertices" [DiffTreeVertex] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeFileGraph'vertices
-           (\ x__ y__ -> x__ {_DiffTreeFileGraph'vertices = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField DiffTreeFileGraph "vec'vertices" (Data.Vector.Vector DiffTreeVertex) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeFileGraph'vertices
-           (\ x__ y__ -> x__ {_DiffTreeFileGraph'vertices = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField DiffTreeFileGraph "edges" [DiffTreeEdge] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeFileGraph'edges
-           (\ x__ y__ -> x__ {_DiffTreeFileGraph'edges = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField DiffTreeFileGraph "vec'edges" (Data.Vector.Vector DiffTreeEdge) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeFileGraph'edges
-           (\ x__ y__ -> x__ {_DiffTreeFileGraph'edges = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField DiffTreeFileGraph "errors" [ParseError] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeFileGraph'errors
-           (\ x__ y__ -> x__ {_DiffTreeFileGraph'errors = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField DiffTreeFileGraph "vec'errors" (Data.Vector.Vector ParseError) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeFileGraph'errors
-           (\ x__ y__ -> x__ {_DiffTreeFileGraph'errors = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message DiffTreeFileGraph where
-  messageName _ = Data.Text.pack "github.semantic.DiffTreeFileGraph"
-  packedMessageDescriptor _
-    = "\n\
-      \\DC1DiffTreeFileGraph\DC2\DC2\n\
-      \\EOTpath\CAN\SOH \SOH(\tR\EOTpath\DC2\SUB\n\
-      \\blanguage\CAN\STX \SOH(\tR\blanguage\DC2;\n\
-      \\bvertices\CAN\ETX \ETX(\v2\US.github.semantic.DiffTreeVertexR\bvertices\DC23\n\
-      \\ENQedges\CAN\EOT \ETX(\v2\GS.github.semantic.DiffTreeEdgeR\ENQedges\DC23\n\
-      \\ACKerrors\CAN\ENQ \ETX(\v2\ESC.github.semantic.ParseErrorR\ACKerrors"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        path__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "path"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"path")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeFileGraph
-        language__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "language"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"language")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeFileGraph
-        vertices__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "vertices"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor DiffTreeVertex)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked
-                 (Data.ProtoLens.Field.field @"vertices")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeFileGraph
-        edges__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "edges"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor DiffTreeEdge)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"edges")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeFileGraph
-        errors__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "errors"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor ParseError)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"errors")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeFileGraph
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, path__field_descriptor),
-           (Data.ProtoLens.Tag 2, language__field_descriptor),
-           (Data.ProtoLens.Tag 3, vertices__field_descriptor),
-           (Data.ProtoLens.Tag 4, edges__field_descriptor),
-           (Data.ProtoLens.Tag 5, errors__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _DiffTreeFileGraph'_unknownFields
-        (\ x__ y__ -> x__ {_DiffTreeFileGraph'_unknownFields = y__})
-  defMessage
-    = DiffTreeFileGraph'_constructor
-        {_DiffTreeFileGraph'path = Data.ProtoLens.fieldDefault,
-         _DiffTreeFileGraph'language = Data.ProtoLens.fieldDefault,
-         _DiffTreeFileGraph'vertices = Data.Vector.Generic.empty,
-         _DiffTreeFileGraph'edges = Data.Vector.Generic.empty,
-         _DiffTreeFileGraph'errors = Data.Vector.Generic.empty,
-         _DiffTreeFileGraph'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          DiffTreeFileGraph
-          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld DiffTreeEdge
-             -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld ParseError
-                -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld DiffTreeVertex
-                   -> Data.ProtoLens.Encoding.Bytes.Parser DiffTreeFileGraph
-        loop x mutable'edges mutable'errors mutable'vertices
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do frozen'edges <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'edges)
-                      frozen'errors <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                         (Data.ProtoLens.Encoding.Growing.unsafeFreeze
-                                            mutable'errors)
-                      frozen'vertices <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                           (Data.ProtoLens.Encoding.Growing.unsafeFreeze
-                                              mutable'vertices)
-                      (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields
-                           (\ !t -> Prelude.reverse t)
-                           (Lens.Family2.set
-                              (Data.ProtoLens.Field.field @"vec'edges")
-                              frozen'edges
-                              (Lens.Family2.set
-                                 (Data.ProtoLens.Field.field @"vec'errors")
-                                 frozen'errors
-                                 (Lens.Family2.set
-                                    (Data.ProtoLens.Field.field @"vec'vertices")
-                                    frozen'vertices
-                                    x))))
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "path"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"path") y x)
-                                  mutable'edges
-                                  mutable'errors
-                                  mutable'vertices
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "language"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"language") y x)
-                                  mutable'edges
-                                  mutable'errors
-                                  mutable'vertices
-                        26
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "vertices"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'vertices y)
-                                loop x mutable'edges mutable'errors v
-                        34
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "edges"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'edges y)
-                                loop x v mutable'errors mutable'vertices
-                        42
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "errors"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'errors y)
-                                loop x mutable'edges v mutable'vertices
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-                                  mutable'edges
-                                  mutable'errors
-                                  mutable'vertices
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do mutable'edges <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                 Data.ProtoLens.Encoding.Growing.new
-              mutable'errors <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                  Data.ProtoLens.Encoding.Growing.new
-              mutable'vertices <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                    Data.ProtoLens.Encoding.Growing.new
-              loop
-                Data.ProtoLens.defMessage
-                mutable'edges
-                mutable'errors
-                mutable'vertices)
-          "DiffTreeFileGraph"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"path") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                      ((Prelude..)
-                         (\ bs
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                         Data.Text.Encoding.encodeUtf8
-                         _v))
-             ((Data.Monoid.<>)
-                (let
-                   _v = Lens.Family2.view (Data.ProtoLens.Field.field @"language") _x
-                 in
-                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                       Data.Monoid.mempty
-                   else
-                       (Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                         ((Prelude..)
-                            (\ bs
-                               -> (Data.Monoid.<>)
-                                    (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                       (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                    (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                            Data.Text.Encoding.encodeUtf8
-                            _v))
-                ((Data.Monoid.<>)
-                   (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                      (\ _v
-                         -> (Data.Monoid.<>)
-                              (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
-                              ((Prelude..)
-                                 (\ bs
-                                    -> (Data.Monoid.<>)
-                                         (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                            (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                         (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                 Data.ProtoLens.encodeMessage
-                                 _v))
-                      (Lens.Family2.view
-                         (Data.ProtoLens.Field.field @"vec'vertices") _x))
-                   ((Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                         (\ _v
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
-                                 ((Prelude..)
-                                    (\ bs
-                                       -> (Data.Monoid.<>)
-                                            (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                               (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                            (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                    Data.ProtoLens.encodeMessage
-                                    _v))
-                         (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'edges") _x))
-                      ((Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                            (\ _v
-                               -> (Data.Monoid.<>)
-                                    (Data.ProtoLens.Encoding.Bytes.putVarInt 42)
-                                    ((Prelude..)
-                                       (\ bs
-                                          -> (Data.Monoid.<>)
-                                               (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                                  (Prelude.fromIntegral
-                                                     (Data.ByteString.length bs)))
-                                               (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                       Data.ProtoLens.encodeMessage
-                                       _v))
-                            (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'errors") _x))
-                         (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                            (Lens.Family2.view Data.ProtoLens.unknownFields _x))))))
-instance Control.DeepSeq.NFData DiffTreeFileGraph where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_DiffTreeFileGraph'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_DiffTreeFileGraph'path x__)
-                (Control.DeepSeq.deepseq
-                   (_DiffTreeFileGraph'language x__)
-                   (Control.DeepSeq.deepseq
-                      (_DiffTreeFileGraph'vertices x__)
-                      (Control.DeepSeq.deepseq
-                         (_DiffTreeFileGraph'edges x__)
-                         (Control.DeepSeq.deepseq (_DiffTreeFileGraph'errors x__) ())))))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.files' @:: Lens' DiffTreeGraphResponse [DiffTreeFileGraph]@
-         * 'Proto.Semantic_Fields.vec'files' @:: Lens' DiffTreeGraphResponse (Data.Vector.Vector DiffTreeFileGraph)@ -}
-data DiffTreeGraphResponse
-  = DiffTreeGraphResponse'_constructor {_DiffTreeGraphResponse'files :: !(Data.Vector.Vector DiffTreeFileGraph),
-                                        _DiffTreeGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show DiffTreeGraphResponse where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField DiffTreeGraphResponse "files" [DiffTreeFileGraph] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeGraphResponse'files
-           (\ x__ y__ -> x__ {_DiffTreeGraphResponse'files = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField DiffTreeGraphResponse "vec'files" (Data.Vector.Vector DiffTreeFileGraph) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeGraphResponse'files
-           (\ x__ y__ -> x__ {_DiffTreeGraphResponse'files = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message DiffTreeGraphResponse where
-  messageName _
-    = Data.Text.pack "github.semantic.DiffTreeGraphResponse"
-  packedMessageDescriptor _
-    = "\n\
-      \\NAKDiffTreeGraphResponse\DC28\n\
-      \\ENQfiles\CAN\SOH \ETX(\v2\".github.semantic.DiffTreeFileGraphR\ENQfiles"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        files__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "files"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor DiffTreeFileGraph)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"files")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeGraphResponse
-      in
-        Data.Map.fromList [(Data.ProtoLens.Tag 1, files__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _DiffTreeGraphResponse'_unknownFields
-        (\ x__ y__ -> x__ {_DiffTreeGraphResponse'_unknownFields = y__})
-  defMessage
-    = DiffTreeGraphResponse'_constructor
-        {_DiffTreeGraphResponse'files = Data.Vector.Generic.empty,
-         _DiffTreeGraphResponse'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          DiffTreeGraphResponse
-          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld DiffTreeFileGraph
-             -> Data.ProtoLens.Encoding.Bytes.Parser DiffTreeGraphResponse
-        loop x mutable'files
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do frozen'files <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'files)
-                      (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields
-                           (\ !t -> Prelude.reverse t)
-                           (Lens.Family2.set
-                              (Data.ProtoLens.Field.field @"vec'files") frozen'files x))
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "files"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'files y)
-                                loop x v
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-                                  mutable'files
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do mutable'files <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                 Data.ProtoLens.Encoding.Growing.new
-              loop Data.ProtoLens.defMessage mutable'files)
-          "DiffTreeGraphResponse"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                (\ _v
-                   -> (Data.Monoid.<>)
-                        (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                        ((Prelude..)
-                           (\ bs
-                              -> (Data.Monoid.<>)
-                                   (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                      (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                   (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                           Data.ProtoLens.encodeMessage
-                           _v))
-                (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'files") _x))
-             (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                (Lens.Family2.view Data.ProtoLens.unknownFields _x))
-instance Control.DeepSeq.NFData DiffTreeGraphResponse where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_DiffTreeGraphResponse'_unknownFields x__)
-             (Control.DeepSeq.deepseq (_DiffTreeGraphResponse'files x__) ())
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.diffVertexId' @:: Lens' DiffTreeVertex Data.Int.Int32@
-         * 'Proto.Semantic_Fields.maybe'diffTerm' @:: Lens' DiffTreeVertex (Prelude.Maybe DiffTreeVertex'DiffTerm)@
-         * 'Proto.Semantic_Fields.maybe'deleted' @:: Lens' DiffTreeVertex (Prelude.Maybe DeletedTerm)@
-         * 'Proto.Semantic_Fields.deleted' @:: Lens' DiffTreeVertex DeletedTerm@
-         * 'Proto.Semantic_Fields.maybe'inserted' @:: Lens' DiffTreeVertex (Prelude.Maybe InsertedTerm)@
-         * 'Proto.Semantic_Fields.inserted' @:: Lens' DiffTreeVertex InsertedTerm@
-         * 'Proto.Semantic_Fields.maybe'replaced' @:: Lens' DiffTreeVertex (Prelude.Maybe ReplacedTerm)@
-         * 'Proto.Semantic_Fields.replaced' @:: Lens' DiffTreeVertex ReplacedTerm@
-         * 'Proto.Semantic_Fields.maybe'merged' @:: Lens' DiffTreeVertex (Prelude.Maybe MergedTerm)@
-         * 'Proto.Semantic_Fields.merged' @:: Lens' DiffTreeVertex MergedTerm@ -}
-data DiffTreeVertex
-  = DiffTreeVertex'_constructor {_DiffTreeVertex'diffVertexId :: !Data.Int.Int32,
-                                 _DiffTreeVertex'diffTerm :: !(Prelude.Maybe DiffTreeVertex'DiffTerm),
-                                 _DiffTreeVertex'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show DiffTreeVertex where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-data DiffTreeVertex'DiffTerm
-  = DiffTreeVertex'Deleted !DeletedTerm |
-    DiffTreeVertex'Inserted !InsertedTerm |
-    DiffTreeVertex'Replaced !ReplacedTerm |
-    DiffTreeVertex'Merged !MergedTerm
-  deriving stock (Prelude.Show, Prelude.Eq, Prelude.Ord)
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "diffVertexId" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffVertexId
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffVertexId = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "maybe'diffTerm" (Prelude.Maybe DiffTreeVertex'DiffTerm) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffTerm
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffTerm = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "maybe'deleted" (Prelude.Maybe DeletedTerm) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffTerm
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffTerm = y__}))
-        (Lens.Family2.Unchecked.lens
-           (\ x__
-              -> case x__ of
-                   (Prelude.Just (DiffTreeVertex'Deleted x__val))
-                     -> Prelude.Just x__val
-                   _otherwise -> Prelude.Nothing)
-           (\ _ y__ -> Prelude.fmap DiffTreeVertex'Deleted y__))
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "deleted" DeletedTerm where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffTerm
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffTerm = y__}))
-        ((Prelude..)
-           (Lens.Family2.Unchecked.lens
-              (\ x__
-                 -> case x__ of
-                      (Prelude.Just (DiffTreeVertex'Deleted x__val))
-                        -> Prelude.Just x__val
-                      _otherwise -> Prelude.Nothing)
-              (\ _ y__ -> Prelude.fmap DiffTreeVertex'Deleted y__))
-           (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage))
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "maybe'inserted" (Prelude.Maybe InsertedTerm) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffTerm
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffTerm = y__}))
-        (Lens.Family2.Unchecked.lens
-           (\ x__
-              -> case x__ of
-                   (Prelude.Just (DiffTreeVertex'Inserted x__val))
-                     -> Prelude.Just x__val
-                   _otherwise -> Prelude.Nothing)
-           (\ _ y__ -> Prelude.fmap DiffTreeVertex'Inserted y__))
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "inserted" InsertedTerm where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffTerm
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffTerm = y__}))
-        ((Prelude..)
-           (Lens.Family2.Unchecked.lens
-              (\ x__
-                 -> case x__ of
-                      (Prelude.Just (DiffTreeVertex'Inserted x__val))
-                        -> Prelude.Just x__val
-                      _otherwise -> Prelude.Nothing)
-              (\ _ y__ -> Prelude.fmap DiffTreeVertex'Inserted y__))
-           (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage))
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "maybe'replaced" (Prelude.Maybe ReplacedTerm) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffTerm
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffTerm = y__}))
-        (Lens.Family2.Unchecked.lens
-           (\ x__
-              -> case x__ of
-                   (Prelude.Just (DiffTreeVertex'Replaced x__val))
-                     -> Prelude.Just x__val
-                   _otherwise -> Prelude.Nothing)
-           (\ _ y__ -> Prelude.fmap DiffTreeVertex'Replaced y__))
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "replaced" ReplacedTerm where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffTerm
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffTerm = y__}))
-        ((Prelude..)
-           (Lens.Family2.Unchecked.lens
-              (\ x__
-                 -> case x__ of
-                      (Prelude.Just (DiffTreeVertex'Replaced x__val))
-                        -> Prelude.Just x__val
-                      _otherwise -> Prelude.Nothing)
-              (\ _ y__ -> Prelude.fmap DiffTreeVertex'Replaced y__))
-           (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage))
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "maybe'merged" (Prelude.Maybe MergedTerm) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffTerm
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffTerm = y__}))
-        (Lens.Family2.Unchecked.lens
-           (\ x__
-              -> case x__ of
-                   (Prelude.Just (DiffTreeVertex'Merged x__val))
-                     -> Prelude.Just x__val
-                   _otherwise -> Prelude.Nothing)
-           (\ _ y__ -> Prelude.fmap DiffTreeVertex'Merged y__))
-instance Data.ProtoLens.Field.HasField DiffTreeVertex "merged" MergedTerm where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _DiffTreeVertex'diffTerm
-           (\ x__ y__ -> x__ {_DiffTreeVertex'diffTerm = y__}))
-        ((Prelude..)
-           (Lens.Family2.Unchecked.lens
-              (\ x__
-                 -> case x__ of
-                      (Prelude.Just (DiffTreeVertex'Merged x__val))
-                        -> Prelude.Just x__val
-                      _otherwise -> Prelude.Nothing)
-              (\ _ y__ -> Prelude.fmap DiffTreeVertex'Merged y__))
-           (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage))
-instance Data.ProtoLens.Message DiffTreeVertex where
-  messageName _ = Data.Text.pack "github.semantic.DiffTreeVertex"
-  packedMessageDescriptor _
-    = "\n\
-      \\SODiffTreeVertex\DC2$\n\
-      \\SOdiff_vertex_id\CAN\SOH \SOH(\ENQR\fdiffVertexId\DC28\n\
-      \\adeleted\CAN\STX \SOH(\v2\FS.github.semantic.DeletedTermH\NULR\adeleted\DC2;\n\
-      \\binserted\CAN\ETX \SOH(\v2\GS.github.semantic.InsertedTermH\NULR\binserted\DC2;\n\
-      \\breplaced\CAN\EOT \SOH(\v2\GS.github.semantic.ReplacedTermH\NULR\breplaced\DC25\n\
-      \\ACKmerged\CAN\ENQ \SOH(\v2\ESC.github.semantic.MergedTermH\NULR\ACKmergedB\v\n\
-      \\tdiff_term"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        diffVertexId__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "diff_vertex_id"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"diffVertexId")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeVertex
-        deleted__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "deleted"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor DeletedTerm)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'deleted")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeVertex
-        inserted__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "inserted"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor InsertedTerm)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'inserted")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeVertex
-        replaced__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "replaced"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor ReplacedTerm)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'replaced")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeVertex
-        merged__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "merged"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor MergedTerm)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'merged")) ::
-              Data.ProtoLens.FieldDescriptor DiffTreeVertex
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, diffVertexId__field_descriptor),
-           (Data.ProtoLens.Tag 2, deleted__field_descriptor),
-           (Data.ProtoLens.Tag 3, inserted__field_descriptor),
-           (Data.ProtoLens.Tag 4, replaced__field_descriptor),
-           (Data.ProtoLens.Tag 5, merged__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _DiffTreeVertex'_unknownFields
-        (\ x__ y__ -> x__ {_DiffTreeVertex'_unknownFields = y__})
-  defMessage
-    = DiffTreeVertex'_constructor
-        {_DiffTreeVertex'diffVertexId = Data.ProtoLens.fieldDefault,
-         _DiffTreeVertex'diffTerm = Prelude.Nothing,
-         _DiffTreeVertex'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          DiffTreeVertex
-          -> Data.ProtoLens.Encoding.Bytes.Parser DiffTreeVertex
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        8 -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "diff_vertex_id"
-                                loop
-                                  (Lens.Family2.set
-                                     (Data.ProtoLens.Field.field @"diffVertexId") y x)
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "deleted"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"deleted") y x)
-                        26
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "inserted"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"inserted") y x)
-                        34
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "replaced"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"replaced") y x)
-                        42
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "merged"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"merged") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "DiffTreeVertex"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let
-                _v
-                  = Lens.Family2.view (Data.ProtoLens.Field.field @"diffVertexId") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 8)
-                      ((Prelude..)
-                         Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
-             ((Data.Monoid.<>)
-                (case
-                     Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'diffTerm") _x
-                 of
-                   Prelude.Nothing -> Data.Monoid.mempty
-                   (Prelude.Just (DiffTreeVertex'Deleted v))
-                     -> (Data.Monoid.<>)
-                          (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                          ((Prelude..)
-                             (\ bs
-                                -> (Data.Monoid.<>)
-                                     (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                        (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                     (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                             Data.ProtoLens.encodeMessage
-                             v)
-                   (Prelude.Just (DiffTreeVertex'Inserted v))
-                     -> (Data.Monoid.<>)
-                          (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
-                          ((Prelude..)
-                             (\ bs
-                                -> (Data.Monoid.<>)
-                                     (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                        (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                     (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                             Data.ProtoLens.encodeMessage
-                             v)
-                   (Prelude.Just (DiffTreeVertex'Replaced v))
-                     -> (Data.Monoid.<>)
-                          (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
-                          ((Prelude..)
-                             (\ bs
-                                -> (Data.Monoid.<>)
-                                     (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                        (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                     (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                             Data.ProtoLens.encodeMessage
-                             v)
-                   (Prelude.Just (DiffTreeVertex'Merged v))
-                     -> (Data.Monoid.<>)
-                          (Data.ProtoLens.Encoding.Bytes.putVarInt 42)
-                          ((Prelude..)
-                             (\ bs
-                                -> (Data.Monoid.<>)
-                                     (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                        (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                     (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                             Data.ProtoLens.encodeMessage
-                             v))
-                (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                   (Lens.Family2.view Data.ProtoLens.unknownFields _x)))
-instance Control.DeepSeq.NFData DiffTreeVertex where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_DiffTreeVertex'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_DiffTreeVertex'diffVertexId x__)
-                (Control.DeepSeq.deepseq (_DiffTreeVertex'diffTerm x__) ()))
-instance Control.DeepSeq.NFData DiffTreeVertex'DiffTerm where
-  rnf (DiffTreeVertex'Deleted x__) = Control.DeepSeq.rnf x__
-  rnf (DiffTreeVertex'Inserted x__) = Control.DeepSeq.rnf x__
-  rnf (DiffTreeVertex'Replaced x__) = Control.DeepSeq.rnf x__
-  rnf (DiffTreeVertex'Merged x__) = Control.DeepSeq.rnf x__
-_DiffTreeVertex'Deleted ::
-  Data.ProtoLens.Prism.Prism' DiffTreeVertex'DiffTerm DeletedTerm
-_DiffTreeVertex'Deleted
-  = Data.ProtoLens.Prism.prism'
-      DiffTreeVertex'Deleted
-      (\ p__
-         -> case p__ of
-              (DiffTreeVertex'Deleted p__val) -> Prelude.Just p__val
-              _otherwise -> Prelude.Nothing)
-_DiffTreeVertex'Inserted ::
-  Data.ProtoLens.Prism.Prism' DiffTreeVertex'DiffTerm InsertedTerm
-_DiffTreeVertex'Inserted
-  = Data.ProtoLens.Prism.prism'
-      DiffTreeVertex'Inserted
-      (\ p__
-         -> case p__ of
-              (DiffTreeVertex'Inserted p__val) -> Prelude.Just p__val
-              _otherwise -> Prelude.Nothing)
-_DiffTreeVertex'Replaced ::
-  Data.ProtoLens.Prism.Prism' DiffTreeVertex'DiffTerm ReplacedTerm
-_DiffTreeVertex'Replaced
-  = Data.ProtoLens.Prism.prism'
-      DiffTreeVertex'Replaced
-      (\ p__
-         -> case p__ of
-              (DiffTreeVertex'Replaced p__val) -> Prelude.Just p__val
-              _otherwise -> Prelude.Nothing)
-_DiffTreeVertex'Merged ::
-  Data.ProtoLens.Prism.Prism' DiffTreeVertex'DiffTerm MergedTerm
-_DiffTreeVertex'Merged
-  = Data.ProtoLens.Prism.prism'
-      DiffTreeVertex'Merged
-      (\ p__
-         -> case p__ of
-              (DiffTreeVertex'Merged p__val) -> Prelude.Just p__val
-              _otherwise -> Prelude.Nothing)
 {- | Fields :
      
          * 'Proto.Semantic_Fields.docstring' @:: Lens' Docstring Data.Text.Text@ -}
@@ -1977,402 +729,6 @@ instance Control.DeepSeq.NFData File where
                       (Control.DeepSeq.deepseq
                          (_File'errors x__)
                          (Control.DeepSeq.deepseq (_File'blobOid x__) ())))))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.term' @:: Lens' InsertedTerm Data.Text.Text@
-         * 'Proto.Semantic_Fields.span' @:: Lens' InsertedTerm Span@
-         * 'Proto.Semantic_Fields.maybe'span' @:: Lens' InsertedTerm (Prelude.Maybe Span)@ -}
-data InsertedTerm
-  = InsertedTerm'_constructor {_InsertedTerm'term :: !Data.Text.Text,
-                               _InsertedTerm'span :: !(Prelude.Maybe Span),
-                               _InsertedTerm'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show InsertedTerm where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField InsertedTerm "term" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _InsertedTerm'term (\ x__ y__ -> x__ {_InsertedTerm'term = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField InsertedTerm "span" Span where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _InsertedTerm'span (\ x__ y__ -> x__ {_InsertedTerm'span = y__}))
-        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
-instance Data.ProtoLens.Field.HasField InsertedTerm "maybe'span" (Prelude.Maybe Span) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _InsertedTerm'span (\ x__ y__ -> x__ {_InsertedTerm'span = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message InsertedTerm where
-  messageName _ = Data.Text.pack "github.semantic.InsertedTerm"
-  packedMessageDescriptor _
-    = "\n\
-      \\fInsertedTerm\DC2\DC2\n\
-      \\EOTterm\CAN\SOH \SOH(\tR\EOTterm\DC2)\n\
-      \\EOTspan\CAN\STX \SOH(\v2\NAK.github.semantic.SpanR\EOTspan"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        term__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "term"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"term")) ::
-              Data.ProtoLens.FieldDescriptor InsertedTerm
-        span__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "span"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor Span)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'span")) ::
-              Data.ProtoLens.FieldDescriptor InsertedTerm
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, term__field_descriptor),
-           (Data.ProtoLens.Tag 2, span__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _InsertedTerm'_unknownFields
-        (\ x__ y__ -> x__ {_InsertedTerm'_unknownFields = y__})
-  defMessage
-    = InsertedTerm'_constructor
-        {_InsertedTerm'term = Data.ProtoLens.fieldDefault,
-         _InsertedTerm'span = Prelude.Nothing,
-         _InsertedTerm'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          InsertedTerm -> Data.ProtoLens.Encoding.Bytes.Parser InsertedTerm
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "term"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"term") y x)
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "span"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"span") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "InsertedTerm"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"term") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                      ((Prelude..)
-                         (\ bs
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                         Data.Text.Encoding.encodeUtf8
-                         _v))
-             ((Data.Monoid.<>)
-                (case
-                     Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'span") _x
-                 of
-                   Prelude.Nothing -> Data.Monoid.mempty
-                   (Prelude.Just _v)
-                     -> (Data.Monoid.<>)
-                          (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                          ((Prelude..)
-                             (\ bs
-                                -> (Data.Monoid.<>)
-                                     (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                        (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                     (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                             Data.ProtoLens.encodeMessage
-                             _v))
-                (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                   (Lens.Family2.view Data.ProtoLens.unknownFields _x)))
-instance Control.DeepSeq.NFData InsertedTerm where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_InsertedTerm'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_InsertedTerm'term x__)
-                (Control.DeepSeq.deepseq (_InsertedTerm'span x__) ()))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.term' @:: Lens' MergedTerm Data.Text.Text@
-         * 'Proto.Semantic_Fields.beforeSpan' @:: Lens' MergedTerm Span@
-         * 'Proto.Semantic_Fields.maybe'beforeSpan' @:: Lens' MergedTerm (Prelude.Maybe Span)@
-         * 'Proto.Semantic_Fields.afterSpan' @:: Lens' MergedTerm Span@
-         * 'Proto.Semantic_Fields.maybe'afterSpan' @:: Lens' MergedTerm (Prelude.Maybe Span)@ -}
-data MergedTerm
-  = MergedTerm'_constructor {_MergedTerm'term :: !Data.Text.Text,
-                             _MergedTerm'beforeSpan :: !(Prelude.Maybe Span),
-                             _MergedTerm'afterSpan :: !(Prelude.Maybe Span),
-                             _MergedTerm'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show MergedTerm where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField MergedTerm "term" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _MergedTerm'term (\ x__ y__ -> x__ {_MergedTerm'term = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField MergedTerm "beforeSpan" Span where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _MergedTerm'beforeSpan
-           (\ x__ y__ -> x__ {_MergedTerm'beforeSpan = y__}))
-        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
-instance Data.ProtoLens.Field.HasField MergedTerm "maybe'beforeSpan" (Prelude.Maybe Span) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _MergedTerm'beforeSpan
-           (\ x__ y__ -> x__ {_MergedTerm'beforeSpan = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField MergedTerm "afterSpan" Span where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _MergedTerm'afterSpan
-           (\ x__ y__ -> x__ {_MergedTerm'afterSpan = y__}))
-        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
-instance Data.ProtoLens.Field.HasField MergedTerm "maybe'afterSpan" (Prelude.Maybe Span) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _MergedTerm'afterSpan
-           (\ x__ y__ -> x__ {_MergedTerm'afterSpan = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message MergedTerm where
-  messageName _ = Data.Text.pack "github.semantic.MergedTerm"
-  packedMessageDescriptor _
-    = "\n\
-      \\n\
-      \MergedTerm\DC2\DC2\n\
-      \\EOTterm\CAN\SOH \SOH(\tR\EOTterm\DC26\n\
-      \\vbefore_span\CAN\STX \SOH(\v2\NAK.github.semantic.SpanR\n\
-      \beforeSpan\DC24\n\
-      \\n\
-      \after_span\CAN\ETX \SOH(\v2\NAK.github.semantic.SpanR\tafterSpan"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        term__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "term"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"term")) ::
-              Data.ProtoLens.FieldDescriptor MergedTerm
-        beforeSpan__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "before_span"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor Span)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'beforeSpan")) ::
-              Data.ProtoLens.FieldDescriptor MergedTerm
-        afterSpan__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "after_span"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor Span)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'afterSpan")) ::
-              Data.ProtoLens.FieldDescriptor MergedTerm
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, term__field_descriptor),
-           (Data.ProtoLens.Tag 2, beforeSpan__field_descriptor),
-           (Data.ProtoLens.Tag 3, afterSpan__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _MergedTerm'_unknownFields
-        (\ x__ y__ -> x__ {_MergedTerm'_unknownFields = y__})
-  defMessage
-    = MergedTerm'_constructor
-        {_MergedTerm'term = Data.ProtoLens.fieldDefault,
-         _MergedTerm'beforeSpan = Prelude.Nothing,
-         _MergedTerm'afterSpan = Prelude.Nothing,
-         _MergedTerm'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          MergedTerm -> Data.ProtoLens.Encoding.Bytes.Parser MergedTerm
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "term"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"term") y x)
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "before_span"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"beforeSpan") y x)
-                        26
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "after_span"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"afterSpan") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "MergedTerm"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"term") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                      ((Prelude..)
-                         (\ bs
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                         Data.Text.Encoding.encodeUtf8
-                         _v))
-             ((Data.Monoid.<>)
-                (case
-                     Lens.Family2.view
-                       (Data.ProtoLens.Field.field @"maybe'beforeSpan") _x
-                 of
-                   Prelude.Nothing -> Data.Monoid.mempty
-                   (Prelude.Just _v)
-                     -> (Data.Monoid.<>)
-                          (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                          ((Prelude..)
-                             (\ bs
-                                -> (Data.Monoid.<>)
-                                     (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                        (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                     (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                             Data.ProtoLens.encodeMessage
-                             _v))
-                ((Data.Monoid.<>)
-                   (case
-                        Lens.Family2.view
-                          (Data.ProtoLens.Field.field @"maybe'afterSpan") _x
-                    of
-                      Prelude.Nothing -> Data.Monoid.mempty
-                      (Prelude.Just _v)
-                        -> (Data.Monoid.<>)
-                             (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
-                             ((Prelude..)
-                                (\ bs
-                                   -> (Data.Monoid.<>)
-                                        (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                           (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                        (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                Data.ProtoLens.encodeMessage
-                                _v))
-                   (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                      (Lens.Family2.view Data.ProtoLens.unknownFields _x))))
-instance Control.DeepSeq.NFData MergedTerm where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_MergedTerm'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_MergedTerm'term x__)
-                (Control.DeepSeq.deepseq
-                   (_MergedTerm'beforeSpan x__)
-                   (Control.DeepSeq.deepseq (_MergedTerm'afterSpan x__) ())))
 newtype NodeType'UnrecognizedValue
   = NodeType'UnrecognizedValue Data.Int.Int32
   deriving stock (Prelude.Eq, Prelude.Ord, Prelude.Show)
@@ -2577,525 +933,6 @@ instance Control.DeepSeq.NFData ParseError where
         -> Control.DeepSeq.deepseq
              (_ParseError'_unknownFields x__)
              (Control.DeepSeq.deepseq (_ParseError'error x__) ())
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.path' @:: Lens' ParseTreeFileGraph Data.Text.Text@
-         * 'Proto.Semantic_Fields.language' @:: Lens' ParseTreeFileGraph Data.Text.Text@
-         * 'Proto.Semantic_Fields.vertices' @:: Lens' ParseTreeFileGraph [TermVertex]@
-         * 'Proto.Semantic_Fields.vec'vertices' @:: Lens' ParseTreeFileGraph (Data.Vector.Vector TermVertex)@
-         * 'Proto.Semantic_Fields.edges' @:: Lens' ParseTreeFileGraph [TermEdge]@
-         * 'Proto.Semantic_Fields.vec'edges' @:: Lens' ParseTreeFileGraph (Data.Vector.Vector TermEdge)@
-         * 'Proto.Semantic_Fields.errors' @:: Lens' ParseTreeFileGraph [ParseError]@
-         * 'Proto.Semantic_Fields.vec'errors' @:: Lens' ParseTreeFileGraph (Data.Vector.Vector ParseError)@ -}
-data ParseTreeFileGraph
-  = ParseTreeFileGraph'_constructor {_ParseTreeFileGraph'path :: !Data.Text.Text,
-                                     _ParseTreeFileGraph'language :: !Data.Text.Text,
-                                     _ParseTreeFileGraph'vertices :: !(Data.Vector.Vector TermVertex),
-                                     _ParseTreeFileGraph'edges :: !(Data.Vector.Vector TermEdge),
-                                     _ParseTreeFileGraph'errors :: !(Data.Vector.Vector ParseError),
-                                     _ParseTreeFileGraph'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show ParseTreeFileGraph where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField ParseTreeFileGraph "path" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeFileGraph'path
-           (\ x__ y__ -> x__ {_ParseTreeFileGraph'path = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ParseTreeFileGraph "language" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeFileGraph'language
-           (\ x__ y__ -> x__ {_ParseTreeFileGraph'language = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ParseTreeFileGraph "vertices" [TermVertex] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeFileGraph'vertices
-           (\ x__ y__ -> x__ {_ParseTreeFileGraph'vertices = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField ParseTreeFileGraph "vec'vertices" (Data.Vector.Vector TermVertex) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeFileGraph'vertices
-           (\ x__ y__ -> x__ {_ParseTreeFileGraph'vertices = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ParseTreeFileGraph "edges" [TermEdge] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeFileGraph'edges
-           (\ x__ y__ -> x__ {_ParseTreeFileGraph'edges = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField ParseTreeFileGraph "vec'edges" (Data.Vector.Vector TermEdge) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeFileGraph'edges
-           (\ x__ y__ -> x__ {_ParseTreeFileGraph'edges = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ParseTreeFileGraph "errors" [ParseError] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeFileGraph'errors
-           (\ x__ y__ -> x__ {_ParseTreeFileGraph'errors = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField ParseTreeFileGraph "vec'errors" (Data.Vector.Vector ParseError) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeFileGraph'errors
-           (\ x__ y__ -> x__ {_ParseTreeFileGraph'errors = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message ParseTreeFileGraph where
-  messageName _ = Data.Text.pack "github.semantic.ParseTreeFileGraph"
-  packedMessageDescriptor _
-    = "\n\
-      \\DC2ParseTreeFileGraph\DC2\DC2\n\
-      \\EOTpath\CAN\SOH \SOH(\tR\EOTpath\DC2\SUB\n\
-      \\blanguage\CAN\STX \SOH(\tR\blanguage\DC27\n\
-      \\bvertices\CAN\ETX \ETX(\v2\ESC.github.semantic.TermVertexR\bvertices\DC2/\n\
-      \\ENQedges\CAN\EOT \ETX(\v2\EM.github.semantic.TermEdgeR\ENQedges\DC23\n\
-      \\ACKerrors\CAN\ENQ \ETX(\v2\ESC.github.semantic.ParseErrorR\ACKerrors"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        path__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "path"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"path")) ::
-              Data.ProtoLens.FieldDescriptor ParseTreeFileGraph
-        language__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "language"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"language")) ::
-              Data.ProtoLens.FieldDescriptor ParseTreeFileGraph
-        vertices__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "vertices"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor TermVertex)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked
-                 (Data.ProtoLens.Field.field @"vertices")) ::
-              Data.ProtoLens.FieldDescriptor ParseTreeFileGraph
-        edges__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "edges"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor TermEdge)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"edges")) ::
-              Data.ProtoLens.FieldDescriptor ParseTreeFileGraph
-        errors__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "errors"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor ParseError)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"errors")) ::
-              Data.ProtoLens.FieldDescriptor ParseTreeFileGraph
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, path__field_descriptor),
-           (Data.ProtoLens.Tag 2, language__field_descriptor),
-           (Data.ProtoLens.Tag 3, vertices__field_descriptor),
-           (Data.ProtoLens.Tag 4, edges__field_descriptor),
-           (Data.ProtoLens.Tag 5, errors__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _ParseTreeFileGraph'_unknownFields
-        (\ x__ y__ -> x__ {_ParseTreeFileGraph'_unknownFields = y__})
-  defMessage
-    = ParseTreeFileGraph'_constructor
-        {_ParseTreeFileGraph'path = Data.ProtoLens.fieldDefault,
-         _ParseTreeFileGraph'language = Data.ProtoLens.fieldDefault,
-         _ParseTreeFileGraph'vertices = Data.Vector.Generic.empty,
-         _ParseTreeFileGraph'edges = Data.Vector.Generic.empty,
-         _ParseTreeFileGraph'errors = Data.Vector.Generic.empty,
-         _ParseTreeFileGraph'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          ParseTreeFileGraph
-          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld TermEdge
-             -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld ParseError
-                -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld TermVertex
-                   -> Data.ProtoLens.Encoding.Bytes.Parser ParseTreeFileGraph
-        loop x mutable'edges mutable'errors mutable'vertices
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do frozen'edges <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'edges)
-                      frozen'errors <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                         (Data.ProtoLens.Encoding.Growing.unsafeFreeze
-                                            mutable'errors)
-                      frozen'vertices <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                           (Data.ProtoLens.Encoding.Growing.unsafeFreeze
-                                              mutable'vertices)
-                      (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields
-                           (\ !t -> Prelude.reverse t)
-                           (Lens.Family2.set
-                              (Data.ProtoLens.Field.field @"vec'edges")
-                              frozen'edges
-                              (Lens.Family2.set
-                                 (Data.ProtoLens.Field.field @"vec'errors")
-                                 frozen'errors
-                                 (Lens.Family2.set
-                                    (Data.ProtoLens.Field.field @"vec'vertices")
-                                    frozen'vertices
-                                    x))))
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "path"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"path") y x)
-                                  mutable'edges
-                                  mutable'errors
-                                  mutable'vertices
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "language"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"language") y x)
-                                  mutable'edges
-                                  mutable'errors
-                                  mutable'vertices
-                        26
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "vertices"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'vertices y)
-                                loop x mutable'edges mutable'errors v
-                        34
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "edges"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'edges y)
-                                loop x v mutable'errors mutable'vertices
-                        42
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "errors"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'errors y)
-                                loop x mutable'edges v mutable'vertices
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-                                  mutable'edges
-                                  mutable'errors
-                                  mutable'vertices
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do mutable'edges <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                 Data.ProtoLens.Encoding.Growing.new
-              mutable'errors <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                  Data.ProtoLens.Encoding.Growing.new
-              mutable'vertices <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                    Data.ProtoLens.Encoding.Growing.new
-              loop
-                Data.ProtoLens.defMessage
-                mutable'edges
-                mutable'errors
-                mutable'vertices)
-          "ParseTreeFileGraph"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"path") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                      ((Prelude..)
-                         (\ bs
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                         Data.Text.Encoding.encodeUtf8
-                         _v))
-             ((Data.Monoid.<>)
-                (let
-                   _v = Lens.Family2.view (Data.ProtoLens.Field.field @"language") _x
-                 in
-                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                       Data.Monoid.mempty
-                   else
-                       (Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                         ((Prelude..)
-                            (\ bs
-                               -> (Data.Monoid.<>)
-                                    (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                       (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                    (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                            Data.Text.Encoding.encodeUtf8
-                            _v))
-                ((Data.Monoid.<>)
-                   (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                      (\ _v
-                         -> (Data.Monoid.<>)
-                              (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
-                              ((Prelude..)
-                                 (\ bs
-                                    -> (Data.Monoid.<>)
-                                         (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                            (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                         (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                 Data.ProtoLens.encodeMessage
-                                 _v))
-                      (Lens.Family2.view
-                         (Data.ProtoLens.Field.field @"vec'vertices") _x))
-                   ((Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                         (\ _v
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
-                                 ((Prelude..)
-                                    (\ bs
-                                       -> (Data.Monoid.<>)
-                                            (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                               (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                            (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                    Data.ProtoLens.encodeMessage
-                                    _v))
-                         (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'edges") _x))
-                      ((Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                            (\ _v
-                               -> (Data.Monoid.<>)
-                                    (Data.ProtoLens.Encoding.Bytes.putVarInt 42)
-                                    ((Prelude..)
-                                       (\ bs
-                                          -> (Data.Monoid.<>)
-                                               (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                                  (Prelude.fromIntegral
-                                                     (Data.ByteString.length bs)))
-                                               (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                       Data.ProtoLens.encodeMessage
-                                       _v))
-                            (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'errors") _x))
-                         (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                            (Lens.Family2.view Data.ProtoLens.unknownFields _x))))))
-instance Control.DeepSeq.NFData ParseTreeFileGraph where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_ParseTreeFileGraph'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_ParseTreeFileGraph'path x__)
-                (Control.DeepSeq.deepseq
-                   (_ParseTreeFileGraph'language x__)
-                   (Control.DeepSeq.deepseq
-                      (_ParseTreeFileGraph'vertices x__)
-                      (Control.DeepSeq.deepseq
-                         (_ParseTreeFileGraph'edges x__)
-                         (Control.DeepSeq.deepseq (_ParseTreeFileGraph'errors x__) ())))))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.files' @:: Lens' ParseTreeGraphResponse [ParseTreeFileGraph]@
-         * 'Proto.Semantic_Fields.vec'files' @:: Lens' ParseTreeGraphResponse (Data.Vector.Vector ParseTreeFileGraph)@ -}
-data ParseTreeGraphResponse
-  = ParseTreeGraphResponse'_constructor {_ParseTreeGraphResponse'files :: !(Data.Vector.Vector ParseTreeFileGraph),
-                                         _ParseTreeGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show ParseTreeGraphResponse where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField ParseTreeGraphResponse "files" [ParseTreeFileGraph] where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeGraphResponse'files
-           (\ x__ y__ -> x__ {_ParseTreeGraphResponse'files = y__}))
-        (Lens.Family2.Unchecked.lens
-           Data.Vector.Generic.toList
-           (\ _ y__ -> Data.Vector.Generic.fromList y__))
-instance Data.ProtoLens.Field.HasField ParseTreeGraphResponse "vec'files" (Data.Vector.Vector ParseTreeFileGraph) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ParseTreeGraphResponse'files
-           (\ x__ y__ -> x__ {_ParseTreeGraphResponse'files = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message ParseTreeGraphResponse where
-  messageName _
-    = Data.Text.pack "github.semantic.ParseTreeGraphResponse"
-  packedMessageDescriptor _
-    = "\n\
-      \\SYNParseTreeGraphResponse\DC29\n\
-      \\ENQfiles\CAN\SOH \ETX(\v2#.github.semantic.ParseTreeFileGraphR\ENQfiles"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        files__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "files"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor ParseTreeFileGraph)
-              (Data.ProtoLens.RepeatedField
-                 Data.ProtoLens.Unpacked (Data.ProtoLens.Field.field @"files")) ::
-              Data.ProtoLens.FieldDescriptor ParseTreeGraphResponse
-      in
-        Data.Map.fromList [(Data.ProtoLens.Tag 1, files__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _ParseTreeGraphResponse'_unknownFields
-        (\ x__ y__ -> x__ {_ParseTreeGraphResponse'_unknownFields = y__})
-  defMessage
-    = ParseTreeGraphResponse'_constructor
-        {_ParseTreeGraphResponse'files = Data.Vector.Generic.empty,
-         _ParseTreeGraphResponse'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          ParseTreeGraphResponse
-          -> Data.ProtoLens.Encoding.Growing.Growing Data.Vector.Vector Data.ProtoLens.Encoding.Growing.RealWorld ParseTreeFileGraph
-             -> Data.ProtoLens.Encoding.Bytes.Parser ParseTreeGraphResponse
-        loop x mutable'files
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do frozen'files <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                        (Data.ProtoLens.Encoding.Growing.unsafeFreeze mutable'files)
-                      (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields
-                           (\ !t -> Prelude.reverse t)
-                           (Lens.Family2.set
-                              (Data.ProtoLens.Field.field @"vec'files") frozen'files x))
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do !y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                            Data.ProtoLens.Encoding.Bytes.isolate
-                                              (Prelude.fromIntegral len)
-                                              Data.ProtoLens.parseMessage)
-                                        "files"
-                                v <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                       (Data.ProtoLens.Encoding.Growing.append mutable'files y)
-                                loop x v
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-                                  mutable'files
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do mutable'files <- Data.ProtoLens.Encoding.Parser.Unsafe.unsafeLiftIO
-                                 Data.ProtoLens.Encoding.Growing.new
-              loop Data.ProtoLens.defMessage mutable'files)
-          "ParseTreeGraphResponse"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (Data.ProtoLens.Encoding.Bytes.foldMapBuilder
-                (\ _v
-                   -> (Data.Monoid.<>)
-                        (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                        ((Prelude..)
-                           (\ bs
-                              -> (Data.Monoid.<>)
-                                   (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                      (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                   (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                           Data.ProtoLens.encodeMessage
-                           _v))
-                (Lens.Family2.view (Data.ProtoLens.Field.field @"vec'files") _x))
-             (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                (Lens.Family2.view Data.ProtoLens.unknownFields _x))
-instance Control.DeepSeq.NFData ParseTreeGraphResponse where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_ParseTreeGraphResponse'_unknownFields x__)
-             (Control.DeepSeq.deepseq (_ParseTreeGraphResponse'files x__) ())
 {- | Fields :
      
          * 'Proto.Semantic_Fields.blobs' @:: Lens' ParseTreeRequest [Blob]@
@@ -3896,294 +1733,6 @@ instance Control.DeepSeq.NFData Position where
              (Control.DeepSeq.deepseq
                 (_Position'line x__)
                 (Control.DeepSeq.deepseq (_Position'column x__) ()))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.beforeTerm' @:: Lens' ReplacedTerm Data.Text.Text@
-         * 'Proto.Semantic_Fields.beforeSpan' @:: Lens' ReplacedTerm Span@
-         * 'Proto.Semantic_Fields.maybe'beforeSpan' @:: Lens' ReplacedTerm (Prelude.Maybe Span)@
-         * 'Proto.Semantic_Fields.afterTerm' @:: Lens' ReplacedTerm Data.Text.Text@
-         * 'Proto.Semantic_Fields.afterSpan' @:: Lens' ReplacedTerm Span@
-         * 'Proto.Semantic_Fields.maybe'afterSpan' @:: Lens' ReplacedTerm (Prelude.Maybe Span)@ -}
-data ReplacedTerm
-  = ReplacedTerm'_constructor {_ReplacedTerm'beforeTerm :: !Data.Text.Text,
-                               _ReplacedTerm'beforeSpan :: !(Prelude.Maybe Span),
-                               _ReplacedTerm'afterTerm :: !Data.Text.Text,
-                               _ReplacedTerm'afterSpan :: !(Prelude.Maybe Span),
-                               _ReplacedTerm'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show ReplacedTerm where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField ReplacedTerm "beforeTerm" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ReplacedTerm'beforeTerm
-           (\ x__ y__ -> x__ {_ReplacedTerm'beforeTerm = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ReplacedTerm "beforeSpan" Span where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ReplacedTerm'beforeSpan
-           (\ x__ y__ -> x__ {_ReplacedTerm'beforeSpan = y__}))
-        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
-instance Data.ProtoLens.Field.HasField ReplacedTerm "maybe'beforeSpan" (Prelude.Maybe Span) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ReplacedTerm'beforeSpan
-           (\ x__ y__ -> x__ {_ReplacedTerm'beforeSpan = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ReplacedTerm "afterTerm" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ReplacedTerm'afterTerm
-           (\ x__ y__ -> x__ {_ReplacedTerm'afterTerm = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField ReplacedTerm "afterSpan" Span where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ReplacedTerm'afterSpan
-           (\ x__ y__ -> x__ {_ReplacedTerm'afterSpan = y__}))
-        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
-instance Data.ProtoLens.Field.HasField ReplacedTerm "maybe'afterSpan" (Prelude.Maybe Span) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _ReplacedTerm'afterSpan
-           (\ x__ y__ -> x__ {_ReplacedTerm'afterSpan = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message ReplacedTerm where
-  messageName _ = Data.Text.pack "github.semantic.ReplacedTerm"
-  packedMessageDescriptor _
-    = "\n\
-      \\fReplacedTerm\DC2\US\n\
-      \\vbefore_term\CAN\SOH \SOH(\tR\n\
-      \beforeTerm\DC26\n\
-      \\vbefore_span\CAN\STX \SOH(\v2\NAK.github.semantic.SpanR\n\
-      \beforeSpan\DC2\GS\n\
-      \\n\
-      \after_term\CAN\ETX \SOH(\tR\tafterTerm\DC24\n\
-      \\n\
-      \after_span\CAN\EOT \SOH(\v2\NAK.github.semantic.SpanR\tafterSpan"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        beforeTerm__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "before_term"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"beforeTerm")) ::
-              Data.ProtoLens.FieldDescriptor ReplacedTerm
-        beforeSpan__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "before_span"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor Span)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'beforeSpan")) ::
-              Data.ProtoLens.FieldDescriptor ReplacedTerm
-        afterTerm__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "after_term"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"afterTerm")) ::
-              Data.ProtoLens.FieldDescriptor ReplacedTerm
-        afterSpan__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "after_span"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor Span)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'afterSpan")) ::
-              Data.ProtoLens.FieldDescriptor ReplacedTerm
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, beforeTerm__field_descriptor),
-           (Data.ProtoLens.Tag 2, beforeSpan__field_descriptor),
-           (Data.ProtoLens.Tag 3, afterTerm__field_descriptor),
-           (Data.ProtoLens.Tag 4, afterSpan__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _ReplacedTerm'_unknownFields
-        (\ x__ y__ -> x__ {_ReplacedTerm'_unknownFields = y__})
-  defMessage
-    = ReplacedTerm'_constructor
-        {_ReplacedTerm'beforeTerm = Data.ProtoLens.fieldDefault,
-         _ReplacedTerm'beforeSpan = Prelude.Nothing,
-         _ReplacedTerm'afterTerm = Data.ProtoLens.fieldDefault,
-         _ReplacedTerm'afterSpan = Prelude.Nothing,
-         _ReplacedTerm'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          ReplacedTerm -> Data.ProtoLens.Encoding.Bytes.Parser ReplacedTerm
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        10
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "before_term"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"beforeTerm") y x)
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "before_span"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"beforeSpan") y x)
-                        26
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "after_term"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"afterTerm") y x)
-                        34
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "after_span"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"afterSpan") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "ReplacedTerm"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let
-                _v
-                  = Lens.Family2.view (Data.ProtoLens.Field.field @"beforeTerm") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 10)
-                      ((Prelude..)
-                         (\ bs
-                            -> (Data.Monoid.<>)
-                                 (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                    (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                 (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                         Data.Text.Encoding.encodeUtf8
-                         _v))
-             ((Data.Monoid.<>)
-                (case
-                     Lens.Family2.view
-                       (Data.ProtoLens.Field.field @"maybe'beforeSpan") _x
-                 of
-                   Prelude.Nothing -> Data.Monoid.mempty
-                   (Prelude.Just _v)
-                     -> (Data.Monoid.<>)
-                          (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                          ((Prelude..)
-                             (\ bs
-                                -> (Data.Monoid.<>)
-                                     (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                        (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                     (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                             Data.ProtoLens.encodeMessage
-                             _v))
-                ((Data.Monoid.<>)
-                   (let
-                      _v = Lens.Family2.view (Data.ProtoLens.Field.field @"afterTerm") _x
-                    in
-                      if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                          Data.Monoid.mempty
-                      else
-                          (Data.Monoid.<>)
-                            (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
-                            ((Prelude..)
-                               (\ bs
-                                  -> (Data.Monoid.<>)
-                                       (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                          (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                       (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                               Data.Text.Encoding.encodeUtf8
-                               _v))
-                   ((Data.Monoid.<>)
-                      (case
-                           Lens.Family2.view
-                             (Data.ProtoLens.Field.field @"maybe'afterSpan") _x
-                       of
-                         Prelude.Nothing -> Data.Monoid.mempty
-                         (Prelude.Just _v)
-                           -> (Data.Monoid.<>)
-                                (Data.ProtoLens.Encoding.Bytes.putVarInt 34)
-                                ((Prelude..)
-                                   (\ bs
-                                      -> (Data.Monoid.<>)
-                                           (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                              (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                           (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                   Data.ProtoLens.encodeMessage
-                                   _v))
-                      (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                         (Lens.Family2.view Data.ProtoLens.unknownFields _x)))))
-instance Control.DeepSeq.NFData ReplacedTerm where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_ReplacedTerm'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_ReplacedTerm'beforeTerm x__)
-                (Control.DeepSeq.deepseq
-                   (_ReplacedTerm'beforeSpan x__)
-                   (Control.DeepSeq.deepseq
-                      (_ReplacedTerm'afterTerm x__)
-                      (Control.DeepSeq.deepseq (_ReplacedTerm'afterSpan x__) ()))))
 {- | Fields :
      
          * 'Proto.Semantic_Fields.start' @:: Lens' Span Position@
@@ -6385,358 +3934,6 @@ instance Data.ProtoLens.FieldDefault SyntaxType where
   fieldDefault = UNKNOWN_SYNTAX
 instance Control.DeepSeq.NFData SyntaxType where
   rnf x__ = Prelude.seq x__ ()
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.source' @:: Lens' TermEdge Data.Int.Int32@
-         * 'Proto.Semantic_Fields.target' @:: Lens' TermEdge Data.Int.Int32@ -}
-data TermEdge
-  = TermEdge'_constructor {_TermEdge'source :: !Data.Int.Int32,
-                           _TermEdge'target :: !Data.Int.Int32,
-                           _TermEdge'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show TermEdge where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField TermEdge "source" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _TermEdge'source (\ x__ y__ -> x__ {_TermEdge'source = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField TermEdge "target" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _TermEdge'target (\ x__ y__ -> x__ {_TermEdge'target = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message TermEdge where
-  messageName _ = Data.Text.pack "github.semantic.TermEdge"
-  packedMessageDescriptor _
-    = "\n\
-      \\bTermEdge\DC2\SYN\n\
-      \\ACKsource\CAN\SOH \SOH(\ENQR\ACKsource\DC2\SYN\n\
-      \\ACKtarget\CAN\STX \SOH(\ENQR\ACKtarget"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        source__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "source"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"source")) ::
-              Data.ProtoLens.FieldDescriptor TermEdge
-        target__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "target"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"target")) ::
-              Data.ProtoLens.FieldDescriptor TermEdge
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, source__field_descriptor),
-           (Data.ProtoLens.Tag 2, target__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _TermEdge'_unknownFields
-        (\ x__ y__ -> x__ {_TermEdge'_unknownFields = y__})
-  defMessage
-    = TermEdge'_constructor
-        {_TermEdge'source = Data.ProtoLens.fieldDefault,
-         _TermEdge'target = Data.ProtoLens.fieldDefault,
-         _TermEdge'_unknownFields = []}
-  parseMessage
-    = let
-        loop :: TermEdge -> Data.ProtoLens.Encoding.Bytes.Parser TermEdge
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        8 -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "source"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"source") y x)
-                        16
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "target"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"target") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "TermEdge"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let
-                _v = Lens.Family2.view (Data.ProtoLens.Field.field @"source") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 8)
-                      ((Prelude..)
-                         Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
-             ((Data.Monoid.<>)
-                (let
-                   _v = Lens.Family2.view (Data.ProtoLens.Field.field @"target") _x
-                 in
-                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                       Data.Monoid.mempty
-                   else
-                       (Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.putVarInt 16)
-                         ((Prelude..)
-                            Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
-                (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                   (Lens.Family2.view Data.ProtoLens.unknownFields _x)))
-instance Control.DeepSeq.NFData TermEdge where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_TermEdge'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_TermEdge'source x__)
-                (Control.DeepSeq.deepseq (_TermEdge'target x__) ()))
-{- | Fields :
-     
-         * 'Proto.Semantic_Fields.vertexId' @:: Lens' TermVertex Data.Int.Int32@
-         * 'Proto.Semantic_Fields.term' @:: Lens' TermVertex Data.Text.Text@
-         * 'Proto.Semantic_Fields.span' @:: Lens' TermVertex Span@
-         * 'Proto.Semantic_Fields.maybe'span' @:: Lens' TermVertex (Prelude.Maybe Span)@ -}
-data TermVertex
-  = TermVertex'_constructor {_TermVertex'vertexId :: !Data.Int.Int32,
-                             _TermVertex'term :: !Data.Text.Text,
-                             _TermVertex'span :: !(Prelude.Maybe Span),
-                             _TermVertex'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving stock (Prelude.Eq, Prelude.Ord)
-instance Prelude.Show TermVertex where
-  showsPrec _ __x __s
-    = Prelude.showChar
-        '{'
-        (Prelude.showString
-           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
-instance Data.ProtoLens.Field.HasField TermVertex "vertexId" Data.Int.Int32 where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _TermVertex'vertexId
-           (\ x__ y__ -> x__ {_TermVertex'vertexId = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField TermVertex "term" Data.Text.Text where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _TermVertex'term (\ x__ y__ -> x__ {_TermVertex'term = y__}))
-        Prelude.id
-instance Data.ProtoLens.Field.HasField TermVertex "span" Span where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _TermVertex'span (\ x__ y__ -> x__ {_TermVertex'span = y__}))
-        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
-instance Data.ProtoLens.Field.HasField TermVertex "maybe'span" (Prelude.Maybe Span) where
-  fieldOf _
-    = (Prelude..)
-        (Lens.Family2.Unchecked.lens
-           _TermVertex'span (\ x__ y__ -> x__ {_TermVertex'span = y__}))
-        Prelude.id
-instance Data.ProtoLens.Message TermVertex where
-  messageName _ = Data.Text.pack "github.semantic.TermVertex"
-  packedMessageDescriptor _
-    = "\n\
-      \\n\
-      \TermVertex\DC2\ESC\n\
-      \\tvertex_id\CAN\SOH \SOH(\ENQR\bvertexId\DC2\DC2\n\
-      \\EOTterm\CAN\STX \SOH(\tR\EOTterm\DC2)\n\
-      \\EOTspan\CAN\ETX \SOH(\v2\NAK.github.semantic.SpanR\EOTspan"
-  packedFileDescriptor _ = packedFileDescriptor
-  fieldsByTag
-    = let
-        vertexId__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "vertex_id"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional
-                 (Data.ProtoLens.Field.field @"vertexId")) ::
-              Data.ProtoLens.FieldDescriptor TermVertex
-        term__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "term"
-              (Data.ProtoLens.ScalarField Data.ProtoLens.StringField ::
-                 Data.ProtoLens.FieldTypeDescriptor Data.Text.Text)
-              (Data.ProtoLens.PlainField
-                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"term")) ::
-              Data.ProtoLens.FieldDescriptor TermVertex
-        span__field_descriptor
-          = Data.ProtoLens.FieldDescriptor
-              "span"
-              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
-                 Data.ProtoLens.FieldTypeDescriptor Span)
-              (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'span")) ::
-              Data.ProtoLens.FieldDescriptor TermVertex
-      in
-        Data.Map.fromList
-          [(Data.ProtoLens.Tag 1, vertexId__field_descriptor),
-           (Data.ProtoLens.Tag 2, term__field_descriptor),
-           (Data.ProtoLens.Tag 3, span__field_descriptor)]
-  unknownFields
-    = Lens.Family2.Unchecked.lens
-        _TermVertex'_unknownFields
-        (\ x__ y__ -> x__ {_TermVertex'_unknownFields = y__})
-  defMessage
-    = TermVertex'_constructor
-        {_TermVertex'vertexId = Data.ProtoLens.fieldDefault,
-         _TermVertex'term = Data.ProtoLens.fieldDefault,
-         _TermVertex'span = Prelude.Nothing,
-         _TermVertex'_unknownFields = []}
-  parseMessage
-    = let
-        loop ::
-          TermVertex -> Data.ProtoLens.Encoding.Bytes.Parser TermVertex
-        loop x
-          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
-               if end then
-                   do (let missing = []
-                       in
-                         if Prelude.null missing then
-                             Prelude.return ()
-                         else
-                             Prelude.fail
-                               ((Prelude.++)
-                                  "Missing required fields: "
-                                  (Prelude.show (missing :: [Prelude.String]))))
-                      Prelude.return
-                        (Lens.Family2.over
-                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
-               else
-                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                      case tag of
-                        8 -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (Prelude.fmap
-                                          Prelude.fromIntegral
-                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
-                                       "vertex_id"
-                                loop
-                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"vertexId") y x)
-                        18
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do value <- do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                                       Data.ProtoLens.Encoding.Bytes.getBytes
-                                                         (Prelude.fromIntegral len)
-                                           Data.ProtoLens.Encoding.Bytes.runEither
-                                             (case Data.Text.Encoding.decodeUtf8' value of
-                                                (Prelude.Left err)
-                                                  -> Prelude.Left (Prelude.show err)
-                                                (Prelude.Right r) -> Prelude.Right r))
-                                       "term"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"term") y x)
-                        26
-                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
-                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
-                                           Data.ProtoLens.Encoding.Bytes.isolate
-                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "span"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"span") y x)
-                        wire
-                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
-                                        wire
-                                loop
-                                  (Lens.Family2.over
-                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
-      in
-        (Data.ProtoLens.Encoding.Bytes.<?>)
-          (do loop Data.ProtoLens.defMessage) "TermVertex"
-  buildMessage
-    = \ _x
-        -> (Data.Monoid.<>)
-             (let
-                _v = Lens.Family2.view (Data.ProtoLens.Field.field @"vertexId") _x
-              in
-                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                    Data.Monoid.mempty
-                else
-                    (Data.Monoid.<>)
-                      (Data.ProtoLens.Encoding.Bytes.putVarInt 8)
-                      ((Prelude..)
-                         Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
-             ((Data.Monoid.<>)
-                (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"term") _x
-                 in
-                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
-                       Data.Monoid.mempty
-                   else
-                       (Data.Monoid.<>)
-                         (Data.ProtoLens.Encoding.Bytes.putVarInt 18)
-                         ((Prelude..)
-                            (\ bs
-                               -> (Data.Monoid.<>)
-                                    (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                       (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                    (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                            Data.Text.Encoding.encodeUtf8
-                            _v))
-                ((Data.Monoid.<>)
-                   (case
-                        Lens.Family2.view (Data.ProtoLens.Field.field @"maybe'span") _x
-                    of
-                      Prelude.Nothing -> Data.Monoid.mempty
-                      (Prelude.Just _v)
-                        -> (Data.Monoid.<>)
-                             (Data.ProtoLens.Encoding.Bytes.putVarInt 26)
-                             ((Prelude..)
-                                (\ bs
-                                   -> (Data.Monoid.<>)
-                                        (Data.ProtoLens.Encoding.Bytes.putVarInt
-                                           (Prelude.fromIntegral (Data.ByteString.length bs)))
-                                        (Data.ProtoLens.Encoding.Bytes.putBytes bs))
-                                Data.ProtoLens.encodeMessage
-                                _v))
-                   (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                      (Lens.Family2.view Data.ProtoLens.unknownFields _x))))
-instance Control.DeepSeq.NFData TermVertex where
-  rnf
-    = \ x__
-        -> Control.DeepSeq.deepseq
-             (_TermVertex'_unknownFields x__)
-             (Control.DeepSeq.deepseq
-                (_TermVertex'vertexId x__)
-                (Control.DeepSeq.deepseq
-                   (_TermVertex'term x__)
-                   (Control.DeepSeq.deepseq (_TermVertex'span x__) ())))
 packedFileDescriptor :: Data.ByteString.ByteString
 packedFileDescriptor
   = "\n\
@@ -6751,70 +3948,14 @@ packedFileDescriptor
     \\DLEParseTreeRequest\DC2+\n\
     \\ENQblobs\CAN\SOH \ETX(\v2\NAK.github.semantic.BlobR\ENQblobs\"F\n\
     \\ETBParseTreeSymbolResponse\DC2+\n\
-    \\ENQfiles\CAN\SOH \ETX(\v2\NAK.github.semantic.FileR\ENQfiles\"S\n\
-    \\SYNParseTreeGraphResponse\DC29\n\
-    \\ENQfiles\CAN\SOH \ETX(\v2#.github.semantic.ParseTreeFileGraphR\ENQfiles\"@\n\
+    \\ENQfiles\CAN\SOH \ETX(\v2\NAK.github.semantic.FileR\ENQfiles\"@\n\
     \\DC1StackGraphRequest\DC2+\n\
     \\ENQblobs\CAN\SOH \ETX(\v2\NAK.github.semantic.BlobR\ENQblobs\"K\n\
     \\DC2StackGraphResponse\DC25\n\
-    \\ENQfiles\CAN\SOH \ETX(\v2\US.github.semantic.StackGraphFileR\ENQfiles\"\227\SOH\n\
-    \\DC2ParseTreeFileGraph\DC2\DC2\n\
-    \\EOTpath\CAN\SOH \SOH(\tR\EOTpath\DC2\SUB\n\
-    \\blanguage\CAN\STX \SOH(\tR\blanguage\DC27\n\
-    \\bvertices\CAN\ETX \ETX(\v2\ESC.github.semantic.TermVertexR\bvertices\DC2/\n\
-    \\ENQedges\CAN\EOT \ETX(\v2\EM.github.semantic.TermEdgeR\ENQedges\DC23\n\
-    \\ACKerrors\CAN\ENQ \ETX(\v2\ESC.github.semantic.ParseErrorR\ACKerrors\":\n\
-    \\bTermEdge\DC2\SYN\n\
-    \\ACKsource\CAN\SOH \SOH(\ENQR\ACKsource\DC2\SYN\n\
-    \\ACKtarget\CAN\STX \SOH(\ENQR\ACKtarget\"h\n\
-    \\n\
-    \TermVertex\DC2\ESC\n\
-    \\tvertex_id\CAN\SOH \SOH(\ENQR\bvertexId\DC2\DC2\n\
-    \\EOTterm\CAN\STX \SOH(\tR\EOTterm\DC2)\n\
-    \\EOTspan\CAN\ETX \SOH(\v2\NAK.github.semantic.SpanR\EOTspan\"\"\n\
+    \\ENQfiles\CAN\SOH \ETX(\v2\US.github.semantic.StackGraphFileR\ENQfiles\"\"\n\
     \\n\
     \ParseError\DC2\DC4\n\
-    \\ENQerror\CAN\SOH \SOH(\tR\ENQerror\"Q\n\
-    \\NAKDiffTreeGraphResponse\DC28\n\
-    \\ENQfiles\CAN\SOH \ETX(\v2\".github.semantic.DiffTreeFileGraphR\ENQfiles\"\234\SOH\n\
-    \\DC1DiffTreeFileGraph\DC2\DC2\n\
-    \\EOTpath\CAN\SOH \SOH(\tR\EOTpath\DC2\SUB\n\
-    \\blanguage\CAN\STX \SOH(\tR\blanguage\DC2;\n\
-    \\bvertices\CAN\ETX \ETX(\v2\US.github.semantic.DiffTreeVertexR\bvertices\DC23\n\
-    \\ENQedges\CAN\EOT \ETX(\v2\GS.github.semantic.DiffTreeEdgeR\ENQedges\DC23\n\
-    \\ACKerrors\CAN\ENQ \ETX(\v2\ESC.github.semantic.ParseErrorR\ACKerrors\">\n\
-    \\fDiffTreeEdge\DC2\SYN\n\
-    \\ACKsource\CAN\SOH \SOH(\ENQR\ACKsource\DC2\SYN\n\
-    \\ACKtarget\CAN\STX \SOH(\ENQR\ACKtarget\"\174\STX\n\
-    \\SODiffTreeVertex\DC2$\n\
-    \\SOdiff_vertex_id\CAN\SOH \SOH(\ENQR\fdiffVertexId\DC28\n\
-    \\adeleted\CAN\STX \SOH(\v2\FS.github.semantic.DeletedTermH\NULR\adeleted\DC2;\n\
-    \\binserted\CAN\ETX \SOH(\v2\GS.github.semantic.InsertedTermH\NULR\binserted\DC2;\n\
-    \\breplaced\CAN\EOT \SOH(\v2\GS.github.semantic.ReplacedTermH\NULR\breplaced\DC25\n\
-    \\ACKmerged\CAN\ENQ \SOH(\v2\ESC.github.semantic.MergedTermH\NULR\ACKmergedB\v\n\
-    \\tdiff_term\"L\n\
-    \\vDeletedTerm\DC2\DC2\n\
-    \\EOTterm\CAN\SOH \SOH(\tR\EOTterm\DC2)\n\
-    \\EOTspan\CAN\STX \SOH(\v2\NAK.github.semantic.SpanR\EOTspan\"M\n\
-    \\fInsertedTerm\DC2\DC2\n\
-    \\EOTterm\CAN\SOH \SOH(\tR\EOTterm\DC2)\n\
-    \\EOTspan\CAN\STX \SOH(\v2\NAK.github.semantic.SpanR\EOTspan\"\188\SOH\n\
-    \\fReplacedTerm\DC2\US\n\
-    \\vbefore_term\CAN\SOH \SOH(\tR\n\
-    \beforeTerm\DC26\n\
-    \\vbefore_span\CAN\STX \SOH(\v2\NAK.github.semantic.SpanR\n\
-    \beforeSpan\DC2\GS\n\
-    \\n\
-    \after_term\CAN\ETX \SOH(\tR\tafterTerm\DC24\n\
-    \\n\
-    \after_span\CAN\EOT \SOH(\v2\NAK.github.semantic.SpanR\tafterSpan\"\142\SOH\n\
-    \\n\
-    \MergedTerm\DC2\DC2\n\
-    \\EOTterm\CAN\SOH \SOH(\tR\EOTterm\DC26\n\
-    \\vbefore_span\CAN\STX \SOH(\v2\NAK.github.semantic.SpanR\n\
-    \beforeSpan\DC24\n\
-    \\n\
-    \after_span\CAN\ETX \SOH(\v2\NAK.github.semantic.SpanR\tafterSpan\"P\n\
+    \\ENQerror\CAN\SOH \SOH(\tR\ENQerror\"P\n\
     \\EOTBlob\DC2\CAN\n\
     \\acontent\CAN\SOH \SOH(\tR\acontent\DC2\DC2\n\
     \\EOTpath\CAN\STX \SOH(\tR\EOTpath\DC2\SUB\n\
@@ -6885,8 +4026,8 @@ packedFileDescriptor
     \\EOTCALL\DLE\ENQ\DC2\b\n\
     \\EOTTYPE\DLE\ACK\DC2\r\n\
     \\tINTERFACE\DLE\a\DC2\DC2\n\
-    \\SOIMPLEMENTATION\DLE\bB\DC2\234\STX\SISemantic::ProtoJ\200\&9\n\
-    \\a\DC2\ENQ\NUL\NUL\194\SOH\SOH\n\
+    \\SOIMPLEMENTATION\DLE\bB\DC2\234\STX\SISemantic::ProtoJ\220\"\n\
+    \\ACK\DC2\EOT\NUL\NULy\SOH\n\
     \\b\n\
     \\SOH\f\DC2\ETX\NUL\NUL\DC2\n\
     \\b\n\
@@ -6999,1018 +4140,609 @@ packedFileDescriptor
     \\STX\EOT\EOT\DC2\EOT\EM\NUL\ESC\SOH\n\
     \\n\
     \\n\
-    \\ETX\EOT\EOT\SOH\DC2\ETX\EM\b\RS\n\
+    \\ETX\EOT\EOT\SOH\DC2\ETX\EM\b\EM\n\
     \\v\n\
-    \\EOT\EOT\EOT\STX\NUL\DC2\ETX\SUB\STX(\n\
+    \\EOT\EOT\EOT\STX\NUL\DC2\ETX\SUB\STX\SUB\n\
     \\f\n\
     \\ENQ\EOT\EOT\STX\NUL\EOT\DC2\ETX\SUB\STX\n\
     \\n\
     \\f\n\
-    \\ENQ\EOT\EOT\STX\NUL\ACK\DC2\ETX\SUB\v\GS\n\
+    \\ENQ\EOT\EOT\STX\NUL\ACK\DC2\ETX\SUB\v\SI\n\
     \\f\n\
-    \\ENQ\EOT\EOT\STX\NUL\SOH\DC2\ETX\SUB\RS#\n\
+    \\ENQ\EOT\EOT\STX\NUL\SOH\DC2\ETX\SUB\DLE\NAK\n\
     \\f\n\
-    \\ENQ\EOT\EOT\STX\NUL\ETX\DC2\ETX\SUB&'\n\
+    \\ENQ\EOT\EOT\STX\NUL\ETX\DC2\ETX\SUB\CAN\EM\n\
     \\n\
     \\n\
     \\STX\EOT\ENQ\DC2\EOT\GS\NUL\US\SOH\n\
     \\n\
     \\n\
-    \\ETX\EOT\ENQ\SOH\DC2\ETX\GS\b\EM\n\
+    \\ETX\EOT\ENQ\SOH\DC2\ETX\GS\b\SUB\n\
     \\v\n\
-    \\EOT\EOT\ENQ\STX\NUL\DC2\ETX\RS\STX\SUB\n\
+    \\EOT\EOT\ENQ\STX\NUL\DC2\ETX\RS\STX$\n\
     \\f\n\
     \\ENQ\EOT\ENQ\STX\NUL\EOT\DC2\ETX\RS\STX\n\
     \\n\
     \\f\n\
-    \\ENQ\EOT\ENQ\STX\NUL\ACK\DC2\ETX\RS\v\SI\n\
+    \\ENQ\EOT\ENQ\STX\NUL\ACK\DC2\ETX\RS\v\EM\n\
     \\f\n\
-    \\ENQ\EOT\ENQ\STX\NUL\SOH\DC2\ETX\RS\DLE\NAK\n\
+    \\ENQ\EOT\ENQ\STX\NUL\SOH\DC2\ETX\RS\SUB\US\n\
     \\f\n\
-    \\ENQ\EOT\ENQ\STX\NUL\ETX\DC2\ETX\RS\CAN\EM\n\
+    \\ENQ\EOT\ENQ\STX\NUL\ETX\DC2\ETX\RS\"#\n\
     \\n\
     \\n\
     \\STX\EOT\ACK\DC2\EOT!\NUL#\SOH\n\
     \\n\
     \\n\
-    \\ETX\EOT\ACK\SOH\DC2\ETX!\b\SUB\n\
+    \\ETX\EOT\ACK\SOH\DC2\ETX!\b\DC2\n\
     \\v\n\
-    \\EOT\EOT\ACK\STX\NUL\DC2\ETX\"\STX$\n\
-    \\f\n\
-    \\ENQ\EOT\ACK\STX\NUL\EOT\DC2\ETX\"\STX\n\
-    \\n\
-    \\f\n\
-    \\ENQ\EOT\ACK\STX\NUL\ACK\DC2\ETX\"\v\EM\n\
-    \\f\n\
-    \\ENQ\EOT\ACK\STX\NUL\SOH\DC2\ETX\"\SUB\US\n\
-    \\f\n\
-    \\ENQ\EOT\ACK\STX\NUL\ETX\DC2\ETX\"\"#\n\
-    \\n\
-    \\n\
-    \\STX\EOT\a\DC2\EOT%\NUL+\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\a\SOH\DC2\ETX%\b\SUB\n\
-    \\v\n\
-    \\EOT\EOT\a\STX\NUL\DC2\ETX&\STX\DC2\n\
+    \\EOT\EOT\ACK\STX\NUL\DC2\ETX\"\STX\DC3\n\
     \\r\n\
-    \\ENQ\EOT\a\STX\NUL\EOT\DC2\EOT&\STX%\FS\n\
+    \\ENQ\EOT\ACK\STX\NUL\EOT\DC2\EOT\"\STX!\DC4\n\
+    \\f\n\
+    \\ENQ\EOT\ACK\STX\NUL\ENQ\DC2\ETX\"\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\ACK\STX\NUL\SOH\DC2\ETX\"\t\SO\n\
+    \\f\n\
+    \\ENQ\EOT\ACK\STX\NUL\ETX\DC2\ETX\"\DC1\DC2\n\
+    \\n\
+    \\n\
+    \\STX\EOT\a\DC2\EOT%\NUL)\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\a\SOH\DC2\ETX%\b\f\n\
+    \\v\n\
+    \\EOT\EOT\a\STX\NUL\DC2\ETX&\STX\NAK\n\
+    \\r\n\
+    \\ENQ\EOT\a\STX\NUL\EOT\DC2\EOT&\STX%\SO\n\
     \\f\n\
     \\ENQ\EOT\a\STX\NUL\ENQ\DC2\ETX&\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\a\STX\NUL\SOH\DC2\ETX&\t\r\n\
+    \\ENQ\EOT\a\STX\NUL\SOH\DC2\ETX&\t\DLE\n\
     \\f\n\
-    \\ENQ\EOT\a\STX\NUL\ETX\DC2\ETX&\DLE\DC1\n\
+    \\ENQ\EOT\a\STX\NUL\ETX\DC2\ETX&\DC3\DC4\n\
     \\v\n\
-    \\EOT\EOT\a\STX\SOH\DC2\ETX'\STX\SYN\n\
+    \\EOT\EOT\a\STX\SOH\DC2\ETX'\STX\DC2\n\
     \\r\n\
-    \\ENQ\EOT\a\STX\SOH\EOT\DC2\EOT'\STX&\DC2\n\
+    \\ENQ\EOT\a\STX\SOH\EOT\DC2\EOT'\STX&\NAK\n\
     \\f\n\
     \\ENQ\EOT\a\STX\SOH\ENQ\DC2\ETX'\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\a\STX\SOH\SOH\DC2\ETX'\t\DC1\n\
+    \\ENQ\EOT\a\STX\SOH\SOH\DC2\ETX'\t\r\n\
     \\f\n\
-    \\ENQ\EOT\a\STX\SOH\ETX\DC2\ETX'\DC4\NAK\n\
+    \\ENQ\EOT\a\STX\SOH\ETX\DC2\ETX'\DLE\DC1\n\
     \\v\n\
-    \\EOT\EOT\a\STX\STX\DC2\ETX(\STX#\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\STX\EOT\DC2\ETX(\STX\n\
-    \\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\STX\ACK\DC2\ETX(\v\NAK\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\STX\SOH\DC2\ETX(\SYN\RS\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\STX\ETX\DC2\ETX(!\"\n\
-    \\v\n\
-    \\EOT\EOT\a\STX\ETX\DC2\ETX)\STX\RS\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\ETX\EOT\DC2\ETX)\STX\n\
-    \\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\ETX\ACK\DC2\ETX)\v\DC3\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\ETX\SOH\DC2\ETX)\DC4\EM\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\ETX\ETX\DC2\ETX)\FS\GS\n\
-    \\v\n\
-    \\EOT\EOT\a\STX\EOT\DC2\ETX*\STX!\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\EOT\EOT\DC2\ETX*\STX\n\
-    \\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\EOT\ACK\DC2\ETX*\v\NAK\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\EOT\SOH\DC2\ETX*\SYN\FS\n\
-    \\f\n\
-    \\ENQ\EOT\a\STX\EOT\ETX\DC2\ETX*\US \n\
-    \\n\
-    \\n\
-    \\STX\EOT\b\DC2\EOT-\NUL0\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\b\SOH\DC2\ETX-\b\DLE\n\
-    \\v\n\
-    \\EOT\EOT\b\STX\NUL\DC2\ETX.\STX\DC3\n\
+    \\EOT\EOT\a\STX\STX\DC2\ETX(\STX\SYN\n\
     \\r\n\
-    \\ENQ\EOT\b\STX\NUL\EOT\DC2\EOT.\STX-\DC2\n\
+    \\ENQ\EOT\a\STX\STX\EOT\DC2\EOT(\STX'\DC2\n\
     \\f\n\
-    \\ENQ\EOT\b\STX\NUL\ENQ\DC2\ETX.\STX\a\n\
+    \\ENQ\EOT\a\STX\STX\ENQ\DC2\ETX(\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\b\STX\NUL\SOH\DC2\ETX.\b\SO\n\
+    \\ENQ\EOT\a\STX\STX\SOH\DC2\ETX(\t\DC1\n\
     \\f\n\
-    \\ENQ\EOT\b\STX\NUL\ETX\DC2\ETX.\DC1\DC2\n\
-    \\v\n\
-    \\EOT\EOT\b\STX\SOH\DC2\ETX/\STX\DC3\n\
-    \\r\n\
-    \\ENQ\EOT\b\STX\SOH\EOT\DC2\EOT/\STX.\DC3\n\
-    \\f\n\
-    \\ENQ\EOT\b\STX\SOH\ENQ\DC2\ETX/\STX\a\n\
-    \\f\n\
-    \\ENQ\EOT\b\STX\SOH\SOH\DC2\ETX/\b\SO\n\
-    \\f\n\
-    \\ENQ\EOT\b\STX\SOH\ETX\DC2\ETX/\DC1\DC2\n\
+    \\ENQ\EOT\a\STX\STX\ETX\DC2\ETX(\DC4\NAK\n\
     \\n\
     \\n\
-    \\STX\EOT\t\DC2\EOT2\NUL6\SOH\n\
+    \\STX\EOT\b\DC2\EOT+\NUL1\SOH\n\
     \\n\
     \\n\
-    \\ETX\EOT\t\SOH\DC2\ETX2\b\DC2\n\
+    \\ETX\EOT\b\SOH\DC2\ETX+\b\f\n\
     \\v\n\
-    \\EOT\EOT\t\STX\NUL\DC2\ETX3\STX\SYN\n\
+    \\EOT\EOT\b\STX\NUL\DC2\ETX,\STX\DC2\n\
     \\r\n\
-    \\ENQ\EOT\t\STX\NUL\EOT\DC2\EOT3\STX2\DC4\n\
+    \\ENQ\EOT\b\STX\NUL\EOT\DC2\EOT,\STX+\SO\n\
     \\f\n\
-    \\ENQ\EOT\t\STX\NUL\ENQ\DC2\ETX3\STX\a\n\
+    \\ENQ\EOT\b\STX\NUL\ENQ\DC2\ETX,\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\t\STX\NUL\SOH\DC2\ETX3\b\DC1\n\
+    \\ENQ\EOT\b\STX\NUL\SOH\DC2\ETX,\t\r\n\
     \\f\n\
-    \\ENQ\EOT\t\STX\NUL\ETX\DC2\ETX3\DC4\NAK\n\
+    \\ENQ\EOT\b\STX\NUL\ETX\DC2\ETX,\DLE\DC1\n\
     \\v\n\
-    \\EOT\EOT\t\STX\SOH\DC2\ETX4\STX\DC2\n\
+    \\EOT\EOT\b\STX\SOH\DC2\ETX-\STX\SYN\n\
     \\r\n\
-    \\ENQ\EOT\t\STX\SOH\EOT\DC2\EOT4\STX3\SYN\n\
+    \\ENQ\EOT\b\STX\SOH\EOT\DC2\EOT-\STX,\DC2\n\
     \\f\n\
-    \\ENQ\EOT\t\STX\SOH\ENQ\DC2\ETX4\STX\b\n\
+    \\ENQ\EOT\b\STX\SOH\ENQ\DC2\ETX-\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\t\STX\SOH\SOH\DC2\ETX4\t\r\n\
+    \\ENQ\EOT\b\STX\SOH\SOH\DC2\ETX-\t\DC1\n\
     \\f\n\
-    \\ENQ\EOT\t\STX\SOH\ETX\DC2\ETX4\DLE\DC1\n\
+    \\ENQ\EOT\b\STX\SOH\ETX\DC2\ETX-\DC4\NAK\n\
     \\v\n\
-    \\EOT\EOT\t\STX\STX\DC2\ETX5\STX\DLE\n\
+    \\EOT\EOT\b\STX\STX\DC2\ETX.\STX\RS\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\STX\EOT\DC2\ETX.\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\STX\ACK\DC2\ETX.\v\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\STX\SOH\DC2\ETX.\DC2\EM\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\STX\ETX\DC2\ETX.\FS\GS\n\
+    \\v\n\
+    \\EOT\EOT\b\STX\ETX\DC2\ETX/\STX!\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\ETX\EOT\DC2\ETX/\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\ETX\ACK\DC2\ETX/\v\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\ETX\SOH\DC2\ETX/\SYN\FS\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\ETX\ETX\DC2\ETX/\US \n\
+    \\v\n\
+    \\EOT\EOT\b\STX\EOT\DC2\ETX0\STX\SYN\n\
     \\r\n\
-    \\ENQ\EOT\t\STX\STX\EOT\DC2\EOT5\STX4\DC2\n\
+    \\ENQ\EOT\b\STX\EOT\EOT\DC2\EOT0\STX/!\n\
     \\f\n\
-    \\ENQ\EOT\t\STX\STX\ACK\DC2\ETX5\STX\ACK\n\
+    \\ENQ\EOT\b\STX\EOT\ENQ\DC2\ETX0\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\t\STX\STX\SOH\DC2\ETX5\a\v\n\
+    \\ENQ\EOT\b\STX\EOT\SOH\DC2\ETX0\t\DC1\n\
     \\f\n\
-    \\ENQ\EOT\t\STX\STX\ETX\DC2\ETX5\SO\SI\n\
+    \\ENQ\EOT\b\STX\EOT\ETX\DC2\ETX0\DC4\NAK\n\
+    \\n\
+    \\n\
+    \\STX\EOT\t\DC2\EOT3\NUL;\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\t\SOH\DC2\ETX3\b\SO\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\NUL\DC2\ETX4\STX\DC4\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\NUL\EOT\DC2\EOT4\STX3\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\NUL\ENQ\DC2\ETX4\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\NUL\SOH\DC2\ETX4\t\SI\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\NUL\ETX\DC2\ETX4\DC2\DC3\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\SOH\DC2\ETX5\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\SOH\EOT\DC2\EOT5\STX4\DC4\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\SOH\ENQ\DC2\ETX5\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\SOH\SOH\DC2\ETX5\t\r\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\SOH\ETX\DC2\ETX5\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\STX\DC2\ETX6\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\STX\EOT\DC2\EOT6\STX5\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\STX\ENQ\DC2\ETX6\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\STX\SOH\DC2\ETX6\t\r\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\STX\ETX\DC2\ETX6\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\ETX\DC2\ETX7\STX\DLE\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\ETX\EOT\DC2\EOT7\STX6\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ETX\ACK\DC2\ETX7\STX\ACK\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ETX\SOH\DC2\ETX7\a\v\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ETX\ETX\DC2\ETX7\SO\SI\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\EOT\DC2\ETX8\STX\NAK\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\EOT\EOT\DC2\EOT8\STX7\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\EOT\ACK\DC2\ETX8\STX\v\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\EOT\SOH\DC2\ETX8\f\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\EOT\ETX\DC2\ETX8\DC3\DC4\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\ENQ\DC2\ETX9\STX\EM\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\ENQ\EOT\DC2\EOT9\STX8\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ENQ\ACK\DC2\ETX9\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ENQ\SOH\DC2\ETX9\v\DC4\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ENQ\ETX\DC2\ETX9\ETB\CAN\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\ACK\DC2\ETX:\STX\GS\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\ACK\EOT\DC2\EOT:\STX9\EM\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ACK\ACK\DC2\ETX:\STX\f\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ACK\SOH\DC2\ETX:\r\CAN\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ACK\ETX\DC2\ETX:\ESC\FS\n\
     \\n\
     \\n\
     \\STX\EOT\n\
-    \\DC2\EOT8\NUL:\SOH\n\
+    \\DC2\EOT=\NUL?\SOH\n\
     \\n\
     \\n\
     \\ETX\EOT\n\
-    \\SOH\DC2\ETX8\b\DC2\n\
+    \\SOH\DC2\ETX=\b\DC1\n\
     \\v\n\
     \\EOT\EOT\n\
-    \\STX\NUL\DC2\ETX9\STX\DC3\n\
+    \\STX\NUL\DC2\ETX>\STX\ETB\n\
     \\r\n\
     \\ENQ\EOT\n\
-    \\STX\NUL\EOT\DC2\EOT9\STX8\DC4\n\
+    \\STX\NUL\EOT\DC2\EOT>\STX=\DC3\n\
     \\f\n\
     \\ENQ\EOT\n\
-    \\STX\NUL\ENQ\DC2\ETX9\STX\b\n\
+    \\STX\NUL\ENQ\DC2\ETX>\STX\b\n\
     \\f\n\
     \\ENQ\EOT\n\
-    \\STX\NUL\SOH\DC2\ETX9\t\SO\n\
+    \\STX\NUL\SOH\DC2\ETX>\t\DC2\n\
     \\f\n\
     \\ENQ\EOT\n\
-    \\STX\NUL\ETX\DC2\ETX9\DC1\DC2\n\
+    \\STX\NUL\ETX\DC2\ETX>\NAK\SYN\n\
     \\n\
     \\n\
-    \\STX\EOT\v\DC2\EOT<\NUL>\SOH\n\
+    \\STX\EOT\v\DC2\EOTA\NULD\SOH\n\
     \\n\
     \\n\
-    \\ETX\EOT\v\SOH\DC2\ETX<\b\GS\n\
+    \\ETX\EOT\v\SOH\DC2\ETXA\b\DLE\n\
     \\v\n\
-    \\EOT\EOT\v\STX\NUL\DC2\ETX=\STX'\n\
+    \\EOT\EOT\v\STX\NUL\DC2\ETXB\STX\DC1\n\
+    \\r\n\
+    \\ENQ\EOT\v\STX\NUL\EOT\DC2\EOTB\STXA\DC2\n\
     \\f\n\
-    \\ENQ\EOT\v\STX\NUL\EOT\DC2\ETX=\STX\n\
-    \\n\
+    \\ENQ\EOT\v\STX\NUL\ENQ\DC2\ETXB\STX\a\n\
     \\f\n\
-    \\ENQ\EOT\v\STX\NUL\ACK\DC2\ETX=\v\FS\n\
+    \\ENQ\EOT\v\STX\NUL\SOH\DC2\ETXB\b\f\n\
     \\f\n\
-    \\ENQ\EOT\v\STX\NUL\SOH\DC2\ETX=\GS\"\n\
-    \\f\n\
-    \\ENQ\EOT\v\STX\NUL\ETX\DC2\ETX=%&\n\
-    \\n\
-    \\n\
-    \\STX\EOT\f\DC2\EOT@\NULF\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\f\SOH\DC2\ETX@\b\EM\n\
+    \\ENQ\EOT\v\STX\NUL\ETX\DC2\ETXB\SI\DLE\n\
     \\v\n\
-    \\EOT\EOT\f\STX\NUL\DC2\ETXA\STX\DC2\n\
+    \\EOT\EOT\v\STX\SOH\DC2\ETXC\STX\DC3\n\
     \\r\n\
-    \\ENQ\EOT\f\STX\NUL\EOT\DC2\EOTA\STX@\ESC\n\
+    \\ENQ\EOT\v\STX\SOH\EOT\DC2\EOTC\STXB\DC1\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\NUL\ENQ\DC2\ETXA\STX\b\n\
+    \\ENQ\EOT\v\STX\SOH\ENQ\DC2\ETXC\STX\a\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\NUL\SOH\DC2\ETXA\t\r\n\
+    \\ENQ\EOT\v\STX\SOH\SOH\DC2\ETXC\b\SO\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\NUL\ETX\DC2\ETXA\DLE\DC1\n\
+    \\ENQ\EOT\v\STX\SOH\ETX\DC2\ETXC\DC1\DC2\n\
+    \\n\
+    \\n\
+    \\STX\EOT\f\DC2\EOTF\NULI\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\f\SOH\DC2\ETXF\b\f\n\
     \\v\n\
-    \\EOT\EOT\f\STX\SOH\DC2\ETXB\STX\SYN\n\
+    \\EOT\EOT\f\STX\NUL\DC2\ETXG\STX\NAK\n\
     \\r\n\
-    \\ENQ\EOT\f\STX\SOH\EOT\DC2\EOTB\STXA\DC2\n\
+    \\ENQ\EOT\f\STX\NUL\EOT\DC2\EOTG\STXF\SO\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\SOH\ENQ\DC2\ETXB\STX\b\n\
+    \\ENQ\EOT\f\STX\NUL\ACK\DC2\ETXG\STX\n\
+    \\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\SOH\SOH\DC2\ETXB\t\DC1\n\
+    \\ENQ\EOT\f\STX\NUL\SOH\DC2\ETXG\v\DLE\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\SOH\ETX\DC2\ETXB\DC4\NAK\n\
+    \\ENQ\EOT\f\STX\NUL\ETX\DC2\ETXG\DC3\DC4\n\
     \\v\n\
-    \\EOT\EOT\f\STX\STX\DC2\ETXC\STX'\n\
+    \\EOT\EOT\f\STX\SOH\DC2\ETXH\STX\DC3\n\
+    \\r\n\
+    \\ENQ\EOT\f\STX\SOH\EOT\DC2\EOTH\STXG\NAK\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\STX\EOT\DC2\ETXC\STX\n\
+    \\ENQ\EOT\f\STX\SOH\ACK\DC2\ETXH\STX\n\
     \\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\STX\ACK\DC2\ETXC\v\EM\n\
+    \\ENQ\EOT\f\STX\SOH\SOH\DC2\ETXH\v\SO\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\STX\SOH\DC2\ETXC\SUB\"\n\
-    \\f\n\
-    \\ENQ\EOT\f\STX\STX\ETX\DC2\ETXC%&\n\
+    \\ENQ\EOT\f\STX\SOH\ETX\DC2\ETXH\DC1\DC2\n\
+    \\n\
+    \\n\
+    \\STX\EOT\r\DC2\EOTK\NULQ\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\r\SOH\DC2\ETXK\b\SYN\n\
     \\v\n\
-    \\EOT\EOT\f\STX\ETX\DC2\ETXD\STX\"\n\
+    \\EOT\EOT\r\STX\NUL\DC2\ETXL\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\r\STX\NUL\EOT\DC2\EOTL\STXK\CAN\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\ETX\EOT\DC2\ETXD\STX\n\
-    \\n\
+    \\ENQ\EOT\r\STX\NUL\ENQ\DC2\ETXL\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\ETX\ACK\DC2\ETXD\v\ETB\n\
+    \\ENQ\EOT\r\STX\NUL\SOH\DC2\ETXL\t\r\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\ETX\SOH\DC2\ETXD\CAN\GS\n\
-    \\f\n\
-    \\ENQ\EOT\f\STX\ETX\ETX\DC2\ETXD !\n\
+    \\ENQ\EOT\r\STX\NUL\ETX\DC2\ETXL\DLE\DC1\n\
     \\v\n\
-    \\EOT\EOT\f\STX\EOT\DC2\ETXE\STX!\n\
+    \\EOT\EOT\r\STX\SOH\DC2\ETXM\STX\SYN\n\
+    \\r\n\
+    \\ENQ\EOT\r\STX\SOH\EOT\DC2\EOTM\STXL\DC2\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\EOT\EOT\DC2\ETXE\STX\n\
-    \\n\
+    \\ENQ\EOT\r\STX\SOH\ENQ\DC2\ETXM\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\EOT\ACK\DC2\ETXE\v\NAK\n\
+    \\ENQ\EOT\r\STX\SOH\SOH\DC2\ETXM\t\DC1\n\
     \\f\n\
-    \\ENQ\EOT\f\STX\EOT\SOH\DC2\ETXE\SYN\FS\n\
-    \\f\n\
-    \\ENQ\EOT\f\STX\EOT\ETX\DC2\ETXE\US \n\
-    \\n\
-    \\n\
-    \\STX\EOT\r\DC2\EOTH\NULK\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\r\SOH\DC2\ETXH\b\DC4\n\
+    \\ENQ\EOT\r\STX\SOH\ETX\DC2\ETXM\DC4\NAK\n\
     \\v\n\
-    \\EOT\EOT\r\STX\NUL\DC2\ETXI\STX\DC3\n\
-    \\r\n\
-    \\ENQ\EOT\r\STX\NUL\EOT\DC2\EOTI\STXH\SYN\n\
+    \\EOT\EOT\r\STX\STX\DC2\ETXN\STX$\n\
     \\f\n\
-    \\ENQ\EOT\r\STX\NUL\ENQ\DC2\ETXI\STX\a\n\
+    \\ENQ\EOT\r\STX\STX\EOT\DC2\ETXN\STX\n\
+    \\n\
     \\f\n\
-    \\ENQ\EOT\r\STX\NUL\SOH\DC2\ETXI\b\SO\n\
+    \\ENQ\EOT\r\STX\STX\ACK\DC2\ETXN\v\EM\n\
     \\f\n\
-    \\ENQ\EOT\r\STX\NUL\ETX\DC2\ETXI\DC1\DC2\n\
+    \\ENQ\EOT\r\STX\STX\SOH\DC2\ETXN\SUB\US\n\
+    \\f\n\
+    \\ENQ\EOT\r\STX\STX\ETX\DC2\ETXN\"#\n\
     \\v\n\
-    \\EOT\EOT\r\STX\SOH\DC2\ETXJ\STX\DC3\n\
-    \\r\n\
-    \\ENQ\EOT\r\STX\SOH\EOT\DC2\EOTJ\STXI\DC3\n\
+    \\EOT\EOT\r\STX\ETX\DC2\ETXO\STX$\n\
     \\f\n\
-    \\ENQ\EOT\r\STX\SOH\ENQ\DC2\ETXJ\STX\a\n\
+    \\ENQ\EOT\r\STX\ETX\EOT\DC2\ETXO\STX\n\
+    \\n\
     \\f\n\
-    \\ENQ\EOT\r\STX\SOH\SOH\DC2\ETXJ\b\SO\n\
+    \\ENQ\EOT\r\STX\ETX\ACK\DC2\ETXO\v\EM\n\
     \\f\n\
-    \\ENQ\EOT\r\STX\SOH\ETX\DC2\ETXJ\DC1\DC2\n\
-    \\n\
-    \\n\
-    \\STX\EOT\SO\DC2\EOTM\NULU\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\SO\SOH\DC2\ETXM\b\SYN\n\
+    \\ENQ\EOT\r\STX\ETX\SOH\DC2\ETXO\SUB\US\n\
+    \\f\n\
+    \\ENQ\EOT\r\STX\ETX\ETX\DC2\ETXO\"#\n\
     \\v\n\
-    \\EOT\EOT\SO\STX\NUL\DC2\ETXN\STX\ESC\n\
-    \\r\n\
-    \\ENQ\EOT\SO\STX\NUL\EOT\DC2\EOTN\STXM\CAN\n\
+    \\EOT\EOT\r\STX\EOT\DC2\ETXP\STX!\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\NUL\ENQ\DC2\ETXN\STX\a\n\
+    \\ENQ\EOT\r\STX\EOT\EOT\DC2\ETXP\STX\n\
+    \\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\NUL\SOH\DC2\ETXN\b\SYN\n\
+    \\ENQ\EOT\r\STX\EOT\ACK\DC2\ETXP\v\NAK\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\NUL\ETX\DC2\ETXN\EM\SUB\n\
+    \\ENQ\EOT\r\STX\EOT\SOH\DC2\ETXP\SYN\FS\n\
     \\f\n\
-    \\EOT\EOT\SO\b\NUL\DC2\EOTO\STXT\ETX\n\
-    \\f\n\
-    \\ENQ\EOT\SO\b\NUL\SOH\DC2\ETXO\b\DC1\n\
+    \\ENQ\EOT\r\STX\EOT\ETX\DC2\ETXP\US \n\
+    \\n\
+    \\n\
+    \\STX\ENQ\NUL\DC2\EOTS\NULZ\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\ENQ\NUL\SOH\DC2\ETXS\ENQ\r\n\
     \\v\n\
-    \\EOT\EOT\SO\STX\SOH\DC2\ETXP\EOT\FS\n\
+    \\EOT\ENQ\NUL\STX\NUL\DC2\ETXT\STX\DC3\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\SOH\ACK\DC2\ETXP\EOT\SI\n\
+    \\ENQ\ENQ\NUL\STX\NUL\SOH\DC2\ETXT\STX\SO\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\SOH\SOH\DC2\ETXP\DLE\ETB\n\
-    \\f\n\
-    \\ENQ\EOT\SO\STX\SOH\ETX\DC2\ETXP\SUB\ESC\n\
+    \\ENQ\ENQ\NUL\STX\NUL\STX\DC2\ETXT\DC1\DC2\n\
     \\v\n\
-    \\EOT\EOT\SO\STX\STX\DC2\ETXQ\EOT\RS\n\
+    \\EOT\ENQ\NUL\STX\SOH\DC2\ETXU\STX\DC1\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\STX\ACK\DC2\ETXQ\EOT\DLE\n\
+    \\ENQ\ENQ\NUL\STX\SOH\SOH\DC2\ETXU\STX\f\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\STX\SOH\DC2\ETXQ\DC1\EM\n\
-    \\f\n\
-    \\ENQ\EOT\SO\STX\STX\ETX\DC2\ETXQ\FS\GS\n\
+    \\ENQ\ENQ\NUL\STX\SOH\STX\DC2\ETXU\SI\DLE\n\
     \\v\n\
-    \\EOT\EOT\SO\STX\ETX\DC2\ETXR\EOT\RS\n\
+    \\EOT\ENQ\NUL\STX\STX\DC2\ETXV\STX\DC4\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\ETX\ACK\DC2\ETXR\EOT\DLE\n\
+    \\ENQ\ENQ\NUL\STX\STX\SOH\DC2\ETXV\STX\SI\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\ETX\SOH\DC2\ETXR\DC1\EM\n\
-    \\f\n\
-    \\ENQ\EOT\SO\STX\ETX\ETX\DC2\ETXR\FS\GS\n\
+    \\ENQ\ENQ\NUL\STX\STX\STX\DC2\ETXV\DC2\DC3\n\
     \\v\n\
-    \\EOT\EOT\SO\STX\EOT\DC2\ETXS\EOT\SUB\n\
+    \\EOT\ENQ\NUL\STX\ETX\DC2\ETXW\STX\NAK\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\EOT\ACK\DC2\ETXS\EOT\SO\n\
+    \\ENQ\ENQ\NUL\STX\ETX\SOH\DC2\ETXW\STX\DLE\n\
     \\f\n\
-    \\ENQ\EOT\SO\STX\EOT\SOH\DC2\ETXS\SI\NAK\n\
-    \\f\n\
-    \\ENQ\EOT\SO\STX\EOT\ETX\DC2\ETXS\CAN\EM\n\
-    \\n\
-    \\n\
-    \\STX\EOT\SI\DC2\EOTW\NULZ\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\SI\SOH\DC2\ETXW\b\DC3\n\
+    \\ENQ\ENQ\NUL\STX\ETX\STX\DC2\ETXW\DC3\DC4\n\
     \\v\n\
-    \\EOT\EOT\SI\STX\NUL\DC2\ETXX\STX\DC2\n\
-    \\r\n\
-    \\ENQ\EOT\SI\STX\NUL\EOT\DC2\EOTX\STXW\NAK\n\
+    \\EOT\ENQ\NUL\STX\EOT\DC2\ETXX\STX\DC1\n\
     \\f\n\
-    \\ENQ\EOT\SI\STX\NUL\ENQ\DC2\ETXX\STX\b\n\
+    \\ENQ\ENQ\NUL\STX\EOT\SOH\DC2\ETXX\STX\f\n\
     \\f\n\
-    \\ENQ\EOT\SI\STX\NUL\SOH\DC2\ETXX\t\r\n\
-    \\f\n\
-    \\ENQ\EOT\SI\STX\NUL\ETX\DC2\ETXX\DLE\DC1\n\
+    \\ENQ\ENQ\NUL\STX\EOT\STX\DC2\ETXX\SI\DLE\n\
     \\v\n\
-    \\EOT\EOT\SI\STX\SOH\DC2\ETXY\STX\DLE\n\
-    \\r\n\
-    \\ENQ\EOT\SI\STX\SOH\EOT\DC2\EOTY\STXX\DC2\n\
+    \\EOT\ENQ\NUL\STX\ENQ\DC2\ETXY\STX\DLE\n\
     \\f\n\
-    \\ENQ\EOT\SI\STX\SOH\ACK\DC2\ETXY\STX\ACK\n\
+    \\ENQ\ENQ\NUL\STX\ENQ\SOH\DC2\ETXY\STX\v\n\
     \\f\n\
-    \\ENQ\EOT\SI\STX\SOH\SOH\DC2\ETXY\a\v\n\
-    \\f\n\
-    \\ENQ\EOT\SI\STX\SOH\ETX\DC2\ETXY\SO\SI\n\
+    \\ENQ\ENQ\NUL\STX\ENQ\STX\DC2\ETXY\SO\SI\n\
     \\n\
     \\n\
-    \\STX\EOT\DLE\DC2\EOT\\\NUL_\SOH\n\
+    \\STX\ENQ\SOH\DC2\EOT\\\NULf\SOH\n\
     \\n\
     \\n\
-    \\ETX\EOT\DLE\SOH\DC2\ETX\\\b\DC4\n\
+    \\ETX\ENQ\SOH\SOH\DC2\ETX\\\ENQ\SI\n\
     \\v\n\
-    \\EOT\EOT\DLE\STX\NUL\DC2\ETX]\STX\DC2\n\
-    \\r\n\
-    \\ENQ\EOT\DLE\STX\NUL\EOT\DC2\EOT]\STX\\\SYN\n\
+    \\EOT\ENQ\SOH\STX\NUL\DC2\ETX]\STX\NAK\n\
     \\f\n\
-    \\ENQ\EOT\DLE\STX\NUL\ENQ\DC2\ETX]\STX\b\n\
+    \\ENQ\ENQ\SOH\STX\NUL\SOH\DC2\ETX]\STX\DLE\n\
     \\f\n\
-    \\ENQ\EOT\DLE\STX\NUL\SOH\DC2\ETX]\t\r\n\
-    \\f\n\
-    \\ENQ\EOT\DLE\STX\NUL\ETX\DC2\ETX]\DLE\DC1\n\
+    \\ENQ\ENQ\SOH\STX\NUL\STX\DC2\ETX]\DC3\DC4\n\
     \\v\n\
-    \\EOT\EOT\DLE\STX\SOH\DC2\ETX^\STX\DLE\n\
-    \\r\n\
-    \\ENQ\EOT\DLE\STX\SOH\EOT\DC2\EOT^\STX]\DC2\n\
+    \\EOT\ENQ\SOH\STX\SOH\DC2\ETX^\STX\SI\n\
     \\f\n\
-    \\ENQ\EOT\DLE\STX\SOH\ACK\DC2\ETX^\STX\ACK\n\
+    \\ENQ\ENQ\SOH\STX\SOH\SOH\DC2\ETX^\STX\n\
+    \\n\
     \\f\n\
-    \\ENQ\EOT\DLE\STX\SOH\SOH\DC2\ETX^\a\v\n\
-    \\f\n\
-    \\ENQ\EOT\DLE\STX\SOH\ETX\DC2\ETX^\SO\SI\n\
-    \\n\
-    \\n\
-    \\STX\EOT\DC1\DC2\EOTa\NULf\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\DC1\SOH\DC2\ETXa\b\DC4\n\
+    \\ENQ\ENQ\SOH\STX\SOH\STX\DC2\ETX^\r\SO\n\
     \\v\n\
-    \\EOT\EOT\DC1\STX\NUL\DC2\ETXb\STX\EM\n\
-    \\r\n\
-    \\ENQ\EOT\DC1\STX\NUL\EOT\DC2\EOTb\STXa\SYN\n\
+    \\EOT\ENQ\SOH\STX\STX\DC2\ETX_\STX\r\n\
     \\f\n\
-    \\ENQ\EOT\DC1\STX\NUL\ENQ\DC2\ETXb\STX\b\n\
+    \\ENQ\ENQ\SOH\STX\STX\SOH\DC2\ETX_\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\DC1\STX\NUL\SOH\DC2\ETXb\t\DC4\n\
-    \\f\n\
-    \\ENQ\EOT\DC1\STX\NUL\ETX\DC2\ETXb\ETB\CAN\n\
+    \\ENQ\ENQ\SOH\STX\STX\STX\DC2\ETX_\v\f\n\
     \\v\n\
-    \\EOT\EOT\DC1\STX\SOH\DC2\ETXc\STX\ETB\n\
-    \\r\n\
-    \\ENQ\EOT\DC1\STX\SOH\EOT\DC2\EOTc\STXb\EM\n\
+    \\EOT\ENQ\SOH\STX\ETX\DC2\ETX`\STX\f\n\
     \\f\n\
-    \\ENQ\EOT\DC1\STX\SOH\ACK\DC2\ETXc\STX\ACK\n\
+    \\ENQ\ENQ\SOH\STX\ETX\SOH\DC2\ETX`\STX\a\n\
     \\f\n\
-    \\ENQ\EOT\DC1\STX\SOH\SOH\DC2\ETXc\a\DC2\n\
-    \\f\n\
-    \\ENQ\EOT\DC1\STX\SOH\ETX\DC2\ETXc\NAK\SYN\n\
+    \\ENQ\ENQ\SOH\STX\ETX\STX\DC2\ETX`\n\
     \\v\n\
-    \\EOT\EOT\DC1\STX\STX\DC2\ETXd\STX\CAN\n\
-    \\r\n\
-    \\ENQ\EOT\DC1\STX\STX\EOT\DC2\EOTd\STXc\ETB\n\
-    \\f\n\
-    \\ENQ\EOT\DC1\STX\STX\ENQ\DC2\ETXd\STX\b\n\
-    \\f\n\
-    \\ENQ\EOT\DC1\STX\STX\SOH\DC2\ETXd\t\DC3\n\
-    \\f\n\
-    \\ENQ\EOT\DC1\STX\STX\ETX\DC2\ETXd\SYN\ETB\n\
     \\v\n\
-    \\EOT\EOT\DC1\STX\ETX\DC2\ETXe\STX\SYN\n\
-    \\r\n\
-    \\ENQ\EOT\DC1\STX\ETX\EOT\DC2\EOTe\STXd\CAN\n\
+    \\EOT\ENQ\SOH\STX\EOT\DC2\ETXa\STX\r\n\
     \\f\n\
-    \\ENQ\EOT\DC1\STX\ETX\ACK\DC2\ETXe\STX\ACK\n\
+    \\ENQ\ENQ\SOH\STX\EOT\SOH\DC2\ETXa\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\DC1\STX\ETX\SOH\DC2\ETXe\a\DC1\n\
-    \\f\n\
-    \\ENQ\EOT\DC1\STX\ETX\ETX\DC2\ETXe\DC4\NAK\n\
-    \\n\
-    \\n\
-    \\STX\EOT\DC2\DC2\EOTh\NULl\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\DC2\SOH\DC2\ETXh\b\DC2\n\
+    \\ENQ\ENQ\SOH\STX\EOT\STX\DC2\ETXa\v\f\n\
     \\v\n\
-    \\EOT\EOT\DC2\STX\NUL\DC2\ETXi\STX\DC2\n\
-    \\r\n\
-    \\ENQ\EOT\DC2\STX\NUL\EOT\DC2\EOTi\STXh\DC4\n\
+    \\EOT\ENQ\SOH\STX\ENQ\DC2\ETXb\STX\v\n\
     \\f\n\
-    \\ENQ\EOT\DC2\STX\NUL\ENQ\DC2\ETXi\STX\b\n\
+    \\ENQ\ENQ\SOH\STX\ENQ\SOH\DC2\ETXb\STX\ACK\n\
     \\f\n\
-    \\ENQ\EOT\DC2\STX\NUL\SOH\DC2\ETXi\t\r\n\
-    \\f\n\
-    \\ENQ\EOT\DC2\STX\NUL\ETX\DC2\ETXi\DLE\DC1\n\
+    \\ENQ\ENQ\SOH\STX\ENQ\STX\DC2\ETXb\t\n\
+    \\n\
     \\v\n\
-    \\EOT\EOT\DC2\STX\SOH\DC2\ETXj\STX\ETB\n\
-    \\r\n\
-    \\ENQ\EOT\DC2\STX\SOH\EOT\DC2\EOTj\STXi\DC2\n\
+    \\EOT\ENQ\SOH\STX\ACK\DC2\ETXc\STX\v\n\
     \\f\n\
-    \\ENQ\EOT\DC2\STX\SOH\ACK\DC2\ETXj\STX\ACK\n\
+    \\ENQ\ENQ\SOH\STX\ACK\SOH\DC2\ETXc\STX\ACK\n\
     \\f\n\
-    \\ENQ\EOT\DC2\STX\SOH\SOH\DC2\ETXj\a\DC2\n\
-    \\f\n\
-    \\ENQ\EOT\DC2\STX\SOH\ETX\DC2\ETXj\NAK\SYN\n\
+    \\ENQ\ENQ\SOH\STX\ACK\STX\DC2\ETXc\t\n\
+    \\n\
     \\v\n\
-    \\EOT\EOT\DC2\STX\STX\DC2\ETXk\STX\SYN\n\
-    \\r\n\
-    \\ENQ\EOT\DC2\STX\STX\EOT\DC2\EOTk\STXj\ETB\n\
+    \\EOT\ENQ\SOH\STX\a\DC2\ETXd\STX\DLE\n\
     \\f\n\
-    \\ENQ\EOT\DC2\STX\STX\ACK\DC2\ETXk\STX\ACK\n\
+    \\ENQ\ENQ\SOH\STX\a\SOH\DC2\ETXd\STX\v\n\
     \\f\n\
-    \\ENQ\EOT\DC2\STX\STX\SOH\DC2\ETXk\a\DC1\n\
-    \\f\n\
-    \\ENQ\EOT\DC2\STX\STX\ETX\DC2\ETXk\DC4\NAK\n\
-    \\n\
-    \\n\
-    \\STX\EOT\DC3\DC2\EOTn\NULr\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\DC3\SOH\DC2\ETXn\b\f\n\
+    \\ENQ\ENQ\SOH\STX\a\STX\DC2\ETXd\SO\SI\n\
     \\v\n\
-    \\EOT\EOT\DC3\STX\NUL\DC2\ETXo\STX\NAK\n\
-    \\r\n\
-    \\ENQ\EOT\DC3\STX\NUL\EOT\DC2\EOTo\STXn\SO\n\
+    \\EOT\ENQ\SOH\STX\b\DC2\ETXe\STX\NAK\n\
     \\f\n\
-    \\ENQ\EOT\DC3\STX\NUL\ENQ\DC2\ETXo\STX\b\n\
+    \\ENQ\ENQ\SOH\STX\b\SOH\DC2\ETXe\STX\DLE\n\
     \\f\n\
-    \\ENQ\EOT\DC3\STX\NUL\SOH\DC2\ETXo\t\DLE\n\
-    \\f\n\
-    \\ENQ\EOT\DC3\STX\NUL\ETX\DC2\ETXo\DC3\DC4\n\
+    \\ENQ\ENQ\SOH\STX\b\STX\DC2\ETXe\DC3\DC4\n\
+    \\n\
+    \\n\
+    \\STX\EOT\SO\DC2\EOTh\NULo\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\SO\SOH\DC2\ETXh\b\SYN\n\
     \\v\n\
-    \\EOT\EOT\DC3\STX\SOH\DC2\ETXp\STX\DC2\n\
+    \\EOT\EOT\SO\STX\NUL\DC2\ETXi\STX\SI\n\
     \\r\n\
-    \\ENQ\EOT\DC3\STX\SOH\EOT\DC2\EOTp\STXo\NAK\n\
+    \\ENQ\EOT\SO\STX\NUL\EOT\DC2\EOTi\STXh\CAN\n\
     \\f\n\
-    \\ENQ\EOT\DC3\STX\SOH\ENQ\DC2\ETXp\STX\b\n\
+    \\ENQ\EOT\SO\STX\NUL\ENQ\DC2\ETXi\STX\a\n\
     \\f\n\
-    \\ENQ\EOT\DC3\STX\SOH\SOH\DC2\ETXp\t\r\n\
+    \\ENQ\EOT\SO\STX\NUL\SOH\DC2\ETXi\b\n\
+    \\n\
     \\f\n\
-    \\ENQ\EOT\DC3\STX\SOH\ETX\DC2\ETXp\DLE\DC1\n\
+    \\ENQ\EOT\SO\STX\NUL\ETX\DC2\ETXi\r\SO\n\
     \\v\n\
-    \\EOT\EOT\DC3\STX\STX\DC2\ETXq\STX\SYN\n\
+    \\EOT\EOT\SO\STX\SOH\DC2\ETXj\STX\DC2\n\
     \\r\n\
-    \\ENQ\EOT\DC3\STX\STX\EOT\DC2\EOTq\STXp\DC2\n\
+    \\ENQ\EOT\SO\STX\SOH\EOT\DC2\EOTj\STXi\SI\n\
     \\f\n\
-    \\ENQ\EOT\DC3\STX\STX\ENQ\DC2\ETXq\STX\b\n\
+    \\ENQ\EOT\SO\STX\SOH\ENQ\DC2\ETXj\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\DC3\STX\STX\SOH\DC2\ETXq\t\DC1\n\
+    \\ENQ\EOT\SO\STX\SOH\SOH\DC2\ETXj\t\r\n\
     \\f\n\
-    \\ENQ\EOT\DC3\STX\STX\ETX\DC2\ETXq\DC4\NAK\n\
-    \\n\
-    \\n\
-    \\STX\EOT\DC4\DC2\EOTt\NULz\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\DC4\SOH\DC2\ETXt\b\f\n\
+    \\ENQ\EOT\SO\STX\SOH\ETX\DC2\ETXj\DLE\DC1\n\
     \\v\n\
-    \\EOT\EOT\DC4\STX\NUL\DC2\ETXu\STX\DC2\n\
+    \\EOT\EOT\SO\STX\STX\DC2\ETXk\STX\DC2\n\
     \\r\n\
-    \\ENQ\EOT\DC4\STX\NUL\EOT\DC2\EOTu\STXt\SO\n\
+    \\ENQ\EOT\SO\STX\STX\EOT\DC2\EOTk\STXj\DC2\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\NUL\ENQ\DC2\ETXu\STX\b\n\
+    \\ENQ\EOT\SO\STX\STX\ENQ\DC2\ETXk\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\NUL\SOH\DC2\ETXu\t\r\n\
+    \\ENQ\EOT\SO\STX\STX\SOH\DC2\ETXk\t\r\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\NUL\ETX\DC2\ETXu\DLE\DC1\n\
+    \\ENQ\EOT\SO\STX\STX\ETX\DC2\ETXk\DLE\DC1\n\
     \\v\n\
-    \\EOT\EOT\DC4\STX\SOH\DC2\ETXv\STX\SYN\n\
+    \\EOT\EOT\SO\STX\ETX\DC2\ETXl\STX\DLE\n\
     \\r\n\
-    \\ENQ\EOT\DC4\STX\SOH\EOT\DC2\EOTv\STXu\DC2\n\
+    \\ENQ\EOT\SO\STX\ETX\EOT\DC2\EOTl\STXk\DC2\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\SOH\ENQ\DC2\ETXv\STX\b\n\
+    \\ENQ\EOT\SO\STX\ETX\ACK\DC2\ETXl\STX\ACK\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\SOH\SOH\DC2\ETXv\t\DC1\n\
+    \\ENQ\EOT\SO\STX\ETX\SOH\DC2\ETXl\a\v\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\SOH\ETX\DC2\ETXv\DC4\NAK\n\
+    \\ENQ\EOT\SO\STX\ETX\ETX\DC2\ETXl\SO\SI\n\
     \\v\n\
-    \\EOT\EOT\DC4\STX\STX\DC2\ETXw\STX\RS\n\
+    \\EOT\EOT\SO\STX\EOT\DC2\ETXm\STX\GS\n\
+    \\r\n\
+    \\ENQ\EOT\SO\STX\EOT\EOT\DC2\EOTm\STXl\DLE\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\STX\EOT\DC2\ETXw\STX\n\
-    \\n\
+    \\ENQ\EOT\SO\STX\EOT\ACK\DC2\ETXm\STX\f\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\STX\ACK\DC2\ETXw\v\DC1\n\
+    \\ENQ\EOT\SO\STX\EOT\SOH\DC2\ETXm\r\CAN\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\STX\SOH\DC2\ETXw\DC2\EM\n\
-    \\f\n\
-    \\ENQ\EOT\DC4\STX\STX\ETX\DC2\ETXw\FS\GS\n\
+    \\ENQ\EOT\SO\STX\EOT\ETX\DC2\ETXm\ESC\FS\n\
     \\v\n\
-    \\EOT\EOT\DC4\STX\ETX\DC2\ETXx\STX!\n\
+    \\EOT\EOT\SO\STX\ENQ\DC2\ETXn\STX\EM\n\
+    \\r\n\
+    \\ENQ\EOT\SO\STX\ENQ\EOT\DC2\EOTn\STXm\GS\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\ETX\EOT\DC2\ETXx\STX\n\
+    \\ENQ\EOT\SO\STX\ENQ\ACK\DC2\ETXn\STX\n\
     \\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\ETX\ACK\DC2\ETXx\v\NAK\n\
+    \\ENQ\EOT\SO\STX\ENQ\SOH\DC2\ETXn\v\DC4\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\ETX\SOH\DC2\ETXx\SYN\FS\n\
-    \\f\n\
-    \\ENQ\EOT\DC4\STX\ETX\ETX\DC2\ETXx\US \n\
+    \\ENQ\EOT\SO\STX\ENQ\ETX\DC2\ETXn\ETB\CAN\n\
+    \\n\
+    \\n\
+    \\STX\EOT\SI\DC2\EOTq\NULy\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\SI\SOH\DC2\ETXq\b\SYN\n\
     \\v\n\
-    \\EOT\EOT\DC4\STX\EOT\DC2\ETXy\STX\SYN\n\
-    \\r\n\
-    \\ENQ\EOT\DC4\STX\EOT\EOT\DC2\EOTy\STXx!\n\
+    \\EOT\EOT\SI\STX\NUL\DC2\ETXr\STX,\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\EOT\ENQ\DC2\ETXy\STX\b\n\
+    \\ENQ\EOT\SI\STX\NUL\EOT\DC2\ETXr\STX\n\
+    \\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\EOT\SOH\DC2\ETXy\t\DC1\n\
+    \\ENQ\EOT\SI\STX\NUL\ENQ\DC2\ETXr\v\DC1\n\
     \\f\n\
-    \\ENQ\EOT\DC4\STX\EOT\ETX\DC2\ETXy\DC4\NAK\n\
+    \\ENQ\EOT\SI\STX\NUL\SOH\DC2\ETXr\DC2'\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\NUL\ETX\DC2\ETXr*+\n\
     \\v\n\
-    \\STX\EOT\NAK\DC2\ENQ|\NUL\132\SOH\SOH\n\
-    \\n\
-    \\n\
-    \\ETX\EOT\NAK\SOH\DC2\ETX|\b\SO\n\
+    \\EOT\EOT\SI\STX\SOH\DC2\ETXs\STX&\n\
+    \\r\n\
+    \\ENQ\EOT\SI\STX\SOH\EOT\DC2\EOTs\STXr,\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\SOH\ENQ\DC2\ETXs\STX\a\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\SOH\SOH\DC2\ETXs\b!\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\SOH\ETX\DC2\ETXs$%\n\
     \\v\n\
-    \\EOT\EOT\NAK\STX\NUL\DC2\ETX}\STX\DC4\n\
+    \\EOT\EOT\SI\STX\STX\DC2\ETXt\STX\DC1\n\
     \\r\n\
-    \\ENQ\EOT\NAK\STX\NUL\EOT\DC2\EOT}\STX|\DLE\n\
+    \\ENQ\EOT\SI\STX\STX\EOT\DC2\EOTt\STXs&\n\
     \\f\n\
-    \\ENQ\EOT\NAK\STX\NUL\ENQ\DC2\ETX}\STX\b\n\
+    \\ENQ\EOT\SI\STX\STX\ENQ\DC2\ETXt\STX\a\n\
     \\f\n\
-    \\ENQ\EOT\NAK\STX\NUL\SOH\DC2\ETX}\t\SI\n\
+    \\ENQ\EOT\SI\STX\STX\SOH\DC2\ETXt\b\f\n\
     \\f\n\
-    \\ENQ\EOT\NAK\STX\NUL\ETX\DC2\ETX}\DC2\DC3\n\
+    \\ENQ\EOT\SI\STX\STX\ETX\DC2\ETXt\SI\DLE\n\
     \\v\n\
-    \\EOT\EOT\NAK\STX\SOH\DC2\ETX~\STX\DC2\n\
+    \\EOT\EOT\SI\STX\ETX\DC2\ETXu\STX\DC3\n\
     \\r\n\
-    \\ENQ\EOT\NAK\STX\SOH\EOT\DC2\EOT~\STX}\DC4\n\
+    \\ENQ\EOT\SI\STX\ETX\EOT\DC2\EOTu\STXt\DC1\n\
     \\f\n\
-    \\ENQ\EOT\NAK\STX\SOH\ENQ\DC2\ETX~\STX\b\n\
+    \\ENQ\EOT\SI\STX\ETX\ENQ\DC2\ETXu\STX\b\n\
     \\f\n\
-    \\ENQ\EOT\NAK\STX\SOH\SOH\DC2\ETX~\t\r\n\
+    \\ENQ\EOT\SI\STX\ETX\SOH\DC2\ETXu\t\SO\n\
     \\f\n\
-    \\ENQ\EOT\NAK\STX\SOH\ETX\DC2\ETX~\DLE\DC1\n\
+    \\ENQ\EOT\SI\STX\ETX\ETX\DC2\ETXu\DC1\DC2\n\
     \\v\n\
-    \\EOT\EOT\NAK\STX\STX\DC2\ETX\DEL\STX\DC2\n\
+    \\EOT\EOT\SI\STX\EOT\DC2\ETXv\STX\SI\n\
     \\r\n\
-    \\ENQ\EOT\NAK\STX\STX\EOT\DC2\EOT\DEL\STX~\DC2\n\
+    \\ENQ\EOT\SI\STX\EOT\EOT\DC2\EOTv\STXu\DC3\n\
     \\f\n\
-    \\ENQ\EOT\NAK\STX\STX\ENQ\DC2\ETX\DEL\STX\b\n\
+    \\ENQ\EOT\SI\STX\EOT\ENQ\DC2\ETXv\STX\a\n\
     \\f\n\
-    \\ENQ\EOT\NAK\STX\STX\SOH\DC2\ETX\DEL\t\r\n\
-    \\f\n\
-    \\ENQ\EOT\NAK\STX\STX\ETX\DC2\ETX\DEL\DLE\DC1\n\
-    \\f\n\
-    \\EOT\EOT\NAK\STX\ETX\DC2\EOT\128\SOH\STX\DLE\n\
-    \\SO\n\
-    \\ENQ\EOT\NAK\STX\ETX\EOT\DC2\ENQ\128\SOH\STX\DEL\DC2\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\ETX\ACK\DC2\EOT\128\SOH\STX\ACK\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\ETX\SOH\DC2\EOT\128\SOH\a\v\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\ETX\ETX\DC2\EOT\128\SOH\SO\SI\n\
-    \\f\n\
-    \\EOT\EOT\NAK\STX\EOT\DC2\EOT\129\SOH\STX\NAK\n\
-    \\SI\n\
-    \\ENQ\EOT\NAK\STX\EOT\EOT\DC2\ACK\129\SOH\STX\128\SOH\DLE\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\EOT\ACK\DC2\EOT\129\SOH\STX\v\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\EOT\SOH\DC2\EOT\129\SOH\f\DLE\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\EOT\ETX\DC2\EOT\129\SOH\DC3\DC4\n\
-    \\f\n\
-    \\EOT\EOT\NAK\STX\ENQ\DC2\EOT\130\SOH\STX\EM\n\
-    \\SI\n\
-    \\ENQ\EOT\NAK\STX\ENQ\EOT\DC2\ACK\130\SOH\STX\129\SOH\NAK\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\ENQ\ACK\DC2\EOT\130\SOH\STX\n\
+    \\ENQ\EOT\SI\STX\EOT\SOH\DC2\ETXv\b\n\
     \\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\ENQ\SOH\DC2\EOT\130\SOH\v\DC4\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\ENQ\ETX\DC2\EOT\130\SOH\ETB\CAN\n\
     \\f\n\
-    \\EOT\EOT\NAK\STX\ACK\DC2\EOT\131\SOH\STX\GS\n\
-    \\SI\n\
-    \\ENQ\EOT\NAK\STX\ACK\EOT\DC2\ACK\131\SOH\STX\130\SOH\EM\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\ACK\ACK\DC2\EOT\131\SOH\STX\f\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\ACK\SOH\DC2\EOT\131\SOH\r\CAN\n\
-    \\r\n\
-    \\ENQ\EOT\NAK\STX\ACK\ETX\DC2\EOT\131\SOH\ESC\FS\n\
-    \\f\n\
-    \\STX\EOT\SYN\DC2\ACK\134\SOH\NUL\136\SOH\SOH\n\
+    \\ENQ\EOT\SI\STX\EOT\ETX\DC2\ETXv\r\SO\n\
     \\v\n\
-    \\ETX\EOT\SYN\SOH\DC2\EOT\134\SOH\b\DC1\n\
+    \\EOT\EOT\SI\STX\ENQ\DC2\ETXw\STX(\n\
     \\f\n\
-    \\EOT\EOT\SYN\STX\NUL\DC2\EOT\135\SOH\STX\ETB\n\
-    \\SI\n\
-    \\ENQ\EOT\SYN\STX\NUL\EOT\DC2\ACK\135\SOH\STX\134\SOH\DC3\n\
-    \\r\n\
-    \\ENQ\EOT\SYN\STX\NUL\ENQ\DC2\EOT\135\SOH\STX\b\n\
-    \\r\n\
-    \\ENQ\EOT\SYN\STX\NUL\SOH\DC2\EOT\135\SOH\t\DC2\n\
-    \\r\n\
-    \\ENQ\EOT\SYN\STX\NUL\ETX\DC2\EOT\135\SOH\NAK\SYN\n\
+    \\ENQ\EOT\SI\STX\ENQ\EOT\DC2\ETXw\STX\n\
+    \\n\
     \\f\n\
-    \\STX\EOT\ETB\DC2\ACK\138\SOH\NUL\141\SOH\SOH\n\
+    \\ENQ\EOT\SI\STX\ENQ\ENQ\DC2\ETXw\v\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\ENQ\SOH\DC2\ETXw\DC1#\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\ENQ\ETX\DC2\ETXw&'\n\
     \\v\n\
-    \\ETX\EOT\ETB\SOH\DC2\EOT\138\SOH\b\DLE\n\
+    \\EOT\EOT\SI\STX\ACK\DC2\ETXx\STX*\n\
     \\f\n\
-    \\EOT\EOT\ETB\STX\NUL\DC2\EOT\139\SOH\STX\DC1\n\
-    \\SI\n\
-    \\ENQ\EOT\ETB\STX\NUL\EOT\DC2\ACK\139\SOH\STX\138\SOH\DC2\n\
-    \\r\n\
-    \\ENQ\EOT\ETB\STX\NUL\ENQ\DC2\EOT\139\SOH\STX\a\n\
-    \\r\n\
-    \\ENQ\EOT\ETB\STX\NUL\SOH\DC2\EOT\139\SOH\b\f\n\
-    \\r\n\
-    \\ENQ\EOT\ETB\STX\NUL\ETX\DC2\EOT\139\SOH\SI\DLE\n\
-    \\f\n\
-    \\EOT\EOT\ETB\STX\SOH\DC2\EOT\140\SOH\STX\DC3\n\
-    \\SI\n\
-    \\ENQ\EOT\ETB\STX\SOH\EOT\DC2\ACK\140\SOH\STX\139\SOH\DC1\n\
-    \\r\n\
-    \\ENQ\EOT\ETB\STX\SOH\ENQ\DC2\EOT\140\SOH\STX\a\n\
-    \\r\n\
-    \\ENQ\EOT\ETB\STX\SOH\SOH\DC2\EOT\140\SOH\b\SO\n\
-    \\r\n\
-    \\ENQ\EOT\ETB\STX\SOH\ETX\DC2\EOT\140\SOH\DC1\DC2\n\
-    \\f\n\
-    \\STX\EOT\CAN\DC2\ACK\143\SOH\NUL\146\SOH\SOH\n\
-    \\v\n\
-    \\ETX\EOT\CAN\SOH\DC2\EOT\143\SOH\b\f\n\
-    \\f\n\
-    \\EOT\EOT\CAN\STX\NUL\DC2\EOT\144\SOH\STX\NAK\n\
-    \\SI\n\
-    \\ENQ\EOT\CAN\STX\NUL\EOT\DC2\ACK\144\SOH\STX\143\SOH\SO\n\
-    \\r\n\
-    \\ENQ\EOT\CAN\STX\NUL\ACK\DC2\EOT\144\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\CAN\STX\NUL\SOH\DC2\EOT\144\SOH\v\DLE\n\
-    \\r\n\
-    \\ENQ\EOT\CAN\STX\NUL\ETX\DC2\EOT\144\SOH\DC3\DC4\n\
-    \\f\n\
-    \\EOT\EOT\CAN\STX\SOH\DC2\EOT\145\SOH\STX\DC3\n\
-    \\SI\n\
-    \\ENQ\EOT\CAN\STX\SOH\EOT\DC2\ACK\145\SOH\STX\144\SOH\NAK\n\
-    \\r\n\
-    \\ENQ\EOT\CAN\STX\SOH\ACK\DC2\EOT\145\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\CAN\STX\SOH\SOH\DC2\EOT\145\SOH\v\SO\n\
-    \\r\n\
-    \\ENQ\EOT\CAN\STX\SOH\ETX\DC2\EOT\145\SOH\DC1\DC2\n\
-    \\f\n\
-    \\STX\EOT\EM\DC2\ACK\148\SOH\NUL\154\SOH\SOH\n\
-    \\v\n\
-    \\ETX\EOT\EM\SOH\DC2\EOT\148\SOH\b\SYN\n\
-    \\f\n\
-    \\EOT\EOT\EM\STX\NUL\DC2\EOT\149\SOH\STX\DC2\n\
-    \\SI\n\
-    \\ENQ\EOT\EM\STX\NUL\EOT\DC2\ACK\149\SOH\STX\148\SOH\CAN\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\NUL\ENQ\DC2\EOT\149\SOH\STX\b\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\NUL\SOH\DC2\EOT\149\SOH\t\r\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\NUL\ETX\DC2\EOT\149\SOH\DLE\DC1\n\
-    \\f\n\
-    \\EOT\EOT\EM\STX\SOH\DC2\EOT\150\SOH\STX\SYN\n\
-    \\SI\n\
-    \\ENQ\EOT\EM\STX\SOH\EOT\DC2\ACK\150\SOH\STX\149\SOH\DC2\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\SOH\ENQ\DC2\EOT\150\SOH\STX\b\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\SOH\SOH\DC2\EOT\150\SOH\t\DC1\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\SOH\ETX\DC2\EOT\150\SOH\DC4\NAK\n\
-    \\f\n\
-    \\EOT\EOT\EM\STX\STX\DC2\EOT\151\SOH\STX$\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\STX\EOT\DC2\EOT\151\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\STX\ACK\DC2\EOT\151\SOH\v\EM\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\STX\SOH\DC2\EOT\151\SOH\SUB\US\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\STX\ETX\DC2\EOT\151\SOH\"#\n\
-    \\f\n\
-    \\EOT\EOT\EM\STX\ETX\DC2\EOT\152\SOH\STX$\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\ETX\EOT\DC2\EOT\152\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\ETX\ACK\DC2\EOT\152\SOH\v\EM\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\ETX\SOH\DC2\EOT\152\SOH\SUB\US\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\ETX\ETX\DC2\EOT\152\SOH\"#\n\
-    \\f\n\
-    \\EOT\EOT\EM\STX\EOT\DC2\EOT\153\SOH\STX!\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\EOT\EOT\DC2\EOT\153\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\EOT\ACK\DC2\EOT\153\SOH\v\NAK\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\EOT\SOH\DC2\EOT\153\SOH\SYN\FS\n\
-    \\r\n\
-    \\ENQ\EOT\EM\STX\EOT\ETX\DC2\EOT\153\SOH\US \n\
-    \\f\n\
-    \\STX\ENQ\NUL\DC2\ACK\156\SOH\NUL\163\SOH\SOH\n\
-    \\v\n\
-    \\ETX\ENQ\NUL\SOH\DC2\EOT\156\SOH\ENQ\r\n\
-    \\f\n\
-    \\EOT\ENQ\NUL\STX\NUL\DC2\EOT\157\SOH\STX\DC3\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\NUL\SOH\DC2\EOT\157\SOH\STX\SO\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\NUL\STX\DC2\EOT\157\SOH\DC1\DC2\n\
-    \\f\n\
-    \\EOT\ENQ\NUL\STX\SOH\DC2\EOT\158\SOH\STX\DC1\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\SOH\SOH\DC2\EOT\158\SOH\STX\f\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\SOH\STX\DC2\EOT\158\SOH\SI\DLE\n\
-    \\f\n\
-    \\EOT\ENQ\NUL\STX\STX\DC2\EOT\159\SOH\STX\DC4\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\STX\SOH\DC2\EOT\159\SOH\STX\SI\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\STX\STX\DC2\EOT\159\SOH\DC2\DC3\n\
-    \\f\n\
-    \\EOT\ENQ\NUL\STX\ETX\DC2\EOT\160\SOH\STX\NAK\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\ETX\SOH\DC2\EOT\160\SOH\STX\DLE\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\ETX\STX\DC2\EOT\160\SOH\DC3\DC4\n\
-    \\f\n\
-    \\EOT\ENQ\NUL\STX\EOT\DC2\EOT\161\SOH\STX\DC1\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\EOT\SOH\DC2\EOT\161\SOH\STX\f\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\EOT\STX\DC2\EOT\161\SOH\SI\DLE\n\
-    \\f\n\
-    \\EOT\ENQ\NUL\STX\ENQ\DC2\EOT\162\SOH\STX\DLE\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\ENQ\SOH\DC2\EOT\162\SOH\STX\v\n\
-    \\r\n\
-    \\ENQ\ENQ\NUL\STX\ENQ\STX\DC2\EOT\162\SOH\SO\SI\n\
-    \\f\n\
-    \\STX\ENQ\SOH\DC2\ACK\165\SOH\NUL\175\SOH\SOH\n\
-    \\v\n\
-    \\ETX\ENQ\SOH\SOH\DC2\EOT\165\SOH\ENQ\SI\n\
-    \\f\n\
-    \\EOT\ENQ\SOH\STX\NUL\DC2\EOT\166\SOH\STX\NAK\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\NUL\SOH\DC2\EOT\166\SOH\STX\DLE\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\NUL\STX\DC2\EOT\166\SOH\DC3\DC4\n\
-    \\f\n\
-    \\EOT\ENQ\SOH\STX\SOH\DC2\EOT\167\SOH\STX\SI\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\SOH\SOH\DC2\EOT\167\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\SOH\STX\DC2\EOT\167\SOH\r\SO\n\
-    \\f\n\
-    \\EOT\ENQ\SOH\STX\STX\DC2\EOT\168\SOH\STX\r\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\STX\SOH\DC2\EOT\168\SOH\STX\b\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\STX\STX\DC2\EOT\168\SOH\v\f\n\
-    \\f\n\
-    \\EOT\ENQ\SOH\STX\ETX\DC2\EOT\169\SOH\STX\f\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\ETX\SOH\DC2\EOT\169\SOH\STX\a\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\ETX\STX\DC2\EOT\169\SOH\n\
-    \\v\n\
-    \\f\n\
-    \\EOT\ENQ\SOH\STX\EOT\DC2\EOT\170\SOH\STX\r\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\EOT\SOH\DC2\EOT\170\SOH\STX\b\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\EOT\STX\DC2\EOT\170\SOH\v\f\n\
-    \\f\n\
-    \\EOT\ENQ\SOH\STX\ENQ\DC2\EOT\171\SOH\STX\v\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\ENQ\SOH\DC2\EOT\171\SOH\STX\ACK\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\ENQ\STX\DC2\EOT\171\SOH\t\n\
+    \\ENQ\EOT\SI\STX\ACK\EOT\DC2\ETXx\STX\n\
     \\n\
     \\f\n\
-    \\EOT\ENQ\SOH\STX\ACK\DC2\EOT\172\SOH\STX\v\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\ACK\SOH\DC2\EOT\172\SOH\STX\ACK\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\ACK\STX\DC2\EOT\172\SOH\t\n\
-    \\n\
+    \\ENQ\EOT\SI\STX\ACK\ENQ\DC2\ETXx\v\DC1\n\
     \\f\n\
-    \\EOT\ENQ\SOH\STX\a\DC2\EOT\173\SOH\STX\DLE\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\a\SOH\DC2\EOT\173\SOH\STX\v\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\a\STX\DC2\EOT\173\SOH\SO\SI\n\
+    \\ENQ\EOT\SI\STX\ACK\SOH\DC2\ETXx\DC2%\n\
     \\f\n\
-    \\EOT\ENQ\SOH\STX\b\DC2\EOT\174\SOH\STX\NAK\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\b\SOH\DC2\EOT\174\SOH\STX\DLE\n\
-    \\r\n\
-    \\ENQ\ENQ\SOH\STX\b\STX\DC2\EOT\174\SOH\DC3\DC4\n\
-    \\f\n\
-    \\STX\EOT\SUB\DC2\ACK\177\SOH\NUL\184\SOH\SOH\n\
-    \\v\n\
-    \\ETX\EOT\SUB\SOH\DC2\EOT\177\SOH\b\SYN\n\
-    \\f\n\
-    \\EOT\EOT\SUB\STX\NUL\DC2\EOT\178\SOH\STX\SI\n\
-    \\SI\n\
-    \\ENQ\EOT\SUB\STX\NUL\EOT\DC2\ACK\178\SOH\STX\177\SOH\CAN\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\NUL\ENQ\DC2\EOT\178\SOH\STX\a\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\NUL\SOH\DC2\EOT\178\SOH\b\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\NUL\ETX\DC2\EOT\178\SOH\r\SO\n\
-    \\f\n\
-    \\EOT\EOT\SUB\STX\SOH\DC2\EOT\179\SOH\STX\DC2\n\
-    \\SI\n\
-    \\ENQ\EOT\SUB\STX\SOH\EOT\DC2\ACK\179\SOH\STX\178\SOH\SI\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\SOH\ENQ\DC2\EOT\179\SOH\STX\b\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\SOH\SOH\DC2\EOT\179\SOH\t\r\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\SOH\ETX\DC2\EOT\179\SOH\DLE\DC1\n\
-    \\f\n\
-    \\EOT\EOT\SUB\STX\STX\DC2\EOT\180\SOH\STX\DC2\n\
-    \\SI\n\
-    \\ENQ\EOT\SUB\STX\STX\EOT\DC2\ACK\180\SOH\STX\179\SOH\DC2\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\STX\ENQ\DC2\EOT\180\SOH\STX\b\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\STX\SOH\DC2\EOT\180\SOH\t\r\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\STX\ETX\DC2\EOT\180\SOH\DLE\DC1\n\
-    \\f\n\
-    \\EOT\EOT\SUB\STX\ETX\DC2\EOT\181\SOH\STX\DLE\n\
-    \\SI\n\
-    \\ENQ\EOT\SUB\STX\ETX\EOT\DC2\ACK\181\SOH\STX\180\SOH\DC2\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\ETX\ACK\DC2\EOT\181\SOH\STX\ACK\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\ETX\SOH\DC2\EOT\181\SOH\a\v\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\ETX\ETX\DC2\EOT\181\SOH\SO\SI\n\
-    \\f\n\
-    \\EOT\EOT\SUB\STX\EOT\DC2\EOT\182\SOH\STX\GS\n\
-    \\SI\n\
-    \\ENQ\EOT\SUB\STX\EOT\EOT\DC2\ACK\182\SOH\STX\181\SOH\DLE\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\EOT\ACK\DC2\EOT\182\SOH\STX\f\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\EOT\SOH\DC2\EOT\182\SOH\r\CAN\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\EOT\ETX\DC2\EOT\182\SOH\ESC\FS\n\
-    \\f\n\
-    \\EOT\EOT\SUB\STX\ENQ\DC2\EOT\183\SOH\STX\EM\n\
-    \\SI\n\
-    \\ENQ\EOT\SUB\STX\ENQ\EOT\DC2\ACK\183\SOH\STX\182\SOH\GS\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\ENQ\ACK\DC2\EOT\183\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\ENQ\SOH\DC2\EOT\183\SOH\v\DC4\n\
-    \\r\n\
-    \\ENQ\EOT\SUB\STX\ENQ\ETX\DC2\EOT\183\SOH\ETB\CAN\n\
-    \\f\n\
-    \\STX\EOT\ESC\DC2\ACK\186\SOH\NUL\194\SOH\SOH\n\
-    \\v\n\
-    \\ETX\EOT\ESC\SOH\DC2\EOT\186\SOH\b\SYN\n\
-    \\f\n\
-    \\EOT\EOT\ESC\STX\NUL\DC2\EOT\187\SOH\STX,\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\NUL\EOT\DC2\EOT\187\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\NUL\ENQ\DC2\EOT\187\SOH\v\DC1\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\NUL\SOH\DC2\EOT\187\SOH\DC2'\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\NUL\ETX\DC2\EOT\187\SOH*+\n\
-    \\f\n\
-    \\EOT\EOT\ESC\STX\SOH\DC2\EOT\188\SOH\STX&\n\
-    \\SI\n\
-    \\ENQ\EOT\ESC\STX\SOH\EOT\DC2\ACK\188\SOH\STX\187\SOH,\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\SOH\ENQ\DC2\EOT\188\SOH\STX\a\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\SOH\SOH\DC2\EOT\188\SOH\b!\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\SOH\ETX\DC2\EOT\188\SOH$%\n\
-    \\f\n\
-    \\EOT\EOT\ESC\STX\STX\DC2\EOT\189\SOH\STX\DC1\n\
-    \\SI\n\
-    \\ENQ\EOT\ESC\STX\STX\EOT\DC2\ACK\189\SOH\STX\188\SOH&\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\STX\ENQ\DC2\EOT\189\SOH\STX\a\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\STX\SOH\DC2\EOT\189\SOH\b\f\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\STX\ETX\DC2\EOT\189\SOH\SI\DLE\n\
-    \\f\n\
-    \\EOT\EOT\ESC\STX\ETX\DC2\EOT\190\SOH\STX\DC3\n\
-    \\SI\n\
-    \\ENQ\EOT\ESC\STX\ETX\EOT\DC2\ACK\190\SOH\STX\189\SOH\DC1\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ETX\ENQ\DC2\EOT\190\SOH\STX\b\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ETX\SOH\DC2\EOT\190\SOH\t\SO\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ETX\ETX\DC2\EOT\190\SOH\DC1\DC2\n\
-    \\f\n\
-    \\EOT\EOT\ESC\STX\EOT\DC2\EOT\191\SOH\STX\SI\n\
-    \\SI\n\
-    \\ENQ\EOT\ESC\STX\EOT\EOT\DC2\ACK\191\SOH\STX\190\SOH\DC3\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\EOT\ENQ\DC2\EOT\191\SOH\STX\a\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\EOT\SOH\DC2\EOT\191\SOH\b\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\EOT\ETX\DC2\EOT\191\SOH\r\SO\n\
-    \\f\n\
-    \\EOT\EOT\ESC\STX\ENQ\DC2\EOT\192\SOH\STX(\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ENQ\EOT\DC2\EOT\192\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ENQ\ENQ\DC2\EOT\192\SOH\v\DLE\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ENQ\SOH\DC2\EOT\192\SOH\DC1#\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ENQ\ETX\DC2\EOT\192\SOH&'\n\
-    \\f\n\
-    \\EOT\EOT\ESC\STX\ACK\DC2\EOT\193\SOH\STX*\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ACK\EOT\DC2\EOT\193\SOH\STX\n\
-    \\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ACK\ENQ\DC2\EOT\193\SOH\v\DC1\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ACK\SOH\DC2\EOT\193\SOH\DC2%\n\
-    \\r\n\
-    \\ENQ\EOT\ESC\STX\ACK\ETX\DC2\EOT\193\SOH()b\ACKproto3"
+    \\ENQ\EOT\SI\STX\ACK\ETX\DC2\ETXx()b\ACKproto3"
