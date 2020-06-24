@@ -20,7 +20,6 @@ import Data.Bifunctor.Join
 import Data.Edit
 import qualified Data.Language as Language
 import Data.List.NonEmpty
-import Data.Term
 import Data.Text as T (Text, pack)
 import Data.Sum
 import Source.Loc
@@ -84,22 +83,6 @@ instance Listable1 NonEmpty where
 
 instance Listable2 p => Listable1 (Join p) where
   liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
-
-instance Listable1 f => Listable2 (TermF f) where
-  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) In
-
-instance (Listable1 f, Listable a) => Listable1 (TermF f a) where
-  liftTiers = liftTiers2 tiers
-
-instance (Listable1 f, Listable a, Listable b) => Listable (TermF f a b) where
-  tiers = tiers1
-
-instance Listable1 f => Listable1 (Term f) where
-  liftTiers annotationTiers = go
-    where go = liftCons1 (liftTiers2 annotationTiers go) Term
-
-instance (Listable1 f, Listable a) => Listable (Term f a) where
-  tiers = tiers1
 
 instance Listable2 Edit where
   liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Compare

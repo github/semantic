@@ -40,7 +40,6 @@ import           Data.Monoid as X (First (..), Last (..), Monoid (..))
 import           Data.Proxy as X
 import           Data.Semigroup as X (Semigroup (..))
 import           Data.Semilattice.Lower as X
-import           Data.Term as X
 import           Data.Traversable as X (for)
 import           Debug.Trace as X (traceM, traceShowM)
 import           Parsing.Parser as X

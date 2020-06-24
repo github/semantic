@@ -29,7 +29,6 @@ module Parsing.Parser
 ) where
 
 import           AST.Unmarshal
-import           Data.AST
 import           Data.Language
 import           Data.Map (Map)
 import qualified Data.Map as Map
@@ -49,8 +48,6 @@ import qualified TreeSitter.Language as TS (Language)
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
-  -- | A parser producing 'AST' using a 'TS.Language'.
-  ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST grammar)
   -- | A parser 'Unmarshal'ing to a precise AST type using a 'TS.Language'.
   UnmarshalParser :: Unmarshal t => Ptr TS.Language -> Parser (t Loc)
 
