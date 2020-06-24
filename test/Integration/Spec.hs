@@ -57,8 +57,6 @@ examples directory = do
   bs <- globFor "*.B.*"
   sExpAs <- globFor "*.parseA.txt"
   sExpBs <- globFor "*.parseB.txt"
-  sExpDiffsAB <- globFor "*.diffA-B.txt"
-  sExpDiffsBA <- globFor "*.diffB-A.txt"
 
   let exampleParse files out name = ParseExample (lookupNormalized name files) out
 
