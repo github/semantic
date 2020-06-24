@@ -259,12 +259,7 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Analysis.Go.Spec
-                     , Analysis.PHP.Spec
-                     , Analysis.Python.Spec
-                     , Analysis.Ruby.Spec
-                     , Analysis.TypeScript.Spec
-                     , Control.Abstract.Evaluator.Spec
+  other-modules:       Control.Abstract.Evaluator.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Abstract.Name.Spec
                      , Data.Functor.Classes.Generic.Spec
@@ -274,7 +269,6 @@ test-suite test
                      , Data.Language.Spec
                      , Data.Scientific.Spec
                      , Data.Semigroup.App.Spec
-                     , Data.Term.Spec
                      , Integration.Spec
                      , Numeric.Spec
                      , Parsing.Spec

@@ -13,7 +13,6 @@ module Data.Functor.Listable
 , (\/)
 , addWeight
 , ofWeight
-, ListableSyntax
 ) where
 
 import qualified Analysis.Name as Name

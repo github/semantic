@@ -10,7 +10,6 @@ module SpecHelpers
 , runTaskOrDie
 , runParseWithConfig
 , TaskSession(..)
-, testEvaluating
 , toList
 , Config
 , LogQueue
@@ -20,7 +19,6 @@ module SpecHelpers
 , EdgeLabel(..)
 , TestEvaluatingResult
 , TestEvaluatingState
-, evaluateProject
 , moduleLookup
 ) where
 
@@ -68,7 +66,6 @@ import           Debug.Trace as X (traceM, traceShowM)
 import           Parsing.Parser as X
 import           Semantic.Api hiding (Blob, File)
 import           Semantic.Config (Config (..), optionsLogLevel)
-import           Semantic.Graph (analysisParsers, runHeap, runScopeGraph)
 import           Semantic.Task as X
 import           Semantic.Telemetry (LogQueue, StatQueue)
 import           Semantic.Util as X
@@ -139,34 +136,8 @@ type TestEvaluatingState term a
       )
     )
 type TestEvaluatingResult term = ModuleTable (Module (ModuleResult Precise (Val term)))
-testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) a
-               -> IO (TestEvaluatingState term a)
-testEvaluating
-  = runM
-  . Trace.Ignoring.runTrace
-  . fmap snd
-  . runFresh 0
-  . runEvaluator
-  . runScopeGraph
-  . runHeap
-  . fmap reassociate
-  . runLoadError
-  . runUnspecialized
-  . runScopeError
-  . runHeapError
-  . runEvalError
-  . runResolutionError
-  . runValueError
-  . runAddressError
 
 type Val term = Value term Precise
-
-evaluateProject :: (HasPrelude lang, SLanguage lang) => TaskSession -> Proxy lang -> [FilePath] -> IO (TestEvaluatingState term (TestEvaluatingResult term))
-evaluateProject session proxy = case parserForLanguage analysisParsers lang of
-  Just (SomeParser parser) -> unsafeCoerce . testEvaluating <=< evaluateProject' session proxy parser
-  _                        -> error $ "analysis not supported for " <> show lang
-  where lang = reflect proxy
-
 
 members :: EdgeLabel
         -> Heap Precise Precise (Value term Precise)
