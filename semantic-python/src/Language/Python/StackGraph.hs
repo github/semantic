@@ -546,7 +546,8 @@ instance ToScopeGraph Py.Module where
     newGraph <- get @(Stack.Graph (Tagged Stack.Node))
 
     ScopeGraph.CurrentScope currentScope' <- currentScope
-    modify (Stack.addEdge declaration currentScope' . Stack.overlay newGraph)
+    modulePopSymbol <- popSymbol "."
+    modify (Stack.addEdge declaration modulePopSymbol . Stack.addEdge modulePopSymbol currentScope' . Stack.overlay newGraph)
 
     pure (Complete (noBindings ()))
 
