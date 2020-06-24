@@ -7,7 +7,6 @@ import qualified Analysis.PHP.Spec
 import qualified Analysis.Python.Spec
 import qualified Analysis.Ruby.Spec
 import qualified Analysis.TypeScript.Spec
-import qualified Assigning.Assignment.Spec
 import qualified Control.Abstract.Evaluator.Spec
 import qualified Data.Abstract.Name.Spec
 import qualified Data.Abstract.Path.Spec
@@ -64,7 +63,6 @@ legacySpecs = parallel $ do
   describe "Analysis.Python" Analysis.Python.Spec.spec
   describe "Analysis.Ruby" Analysis.Ruby.Spec.spec
   describe "Analysis.TypeScript" Analysis.TypeScript.Spec.spec
-  describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
   describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
   describe "Data.Graph" Data.Graph.Spec.spec
   describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec

@@ -93,9 +93,6 @@ library
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.HasTextElement
-                     -- Semantic assignment
-                     , Assigning.Assignment
-                     , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
                      , Control.Abstract.Context
@@ -269,7 +266,6 @@ test-suite test
                      , Analysis.Python.Spec
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
-                     , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Abstract.Name.Spec
