@@ -9,7 +9,6 @@ import qualified Data.Scientific.Spec
 import qualified Data.Semigroup.App.Spec
 import qualified Integration.Spec
 import qualified Numeric.Spec
-import qualified Parsing.Spec
 import qualified Tags.Spec
 import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
@@ -53,7 +52,6 @@ legacySpecs = parallel $ do
   describe "Tags.Spec" Tags.Spec.spec
   describe "Semantic" Semantic.Spec.spec
   describe "Semantic.IO" Semantic.IO.Spec.spec
-  describe "Parsing" Parsing.Spec.spec
 
 
 main :: IO ()
