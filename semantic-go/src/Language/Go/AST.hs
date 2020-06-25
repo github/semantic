@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
@@ -13,6 +14,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
 module Language.Go.AST
 ( module Language.Go.AST
@@ -24,4 +26,8 @@ import           AST.GenerateSyntax
 import           Language.Haskell.TH.Syntax (runIO)
 import qualified TreeSitter.Go as Go (getNodeTypesPath, getTestCorpusDir, tree_sitter_go)
 
-astDeclarationsForLanguage Go.tree_sitter_go "/Users/patrickt/src/semantic/vendor/go-node-types.json"
+#ifdef NODE_TYPES_PATH
+astDeclarationsForLanguage Go.tree_sitter_go NODE_TYPES_PATH
+#else
+runIO Go.getNodeTypesPath >>= astDeclarationsForLanguage Go.tree_sitter_go
+#endif

@@ -36,7 +36,12 @@ def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
         nodetypes = language
     haskell_library(
         name = name,
-        compiler_flags = STANDARD_GHC_WARNINGS,
+        # We can't use Template Haskell to find out the location of the
+        # node-types.json files, but we can pass it in as a preprocessor
+        # directive.
+        compiler_flags = STANDARD_GHC_WARNINGS + [
+            '-DNODE_TYPES_PATH="../../../../$(rootpath //vendor:' + nodetypes + '-node-types.json)"',
+        ],
         srcs = srcs,
         extra_srcs = ["//vendor:" + nodetypes + "-node-types.json"],
         deps = [
