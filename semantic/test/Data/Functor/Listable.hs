@@ -20,9 +20,7 @@ import Data.Bifunctor.Join
 import Data.Edit
 import qualified Data.Language as Language
 import Data.List.NonEmpty
-import Data.Term
 import Data.Text as T (Text, pack)
-import Data.Sum
 import Source.Loc
 import Source.Span
 import Test.LeanCheck
@@ -33,11 +31,6 @@ type Tier a = [a]
 class Listable1 l where
   -- | The tiers for @l :: * -> *@, parameterized by the tiers for @a :: *@.
   liftTiers :: [Tier a] -> [Tier (l a)]
-
--- | A suitable definition of 'tiers' for 'Listable1' type constructors parameterized by 'Listable' types.
-tiers1 :: (Listable a, Listable1 l) => [Tier (l a)]
-tiers1 = liftTiers tiers
-
 
 -- | Lifting of 'Listable' to @* -> * -> *@.
 class Listable2 l where
@@ -85,37 +78,11 @@ instance Listable1 NonEmpty where
 instance Listable2 p => Listable1 (Join p) where
   liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
 
-instance Listable1 f => Listable2 (TermF f) where
-  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) In
-
-instance (Listable1 f, Listable a) => Listable1 (TermF f a) where
-  liftTiers = liftTiers2 tiers
-
-instance (Listable1 f, Listable a, Listable b) => Listable (TermF f a b) where
-  tiers = tiers1
-
-instance Listable1 f => Listable1 (Term f) where
-  liftTiers annotationTiers = go
-    where go = liftCons1 (liftTiers2 annotationTiers go) Term
-
-instance (Listable1 f, Listable a) => Listable (Term f a) where
-  tiers = tiers1
-
 instance Listable2 Edit where
   liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Compare
 
 instance (Listable a, Listable b) => Listable (Edit a b) where
   tiers = tiers2
-
-
-instance (Listable1 f, Listable1 (Sum (g ': fs))) => Listable1 (Sum (f ': g ': fs)) where
-  liftTiers tiers = (inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Sum (g ': fs) a)]) tiers))
-
-instance Listable1 f => Listable1 (Sum '[f]) where
-  liftTiers tiers = inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
-
-instance (Listable1 (Sum fs), Listable a) => Listable (Sum fs a) where
-  tiers = tiers1
 
 
 instance Listable Name.Name where

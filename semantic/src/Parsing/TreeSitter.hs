@@ -9,26 +9,20 @@
 module Parsing.TreeSitter
 ( TSParseException (..)
 , Duration(..)
-, parseToAST
 , parseToPreciseAST
 ) where
 
 import Control.Carrier.Reader
 import Control.Exception as Exc
-import Control.Monad
 import Control.Monad.IO.Class
-import Data.Functor.Foldable
 import Foreign
 import GHC.Generics
 
-import           Data.AST (AST, Node (Node))
 import           Data.Blob
 import           Data.Duration
 import           Data.Maybe.Exts
-import           Data.Term
 import           Source.Loc
 import qualified Source.Source as Source
-import           Source.Span
 import qualified System.Timeout as System
 
 import qualified TreeSitter.Cursor as TS
@@ -44,18 +38,6 @@ data TSParseException
   | UnmarshalTimedOut
   | UnmarshalFailure String
     deriving (Eq, Show, Generic)
-
--- | Parse a 'Blob' with the given 'TS.Language' and return its AST.
--- Returns 'Nothing' if the operation timed out.
-parseToAST :: ( Bounded grammar
-              , Enum grammar
-              , MonadIO m
-              )
-           => Duration
-           -> Ptr TS.Language
-           -> Blob
-           -> m (Either TSParseException (AST grammar))
-parseToAST parseTimeout language blob = runParse parseTimeout language blob (anaM toAST <=< peek)
 
 parseToPreciseAST
   :: ( MonadIO m
@@ -102,22 +84,3 @@ runParse parseTimeout language Blob{..} action =
           TS.withRootNode treePtr action
     else
       Exc.throw IncompatibleVersions
-
-toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST grammar) TS.Node)
-toAST node@TS.Node{..} = do
-  let count = fromIntegral nodeChildCount
-  children <- allocaArray count $ \ childNodesPtr -> do
-    _ <- with nodeTSNode (`TS.ts_node_copy_child_nodes` childNodesPtr)
-    peekArray count childNodesPtr
-  pure $! In (Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (Loc (nodeRange node) (nodeSpan node))) children
-
-anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
-anaM g = a where a = pure . embed <=< traverse a <=< g
-
-
-nodeRange :: TS.Node -> Range
-nodeRange node = Range (fromIntegral (TS.nodeStartByte node)) (fromIntegral (TS.nodeEndByte node))
-
-nodeSpan :: TS.Node -> Span
-nodeSpan node = TS.nodeStartPoint node `seq` TS.nodeEndPoint node `seq` Span (pointPos (TS.nodeStartPoint node)) (pointPos (TS.nodeEndPoint node))
-  where pointPos TS.TSPoint{..} = pointRow `seq` pointColumn `seq` Pos (1 + fromIntegral pointRow) (1 + fromIntegral pointColumn)

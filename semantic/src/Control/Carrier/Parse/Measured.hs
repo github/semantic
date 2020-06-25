@@ -59,10 +59,6 @@ runParser ::
   -> Parser term
   -> m term
 runParser blob@Blob{..} parser = case parser of
-  ASTParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $ do
-      config <- asks config
-      executeParserAction (parseToAST (configTreeSitterParseTimeout config) language blob)
 
   UnmarshalParser language -> do
     (time "parse.tree_sitter_precise_ast_parse" languageTag $ do
