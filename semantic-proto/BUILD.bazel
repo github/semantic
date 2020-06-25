@@ -6,7 +6,6 @@ load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_binary",
     "haskell_library",
-    "haskell_toolchain_library",
 )
 load(
     "@rules_haskell//haskell:cabal.bzl",
@@ -14,17 +13,12 @@ load(
     "haskell_cabal_library",
 )
 
-# haskell_toolchain_library can access builtin GHC packages
-# and assign them a bazel target name, so that they
-# can be referenced as dependencies.
-haskell_toolchain_library(name = "base")
-
 # You can add your own libraries with haskell_library.
 haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     deps = [
-        ":base",
+        "//:base",
         "@stackage//:aeson",
         "@stackage//:proto-lens",
         "@stackage//:proto-lens-jsonpb",

@@ -5,7 +5,17 @@ package(default_visibility = ["//visibility:public"])
 load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_repl",
+    "haskell_toolchain_library",
 )
+
+# The GHC bindists provide us with a set of builtin libraries.
+# We use them rather than looking up those in stackage.
+
+haskell_toolchain_library(name = "base")
+
+haskell_toolchain_library(name = "bytestring")
+
+haskell_toolchain_library(name = "containers")
 
 haskell_repl(
     name = "hie-bios",

@@ -6,7 +6,6 @@ load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_library",
     "haskell_test",
-    "haskell_toolchain_library",
 )
 load(
     "@rules_haskell//haskell:cabal.bzl",
@@ -19,18 +18,13 @@ load(
     "STANDARD_GHC_WARNINGS",
 )
 
-# haskell_toolchain_library can access builtin GHC packages
-# and assign them a bazel target name, so that they
-# can be referenced as dependencies.
-haskell_toolchain_library(name = "base")
-
 # You can add your own libraries with haskell_library.
 haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS,
     deps = [
-        ":base",
+        "//:base",
         "//semantic-analysis:lib",
         "//semantic-source:lib",
         "@stackage//:fused-effects",
@@ -54,8 +48,8 @@ haskell_test(
     ]),
     compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS,
     deps = [
-        ":base",
         ":lib",
+        "//:base",
         "//semantic-analysis:lib",
         "//semantic-source:lib",
         "@stackage//:fused-effects",

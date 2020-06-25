@@ -34,10 +34,11 @@ load(
     "haskell_cabal_library",
     "stack_snapshot",
 )
-
-# load("@rules_haskell//haskell:doctest.bzl", "haskell_doctest_toolchain")
-
-# register_toolchains("//:doctest")
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_library",
+)
 
 stack_snapshot(
     name = "stackage",
@@ -55,8 +56,6 @@ stack_snapshot(
         "attoparsec",
         "bazel-runfiles",
         "bifunctors",
-        "bytestring",
-        "containers",
         "deepseq",
         "directory",
         "directory-tree",
@@ -83,7 +82,6 @@ stack_snapshot(
         "leancheck",
         "lens",
         "mersenne-random-pure64",
-        "mtl",
         "network",
         "network-uri",
         "optparse-applicative",

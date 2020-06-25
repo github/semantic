@@ -20,29 +20,22 @@ load(
     "STANDARD_GHC_WARNINGS",
 )
 
-# haskell_toolchain_library can access builtin GHC packages
-# and assign them a bazel target name, so that they
-# can be referenced as dependencies.
-haskell_toolchain_library(name = "base")
-
 haskell_toolchain_library(name = "ghc-prim")
 
 semantic_common_dependencies = [
+    "//:bytestring",
+    "//:containers",
     "//semantic-analysis:lib",
     "//semantic-ast:lib",
     "//semantic-source:lib",
     "@stackage//:aeson",
     "@stackage//:algebraic-graphs",
     "@stackage//:async",
-    "@stackage//:bytestring",
-    "@stackage//:containers",
     "@stackage//:directory",
-    "@stackage//:fastsum",
     "@stackage//:fused-effects",
     "@stackage//:fused-effects-exceptions",
     "@stackage//:fused-effects-resumable",
     "@stackage//:hashable",
-    "@stackage//:mtl",
     "@stackage//:network",
     "@stackage//:pathtype",
     "@stackage//:process",
@@ -61,7 +54,7 @@ haskell_library(
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + ["-XStrictData"],
     deps = semantic_common_dependencies + [
-        ":base",
+        "//:base",
         ":ghc-prim",
         "//semantic-codeql:lib",
         "//semantic-go:lib",
@@ -81,6 +74,7 @@ haskell_library(
         "@stackage//:bifunctors",
         "@stackage//:deepseq",
         "@stackage//:directory-tree",
+        "@stackage//:fastsum",
         "@stackage//:filepath",
         "@stackage//:fused-syntax",
         "@stackage//:generic-lens",
@@ -120,7 +114,7 @@ haskell_binary(
     srcs = glob(["app/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + ["-XStrictData"],
     deps = [
-        ":base",
+        "//:base",
         "//semantic:lib",
     ],
 )
@@ -146,7 +140,7 @@ haskell_test(
         "test/fixtures/typescript/**/*.ts",
     ]),
     deps = semantic_common_dependencies + [
-        ":base",
+        "//:base",
         "//semantic:lib",
         "//semantic-proto:lib",
         "//semantic-json:lib",

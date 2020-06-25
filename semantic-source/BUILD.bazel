@@ -6,7 +6,6 @@ load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_library",
     "haskell_test",
-    "haskell_toolchain_library",
 )
 load(
     "@rules_haskell//haskell:cabal.bzl",
@@ -24,20 +23,15 @@ load(
     "STANDARD_GHC_WARNINGS",
 )
 
-# haskell_toolchain_library can access builtin GHC packages
-# and assign them a bazel target name, so that they
-# can be referenced as dependencies.
-haskell_toolchain_library(name = "base")
-
 haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + ["-XOverloadedStrings"],
     deps = [
-        ":base",
+        "//:base",
+        "//:bytestring",
+        "//:containers",
         "@stackage//:aeson",
-        "@stackage//:bytestring",
-        "@stackage//:containers",
         "@stackage//:deepseq",
         "@stackage//:filepath",
         "@stackage//:generic-monoid",
@@ -56,8 +50,8 @@ haskell_test(
     ],
     compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS,
     deps = [
-        ":base",
         ":lib",
+        "//:base",
         "@stackage//:hedgehog",
         "@stackage//:tasty",
         "@stackage//:tasty-hedgehog",
@@ -65,5 +59,3 @@ haskell_test(
         "@stackage//:text",
     ],
 )
-
-# TODO: reenable doctests
