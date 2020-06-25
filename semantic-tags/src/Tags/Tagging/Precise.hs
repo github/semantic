@@ -36,11 +36,6 @@ class ToTags t where
   tags :: Source -> t Loc -> [Tag]
 
 
--- yield :: Has (Writer Tags) sig m => Tag -> m ()
--- yield = tell . Endo . (:) . modSpan toOneIndexed where
---   modSpan f t@Tag{ tagLoc = l } = t { tagLoc = l { span = f (span l) } }
---   toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
-
 yield ::
   (Has (Reader Source) sig m, Has (Writer Tags) sig m) =>
   Text ->         -- |^ Text of the identifier
