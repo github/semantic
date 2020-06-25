@@ -13,40 +13,18 @@ load(
     "haskell_cabal_binary",
     "haskell_cabal_library",
 )
+load(
+    "//:build/common.bzl",
+    "semantic_language_library",
+)
 
 # haskell_toolchain_library can access builtin GHC packages
 # and assign them a bazel target name, so that they
 # can be referenced as dependencies.
 haskell_toolchain_library(name = "base")
 
-# You can add your own libraries with haskell_library.
-haskell_library(
+semantic_language_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
-    extra_srcs = ["//vendor:json-node-types.json"],
-    deps = [
-        ":base",
-        "//semantic-analysis:lib",
-        "//semantic-ast:lib",
-        "//semantic-core:lib",
-        "//semantic-proto:lib",
-        "//semantic-scope-graph:lib",
-        "//semantic-source:lib",
-        "//semantic-tags:lib",
-        "@stackage//:aeson",
-        "@stackage//:algebraic-graphs",
-        "@stackage//:containers",
-        "@stackage//:fused-effects",
-        "@stackage//:fused-syntax",
-        "@stackage//:generic-lens",
-        "@stackage//:generic-monoid",
-        "@stackage//:hashable",
-        "@stackage//:lens",
-        "@stackage//:pathtype",
-        "@stackage//:semilattices",
-        "@stackage//:template-haskell",
-        "@stackage//:text",
-        "@stackage//:tree-sitter",
-        "@stackage//:tree-sitter-json",
-    ],
+    language = "json",
 )

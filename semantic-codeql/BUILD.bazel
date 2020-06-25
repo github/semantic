@@ -23,7 +23,7 @@ load(
 # can be referenced as dependencies.
 haskell_toolchain_library(name = "base")
 
-# You can add your own libraries with haskell_library.
+# Not using semantic_language_library because of naming irregularities
 haskell_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),

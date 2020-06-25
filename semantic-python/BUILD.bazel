@@ -4,18 +4,11 @@ package(default_visibility = ["//visibility:public"])
 # Load rules_haskell rules.
 load(
     "@rules_haskell//haskell:defs.bzl",
-    "haskell_binary",
-    "haskell_library",
     "haskell_toolchain_library",
 )
 load(
-    "@rules_haskell//haskell:cabal.bzl",
-    "haskell_cabal_binary",
-    "haskell_cabal_library",
-)
-load(
     "//:build/common.bzl",
-    "STANDARD_GHC_WARNINGS",
+    "semantic_language_library",
 )
 
 # haskell_toolchain_library can access builtin GHC packages
@@ -23,8 +16,7 @@ load(
 # can be referenced as dependencies.
 haskell_toolchain_library(name = "base")
 
-# You can add your own libraries with haskell_library.
-haskell_library(
+semantic_language_library(
     name = "lib",
     srcs = glob(
         include = ["src/**/*.hs"],
@@ -33,31 +25,5 @@ haskell_library(
             "src/Language/Python/ScopeGraph.hs",
         ],
     ),
-    compiler_flags = STANDARD_GHC_WARNINGS,
-    extra_srcs = ["//vendor:python-node-types.json"],
-    deps = [
-        ":base",
-        "//semantic-analysis:lib",
-        "//semantic-ast:lib",
-        "//semantic-core:lib",
-        "//semantic-proto:lib",
-        "//semantic-scope-graph:lib",
-        "//semantic-source:lib",
-        "//semantic-tags:lib",
-        "@stackage//:aeson",
-        "@stackage//:algebraic-graphs",
-        "@stackage//:containers",
-        "@stackage//:fused-effects",
-        "@stackage//:fused-syntax",
-        "@stackage//:generic-lens",
-        "@stackage//:generic-monoid",
-        "@stackage//:hashable",
-        "@stackage//:lens",
-        "@stackage//:pathtype",
-        "@stackage//:semilattices",
-        "@stackage//:template-haskell",
-        "@stackage//:text",
-        "@stackage//:tree-sitter",
-        "@stackage//:tree-sitter-python",
-    ],
+    language = "python",
 )
