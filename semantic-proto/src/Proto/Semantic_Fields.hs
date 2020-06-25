@@ -128,6 +128,11 @@ line ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "line" a) =>
   Lens.Family2.LensLike' f s a
 line = Data.ProtoLens.Field.field @"line"
+lspSpan ::
+  forall f s a.
+  (Prelude.Functor f, Data.ProtoLens.Field.HasField s "lspSpan" a) =>
+  Lens.Family2.LensLike' f s a
+lspSpan = Data.ProtoLens.Field.field @"lspSpan"
 maybe'docs ::
   forall f s a.
   (Prelude.Functor f,
@@ -140,6 +145,12 @@ maybe'end ::
    Data.ProtoLens.Field.HasField s "maybe'end" a) =>
   Lens.Family2.LensLike' f s a
 maybe'end = Data.ProtoLens.Field.field @"maybe'end"
+maybe'lspSpan ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "maybe'lspSpan" a) =>
+  Lens.Family2.LensLike' f s a
+maybe'lspSpan = Data.ProtoLens.Field.field @"maybe'lspSpan"
 maybe'span ::
   forall f s a.
   (Prelude.Functor f,

@@ -57,6 +57,7 @@ message Symbol {
   Docstring docs = 5;
   NodeType node_type = 6;
   SyntaxType syntax_type = 7;
+  Span lsp_span = 8;
 }
 
 message Docstring {
