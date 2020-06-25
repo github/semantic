@@ -8,7 +8,6 @@ import           Hedgehog hiding (Range)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 import qualified Source.Source as Source
-import qualified Source.Range as Source
 import           Source.Span
 import qualified Test.Tasty as Tasty
 import           Test.Tasty.HUnit
@@ -49,16 +48,6 @@ testTree = Tasty.testGroup "Data.Source"
     , testCase "finds \\r" $ Source.newlineIndices "a\rb" @?= [1]
     , testCase "finds \\r\\n" $ Source.newlineIndices "a\r\nb" @?= [2]
     , testCase "finds intermixed line endings" $ Source.newlineIndices "hi\r}\r}\n xxx \r a" @?= [2, 4, 6, 12]
-    ]
-
-  , Tasty.testGroup "takeLine"
-    [ testCase "blank" $ Source.takeLine (Source.fromText "") (Source.Range 0 0) @?= (Source.fromText "")
-    , testCase "newline" $ Source.takeLine (Source.fromText "\n") (Source.Range 0 0) @?= (Source.fromText "")
-    , testCase "newline full range" $ Source.takeLine (Source.fromText "\n") (Source.Range 0 1) @?= (Source.fromText "")
-    , testCase "ascii lf" $ Source.takeLine (Source.fromText "hi\n  a\nb\n") (Source.Range 5 6) @?= (Source.fromText "  a")
-    , testCase "ascii crlf" $ Source.takeLine (Source.fromText "hi\r\n  a\r\nb\r\n") (Source.Range 5 6) @?= (Source.fromText "  a")
-    , testCase "unicode" $ Source.takeLine (Source.fromText "hi\n  à.a\nb\n") (Source.Range 8 9) @?= (Source.fromText "  à.a")
-    , testCase "extended unicode" $ Source.takeLine (Source.fromText "hi\n  😀.a\nb\n") (Source.Range 10 11) @?= (Source.fromText "  😀.a")
     ]
   ]
 

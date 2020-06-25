@@ -28,14 +28,11 @@ module Source.Source
 , lineRanges
 , lineRangesWithin
 , newlineIndices
-, takeLine
-, lineRange
 ) where
 
 import Prelude hiding (drop, take)
 
 import           Control.Arrow ((&&&))
-import           Control.Applicative
 import           Control.DeepSeq (NFData)
 import           Data.Aeson (FromJSON (..), withText)
 import qualified Data.ByteString as B
@@ -146,19 +143,3 @@ newlineIndices = go 0 where
   searchLF = B.elemIndex (toEnum (ord '\n'))
   searchCR = B.elemIndex (toEnum (ord '\r'))
 {-# INLINE newlineIndices #-}
-
-takeLine :: Source -> Range -> Source
-takeLine src = slice src . lineRange src
-
-lineRange :: Source -> Range -> Range
-lineRange src (Range start end) = Range lineStart lineEnd
-  where
-    lineStart = maybe start (start -) $ B.elemIndex lfChar precedingSource <|> B.elemIndex crChar precedingSource
-    precedingSource = B.reverse $ bytes (Source.Source.slice src (Range 0 start))
-
-    lineEnd = maybe end (start +) $ B.elemIndex crChar remainingSource <|> B.elemIndex lfChar remainingSource
-    remainingSource = bytes $ Source.Source.slice src (Range start eof)
-
-    lfChar = toEnum (ord '\n')
-    crChar = toEnum (ord '\r')
-    eof = Source.Source.length src
