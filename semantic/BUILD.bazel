@@ -74,7 +74,6 @@ haskell_library(
         "@stackage//:bifunctors",
         "@stackage//:deepseq",
         "@stackage//:directory-tree",
-        "@stackage//:fastsum",
         "@stackage//:filepath",
         "@stackage//:fused-syntax",
         "@stackage//:generic-lens",

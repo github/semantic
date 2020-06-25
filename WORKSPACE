@@ -60,7 +60,6 @@ stack_snapshot(
         "directory",
         "directory-tree",
         "doctest",
-        "fastsum",
         "filepath",
         "fused-effects",
         "fused-effects-exceptions",

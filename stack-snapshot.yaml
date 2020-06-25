@@ -10,7 +10,6 @@ packages:
     commit: "331545c7633955d8e930656f2093c16aa9f8d7a0"
     sha256: "2b00acb099f179d961838c82155cde64a7da44b2f93ff4d1562e102380907959"
   - semilattices-0.0.0.4
-  - fastsum-0.1.1.1
   - fused-effects-1.0.2.0
   - fused-effects-exceptions-1.0.0.0
   - fused-effects-resumable-0.1.0.0
