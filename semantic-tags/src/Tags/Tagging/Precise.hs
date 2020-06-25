@@ -16,7 +16,8 @@ import Control.Carrier.Reader
 import Control.Carrier.Writer.Strict
 import Data.Functor.Identity
 import Data.Monoid (Endo (..))
-import Data.Text as Text (Text, take, strip, foldr, take)
+import Data.Text (Text)
+import qualified Data.Text as Text
 import Prelude hiding (span)
 import Source.Loc
 import Source.Span (Pos(..), start, end)
@@ -73,7 +74,8 @@ calculateLineAndSpans src Loc {byteRange = srcRange, span = span@Span {start = s
   (line, toOneIndexed span, Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset})
   where
     -- NB: Important to limit to 180 characters after converting to text so as not to take in the middle of a multi-byte character.
-    line = Text.strip . Text.take 180 . Source.toText $ srcLine
+    -- line = Text.strip . Text.take 180 . Source.toText $ srcLine
+    line = sliceCenter180 startCol . Source.toText $ srcLine
     srcLine = surroundingLine src srcRange
     toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
 
@@ -83,6 +85,16 @@ calculateLineAndSpans src Loc {byteRange = srcRange, span = span@Span {start = s
     -- NB: Slice out of the Source ByteString, NOT Text because Loc/Range is in units of bytes.
     startSlice = Source.slice srcLine (Range 0 startCol)
     endSlice = Source.slice srcLine (Range startCol endCol)
+
+    -- Slice out up to 180 characters around an index. Favors including the
+    -- identifier and all succeeding text before including any preceeding context
+    sliceCenter180 :: Int -> Text -> Text
+    sliceCenter180 start txt = lhs <> rhs
+      where
+        (h, t) = Text.splitAt start txt
+        rhs = Text.stripEnd . Text.take 180 $ t
+        quota = 180 - Text.length rhs
+        lhs = Text.stripStart . Text.take quota $ h
 
 countUtf16CodeUnits :: Source -> Int
 countUtf16CodeUnits = Text.foldr len 0 . Source.toText
