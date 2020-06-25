@@ -22,7 +22,6 @@ import Proto.Semantic as P
 import Source.Loc
 import Source.Range
 import Source.Source as Source
-import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags t where
@@ -54,17 +53,14 @@ instance ToTags Java.MethodDeclaration where
         name = Parse.Success (Java.Identifier {text, ann}),
         body
       } = do
-      src <- ask @Source
-      let line =
-            Tags.firstLine
-              src
+      let srcRange =
               range
                 { end = case body of
                     Just (Parse.Success (Java.Block {ann = Loc Range {end} _})) -> end
                     Nothing -> end range
                     Just (Parse.Fail _) -> end range
                 }
-      Tags.yield (Tag text P.METHOD P.DEFINITION ann line Nothing)
+      Tags.yield text P.METHOD P.DEFINITION ann srcRange
       gtags t
   tags _ = pure ()
 
@@ -78,8 +74,7 @@ instance ToTags Java.ClassDeclaration where
         name = Parse.Success (Java.Identifier {text, ann}),
         body = Parse.Success (Java.ClassBody {ann = Loc Range {start = end} _})
       } = do
-      src <- ask @Source
-      Tags.yield (Tag text P.CLASS P.DEFINITION ann (Tags.firstLine src (Range start end)) Nothing)
+      Tags.yield text P.CLASS P.DEFINITION ann (Range start end)
       gtags t
   tags _ = pure ()
 
@@ -89,8 +84,7 @@ instance ToTags Java.MethodInvocation where
       { ann = Loc {byteRange = range},
         name = Parse.Success (Java.Identifier {text, ann})
       } = do
-      src <- ask @Source
-      Tags.yield (Tag text P.CALL P.REFERENCE ann (Tags.firstLine src range) Nothing)
+      Tags.yield text P.CALL P.REFERENCE ann range
       gtags t
   tags _ = pure ()
 
@@ -100,17 +94,15 @@ instance ToTags Java.InterfaceDeclaration where
       { ann = Loc {byteRange},
         name = Parse.Success (Java.Identifier {text, ann})
       } = do
-      src <- ask @Source
-      Tags.yield (Tag text P.INTERFACE P.DEFINITION ann (Tags.firstLine src byteRange) Nothing)
+      Tags.yield text P.INTERFACE P.DEFINITION ann byteRange
       gtags t
   tags _ = pure ()
 
 instance ToTags Java.InterfaceTypeList where
   tags t@Java.InterfaceTypeList {extraChildren = interfaces} = do
-    src <- ask @Source
     for_ interfaces $ \x -> case x of
       Parse.Success (Java.Type (Prj (Java.UnannotatedType (Prj (Java.SimpleType (Prj Java.TypeIdentifier {ann = loc@Loc {byteRange = range}, text = name})))))) ->
-        Tags.yield (Tag name P.IMPLEMENTATION P.REFERENCE loc (Tags.firstLine src range) Nothing)
+        Tags.yield name P.IMPLEMENTATION P.REFERENCE loc range
       _ -> pure ()
     gtags t
 

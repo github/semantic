@@ -26,7 +26,6 @@ import qualified Language.TypeScript.AST as Ts
 import Proto.Semantic as P
 import Source.Loc
 import Source.Source as Source
-import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags (t :: * -> *) where
@@ -152,9 +151,7 @@ nameBlacklist = ["require"]
 
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
 yieldTag name P.CALL _ _ _ | name `elem` nameBlacklist = pure ()
-yieldTag name kind ty loc srcLineRange = do
-  src <- ask @Source
-  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
+yieldTag name kind ty loc srcLineRange = Tags.yield name kind ty loc srcLineRange
 
 {- ORMOLU_DISABLE -}
 instance ToTags Ts.AbstractClassDeclaration

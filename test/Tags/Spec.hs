@@ -14,80 +14,91 @@ spec = do
   describe "go" $ do
     it "produces tags for functions with docs (TODO)" $
       parseTestFile [P.FUNCTION] (Path.relFile "test/fixtures/go/tags/simple_functions.go") `shouldReturn`
-        [ Tag "TestFromBits" P.FUNCTION P.DEFINITION (Loc (Range 56 68) (Span (Pos 6 6) (Pos 6 18))) "func TestFromBits(t *testing.T) {" Nothing
-        , Tag "Hi" P.FUNCTION P.DEFINITION (Loc (Range 99 101) (Span (Pos 10 6) (Pos 10 8))) "func Hi() {" Nothing ]
+        [ Tag "TestFromBits" P.FUNCTION P.DEFINITION (Span (Pos 6 6) (Pos 6 18)) "func TestFromBits(t *testing.T) {" (Span (Pos 5 5) (Pos 5 17))
+        , Tag "Hi" P.FUNCTION P.DEFINITION (Span (Pos 10 6) (Pos 10 8)) "func Hi() {" (Span (Pos 9 5) (Pos 9 7))
+        ]
 
     it "produces tags for methods" $
       parseTestFile [] (Path.relFile "test/fixtures/go/tags/method.go") `shouldReturn`
-        [ Tag "CheckAuth" P.METHOD P.DEFINITION (Loc (Range 39 48) (Span (Pos 3 21) (Pos 3 30))) "func (c *apiClient) CheckAuth(req *http.Request, user, repo string) (*authenticatedActor, error) {}" Nothing]
+        [ Tag "CheckAuth" P.METHOD P.DEFINITION (Span (Pos 3 21) (Pos 3 30)) "func (c *apiClient) CheckAuth(req *http.Request, user, repo string) (*authenticatedActor, error) {}" (Span (Pos 2 20) (Pos 2 29))
+        ]
 
     it "produces tags for calls" $
       parseTestFile [P.CALL] (Path.relFile "test/fixtures/go/tags/simple_functions.go") `shouldReturn`
-        [ Tag "Hi" P.CALL P.REFERENCE (Loc (Range 86 88) (Span (Pos 7 2) (Pos 7 4))) "Hi()" Nothing]
+        [ Tag "Hi" P.CALL P.REFERENCE (Span (Pos 7 2) (Pos 7 4)) "Hi()" (Span (Pos 6 1) (Pos 6 3))
+        ]
 
   describe "javascript and typescript" $ do
     it "produces tags for functions with docs (TODO)" $
       parseTestFile [] (Path.relFile "test/fixtures/javascript/tags/simple_function_with_docs.js") `shouldReturn`
-        [ Tag "myFunction" P.FUNCTION P.DEFINITION (Loc (Range 31 41) (Span (Pos 2 10) (Pos 2 20))) "function myFunction() {" Nothing ]
+        [ Tag "myFunction" P.FUNCTION P.DEFINITION (Span (Pos 2 10) (Pos 2 20)) "function myFunction() {" (Span (Pos 1 9) (Pos 1 19))
+        ]
 
     it "produces tags for classes" $
       parseTestFile [] (Path.relFile "test/fixtures/typescript/tags/class.ts") `shouldReturn`
-        [ Tag "FooBar" P.CLASS P.DEFINITION (Loc (Range 6 12) (Span (Pos 1 7) (Pos 1 13))) "class FooBar {}" Nothing ]
+        [ Tag "FooBar" P.CLASS P.DEFINITION (Span (Pos 1 7) (Pos 1 13)) "class FooBar {}" (Span (Pos 0 6) (Pos 0 12))
+        ]
 
     it "produces tags for modules" $
       parseTestFile [] (Path.relFile "test/fixtures/typescript/tags/module.ts") `shouldReturn`
-        [ Tag "APromise" P.MODULE P.DEFINITION (Loc (Range 7 15) (Span (Pos 1 8) (Pos 1 16))) "module APromise { }" Nothing ]
+        [ Tag "APromise" P.MODULE P.DEFINITION (Span (Pos 1 8) (Pos 1 16)) "module APromise { }" (Span (Pos 0 7) (Pos 0 15))
+        ]
 
   describe "python" $ do
     it "produces tags for functions" $
       parseTestFile [] (Path.relFile "test/fixtures/python/tags/simple_functions.py") `shouldReturn`
-        [ Tag "Foo" P.FUNCTION P.DEFINITION (Loc (Range 4 7) (Span (Pos 1 5) (Pos 1 8))) "def Foo(x):" Nothing
-        , Tag "Bar" P.FUNCTION P.DEFINITION (Loc (Range 74 77) (Span (Pos 7 5) (Pos 7 8))) "def Bar():" Nothing
-        , Tag "local" P.FUNCTION P.DEFINITION (Loc (Range 89 94) (Span (Pos 8 9) (Pos 8 14))) "def local():" Nothing
+        [ Tag "Foo" P.FUNCTION P.DEFINITION (Span (Pos 1 5) (Pos 1 8)) "def Foo(x):" (Span (Pos 0 4) (Pos 0 7))
+        , Tag "Bar" P.FUNCTION P.DEFINITION (Span (Pos 7 5) (Pos 7 8)) "def Bar():" (Span (Pos 6 4) (Pos 6 7))
+        , Tag "local" P.FUNCTION P.DEFINITION (Span (Pos 8 9) (Pos 8 14)) "def local():" (Span (Pos 7 8) (Pos 7 13))
         ]
 
     it "produces tags for functions with docs" $
       parseTestFile [] (Path.relFile "test/fixtures/python/tags/simple_function_with_docs.py") `shouldReturn`
-        [ Tag "Foo" P.FUNCTION P.DEFINITION (Loc (Range 4 7) (Span (Pos 1 5) (Pos 1 8))) "def Foo(x):" (Just "\"\"\"This is the foo function\"\"\"") ]
+        [ Tag "Foo" P.FUNCTION P.DEFINITION (Span (Pos 1 5) (Pos 1 8)) "def Foo(x):" (Span (Pos 0 4) (Pos 0 7))
+        ]
 
     it "produces tags for classes" $
       parseTestFile [] (Path.relFile "test/fixtures/python/tags/class.py") `shouldReturn`
-        [ Tag "Foo" P.CLASS P.DEFINITION (Loc (Range 6 9) (Span (Pos 1 7) (Pos 1 10))) "class Foo:" (Just "\"\"\"The Foo class\"\"\"")
-        , Tag "f" P.FUNCTION P.DEFINITION (Loc (Range 43 44) (Span (Pos 3 9) (Pos 3 10))) "def f(self):" (Just "\"\"\"The f method\"\"\"")
+        [ Tag "Foo" P.CLASS P.DEFINITION (Span (Pos 1 7) (Pos 1 10)) "class Foo:" (Span (Pos 0 6) (Pos 0 9))
+        , Tag "f" P.FUNCTION P.DEFINITION (Span (Pos 3 9) (Pos 3 10)) "def f(self):" (Span (Pos 2 8) (Pos 2 9))
         ]
 
     it "produces tags for multi-line functions" $
       parseTestFile [P.FUNCTION] (Path.relFile "test/fixtures/python/tags/multiline.py") `shouldReturn`
-        [ Tag "Foo" P.FUNCTION P.DEFINITION (Loc (Range 4 7) (Span (Pos 1 5) (Pos 1 8))) "def Foo(x," Nothing ]
+        [ Tag "Foo" P.FUNCTION P.DEFINITION (Span (Pos 1 5) (Pos 1 8)) "def Foo(x," (Span (Pos 0 4) (Pos 0 7))
+        ]
 
   describe "ruby" $ do
     it "produces tags for methods" $
       parseTestFile [P.METHOD] (Path.relFile "test/fixtures/ruby/tags/simple_method.rb") `shouldReturn`
-        [ Tag "foo" P.METHOD P.DEFINITION (Loc (Range 4 7) (Span (Pos 1 5) (Pos 1 8))) "def foo" Nothing ]
+        [ Tag "foo" P.METHOD P.DEFINITION (Span (Pos 1 5) (Pos 1 8)) "def foo" (Span (Pos 0 4) (Pos 0 7))
+        ]
 
     it "produces tags for sends" $
       parseTestFile [P.CALL] (Path.relFile "test/fixtures/ruby/tags/simple_method.rb") `shouldReturn`
-        [ Tag "puts" P.CALL P.REFERENCE (Loc (Range 10 14) (Span (Pos 2 3) (Pos 2 7))) "puts \"hi\"" Nothing
-        , Tag "bar" P.CALL P.REFERENCE (Loc (Range 24 27) (Span (Pos 3 5) (Pos 3 8))) "a.bar" Nothing
-        , Tag "a" P.CALL P.REFERENCE (Loc (Range 22 23) (Span (Pos 3 3) (Pos 3 4))) "a" Nothing
+        [ Tag "puts" P.CALL P.REFERENCE (Span (Pos 2 3) (Pos 2 7)) "puts \"hi\"" (Span (Pos 1 2) (Pos 1 6))
+        , Tag "bar" P.CALL P.REFERENCE (Span (Pos 3 5) (Pos 3 8)) "a.bar" (Span (Pos 2 4) (Pos 2 7))
+        , Tag "a" P.CALL P.REFERENCE (Span (Pos 3 3) (Pos 3 4)) "a.bar" (Span (Pos 2 2) (Pos 2 3))
         ]
 
     it "produces tags for methods with docs (TODO)" $
       parseTestFile [] (Path.relFile "test/fixtures/ruby/tags/simple_method_with_docs.rb") `shouldReturn`
-        [ Tag "foo" P.METHOD P.DEFINITION (Loc (Range 18 21) (Span (Pos 2 5) (Pos 2 8))) "def foo" Nothing ]
+        [ Tag "foo" P.METHOD P.DEFINITION (Span (Pos 2 5) (Pos 2 8)) "def foo" (Span (Pos 1 4) (Pos 1 7))
+        ]
 
     it "correctly tags files containing multibyte UTF-8 characters (TODO)" $
       parseTestFile [] (Path.relFile "test/fixtures/ruby/tags/unicode_identifiers.rb") `shouldReturn`
-        [ Tag "日本語" P.METHOD P.DEFINITION (Loc (Range 20 29) (Span (Pos 2 5) (Pos 2 14))) "def 日本語" Nothing]
+        [ Tag "日本語" P.METHOD P.DEFINITION (Span (Pos 2 5) (Pos 2 14)) "def 日本語" (Span (Pos 1 4) (Pos 1 7))
+        ]
 
     it "produces tags for methods and classes with docs (TODO)" $
       parseTestFile [P.MODULE, P.CLASS, P.METHOD] (Path.relFile "test/fixtures/ruby/tags/class_module.rb") `shouldReturn`
-        [ Tag "Foo" P.MODULE P.DEFINITION (Loc (Range 21 24) (Span (Pos 2 8) (Pos 2 11))) "module Foo" Nothing
-        , Tag "Bar" P.CLASS P.DEFINITION  (Loc (Range 50 53) (Span (Pos 5 9) (Pos 5 12))) "class Bar" Nothing
-        , Tag "baz" P.METHOD P.DEFINITION (Loc (Range 81 84) (Span (Pos 8 9) (Pos 8 12))) "def baz(a)" Nothing
-        , Tag "C" P.CLASS P.DEFINITION (Loc (Range 132 133) (Span (Pos 14 13) (Pos 14 14))) "class A::B::C" Nothing
-        , Tag "foo" P.METHOD P.DEFINITION (Loc (Range 140 143) (Span (Pos 15 7) (Pos 15 10))) "def foo" Nothing
-        , Tag "foo" P.METHOD P.DEFINITION (Loc (Range 175 178) (Span (Pos 18 12) (Pos 18 15))) "def self.foo" Nothing
+        [ Tag "Foo" P.MODULE P.DEFINITION (Span (Pos 2 8) (Pos 2 11)) "module Foo" (Span (Pos 1 7) (Pos 1 10))
+        , Tag "Bar" P.CLASS P.DEFINITION  (Span (Pos 5 9) (Pos 5 12)) "class Bar" (Span (Pos 4 8) (Pos 4 11))
+        , Tag "baz" P.METHOD P.DEFINITION (Span (Pos 8 9) (Pos 8 12)) "def baz(a)" (Span (Pos 7 8) (Pos 7 11))
+        , Tag "C" P.CLASS P.DEFINITION (Span (Pos 14 13) (Pos 14 14)) "class A::B::C" (Span (Pos 13 12) (Pos 13 13))
+        , Tag "foo" P.METHOD P.DEFINITION (Span (Pos 15 7) (Pos 15 10)) "def foo" (Span (Pos 14 6) (Pos 14 9))
+        , Tag "foo" P.METHOD P.DEFINITION (Span (Pos 18 12) (Pos 18 15)) "def self.foo" (Span (Pos 17 11) (Pos 17 14))
         ]
 
 parseTestFile :: Foldable t => t P.SyntaxType -> Path.RelFile -> IO [Tag]
