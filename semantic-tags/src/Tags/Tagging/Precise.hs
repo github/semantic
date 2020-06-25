@@ -58,19 +58,19 @@ utf16CodeUnitsSpan :: Source -> Loc -> (Text, OneIndexedSpan, LspStyleSpan)
 utf16CodeUnitsSpan src Loc{ byteRange, span = span@Span{ start = start@Pos{column = startCol}, end = end@Pos{column = endCol}}}
   = (line, toOneIndexed span, Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset})
   where
-    line = Text.stripEnd . Text.take 180 $ srcLine
-    srcLine = Source.toText $ Source.slice src srcLineRange
+    line = Text.stripEnd . Text.take 180 . Source.toText $ srcLine
+    srcLine = Source.slice src srcLineRange
     srcLineRange = lineRange src byteRange
     toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
 
     utf16cpStartOffset = countUtf16CodeUnits startSlice
     utf16cpEndOffset = utf16cpStartOffset + countUtf16CodeUnits endSlice
 
-    startSlice = sliceText srcLine (Range 0 startCol)
-    endSlice = sliceText srcLine (Range startCol endCol)
+    startSlice = Source.slice srcLine (Range 0 startCol)
+    endSlice = Source.slice srcLine (Range startCol endCol)
 
-    countUtf16CodeUnits :: Text -> Int
-    countUtf16CodeUnits = Text.foldr len 0
+    countUtf16CodeUnits :: Source -> Int
+    countUtf16CodeUnits = Text.foldr len 0 . Source.toText
       where
         len :: Char -> Int -> Int
         len i acc =
@@ -78,10 +78,11 @@ utf16CodeUnitsSpan src Loc{ byteRange, span = span@Span{ start = start@Pos{colum
               x = if c .&. 0xFFFF == c then 1 else 2
           in x + acc
 
-    sliceText :: Text -> Range -> Text
-    sliceText source range = taking $ dropping source where
-      dropping = Text.drop (Range.start range)
-      taking   = Text.take (Range.rangeLength range)
+    -- THIS DOES NOT WORK b/c it drops codepoints and I want to slice with bytes.
+    -- sliceText :: Text -> Range -> Text
+    -- sliceText source range = taking $ dropping source where
+    --   dropping = Text.drop (Range.start range)
+    --   taking   = Text.take (Range.rangeLength range)
 
 lineRange :: Source -> Range -> Range
 lineRange src (Range start end) = Range lineStart lineEnd
