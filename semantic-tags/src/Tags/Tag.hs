@@ -1,7 +1,7 @@
 module Tags.Tag (Tag (..)) where
 
 import Data.Text (Text)
-import Proto.Semantic as P
+import qualified Proto.Semantic as P
 import Source.Loc
 
 data Tag
@@ -11,6 +11,7 @@ data Tag
         tagNodeType :: P.NodeType,
         tagLoc :: Loc,
         tagLine :: Text,
-        tagDocs :: Maybe Text
+        tagDocs :: Maybe Text,
+        tagLspSpan :: Span
       }
   deriving (Eq, Show)
