@@ -6,7 +6,9 @@ module Tags.Tagging.Precise
 , yield
 , runTagging
 , firstLine
-, utf16CodeUnitsSpan
+, firstLineAndSpans
+, surroundingLine
+, surroundingLineRange
 ) where
 
 import Control.Applicative
@@ -14,11 +16,10 @@ import Control.Carrier.Reader
 import Control.Carrier.Writer.Strict
 import Data.Functor.Identity
 import Data.Monoid (Endo (..))
-import Data.Text as Text (Text, take, takeWhile, stripEnd, foldr, drop, take)
+import Data.Text as Text (Text, take, takeWhile, stripEnd, foldr, take)
 import Prelude hiding (span)
 import Source.Loc
 import Source.Span (Pos(..), start, end)
-import qualified Source.Range as Range
 import Source.Source as Source
 import Tags.Tag
 
@@ -49,43 +50,48 @@ runTagging source
 firstLine :: Source -> Range -> Text
 firstLine src = Text.stripEnd . Text.take 180 . Text.takeWhile (/= '\n') . Source.toText . slice src
 
+-- A 1-indexed Span where the units are bytes.
 type OneIndexedSpan = Span
-type LspStyleSpan = Span
 
--- | Takes a Loc (where the span's column offset is measured in utf8 bytes) and
--- returns an LSP friendly span (where column offset is measure in utf16 code units).
-utf16CodeUnitsSpan :: Source -> Loc -> (Text, OneIndexedSpan, LspStyleSpan)
-utf16CodeUnitsSpan src Loc{ byteRange, span = span@Span{ start = start@Pos{column = startCol}, end = end@Pos{column = endCol}}}
-  = (line, toOneIndexed span, Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset})
+-- | A 0-indxed Span where the units are utf-16 code units (2 bytes), suitable for the LSP (Language Server Protocol) specification
+type UTF16CodeUnitSpan = Span
+
+-- | Takes a Loc (where the span's column offset is measured in bytes) and
+-- returns two Spans: A 1-indexed span LSP friendly span (where column offset is measure in utf16 code
+-- units).
+firstLineAndSpans :: Source -> Loc -> (Text, OneIndexedSpan, UTF16CodeUnitSpan)
+firstLineAndSpans src Loc {byteRange, span = span@Span {start = start@Pos {column = startCol}, end = end@Pos {column = endCol}}} =
+  (line, toOneIndexed span, Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset})
   where
+    -- NB: Important to limit to 180 characters after converting to text so as
+    -- not to take in the middle of a multi-byte character.
     line = Text.stripEnd . Text.take 180 . Source.toText $ srcLine
-    srcLine = Source.slice src srcLineRange
-    srcLineRange = lineRange src byteRange
+    srcLine = surroundingLine src byteRange
     toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
 
     utf16cpStartOffset = countUtf16CodeUnits startSlice
     utf16cpEndOffset = utf16cpStartOffset + countUtf16CodeUnits endSlice
 
+    -- NB: Slice out of the Source ByteString, NOT Text because Loc/Range is in units of bytes.
     startSlice = Source.slice srcLine (Range 0 startCol)
     endSlice = Source.slice srcLine (Range startCol endCol)
 
-    countUtf16CodeUnits :: Source -> Int
-    countUtf16CodeUnits = Text.foldr len 0 . Source.toText
-      where
-        len :: Char -> Int -> Int
-        len i acc =
-          let c = fromEnum i
-              x = if c .&. 0xFFFF == c then 1 else 2
-          in x + acc
+countUtf16CodeUnits :: Source -> Int
+countUtf16CodeUnits = Text.foldr len 0 . Source.toText
+  where
+    len :: Char -> Int -> Int
+    len i acc =
+      let c = fromEnum i
+          x = if c .&. 0xFFFF == c then 1 else 2
+      in x + acc
 
-    -- THIS DOES NOT WORK b/c it drops codepoints and I want to slice with bytes.
-    -- sliceText :: Text -> Range -> Text
-    -- sliceText source range = taking $ dropping source where
-    --   dropping = Text.drop (Range.start range)
-    --   taking   = Text.take (Range.rangeLength range)
+-- | The Source of the entire surrounding line.
+surroundingLine :: Source -> Range -> Source
+surroundingLine src = Source.slice src . surroundingLineRange src
 
-lineRange :: Source -> Range -> Range
-lineRange src (Range start end) = Range lineStart lineEnd
+-- | Find the Range of the line surrounding the given Range where a line is defined by `\n`, `\r\n`, or `\r`.
+surroundingLineRange :: Source -> Range -> Range
+surroundingLineRange src (Range start end) = Range lineStart lineEnd
   where
     lineStart = maybe start (start -) $ B.elemIndex lfChar precedingSource <|> B.elemIndex crChar precedingSource
     precedingSource = B.reverse $ bytes (Source.slice src (Range 0 start))
