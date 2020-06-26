@@ -32,7 +32,7 @@ renderDiff ref new = unsafePerformIO $ do
   useJD <- (Path.hasExtension ".json" (Path.relPath ref) &&) <$> fmap isJust (Path.findExecutable "jd")
   pure $ if useJD
     then ["jd", "-set", ref, new]
-    else ["git", "diff", ref, new]
+    else ["diff", ref, new]
 {-# NOINLINE renderDiff #-}
 
 testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile) -> TestTree
