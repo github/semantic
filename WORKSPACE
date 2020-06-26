@@ -39,6 +39,10 @@ load(
     "haskell_binary",
     "haskell_library",
 )
+load(
+    "@bazel_tools//tools/build_defs/repo:git.bzl",
+    "git_repository",
+)
 
 stack_snapshot(
     name = "stackage",
@@ -124,6 +128,7 @@ stack_snapshot(
         "tree-sitter-python",
         "tree-sitter-ql",
         "tree-sitter-ruby",
+        "tree-sitter-rust",
         "tree-sitter-tsx",
         "tree-sitter-typescript",
         "trifecta",
@@ -155,4 +160,65 @@ haskell_cabal_binary(name = "doctest", srcs = glob(["**"]), visibility = ["//vis
     sha256 = "cfe9629f9c4d0aa24a11b5c4dd216fb5b9ebce7b3f6a8a7e58716280943a34f8",
     strip_prefix = "doctest-0.16.3",
     urls = ["http://hackage.haskell.org/package/doctest-0.16.3/doctest-0.16.3.tar.gz"],
+)
+
+load(
+    "//:build/common.bzl",
+    "tree_sitter_node_types_archive",
+)
+
+tree_sitter_node_types_archive(
+    name = "tree-sitter-python",
+    sha256 = "50d3fa560391dc4ab8d9a3466f68f2c6a4c12f9cc6421358d2c307023bd740ab",
+    version = "0.16.0",
+)
+
+tree_sitter_node_types_archive(
+    name = "tree-sitter-ruby",
+    sha256 = "1a63b43f82837a1194cab997475a22f82bfd820dd32999aa1444cfeae70f7596",
+    version = "0.16.2",
+)
+
+tree_sitter_node_types_archive(
+    name = "tree-sitter-php",
+    sha256 = "d7f6b7dbba359f5129f08647ad4cf73a599abdec443c2b0e2cdbbaee56cf3750",
+    version = "0.16.1",
+)
+
+tree_sitter_node_types_archive(
+    name = "tree-sitter-java",
+    sha256 = "1be7f9cfb2b85aece37979d1097fddf538b8984fb7726bf1edea4a7ce",
+    version = "0.16.0",
+)
+
+tree_sitter_node_types_archive(
+    name = "tree-sitter-json",
+    sha256 = "cbf0fefd2825a2db1770013111f49ec609c4fe090a8909e9780458629c22d1f4",
+    version = "0.16.0",
+)
+
+tree_sitter_node_types_archive(
+    name = "tree-sitter-rust",
+    sha256 = "8c34f19a9270ee60367ee235226ff1108341f944e0bd245cb47e1c2721f0c39b",
+    version = "0.16.1",
+)
+
+tree_sitter_node_types_archive(
+    name = "tree-sitter-go",
+    sha256 = "dc4de8a13b0f60407425d38c5cb3973e1938d3031a68e1e69bd0b75",
+    version = "0.16.1",
+)
+
+tree_sitter_node_types_archive(
+    name = "tree-sitter-typescript",
+    nodetypespath = "**/src/node-types.json",
+    sha256 = "3e1fc16daab965f21dc56a919b32a730e889ea2ba1330af5edc5950f4e6b18b6",
+    version = "0.16.2",
+)
+
+tree_sitter_node_types_archive(
+    name = "tree-sitter-ql",
+    nodetypespath = "src/node-types.json",
+    sha256 = "",
+    version = "1.1.0",
 )

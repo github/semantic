@@ -8,6 +8,5 @@ load(
 semantic_language_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
-    language = "typescript",
-    nodetypes = "@tree-sitter-typescript//:typescript/src/node-types.json",
+    language = "rust",
 )

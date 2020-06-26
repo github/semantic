@@ -9,5 +9,4 @@ semantic_language_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     language = "ql",
-    nodetypes = "codeql",
 )

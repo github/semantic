@@ -299,6 +299,7 @@ instance ToTags Ts.True
 instance ToTags Ts.TryStatement
 instance ToTags Ts.TupleType
 instance ToTags Ts.TypeAliasDeclaration
+instance ToTags Ts.TypeAssertion
 instance ToTags Ts.TypeAnnotation
 instance ToTags Ts.TypeArguments
 instance ToTags Ts.TypeIdentifier

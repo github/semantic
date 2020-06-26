@@ -9,4 +9,5 @@ semantic_language_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     language = "ruby",
+    nodetypes = "@tree-sitter-ruby//:src/node-types.json",
 )

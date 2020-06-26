@@ -9,4 +9,5 @@ semantic_language_library(
     name = "lib",
     srcs = glob(["src/**/*.hs"]),
     language = "tsx",
+    nodetypes = "@tree-sitter-typescript//:tsx/src/node-types.json",
 )

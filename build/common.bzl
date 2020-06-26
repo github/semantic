@@ -5,6 +5,7 @@ load(
     "haskell_library",
     "haskell_test",
 )
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 STANDARD_GHC_WARNINGS = [
     "-O0",
@@ -30,20 +31,34 @@ STANDARD_EXECUTABLE_FLAGS = [
     "-threaded",
 ]
 
+def tree_sitter_node_types_archive(name, version, sha256, urls = [], nodetypespath = "src/node-types.json"):
+    if urls == []:
+        urls = ["https://github.com/tree-sitter/{}/archive/v{}.tar.gz".format(name, version)]
+
+    http_archive(
+        name = name,
+        build_file_content = """
+exports_files(glob(["{}"]))
+""".format(nodetypespath),
+        strip_prefix = "{}-{}".format(name, version),
+        urls = urls,
+        sha256 = sha256,
+    )
+
 def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
     """Create a new library target with dependencies needed for a language-AST project."""
     if nodetypes == "":
-        nodetypes = language
+        nodetypes = "@tree-sitter-{}//:src/node-types.json".format(language)
     haskell_library(
         name = name,
         # We can't use Template Haskell to find out the location of the
         # node-types.json files, but we can pass it in as a preprocessor
         # directive.
         compiler_flags = STANDARD_GHC_WARNINGS + [
-            '-DNODE_TYPES_PATH="../../../../$(rootpath //vendor:' + nodetypes + '-node-types.json)"',
+            '-DNODE_TYPES_PATH="../../../../$(rootpath {})"'.format(nodetypes),
         ],
         srcs = srcs,
-        extra_srcs = ["//vendor:" + nodetypes + "-node-types.json"],
+        extra_srcs = [nodetypes],
         deps = [
             "//:base",
             "//semantic-analysis:lib",
