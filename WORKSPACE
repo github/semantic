@@ -100,6 +100,7 @@ stack_snapshot(
         "proto-lens",
         "proto-lens-jsonpb",
         "proto-lens-runtime",
+        "raw-strings-qq",
         "recursion-schemes",
         "reducers",
         "safe-exceptions",
@@ -136,6 +137,7 @@ stack_snapshot(
         "unliftio-core",
         "unordered-containers",
         "vector",
+        "yaml",
     ],
     tools = ["@happy"],
 )
@@ -209,4 +211,13 @@ tree_sitter_node_types_archive(
     name = "tree-sitter-ql",
     sha256 = "b43dca6676dd95eb817bf5e8933183591f48169f6466382463f199ba6132b5c5",
     version = "1.1.0",
+)
+
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "lingo",
+    commit = "6614b9afe1a519364491c170d6b06ff5cd96153a",
+    remote = "https://github.com/tclem/lingo-haskell.git",
+    shallow_since = "1593202797 -0400",
 )

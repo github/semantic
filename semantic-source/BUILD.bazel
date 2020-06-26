@@ -26,6 +26,7 @@ haskell_library(
         "//:base",
         "//:bytestring",
         "//:containers",
+        "@lingo",
         "@stackage//:aeson",
         "@stackage//:deepseq",
         "@stackage//:filepath",
