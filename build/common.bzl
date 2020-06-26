@@ -32,16 +32,14 @@ STANDARD_EXECUTABLE_FLAGS = [
 ]
 
 def tree_sitter_node_types_archive(name, version, sha256, urls = [], nodetypespath = "src/node-types.json"):
-    if urls == []:
-        urls = ["https://github.com/tree-sitter/{}/archive/v{}.tar.gz".format(name, version)]
-
+    """Create a target for a tree-sitter grammar and export its node-types.json file."""
     http_archive(
         name = name,
         build_file_content = """
 exports_files(glob(["{}"]))
 """.format(nodetypespath),
         strip_prefix = "{}-{}".format(name, version),
-        urls = urls,
+        urls = ["https://github.com/tree-sitter/{}/archive/v{}.tar.gz".format(name, version)],
         sha256 = sha256,
     )
 
