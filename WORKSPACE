@@ -137,7 +137,7 @@ stack_snapshot(
         "unordered-containers",
         "vector",
     ],
-    tools = ["@happy"],  # , "@doctest"],
+    tools = ["@happy"],
 )
 
 http_archive(
@@ -149,17 +149,6 @@ haskell_cabal_binary(name = "happy", srcs = glob(["**"]), visibility = ["//visib
     sha256 = "fb9a23e41401711a3b288f93cf0a66db9f97da1ce32ec4fffea4b78a0daeb40f",
     strip_prefix = "happy-1.19.12",
     urls = ["http://hackage.haskell.org/package/happy-1.19.12/happy-1.19.12.tar.gz"],
-)
-
-http_archive(
-    name = "doctest",
-    build_file_content = """
-load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_binary")
-haskell_cabal_binary(name = "doctest", srcs = glob(["**"]), visibility = ["//visibility:public"])
-    """,
-    sha256 = "cfe9629f9c4d0aa24a11b5c4dd216fb5b9ebce7b3f6a8a7e58716280943a34f8",
-    strip_prefix = "doctest-0.16.3",
-    urls = ["http://hackage.haskell.org/package/doctest-0.16.3/doctest-0.16.3.tar.gz"],
 )
 
 load(
@@ -187,7 +176,7 @@ tree_sitter_node_types_archive(
 
 tree_sitter_node_types_archive(
     name = "tree-sitter-java",
-    sha256 = "1be7f9cfb2b85aece37979d1097fddf538b8984fb7726bf1edea4a7ce",
+    sha256 = "41af0051be7f9cfb2b85aece37979d1097fddf538b8984fb7726bf1edea4a7ce",
     version = "0.16.0",
 )
 
@@ -205,7 +194,7 @@ tree_sitter_node_types_archive(
 
 tree_sitter_node_types_archive(
     name = "tree-sitter-go",
-    sha256 = "dc4de8a13b0f60407425d38c5cb3973e1938d3031a68e1e69bd0b75",
+    sha256 = "7278f1fd4dc4de8a13b0f60407425d38c5cb3973e1938d3031a68e1e69bd0b75",
     version = "0.16.1",
 )
 
@@ -218,7 +207,6 @@ tree_sitter_node_types_archive(
 
 tree_sitter_node_types_archive(
     name = "tree-sitter-ql",
-    nodetypespath = "src/node-types.json",
-    sha256 = "",
+    sha256 = "b43dca6676dd95eb817bf5e8933183591f48169f6466382463f199ba6132b5c5",
     version = "1.1.0",
 )

@@ -57,6 +57,9 @@ def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
         compiler_flags = STANDARD_GHC_WARNINGS + [
             '-DNODE_TYPES_PATH="../../../../$(rootpath {})"'.format(nodetypes),
         ],
+        repl_ghci_args = STANDARD_GHC_WARNINGS + [
+            '-DNODE_TYPES_PATH="../../../../$(rootpath {})"'.format(nodetypes),
+        ],
         srcs = srcs,
         extra_srcs = [nodetypes],
         deps = [
