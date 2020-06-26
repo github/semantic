@@ -48,6 +48,10 @@ function flags {
 
   # .hs source dirs
   # TODO: would be nice to figure this out from cabal.project & the .cabal files
+  echo "-isemantic/app"
+  echo "-isemantic/src"
+  echo "-isemantic/bench"
+  echo "-isemantic/test"
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
   echo "-isemantic-codeql/src"
@@ -68,10 +72,6 @@ function flags {
   echo "-isemantic-tsx/src"
   echo "-isemantic-typescript/src"
   echo "-isemantic-tags/src"
-  echo "-iapp"
-  echo "-isrc"
-  echo "-ibench"
-  echo "-itest"
 
   # disable automatic selection of packages
   echo "-hide-all-packages"
