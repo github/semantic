@@ -1,8 +1,19 @@
-# Give your project a name. :)
+# This file defines the workspace for the Semantic monorepo.
+# It loads the Haskell compilation rules, describes the packages
+# that we use from Stackage, and pins the tree-sitter packages
+# so that we can access their node-types.json files.
+
 workspace(name = "semantic")
 
 # Load the repository rule to download an http archive.
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Load the ability to check out a git repository.
+load(
+    "@bazel_tools//tools/build_defs/repo:git.bzl",
+    "git_repository",
+    "new_git_repository",
+)
 
 # Download rules_haskell and make it accessible as "@rules_haskell".
 http_archive(
@@ -30,20 +41,12 @@ rules_haskell_toolchains(version = "8.8.3")
 
 load(
     "@rules_haskell//haskell:cabal.bzl",
-    "haskell_cabal_binary",
-    "haskell_cabal_library",
     "stack_snapshot",
 )
-load(
-    "@rules_haskell//haskell:defs.bzl",
-    "haskell_binary",
-    "haskell_library",
-)
-load(
-    "@bazel_tools//tools/build_defs/repo:git.bzl",
-    "new_git_repository",
-)
 
+# This call establishes a @stackage repository, and describes what packages
+# we use from Stackage. The resolver, as well as the non-Stackage packages
+# on which we depend, are specified in stack-snapshot.yaml.
 stack_snapshot(
     name = "stackage",
     local_snapshot = "//:stack-snapshot.yaml",
@@ -137,6 +140,7 @@ stack_snapshot(
     tools = ["@happy"],
 )
 
+# Download Happy and make it accessible to the build process.
 http_archive(
     name = "happy",
     build_file_content = """
@@ -148,6 +152,9 @@ haskell_cabal_binary(name = "happy", srcs = glob(["**"]), visibility = ["//visib
     urls = ["http://hackage.haskell.org/package/happy-1.19.12/happy-1.19.12.tar.gz"],
 )
 
+# Pin the various tree-sitter packages so that we can access their
+# node-types.json files.
+
 load(
     "//:build/common.bzl",
     "tree_sitter_node_types_archive",
@@ -157,19 +164,6 @@ tree_sitter_node_types_archive(
     name = "tree-sitter-python",
     sha256 = "50d3fa560391dc4ab8d9a3466f68f2c6a4c12f9cc6421358d2c307023bd740ab",
     version = "0.16.0",
-)
-
-# TODO: the versioning here is messed up so we have to pin from git.
-# We should fix this (and see why the tags are breaking).
-
-new_git_repository(
-    name = "tree-sitter-ruby",
-    build_file_content = """
-exports_files(["src/node-types.json"])
-""",
-    commit = "eb2b6225bfb80010f2e4cbd27db8c6f3775230b5",
-    remote = "https://github.com/tree-sitter/tree-sitter-ruby.git",
-    shallow_since = "1576688803 -0800",
 )
 
 tree_sitter_node_types_archive(
@@ -215,11 +209,24 @@ tree_sitter_node_types_archive(
     version = "1.1.0",
 )
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+# Download lingo (which has its own Bazel build instructions).
 
 git_repository(
     name = "lingo",
     commit = "6614b9afe1a519364491c170d6b06ff5cd96153a",
     remote = "https://github.com/tclem/lingo-haskell.git",
     shallow_since = "1593202797 -0400",
+)
+
+# We use new_git_repository here because tree-sitter-ruby doesn't
+# provide a Bazel build, so we hadcode its contents with build_file_contents.
+
+new_git_repository(
+    name = "tree-sitter-ruby",
+    build_file_content = """
+exports_files(["src/node-types.json"])
+""",
+    commit = "eb2b6225bfb80010f2e4cbd27db8c6f3775230b5",
+    remote = "https://github.com/tree-sitter/tree-sitter-ruby.git",
+    shallow_since = "1576688803 -0800",
 )
