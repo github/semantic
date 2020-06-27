@@ -32,23 +32,23 @@ spec = do
     let a = Blob.fromSource (Path.relFile "method.rb") Ruby "def foo; end"
     let b = Blob.fromSource (Path.relFile "method.rb") Ruby "def bar(x); end"
     it "returns blobs for valid JSON encoded diff input" $ do
-      blobs <- blobsFromFilePath "semantic/test/fixtures/cli/diff.json"
+      blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
       blobs `shouldBe` [Compare a b]
 
     it "returns blobs when there's no before" $ do
-      blobs <- blobsFromFilePath "semantic/test/fixtures/cli/diff-no-before.json"
+      blobs <- blobsFromFilePath "test/fixtures/cli/diff-no-before.json"
       blobs `shouldBe` [Insert b]
 
     it "returns blobs when there's null before" $ do
-      blobs <- blobsFromFilePath "semantic/test/fixtures/cli/diff-null-before.json"
+      blobs <- blobsFromFilePath "test/fixtures/cli/diff-null-before.json"
       blobs `shouldBe` [Insert b]
 
     it "returns blobs when there's no after" $ do
-      blobs <- blobsFromFilePath "semantic/test/fixtures/cli/diff-no-after.json"
+      blobs <- blobsFromFilePath "test/fixtures/cli/diff-no-after.json"
       blobs `shouldBe` [Delete a]
 
     it "returns blobs when there's null after" $ do
-      blobs <- blobsFromFilePath "semantic/test/fixtures/cli/diff-null-after.json"
+      blobs <- blobsFromFilePath "test/fixtures/cli/diff-null-after.json"
       blobs `shouldBe` [Delete a]
 
 
@@ -59,7 +59,7 @@ spec = do
       blobs `shouldBe` [Insert b']
 
     it "detects language based on filepath for empty language" $ do
-      blobs <- blobsFromFilePath "semantic/test/fixtures/cli/diff-empty-language.json"
+      blobs <- blobsFromFilePath "test/fixtures/cli/diff-empty-language.json"
       blobs `shouldBe` [Compare a b]
 
     it "throws on blank input" $ do

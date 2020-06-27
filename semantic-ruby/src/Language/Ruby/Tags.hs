@@ -213,7 +213,7 @@ instance ToTags Rb.Lambda where
 instance ToTags Rb.If where
   tags Rb.If {condition = Parse.Success cond, consequence, alternative} = do
     tags cond
-    case consequence of 
+    case consequence of
       Just (Parse.Success cons) -> tags cons
       _ -> pure ()
     case alternative of
@@ -224,7 +224,7 @@ instance ToTags Rb.If where
 instance ToTags Rb.Elsif where
   tags Rb.Elsif {condition = Parse.Success cond, consequence, alternative} = do
     tags cond
-    case consequence of 
+    case consequence of
       Just (Parse.Success cons) -> tags cons
       _ -> pure ()
     case alternative of
@@ -235,7 +235,7 @@ instance ToTags Rb.Elsif where
 instance ToTags Rb.Unless where
   tags Rb.Unless {condition = Parse.Success cond, consequence, alternative} = do
     tags cond
-    case consequence of 
+    case consequence of
       Just (Parse.Success cons) -> tags cons
       _ -> pure ()
     case alternative of
@@ -264,7 +264,7 @@ instance ToTags Rb.Lhs where
     Prj Rb.Call {ann = Loc {byteRange}, method} -> case method of
       EPrj Rb.Identifier {text, ann} -> yieldCall text ann byteRange
       EPrj Rb.Constant {text, ann} -> yieldCall text ann byteRange
-      EPrj Rb.Operator {text, ann} -> yieldCall text ann byteRange
+      EPrj Rb.Operator {text, ann} -> yieldCall text ann byteRangeg
       _ -> gtags t
     -- These do check for locals before yielding a call tag
     Prj (Rb.Variable (Prj Rb.Identifier {ann = loc@Loc {byteRange}, text})) -> yield text P.CALL loc byteRange

@@ -33,12 +33,12 @@ testTree = testGroup "Semantic.CLI"
 renderDiff :: String -> String -> [String]
 renderDiff ref new = unsafePerformIO $ do
   let check p = do
-        exists <- Path.doesFileExist (Path.absFile p)
+        exists <- Path.doesFileExist (Path.absRel p)
         unless exists (throwIO (userError ("Can't find path " <> p)))
 
   check ref
   check new
-  useJD <- (Path.hasExtension ".json" (Path.absPath ref) &&) <$> fmap isJust (Path.findExecutable "jd")
+  useJD <- (Path.hasExtension ".json" (Path.absRel ref) &&) <$> fmap isJust (Path.findExecutable "jd")
   pure $ if useJD
     then ["jd", "-set", ref, new]
     else ["diff", ref, new]
@@ -56,10 +56,9 @@ testForParseFixture (format, runParse, files, expected) =
 parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile)]
 parseFixtures =
   [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.relFile "semantic/test/fixtures/ruby/corpus/and-or.parseA.txt")
-  , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> Path.file "parse-tree.symbols.json")
-  , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> Path.file "parse-tree.symbols.protobuf.bin")
+  , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSON, path'', Path.relFile "semantic/test/fixtures/cli/parse-tree.symbols.json")
+  , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', Path.relFile "semantic/test/fixtures/cli/parse-tree.symbols.protobuf.bin")
   ]
   where path = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby]
         path'' = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
-        prefix = Path.relDir "semantic/test/fixtures/cli"
         run = runReader defaultLanguageModes

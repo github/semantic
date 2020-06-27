@@ -142,6 +142,7 @@ haskell_test(
         "test/fixtures/ruby/**/*.rb",
         "test/fixtures/javascript/**/*.js",
         "test/fixtures/typescript/**/*.ts",
+        "test/fixtures/cli/*.json",
     ]),
     deps = semantic_common_dependencies + [
         "//:base",

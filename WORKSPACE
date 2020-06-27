@@ -41,7 +41,7 @@ load(
 )
 load(
     "@bazel_tools//tools/build_defs/repo:git.bzl",
-    "git_repository",
+    "new_git_repository",
 )
 
 stack_snapshot(
@@ -157,10 +157,17 @@ tree_sitter_node_types_archive(
     version = "0.16.0",
 )
 
-tree_sitter_node_types_archive(
+# TODO: the versioning here is messed up so we have to pin from git.
+# We should fix this (and see why the tags are breaking).
+
+new_git_repository(
     name = "tree-sitter-ruby",
-    sha256 = "1a63b43f82837a1194cab997475a22f82bfd820dd32999aa1444cfeae70f7596",
-    version = "0.16.2",
+    build_file_content = """
+exports_files(["src/node-types.json"])
+""",
+    commit = "eb2b6225bfb80010f2e4cbd27db8c6f3775230b5",
+    remote = "https://github.com/tree-sitter/tree-sitter-ruby.git",
+    shallow_since = "1576688803 -0800",
 )
 
 tree_sitter_node_types_archive(
