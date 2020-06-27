@@ -168,3 +168,30 @@ haskell_test(
         "@stackage//:tree-sitter",
     ],
 )
+
+haskell_test(
+    name = "parse-examples",
+    srcs = ["test/Examples.hs"],
+    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + [
+        "-XStrictData",
+    ],
+    data = glob(include = [
+        "test/fixtures/**/*.json",
+        "test/fixtures/go/**/*.go",
+        "test/fixtures/python/**/*.py",
+        "test/fixtures/ruby/**/*.rb",
+        "test/fixtures/javascript/**/*.js",
+        "test/fixtures/typescript/**/*.ts",
+        "test/fixtures/cli/*.json",
+    ]),
+    deps = semantic_common_dependencies + [
+        "//:base",
+        "//semantic",
+        "//semantic-proto",
+        "@stackage//:Glob",
+        "@stackage//:bazel-runfiles",
+        "@stackage//:lens",
+        "@stackage//:tasty",
+        "@stackage//:tasty-hunit",
+    ],
+)

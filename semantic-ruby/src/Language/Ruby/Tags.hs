@@ -264,7 +264,7 @@ instance ToTags Rb.Lhs where
     Prj Rb.Call {ann = Loc {byteRange}, method} -> case method of
       EPrj Rb.Identifier {text, ann} -> yieldCall text ann byteRange
       EPrj Rb.Constant {text, ann} -> yieldCall text ann byteRange
-      EPrj Rb.Operator {text, ann} -> yieldCall text ann byteRangeg
+      EPrj Rb.Operator {text, ann} -> yieldCall text ann byteRange
       _ -> gtags t
     -- These do check for locals before yielding a call tag
     Prj (Rb.Variable (Prj Rb.Identifier {ann = loc@Loc {byteRange}, text})) -> yield text P.CALL loc byteRange
