@@ -23,6 +23,14 @@ haskell_toolchain_library(name = "filepath")
 
 haskell_toolchain_library(name = "text")
 
+haskell_toolchain_library(name = "haskeline")
+
+haskell_toolchain_library(name = "process")
+
+haskell_toolchain_library(name = "template-haskell")
+
+haskell_toolchain_library(name = "transformers")
+
 haskell_repl(
     name = "hie-bios",
     collect_data = False,

@@ -80,7 +80,7 @@ def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
             "@stackage//:lens",
             "@stackage//:pathtype",
             "@stackage//:semilattices",
-            "@stackage//:template-haskell",
+            "//:template-haskell",
             "//:text",
             "@stackage//:tree-sitter",
             "@stackage//:tree-sitter-" + language,
