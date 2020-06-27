@@ -4,7 +4,7 @@ build:ci --verbose_failures
 common:ci --color=no
 test:ci --test_output=errors
 
-build --disk_cache=tmp/bazel-disk
+build --disk_cache=.bazel-cache/bazel-disk
 build --repository_cache=tmp/bazel-repo
 build --color=yes
 build --jobs=8
@@ -15,5 +15,8 @@ build --jobs=8
 # environment variables, such as LOCALE_ARCHIVE
 # We also need to setup an utf8 locale
 test --test_env=LANG=en_US.utf8 --test_env=LOCALE_ARCHIVE
+
+# Ensure test output is printed.
+test --test_output=errors
 
 try-import .bazelrc.local
