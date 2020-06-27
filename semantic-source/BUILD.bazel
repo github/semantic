@@ -19,22 +19,22 @@ load(
 )
 
 haskell_library(
-    name = "lib",
+    name = "semantic-source",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + ["-XOverloadedStrings"],
     deps = [
         "//:base",
         "//:bytestring",
         "//:containers",
+        "//:deepseq",
+        "//:filepath",
+        "//:text",
         "@lingo",
         "@stackage//:aeson",
-        "@stackage//:deepseq",
-        "@stackage//:filepath",
         "@stackage//:generic-monoid",
         "@stackage//:hashable",
         "@stackage//:pathtype",
         "@stackage//:semilattices",
-        "@stackage//:text",
     ],
 )
 
@@ -46,12 +46,12 @@ haskell_test(
     ],
     compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS,
     deps = [
-        ":lib",
+        ":semantic-source",
         "//:base",
+        "//:text",
         "@stackage//:hedgehog",
         "@stackage//:tasty",
         "@stackage//:tasty-hedgehog",
         "@stackage//:tasty-hunit",
-        "@stackage//:text",
     ],
 )

@@ -20,13 +20,14 @@ load(
 
 # You can add your own libraries with haskell_library.
 haskell_library(
-    name = "lib",
+    name = "semantic-core",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS,
     deps = [
         "//:base",
-        "//semantic-analysis:lib",
-        "//semantic-source:lib",
+        "//:text",
+        "//semantic-analysis",
+        "//semantic-source",
         "@stackage//:fused-effects",
         "@stackage//:fused-syntax",
         "@stackage//:hashable",
@@ -34,7 +35,6 @@ haskell_library(
         "@stackage//:pathtype",
         "@stackage//:prettyprinter",
         "@stackage//:prettyprinter-ansi-terminal",
-        "@stackage//:text",
         "@stackage//:trifecta",
         "@stackage//:unordered-containers",
     ],
@@ -48,17 +48,17 @@ haskell_test(
     ]),
     compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS,
     deps = [
-        ":lib",
         "//:base",
-        "//semantic-analysis:lib",
-        "//semantic-source:lib",
+        "//:text",
+        "//semantic-analysis",
+        "//semantic-core",
+        "//semantic-source",
         "@stackage//:fused-effects",
         "@stackage//:fused-syntax",
         "@stackage//:hedgehog",
         "@stackage//:tasty",
         "@stackage//:tasty-hedgehog",
         "@stackage//:tasty-hunit",
-        "@stackage//:text",
         "@stackage//:trifecta",
     ],
 )

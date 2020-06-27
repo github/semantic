@@ -7,7 +7,7 @@ load(
 )
 
 semantic_language_library(
-    name = "lib",
+    name = "semantic-python",
     srcs = glob(
         include = ["src/**/*.hs"],
         exclude = [

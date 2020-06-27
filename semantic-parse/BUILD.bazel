@@ -19,14 +19,14 @@ load(
 #     compiler_flags = STANDARD_GHC_WARNINGS,
 #     deps = [
 #         ":base",
-#         "//semantic-ast:lib",
-#         "//semantic-python:lib",
-#         "//semantic-source:lib",
+#         "//semantic-ast",
+#         "//semantic-python",
+#         "//semantic-source",
 #         "@stackage//:aeson",
 #         "@stackage//:aeson-pretty",
 #         "//:bytestring",
 #         "@stackage//:optparse-applicative",
 #         "@stackage//:pretty-simple",
-#         "@stackage//:text",
+#         "//:text",
 #     ],
 # )

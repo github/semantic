@@ -19,20 +19,21 @@ load(
 
 # You can add your own libraries with haskell_library.
 haskell_library(
-    name = "lib",
+    name = "semantic-ast",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + ["-XOverloadedStrings"],
     deps = [
         "//:base",
         "//:bytestring",
         "//:containers",
-        "//semantic-source:lib",
+        "//:filepath",
+        "//:text",
+        "//semantic-source",
         "@stackage//:Glob",
         "@stackage//:aeson",
         "@stackage//:aeson-pretty",
         "@stackage//:attoparsec",
         "@stackage//:directory",
-        "@stackage//:filepath",
         "@stackage//:fused-effects",
         "@stackage//:hedgehog",
         "@stackage//:optparse-applicative",
@@ -42,7 +43,6 @@ haskell_library(
         "@stackage//:tasty-hedgehog",
         "@stackage//:tasty-hunit",
         "@stackage//:template-haskell",
-        "@stackage//:text",
         "@stackage//:tree-sitter",
         "@stackage//:tree-sitter-python",
         "@stackage//:unordered-containers",

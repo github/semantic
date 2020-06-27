@@ -19,14 +19,15 @@ load(
 
 # You can add your own libraries with haskell_library.
 haskell_library(
-    name = "lib",
+    name = "semantic-scope-graph",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + ["-XOverloadedStrings"],
     deps = [
         "//:base",
         "//:containers",
-        "//semantic-analysis:lib",
-        "//semantic-source:lib",
+        "//:text",
+        "//semantic-analysis",
+        "//semantic-source",
         "@stackage//:aeson",
         "@stackage//:algebraic-graphs",
         "@stackage//:fused-effects",
@@ -36,6 +37,5 @@ haskell_library(
         "@stackage//:lens",
         "@stackage//:pathtype",
         "@stackage//:semilattices",
-        "@stackage//:text",
     ],
 )

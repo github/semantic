@@ -6,7 +6,7 @@ load(
 )
 
 semantic_language_library(
-    name = "lib",
+    name = "semantic-php",
     srcs = glob(["src/**/*.hs"]),
     language = "php",
 )

@@ -17,8 +17,14 @@ haskell_toolchain_library(name = "bytestring")
 
 haskell_toolchain_library(name = "containers")
 
+haskell_toolchain_library(name = "deepseq")
+
+haskell_toolchain_library(name = "filepath")
+
+haskell_toolchain_library(name = "text")
+
 haskell_repl(
     name = "hie-bios",
     collect_data = False,
-    deps = ["//semantic:lib"],
+    deps = ["//semantic"],
 )

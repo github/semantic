@@ -19,16 +19,17 @@ load(
 
 # You can add your own libraries with haskell_library.
 haskell_library(
-    name = "lib",
+    name = "semantic-analysis",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = STANDARD_GHC_WARNINGS + ["-XOverloadedStrings"],
     deps = [
         "//:base",
         "//:containers",
-        "//semantic-source:lib",
+        "//:filepath",
+        "//:text",
+        "//semantic-source",
         "@stackage//:aeson",
         "@stackage//:algebraic-graphs",
-        "@stackage//:filepath",
         "@stackage//:fused-effects",
         "@stackage//:fused-effects-readline",
         "@stackage//:fused-syntax",
@@ -39,7 +40,6 @@ haskell_library(
         "@stackage//:prettyprinter-ansi-terminal",
         "@stackage//:semilattices",
         "@stackage//:terminal-size",
-        "@stackage//:text",
         "@stackage//:transformers",
     ],
 )

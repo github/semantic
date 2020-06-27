@@ -15,14 +15,14 @@ load(
 
 # You can add your own libraries with haskell_library.
 haskell_library(
-    name = "lib",
+    name = "semantic-proto",
     srcs = glob(["src/**/*.hs"]),
     deps = [
         "//:base",
+        "//:text",
         "@stackage//:aeson",
         "@stackage//:proto-lens",
         "@stackage//:proto-lens-jsonpb",
         "@stackage//:proto-lens-runtime",
-        "@stackage//:text",
     ],
 )
