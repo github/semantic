@@ -17,7 +17,6 @@ load(
     "STANDARD_GHC_WARNINGS",
 )
 
-# You can add your own libraries with haskell_library.
 haskell_library(
     name = "semantic-analysis",
     srcs = glob(["src/**/*.hs"]),

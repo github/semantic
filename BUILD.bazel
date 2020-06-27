@@ -1,4 +1,7 @@
-# Set all target’s visibility in this package to "public".
+# This build file specifies the packages from GHC bindists that
+# we want to use, as well as the top-level hie-bios REPL target
+# that the tooling uses. You probably don't need to edit it.
+
 package(default_visibility = ["//visibility:public"])
 
 # Load rules_haskell rules.

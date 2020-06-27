@@ -13,7 +13,6 @@ load(
     "haskell_cabal_library",
 )
 
-# You can add your own libraries with haskell_library.
 haskell_library(
     name = "semantic-proto",
     srcs = glob(["src/**/*.hs"]),

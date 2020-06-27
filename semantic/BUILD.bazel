@@ -48,7 +48,6 @@ semantic_common_dependencies = [
     "@stackage//:unix",
 ]
 
-# You can add your own libraries with haskell_library.
 haskell_library(
     name = "semantic",
     srcs = glob(["src/**/*.hs"]),
