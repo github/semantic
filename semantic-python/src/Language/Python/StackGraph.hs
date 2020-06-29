@@ -172,6 +172,9 @@ aggregateChildScopeGraphs xs =
       <$> (fmap (fmap flattenEithers)
           <$> (sequenceA <$> mapM childScopeGraph xs))
 
+(<<>>) :: (Applicative f, Monoid a) => f a -> f a -> f a
+x <<>> y = (<>) <$> x <*> y
+
 instance ToScopeGraph Py.Block where
   type FocalPoint Py.Block a = BodyStruct a [Tagged Stack.Node]
   scopeGraph (Py.Block _ statements) = aggregateChildScopeGraphs statements
@@ -429,7 +432,7 @@ instance ToScopeGraph Py.Identifier where
 instance ToScopeGraph Py.IfStatement where
   type FocalPoint Py.IfStatement a = BodyStruct a [Tagged Stack.Node]
   scopeGraph (Py.IfStatement _ alternatives body condition) =
-    childScopeGraph condition >> ((<>) <$> childScopeGraph body <*> aggregateChildScopeGraphs alternatives)
+    childScopeGraph condition >> (childScopeGraph body <<>> aggregateChildScopeGraphs alternatives)
 
 instance ToScopeGraph Py.GlobalStatement where
   type FocalPoint Py.GlobalStatement a = BodyStruct a [Tagged Stack.Node]
@@ -641,7 +644,7 @@ instance ToScopeGraph Py.Tuple where
 instance ToScopeGraph Py.TryStatement where
   type FocalPoint Py.TryStatement a = BodyStruct a [Tagged Stack.Node]
   scopeGraph (Py.TryStatement _ eBody eClauses) = 
-    (<>) <$> childScopeGraph eBody <*> aggregateChildScopeGraphs (toList eClauses)
+    childScopeGraph eBody <<>> aggregateChildScopeGraphs (toList eClauses)
 
 instance ToScopeGraph Py.UnaryOperator where
   type FocalPoint Py.UnaryOperator a = BodyStruct a (Tagged Stack.Node)
@@ -650,7 +653,7 @@ instance ToScopeGraph Py.UnaryOperator where
 instance ToScopeGraph Py.WhileStatement where
   type FocalPoint Py.WhileStatement a = BodyStruct a [Tagged Stack.Node]
   scopeGraph (Py.WhileStatement _ alternative body condition) = 
-    childScopeGraph condition >> ((<>) <$> childScopeGraph body <*> optionalChildScopeGraph alternative ([],[]))
+    childScopeGraph condition >> (childScopeGraph body <<>> optionalChildScopeGraph alternative ([],[]))
 
 instance ToScopeGraph Py.WithStatement where
   type FocalPoint Py.WithStatement a = BodyStruct a [Tagged Stack.Node]
