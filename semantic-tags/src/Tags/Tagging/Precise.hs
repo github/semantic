@@ -62,11 +62,20 @@ runTagging source
 -- returns two Spans: A 1-indexed span LSP friendly span (where column offset is
 -- measure in utf16 code units).
 calculateLineAndSpans ::
-  Source -> -- |^ Source
-  Loc ->    -- |^ Location of identifier
+  Source -> -- | ^ Source
+  Loc ->    -- | ^ Location of identifier
   (Text, OneIndexedSpan, UTF16CodeUnitSpan)
-calculateLineAndSpans src Loc {byteRange = srcRange, span = span@Span {start = start@Pos {column = startCol}, end = end@Pos {column = endCol}}} =
-  (line, toOneIndexed span, Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset})
+calculateLineAndSpans
+  src
+  Loc
+    { byteRange = srcRange,
+      span =
+        span@Span
+          { start = start@Pos {column = startCol},
+            end = end@Pos {column = endCol}
+          }
+    } =
+    (line, toOneIndexed span, Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset})
   where
     -- NB: Important to limit to 180 characters after converting to text so as not to take in the middle of a multi-byte character.
     -- line = Text.strip . Text.take 180 . Source.toText $ srcLine
@@ -94,10 +103,15 @@ calculateLineAndSpans src Loc {byteRange = srcRange, span = span@Span {start = s
 countUtf16CodeUnits :: Source -> Int
 countUtf16CodeUnits = Text.foldr len 0 . Source.toText
   where
+    -- Look at the integer representation of the Char enum, if masking that
+    -- integer with 0xFFFF returns a different integer we know it's a multi-byte
+    -- utf-16 character (2 code units).
+    --   0x04321 & 0xFFFF = 0x4321 -> 0x04321 == 0x4321 = true
+    --   0x54321 & 0xFFFF = 0x4321 -> 0x54321 == 0x4321 = false
     len :: Char -> Int -> Int
-    len i acc =
-      let c = fromEnum i
-          x = if c .&. 0xFFFF == c then 1 else 2
+    len c acc =
+      let i = fromEnum c
+          x = if i .&. 0xFFFF == i then 1 else 2
       in x + acc
 
 -- | The Source of the entire surrounding line.
