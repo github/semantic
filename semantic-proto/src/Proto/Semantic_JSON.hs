@@ -251,7 +251,7 @@ instance FromJSONPB Symbol where
     docs' <- obj A..:? "docs"
     nodeType' <- obj .: "nodeType"
     syntaxType' <- obj .: "syntaxType"
-    lspSpan' <- obj A..:? "lspSpan"
+    utf16CodeUnitSpan' <- obj A..:? "utf16CodeUnitSpan"
     pure $ defMessage
       & P.symbol .~ symbol'
       & P.kind .~ kind'
@@ -260,7 +260,7 @@ instance FromJSONPB Symbol where
       & P.maybe'docs .~ docs'
       & P.nodeType .~ nodeType'
       & P.syntaxType .~ syntaxType'
-      & P.maybe'lspSpan .~ lspSpan'
+      & P.maybe'utf16CodeUnitSpan .~ utf16CodeUnitSpan'
 
 instance ToJSONPB Symbol where
   toJSONPB x = object
@@ -271,7 +271,7 @@ instance ToJSONPB Symbol where
     , "docs" .= (x^.maybe'docs)
     , "nodeType" .= (x^.nodeType)
     , "syntaxType" .= (x^.syntaxType)
-    , "lspSpan" .= (x^.maybe'lspSpan)
+    , "utf16CodeUnitSpan" .= (x^.maybe'utf16CodeUnitSpan)
     ]
   toEncodingPB x = pairs
     [ "symbol" .= (x^.symbol)
@@ -281,7 +281,7 @@ instance ToJSONPB Symbol where
     , "docs" .= (x^.maybe'docs)
     , "nodeType" .= (x^.nodeType)
     , "syntaxType" .= (x^.syntaxType)
-    , "lspSpan" .= (x^.maybe'lspSpan)
+    , "utf16CodeUnitSpan" .= (x^.maybe'utf16CodeUnitSpan)
     ]
 
 instance FromJSON Symbol where

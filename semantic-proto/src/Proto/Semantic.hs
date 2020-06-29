@@ -3315,8 +3315,8 @@ instance Control.DeepSeq.NFData StackGraphResponse where
          * 'Proto.Semantic_Fields.maybe'docs' @:: Lens' Symbol (Prelude.Maybe Docstring)@
          * 'Proto.Semantic_Fields.nodeType' @:: Lens' Symbol NodeType@
          * 'Proto.Semantic_Fields.syntaxType' @:: Lens' Symbol SyntaxType@
-         * 'Proto.Semantic_Fields.lspSpan' @:: Lens' Symbol Span@
-         * 'Proto.Semantic_Fields.maybe'lspSpan' @:: Lens' Symbol (Prelude.Maybe Span)@ -}
+         * 'Proto.Semantic_Fields.utf16CodeUnitSpan' @:: Lens' Symbol Span@
+         * 'Proto.Semantic_Fields.maybe'utf16CodeUnitSpan' @:: Lens' Symbol (Prelude.Maybe Span)@ -}
 data Symbol
   = Symbol'_constructor {_Symbol'symbol :: !Data.Text.Text,
                          _Symbol'kind :: !Data.Text.Text,
@@ -3325,7 +3325,7 @@ data Symbol
                          _Symbol'docs :: !(Prelude.Maybe Docstring),
                          _Symbol'nodeType :: !NodeType,
                          _Symbol'syntaxType :: !SyntaxType,
-                         _Symbol'lspSpan :: !(Prelude.Maybe Span),
+                         _Symbol'utf16CodeUnitSpan :: !(Prelude.Maybe Span),
                          _Symbol'_unknownFields :: !Data.ProtoLens.FieldSet}
   deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Symbol where
@@ -3388,17 +3388,19 @@ instance Data.ProtoLens.Field.HasField Symbol "syntaxType" SyntaxType where
         (Lens.Family2.Unchecked.lens
            _Symbol'syntaxType (\ x__ y__ -> x__ {_Symbol'syntaxType = y__}))
         Prelude.id
-instance Data.ProtoLens.Field.HasField Symbol "lspSpan" Span where
+instance Data.ProtoLens.Field.HasField Symbol "utf16CodeUnitSpan" Span where
   fieldOf _
     = (Prelude..)
         (Lens.Family2.Unchecked.lens
-           _Symbol'lspSpan (\ x__ y__ -> x__ {_Symbol'lspSpan = y__}))
+           _Symbol'utf16CodeUnitSpan
+           (\ x__ y__ -> x__ {_Symbol'utf16CodeUnitSpan = y__}))
         (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
-instance Data.ProtoLens.Field.HasField Symbol "maybe'lspSpan" (Prelude.Maybe Span) where
+instance Data.ProtoLens.Field.HasField Symbol "maybe'utf16CodeUnitSpan" (Prelude.Maybe Span) where
   fieldOf _
     = (Prelude..)
         (Lens.Family2.Unchecked.lens
-           _Symbol'lspSpan (\ x__ y__ -> x__ {_Symbol'lspSpan = y__}))
+           _Symbol'utf16CodeUnitSpan
+           (\ x__ y__ -> x__ {_Symbol'utf16CodeUnitSpan = y__}))
         Prelude.id
 instance Data.ProtoLens.Message Symbol where
   messageName _ = Data.Text.pack "github.semantic.Symbol"
@@ -3462,13 +3464,13 @@ instance Data.ProtoLens.Message Symbol where
                  Data.ProtoLens.Optional
                  (Data.ProtoLens.Field.field @"syntaxType")) ::
               Data.ProtoLens.FieldDescriptor Symbol
-        lspSpan__field_descriptor
+        utf16CodeUnitSpan__field_descriptor
           = Data.ProtoLens.FieldDescriptor
-              "lsp_span"
+              "utf16_code_unit_span"
               (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
                  Data.ProtoLens.FieldTypeDescriptor Span)
               (Data.ProtoLens.OptionalField
-                 (Data.ProtoLens.Field.field @"maybe'lspSpan")) ::
+                 (Data.ProtoLens.Field.field @"maybe'utf16CodeUnitSpan")) ::
               Data.ProtoLens.FieldDescriptor Symbol
       in
         Data.Map.fromList
@@ -3479,7 +3481,7 @@ instance Data.ProtoLens.Message Symbol where
            (Data.ProtoLens.Tag 5, docs__field_descriptor),
            (Data.ProtoLens.Tag 6, nodeType__field_descriptor),
            (Data.ProtoLens.Tag 7, syntaxType__field_descriptor),
-           (Data.ProtoLens.Tag 8, lspSpan__field_descriptor)]
+           (Data.ProtoLens.Tag 8, utf16CodeUnitSpan__field_descriptor)]
   unknownFields
     = Lens.Family2.Unchecked.lens
         _Symbol'_unknownFields
@@ -3492,7 +3494,8 @@ instance Data.ProtoLens.Message Symbol where
          _Symbol'span = Prelude.Nothing, _Symbol'docs = Prelude.Nothing,
          _Symbol'nodeType = Data.ProtoLens.fieldDefault,
          _Symbol'syntaxType = Data.ProtoLens.fieldDefault,
-         _Symbol'lspSpan = Prelude.Nothing, _Symbol'_unknownFields = []}
+         _Symbol'utf16CodeUnitSpan = Prelude.Nothing,
+         _Symbol'_unknownFields = []}
   parseMessage
     = let
         loop :: Symbol -> Data.ProtoLens.Encoding.Bytes.Parser Symbol
@@ -3589,8 +3592,10 @@ instance Data.ProtoLens.Message Symbol where
                                        (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
                                            Data.ProtoLens.Encoding.Bytes.isolate
                                              (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
-                                       "lsp_span"
-                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"lspSpan") y x)
+                                       "utf16_code_unit_span"
+                                loop
+                                  (Lens.Family2.set
+                                     (Data.ProtoLens.Field.field @"utf16CodeUnitSpan") y x)
                         wire
                           -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
                                         wire
@@ -3718,7 +3723,7 @@ instance Data.ProtoLens.Message Symbol where
                                ((Data.Monoid.<>)
                                   (case
                                        Lens.Family2.view
-                                         (Data.ProtoLens.Field.field @"maybe'lspSpan") _x
+                                         (Data.ProtoLens.Field.field @"maybe'utf16CodeUnitSpan") _x
                                    of
                                      Prelude.Nothing -> Data.Monoid.mempty
                                      (Prelude.Just _v)
@@ -3754,7 +3759,8 @@ instance Control.DeepSeq.NFData Symbol where
                                (_Symbol'nodeType x__)
                                (Control.DeepSeq.deepseq
                                   (_Symbol'syntaxType x__)
-                                  (Control.DeepSeq.deepseq (_Symbol'lspSpan x__) ()))))))))
+                                  (Control.DeepSeq.deepseq
+                                     (_Symbol'utf16CodeUnitSpan x__) ()))))))))
 newtype SyntaxType'UnrecognizedValue
   = SyntaxType'UnrecognizedValue Data.Int.Int32
   deriving (Prelude.Eq, Prelude.Ord, Prelude.Show)
