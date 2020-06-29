@@ -32,7 +32,7 @@ renderDiff ref new = unsafePerformIO $ do
   useJD <- (Path.hasExtension ".json" (Path.relPath ref) &&) <$> fmap isJust (Path.findExecutable "jd")
   pure $ if useJD
     then ["jd", "-set", ref, new]
-    else ["git", "diff", ref, new]
+    else ["diff", ref, new]
 {-# NOINLINE renderDiff #-}
 
 testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile) -> TestTree
@@ -45,11 +45,11 @@ testForParseFixture (format, runParse, files, expected) =
 
 parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile)]
 parseFixtures =
-  [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.relFile "test/fixtures/ruby/corpus/and-or.parseA.txt")
+  [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.relFile "semantic/test/fixtures/ruby/corpus/and-or.parseA.txt")
   , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSON, path'', prefix </> Path.file "parse-tree.symbols.json")
   , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', prefix </> Path.file "parse-tree.symbols.protobuf.bin")
   ]
-  where path = [File (Path.absRel "test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby]
-        path'' = [File (Path.absRel "test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
-        prefix = Path.relDir "test/fixtures/cli"
+  where path = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby]
+        path'' = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
+        prefix = Path.relDir "semantic/test/fixtures/cli"
         run = runReader defaultLanguageModes
