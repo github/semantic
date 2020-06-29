@@ -1,4 +1,4 @@
-module Tags.Tag (Tag (..), UTF16CodeUnitSpan, OneIndexedSpan) where
+module Tags.Tag (Tag (..), UTF16CodeUnitSpan(..), OneIndexedSpan(..)) where
 
 import Data.Text (Text)
 import qualified Proto.Semantic as P
@@ -6,10 +6,12 @@ import Source.Loc
 
 -- | A 0-indxed Span where the column offset units are utf-16 code units (2
 -- bytes), suitable for the LSP (Language Server Protocol) specification.
-type UTF16CodeUnitSpan = Span
+newtype UTF16CodeUnitSpan = UTF16CodeUnitSpan { unUTF16CodeUnitSpan :: Span }
+  deriving (Eq, Show)
 
 -- A 1-indexed Span where the units are bytes.
-type OneIndexedSpan = Span
+newtype OneIndexedSpan = OneIndexedSpan { unOneIndexedSpan :: Span }
+  deriving (Eq, Show)
 
 data Tag
   = Tag
@@ -18,6 +20,6 @@ data Tag
         tagNodeType :: P.NodeType,
         tagSpan :: OneIndexedSpan,
         tagLine :: Text,
-        tagLspSpan :: UTF16CodeUnitSpan
+        tagUTF16CodeUnitSpan :: UTF16CodeUnitSpan
       }
   deriving (Eq, Show)

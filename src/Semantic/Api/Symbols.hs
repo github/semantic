@@ -76,8 +76,8 @@ parseSymbols blobs = do
             & P.nodeType .~ tagNodeType tag
             & P.syntaxType .~ tagSyntaxType tag
             & P.line .~ tagLine tag
-            & P.maybe'span ?~ converting # tagSpan tag
-            & P.maybe'utf16CodeUnitSpan ?~ converting # tagLspSpan tag
+            & P.maybe'span ?~ converting # unUTF16CodeUnitSpan (tagSpan tag)
+            & P.maybe'utf16CodeUnitSpan ?~ converting # unOneIndexedSpan (tagLspSpan tag)
           where
             toKind = toTitle . pack . show . tagSyntaxType
 

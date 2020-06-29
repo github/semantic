@@ -3,6 +3,8 @@
 module Tags.Tagging.Precise
 ( Tags
 , Tag(..)
+, OneIndexedSpan(..)
+, UTF16CodeUnitSpan(..)
 , ToTags(..)
 , yield
 , runTagging
@@ -74,14 +76,14 @@ calculateLineAndSpans
           { start = start@Pos {column = startCol},
             end = end@Pos {column = endCol}
           }
-    } =
-    (line, toOneIndexed span, Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset})
+    } = (line, toOneIndexed span, utf16Span)
   where
     -- NB: Important to limit to 180 characters after converting to text so as not to take in the middle of a multi-byte character.
     -- line = Text.strip . Text.take 180 . Source.toText $ srcLine
     line = sliceCenter180 startCol . Source.toText $ srcLine
     srcLine = surroundingLine src srcRange
-    toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
+    toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = OneIndexedSpan $ Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
+    utf16Span = UTF16CodeUnitSpan $ Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset}
 
     utf16cpStartOffset = countUtf16CodeUnits startSlice
     utf16cpEndOffset = utf16cpStartOffset + countUtf16CodeUnits endSlice
