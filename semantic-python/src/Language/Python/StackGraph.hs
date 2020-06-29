@@ -32,7 +32,6 @@ import AST.Element
 import AST.Element
 import qualified AST.Parse as Parse
 import qualified Analysis.Name as Name
-import Control.Applicative
 import Control.Effect.Reader
 import Control.Effect.StackGraph
 import Control.Effect.State
