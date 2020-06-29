@@ -124,6 +124,7 @@ tsxSkips = Path.relFile <$>
 typescriptSkips :: [Path.RelFile]
 typescriptSkips = Path.relFile <$>
   [ "npm/node_modules/slide/lib/async-map-ordered.js"
+  , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/regenerator.min.js"
   ]
 
 buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree

@@ -5,10 +5,8 @@ module Main (allTests, legacySpecs, main, tests) where
 import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Graph.Spec
 import qualified Data.Language.Spec
-import qualified Data.Scientific.Spec
 import qualified Data.Semigroup.App.Spec
 import qualified Integration.Spec
-import qualified Numeric.Spec
 import qualified Tags.Spec
 import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
@@ -23,10 +21,8 @@ import Test.Tasty.Hspec as Tasty
 tests :: (?session :: TaskSession) => [TestTree]
 tests =
   [ Data.Language.Spec.testTree
-  , Data.Scientific.Spec.testTree
   , Data.Semigroup.App.Spec.testTree
   , Integration.Spec.testTree
-  , Numeric.Spec.testTree
   , Semantic.CLI.Spec.testTree
   , Semantic.Stat.Spec.testTree
   ]
