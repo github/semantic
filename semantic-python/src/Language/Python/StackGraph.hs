@@ -32,6 +32,7 @@ import AST.Element
 import AST.Element
 import qualified AST.Parse as Parse
 import qualified Analysis.Name as Name
+import Control.Applicative
 import Control.Effect.Reader
 import Control.Effect.StackGraph
 import Control.Effect.State
@@ -160,13 +161,21 @@ instance ToScopeGraph Py.Attribute where
   type FocalPoint Py.Attribute a = BodyStruct a (Tagged Stack.Node)
   scopeGraph = todo
 
+childScopeGraph :: (ToScopeGraph t, StackGraphEff sig m) => Parse.Err (t Loc) -> m (Result (FocalPoint t Loc))
+childScopeGraph = scopeGraph <=< ensureAST
+
+optionalChildScopeGraph :: (ToScopeGraph t, StackGraphEff sig m) => Maybe (Parse.Err (t Loc)) -> FocalPoint t Loc -> m (Result (FocalPoint t Loc))
+optionalChildScopeGraph Nothing  n = pure (Complete n)
+optionalChildScopeGraph (Just x) _ = childScopeGraph x
+
+aggregateChildScopeGraphs xs =
+  fmap (\rs -> let (obs, ons) = unzip rs in (concat obs, concat ons))
+      <$> (fmap (fmap flattenEithers)
+          <$> (sequenceA <$> mapM childScopeGraph xs))
+
 instance ToScopeGraph Py.Block where
   type FocalPoint Py.Block a = BodyStruct a [Tagged Stack.Node]
-  scopeGraph (Py.Block _ statements) = do
-    whatev <- mapM (scopeGraph <=< ensureAST) statements
-    let results = sequenceA whatev
-    let res' = fmap (fmap flattenEithers) results
-    pure $ fmap (foldr (\oldBody (newBindings, newNodes) -> (newBindings <> fst oldBody, newNodes <> snd oldBody)) mempty) (res' :: Result [BodyStruct Loc [Tagged Stack.Node]])
+  scopeGraph (Py.Block _ statements) = aggregateChildScopeGraphs statements
 
 instance ToScopeGraph Py.BreakStatement where
   type FocalPoint Py.BreakStatement a = BodyStruct a [Tagged Stack.Node]
@@ -420,11 +429,8 @@ instance ToScopeGraph Py.Identifier where
 
 instance ToScopeGraph Py.IfStatement where
   type FocalPoint Py.IfStatement a = BodyStruct a [Tagged Stack.Node]
-  scopeGraph (Py.IfStatement _ alternative (Parse.Success body) (Parse.Success condition)) = do
-    _ <- scopeGraph condition
-    res <- scopeGraph body
-    reses <- mapM (scopeGraph <=< ensureAST) alternative
-    pure (res <> mconcat (map (fmap flattenEithers) reses))
+  scopeGraph (Py.IfStatement _ alternatives body condition) =
+    childScopeGraph condition >> ((<>) <$> childScopeGraph body <*> aggregateChildScopeGraphs alternatives)
 
 instance ToScopeGraph Py.GlobalStatement where
   type FocalPoint Py.GlobalStatement a = BodyStruct a [Tagged Stack.Node]
@@ -635,12 +641,8 @@ instance ToScopeGraph Py.Tuple where
 
 instance ToScopeGraph Py.TryStatement where
   type FocalPoint Py.TryStatement a = BodyStruct a [Tagged Stack.Node]
-  scopeGraph (Py.TryStatement _ eBody eClauses) = do
-    body <- ensureAST eBody
-    res <- scopeGraph body
-    elseClauses <- mapM ensureAST eClauses
-    reses <- mapM scopeGraph elseClauses
-    pure (res <> mconcat (map (fmap flattenEithers) (toList reses)))
+  scopeGraph (Py.TryStatement _ eBody eClauses) = 
+    (<>) <$> childScopeGraph eBody <*> aggregateChildScopeGraphs (toList eClauses)
 
 instance ToScopeGraph Py.UnaryOperator where
   type FocalPoint Py.UnaryOperator a = BodyStruct a (Tagged Stack.Node)
@@ -648,13 +650,8 @@ instance ToScopeGraph Py.UnaryOperator where
 
 instance ToScopeGraph Py.WhileStatement where
   type FocalPoint Py.WhileStatement a = BodyStruct a [Tagged Stack.Node]
-  scopeGraph (Py.WhileStatement _ (Just eAlternative) (Parse.Success body) (Parse.Success condition)) = do
-    _ <- scopeGraph condition
-    res <- scopeGraph body
-
-    reses <- (scopeGraph <=< ensureAST) eAlternative
-    pure (res <> reses)
-  scopeGraph x = todo x
+  scopeGraph (Py.WhileStatement _ alternative body condition) = 
+    childScopeGraph condition >> ((<>) <$> childScopeGraph body <*> optionalChildScopeGraph alternative ([],[]))
 
 instance ToScopeGraph Py.WithStatement where
   type FocalPoint Py.WithStatement a = BodyStruct a [Tagged Stack.Node]
