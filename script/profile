@@ -15,7 +15,7 @@ PROFILE_DIR="$PROFILES_DIR/$TODAY/$NOW-$CURRENT_BRANCH-$HEAD_SHA/"
 OUTFILE="$PROFILE_DIR/profile.out.log"
 ERRFILE="$PROFILE_DIR/profile.err.log"
 
-cabal v2-build
+cabal v2-build all
 
 mkdir -p "$PROFILE_DIR"
 
