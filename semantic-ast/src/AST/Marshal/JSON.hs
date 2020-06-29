@@ -15,7 +15,8 @@ module AST.Marshal.JSON
 ( MarshalJSON(..)
 ) where
 
-import           Data.Aeson as Aeson
+import           AST.Parse
+import           Data.Aeson as Aeson hiding (Success)
 import           Data.List.NonEmpty (NonEmpty)
 import           Data.Text (Text)
 import qualified Data.Text as Text
@@ -77,6 +78,10 @@ instance (GValue t) => GValue ([] :.: t) where
 
 instance (GValue t) => GValue (NonEmpty :.: t) where
   gvalue (Comp1 ts) = toJSON $ fmap gvalue ts
+
+instance (GValue t) => GValue (Err :.: t) where
+  gvalue (Comp1 (Success t)) = gvalue t
+  gvalue (Comp1 (Fail _)) = Null
 
 -- GFields operates on product field types: it takes an accumulator, a datatype, and returns a new accumulator value.
 class GFields f where
