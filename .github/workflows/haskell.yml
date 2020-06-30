@@ -65,6 +65,7 @@ jobs:
         # cabal v2-run   --project-file=cabal.project.ci semantic-python:test:compiling
         # cabal v2-run   --project-file=cabal.project.ci semantic-python:test:graphing
         cabal v2-run   --project-file=cabal.project.ci semantic-ruby:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-rust:test
         cabal v2-run   --project-file=cabal.project.ci semantic-tsx:test
         cabal v2-run   --project-file=cabal.project.ci semantic-typescript:test
         cd semantic-source; cabal v2-run --project-file=cabal.project.ci semantic-source:test; cd ..
