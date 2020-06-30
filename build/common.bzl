@@ -36,7 +36,11 @@ def tree_sitter_node_types_archive(name, version, sha256, urls = [], nodetypespa
     http_archive(
         name = name,
         build_file_content = """
+package(default_visibility = ["//visibility:public"])
+
 exports_files(glob(["{}"]))
+
+filegroup(name = "corpus", srcs = glob(['corpus/*.txt']))
 """.format(nodetypespath),
         strip_prefix = "{}-{}".format(name, version),
         urls = ["https://github.com/tree-sitter/{}/archive/v{}.tar.gz".format(name, version)],
@@ -59,7 +63,7 @@ def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
             '-DNODE_TYPES_PATH="../../../../$(rootpath {})"'.format(nodetypes),
         ],
         srcs = srcs,
-        extra_srcs = [nodetypes],
+        extra_srcs = [nodetypes, "@tree-sitter-{}//:corpus".format(language)],
         deps = [
             "//:base",
             "//semantic-analysis",
