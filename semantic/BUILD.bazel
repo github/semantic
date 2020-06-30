@@ -118,6 +118,16 @@ haskell_binary(
     ],
 )
 
+haskell_library(
+    name = "fixtureshim",
+    srcs = ["test/System/Path/Bazel.hs"],
+    deps = [
+        "//:base",
+        "@stackage//:bazel-runfiles",
+        "@stackage//:pathtype",
+    ],
+)
+
 haskell_test(
     name = "spec",
     srcs = glob(
@@ -125,6 +135,7 @@ haskell_test(
         exclude = [
             "test/fixtures/**/*.hs",
             "test/Examples.hs",
+            "test/System/Path/Bazel.hs",
         ],
     ),
     compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + [
@@ -140,6 +151,7 @@ haskell_test(
         "test/fixtures/cli/*.json",
     ]),
     deps = semantic_common_dependencies + [
+        ":fixtureshim",
         "//:base",
         "//semantic",
         "//semantic-proto",
@@ -166,7 +178,9 @@ haskell_test(
 
 haskell_test(
     name = "parse-examples",
-    srcs = ["test/Examples.hs"],
+    srcs = [
+        "test/Examples.hs",
+    ],
     compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + [
         "-XStrictData",
     ],
@@ -178,8 +192,12 @@ haskell_test(
         "test/fixtures/javascript/**/*.js",
         "test/fixtures/typescript/**/*.ts",
         "test/fixtures/cli/*.json",
-    ]),
+    ]) + [
+        "@golang//:src",
+        "@moby//:src",
+    ],
     deps = semantic_common_dependencies + [
+        ":fixtureshim",
         "//:base",
         "//semantic",
         "//semantic-proto",

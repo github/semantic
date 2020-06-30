@@ -4,6 +4,7 @@
 module System.Path.Bazel
   ( bazelFile,
     bazelFile',
+    absRelFile,
     bazelDir,
     HasBazel,
   )
@@ -18,8 +19,9 @@ type HasBazel = (?runfiles :: Bazel.Runfiles, HasCallStack)
 bazelFile :: (HasBazel) => String -> Path.AbsFile
 bazelFile x = Path.absFile (Bazel.rlocation ?runfiles ("semantic/semantic/" <> x))
 
-bazelFile' :: (HasBazel) => String -> Path.AbsRelFile
+bazelFile', absRelFile :: (HasBazel) => String -> Path.AbsRelFile
 bazelFile' = Path.toAbsRel . bazelFile
+absRelFile = bazelFile'
 
 bazelDir :: HasBazel => String -> Path.AbsDir
 bazelDir x = Path.absDir (Bazel.rlocation ?runfiles ("semantic/semantic/" <> x))
