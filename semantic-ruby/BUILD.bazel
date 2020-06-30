@@ -5,9 +5,35 @@ load(
     "semantic_language_library",
 )
 
+# Load rules_haskell rules.
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_test",
+)
+
 semantic_language_library(
     name = "semantic-ruby",
     srcs = glob(["src/**/*.hs"]),
     language = "ruby",
     nodetypes = "@tree-sitter-ruby//:src/node-types.json",
+)
+
+haskell_test(
+    name = "test",
+    srcs = glob(["test/**/*.hs"]),
+    deps = [
+        ":semantic-ruby",
+        "//:base",
+        "//:bytestring",
+        "//:text",
+        "//semantic:fixtureshim",
+        "//semantic-ast",
+        "@stackage//:bazel-runfiles",
+        "@stackage//:hedgehog",
+        "@stackage//:pathtype",
+        "@stackage//:tasty",
+        "@stackage//:tasty-hedgehog",
+        "@stackage//:tasty-hunit",
+        "@stackage//:tree-sitter-ruby",
+    ],
 )

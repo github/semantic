@@ -37,16 +37,28 @@ def tree_sitter_node_types_archive(name, version, sha256, urls = [], nodetypespa
         name = name,
         build_file_content = """
 exports_files(glob(["{}"]))
+
+native.filegroup(
+    name = "corpus",
+    srcs = "test/corpus/*.txt",
+    visibility = ["//visibility:public"],
+)
 """.format(nodetypespath),
         strip_prefix = "{}-{}".format(name, version),
         urls = ["https://github.com/tree-sitter/{}/archive/v{}.tar.gz".format(name, version)],
         sha256 = sha256,
     )
 
-def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
+def semantic_language_library(language, name, srcs, nodetypes = [], **kwargs):
     """Create a new library target with dependencies needed for a language-AST project."""
-    if nodetypes == "":
-        nodetypes = "@tree-sitter-{}//:src/node-types.json".format(language)
+    if nodetypes == []:
+        nodetypes = [
+            "@tree-sitter-{}//:src/node-types.json".format(language),
+        ]
+    filegroup(
+        name = "corpus",
+        srcs = native.glob("@"),
+    )
     haskell_library(
         name = name,
         # We can't use Template Haskell to find out the location of the
@@ -59,7 +71,7 @@ def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
             '-DNODE_TYPES_PATH="../../../../$(rootpath {})"'.format(nodetypes),
         ],
         srcs = srcs,
-        extra_srcs = [nodetypes],
+        extra_srcs = nodetypes,
         deps = [
             "//:base",
             "//semantic-analysis",
