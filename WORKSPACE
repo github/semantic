@@ -199,12 +199,6 @@ tree_sitter_node_types_archive(
     version = "0.16.2",
 )
 
-tree_sitter_node_types_archive(
-    name = "tree-sitter-ql",
-    sha256 = "b43dca6676dd95eb817bf5e8933183591f48169f6466382463f199ba6132b5c5",
-    version = "1.1.0",
-)
-
 # Download lingo (which has its own Bazel build instructions).
 
 git_repository(
@@ -225,4 +219,14 @@ exports_files(["src/node-types.json"])
     commit = "eb2b6225bfb80010f2e4cbd27db8c6f3775230b5",
     remote = "https://github.com/tree-sitter/tree-sitter-ruby.git",
     shallow_since = "1576688803 -0800",
+)
+
+new_git_repository(
+    name = "tree-sitter-ql",
+    build_file_content = """
+exports_files(["src/node-types.json"])
+""",
+    commit = "c0d674abed8836bb5a4770f547343ef100f88c24",
+    remote = "https://github.com/tree-sitter/tree-sitter-ql.git",
+    shallow_since = "1585868745 -0700",
 )

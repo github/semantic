@@ -45,7 +45,7 @@ renderDiff ref new = unsafePerformIO $ do
 {-# NOINLINE renderDiff #-}
 
 
-testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile) -> TestTree
+testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File Language], Path.AbsRelFile) -> TestTree
 testForParseFixture (format, runParse, files, expected) =
   goldenVsStringDiff
     ("parse fixture renders to " <> format)
@@ -53,11 +53,11 @@ testForParseFixture (format, runParse, files, expected) =
     (Path.toString expected)
     (fmap toLazyByteString . runTaskOrDie $ readBlobs (FilesFromPaths files) >>= runParse)
 
-parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], Path.RelFile)]
+parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], Path.AbsRelFile)]
 parseFixtures =
-  [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.relFile "semantic/test/fixtures/ruby/corpus/and-or.parseA.txt")
-  , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSON, path'', Path.relFile "semantic/test/fixtures/cli/parse-tree.symbols.json")
-  , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', Path.relFile "semantic/test/fixtures/cli/parse-tree.symbols.protobuf.bin")
+  [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.parseA.txt")
+  , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSON, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.json")
+  , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.protobuf.bin")
   ]
   where path = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby]
         path'' = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
