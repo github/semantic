@@ -4,28 +4,34 @@ load(
     "new_git_repository",
 )
 
-all_example_repos = {
+_all_example_repos = {
     "numpy": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "058851c5cfc98f50f11237b1c13d77cfd1f40475",
         "repo": "numpy/numpy",
         "since": "",
-        "excludes": ["data structures"],
+        "excludes": [],
     },
     "python": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "c6be53e1c43f870f5364eef1499ee1b411c966fb",
         "repo": "thealgorithms/python",
-        "since": "",
-        "excludes": [],
+        "since": "1548508158 +0800",
+        "excludes": [
+            "**/data structures/*",
+            "**/binary tree/*",
+            "**/graphs/*",
+            "**/Random Forest*/*",
+            "**/* */*",
+        ],
     },
     "flask": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "0b5b4a66ef99c8b91569dd9b9b34911834689d3f",
         "repo": "pallets/flask",
@@ -34,7 +40,7 @@ all_example_repos = {
     },
     "httpie": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "358342d1c915d6462a080a77aefbb20166d0bd5d",
         "repo": "jakubroztocil/httpie",
@@ -43,16 +49,16 @@ all_example_repos = {
     },
     "keras": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "e59570ae26670f788d6c649191031e4a8824f955",
         "repo": "keras-team/keras",
-        "since": "",
+        "since": "1548927621 +0530",
         "excludes": [],
     },
     "requests": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "64bde6582d9b49e9345d9b8df16aaa26dc372d13",
         "repo": "requests/requests",
@@ -61,7 +67,7 @@ all_example_repos = {
     },
     "scikit-learn": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "d0f63a760d9993a7f68cfc5e1a075700d67c53d3",
         "repo": "scikit-learn/scikit-learn",
@@ -70,16 +76,16 @@ all_example_repos = {
     },
     "scrapy": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "65d631329a1434ec013f24341e4b8520241aec70",
         "repo": "scrapy/scrapy",
-        "since": "",
+        "since": "1548908933 -0300",
         "excludes": [],
     },
     "pytorch": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "c865d46736db4afff51690a712e35ed8e3899490",
         "repo": "pytorch/pytorch",
@@ -88,11 +94,11 @@ all_example_repos = {
     },
     "certbot": {
         "data": [
-            "**/*.rb",
+            "**/*.py",
         ],
         "commit": "bb8222200a8cbd39a3ce9584ce6dfed6c5d05228",
         "repo": "certbot/certbot",
-        "since": "",
+        "since": "1549052531 -0800",
         "excludes": [],
     },
     "spec": {
@@ -106,18 +112,18 @@ all_example_repos = {
     },
     "desktop": {
         "data": [
-            "**/*.rb",
+            "**/*.[tj]s",
         ],
-        "commit": "d1324f56d02dd9afca5d2e9da545905",
+        "commit": "d1324f56d02dd9afca5d2e9da545905a7d41d671",
         "repo": "desktop/desktop",
-        "since": "",
+        "since": "1523834029 +1000",
         "excludes": [],
     },
 }
 
-all_repo_deps = ["@" + k + "//:src" for (k, v) in all_example_repos.items()]
+semantic_external_test_repositories = ["@" + k + "//:src" for (k, v) in _all_example_repos.items()]
 
-def example_repo(name, data, excludes, commit, repo):
+def _example_repo(name, data, excludes, commit, repo, since):
     new_git_repository(
         name = name,
         build_file_content = """
@@ -129,8 +135,9 @@ filegroup(
 """.format(data, excludes),
         commit = commit,
         remote = "https://github.com/{}.git".format(repo),
+        shallow_since = since,
     )
 
 def declare_example_repos():
-    for k, v in all_example_repos.items():
-        example_repo(name = k, data = v["data"], excludes = v["excludes"], commit = v["commit"], repo = v["repo"])
+    for k, v in _all_example_repos.items():
+        _example_repo(name = k, data = v["data"], excludes = v["excludes"], commit = v["commit"], repo = v["repo"], since = v["since"])

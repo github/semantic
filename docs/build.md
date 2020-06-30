@@ -10,7 +10,7 @@ The Semantic project supports builds with the Bazel build system. This is unconv
 
 Assuming you're on macOS, run the script located at ~script/bootstrap-bazel~. This uses Homebrew to install Bazel and creates the `.bazel-cache` directory.
 
-The first time you run `bazel build`
+The first time you run `bazel build`, it'll take some time, as Bazel will compile all of Stackage. Fear not: you won't have to do this again.
 
 ## `cabal` → `stack` cheatsheet
 
@@ -36,7 +36,7 @@ If this seems complicated, don't worry: most of the time you'll be able to skip 
 ## Things to know
 
 1. **Don't generally run `bazel clean`**. Since Bazel builds are reproducible, there's very little reason to clean, unless somehow your whole cache got irrevocably corrupted.
-2. **You can load a REPL for any target by appending `@repl`.**
+2. **You can load a REPL for any target by appending `@repl`.** (with the exception of the language packages, due to [this](https://github.com/tweag/rules_haskell/issues/1377)).
 3. **Some packages come with GHC and are not loaded from Stackage**. These include `base`, `containers`, and [others](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/8.10.1-notes.html?highlight=bytestring#included-libraries). To depend on those packages, you use `//:base`, `//:containers`, etc. They are specified in the `BAZEL.build` at the project root. You probably won't need to add any more.
 
 ## Quick reference links
@@ -58,4 +58,6 @@ The default `.bazelrc` file imports a `.bazelrc.local` file if it's present; use
 
 ## Custom rules
 
-We have two custom rules, defined in `build/common.bzl`. The first, `tree_sitter_node_types_archive`, uses the `http_archive` rule to download a specified tree-sitter grammar's `node-types.json` file. These calls declare new top-level targets, so they're only present in the top-level `WORKSPACE` file. The second, `semantic_language_library`, takes care of the boilerplate associated with declaring a target for a `semantic-LANG` language package (as these packages' contents are identical, their target declarations are almost identical).
+We have two common custom rules, defined in `build/common.bzl`. The first, `tree_sitter_node_types_archive`, uses the `http_archive` rule to download a specified tree-sitter grammar's `node-types.json` file. These calls declare new top-level targets, so they're only present in the top-level `WORKSPACE` file. The second, `semantic_language_library`, takes care of the boilerplate associated with declaring a target for a `semantic-LANG` language package (as these packages' contents are identical, their target declarations are almost identical).
+
+For the purposes of setting up the examples upon which the `parse-examples` test depends, we have code in `build/example_repos.bzl` which defines them, checks them out, and computes the set of target names. You shouldn't need to change or modify this, unless you're adding new repos.

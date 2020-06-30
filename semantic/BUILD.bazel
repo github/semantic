@@ -21,7 +21,7 @@ load(
 )
 load(
     "//:build/example_repos.bzl",
-    "all_repo_deps",
+    "semantic_external_test_repositories",
 )
 
 haskell_toolchain_library(name = "ghc-prim")
@@ -197,7 +197,7 @@ haskell_test(
         "test/fixtures/javascript/**/*.js",
         "test/fixtures/typescript/**/*.ts",
         "test/fixtures/cli/*.json",
-    ]) + all_repo_deps,
+    ]) + semantic_external_test_repositories,
     deps = semantic_common_dependencies + [
         ":fixtureshim",
         "//:base",
