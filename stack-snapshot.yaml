@@ -10,11 +10,12 @@ packages:
     commit: "e677228b1f9c69a9378c3f33ea9ca798b06831d3"
     sha256: "9d7510f7b303dc7269b16d2425a698b350e93f359d253ecc82fc7f711292fe28"
   - github: fused-effects/fused-effects-readline
-    commit: "331545c7633955d8e930656f2093c16aa9f8d7a0"
-    sha256: "2b00acb099f179d961838c82155cde64a7da44b2f93ff4d1562e102380907959"
+    commit: "ef7de14f5ba488d0ad4f705b956a5f580299cfd6"
+    sha256: "4d3297147679c33a679ae9d2c76417da16150d92861087e1edc38dc0e85d6f52"
   - semilattices-0.0.0.4
   - fused-effects-exceptions-1.0.0.0
   - fused-effects-resumable-0.1.0.0
+  - haskeline-0.8.0.0
   - tree-sitter-0.9.0.1
   - tree-sitter-python-0.9.0.2
   - tree-sitter-ruby-0.5.0.2

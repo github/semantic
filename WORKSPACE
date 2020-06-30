@@ -73,6 +73,7 @@ stack_snapshot(
         "fused-syntax",
         "generic-lens",
         "generic-monoid",
+        "haskeline",
         "hashable",
         "hedgehog",
         "hostname",
