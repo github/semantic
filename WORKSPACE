@@ -230,3 +230,12 @@ exports_files(["src/node-types.json"])
     remote = "https://github.com/tree-sitter/tree-sitter-ql.git",
     shallow_since = "1585868745 -0700",
 )
+
+new_git_repository(
+    name = "tree-sitter-php",
+    build_file_content = """
+exports_files(["src/node-types.json"])
+""",
+    commit = "41a408d5b996ef54d8b9e1b9a2469fad00c1b52b",
+    remote = "https://github.com/tree-sitter/tree-sitter-php.git",
+)
