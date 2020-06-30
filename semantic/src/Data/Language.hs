@@ -17,6 +17,7 @@ data PerLanguageModes = PerLanguageModes
   , tsxMode        :: LanguageMode
   , javascriptMode :: LanguageMode
   , jsxMode        :: LanguageMode
+  , rustMode       :: LanguageMode
   }
   deriving (Eq, Ord, Show)
 
@@ -43,6 +44,7 @@ preciseLanguageModes = PerLanguageModes
   , tsxMode = Precise
   , javascriptMode = Precise
   , jsxMode = Precise
+  , rustMode = Precise
   }
 
 data LanguageMode
