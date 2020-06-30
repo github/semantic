@@ -1,8 +1,8 @@
 resolver: lts-15.13
 packages:
   - github: antitypical/fused-syntax
-    commit: "d11e14581217590a5c67f79cbaeee35ac8acee6a"
-    sha256: "e84d4812c4a6a4a6d76a684fa7adda7b8b42cded4e3b19c73212a848e1130f09"
+    commit: "4a383d57c8fd7592f54a33f43eb9666314a6e80e"
+    sha256: "aa345f8f04a12beaf8f07620467dee06370b72c763cf2d1c60556878b226fafc"
   - github: tclem/proto-lens-jsonpb
     commit: "5d40444be689bef1e12cbe38da0261283775ec64"
     sha256: "39f783f07aeb64614aadb6ee618d000051c46cc9f511277d87feea6cba8fe955"
