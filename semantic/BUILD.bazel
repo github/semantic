@@ -124,7 +124,7 @@ haskell_binary(
 
 haskell_library(
     name = "fixtureshim",
-    srcs = ["test/System/Path/Bazel.hs"],
+    srcs = ["test/System/Path/Fixture.hs"],
     deps = [
         "//:base",
         "@stackage//:bazel-runfiles",
@@ -139,7 +139,7 @@ haskell_test(
         exclude = [
             "test/fixtures/**/*.hs",
             "test/Examples.hs",
-            "test/System/Path/Bazel.hs",
+            "test/System/Path/Fixture.hs",
         ],
     ),
     compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + [

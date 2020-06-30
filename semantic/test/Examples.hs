@@ -28,7 +28,7 @@ import           System.Path ((</>))
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import qualified System.Process as Process
-import qualified System.Path.Bazel as Fixture
+import qualified System.Path.Fixture as Fixture
 import qualified Bazel.Runfiles as Runfiles
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
@@ -131,7 +131,7 @@ typescriptSkips = Path.relFile <$>
   , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/regenerator.min.js"
   ]
 
-buildExamples :: Fixture.HasBazel => TaskSession -> LanguageExample -> Path.AbsRelDir -> IO Tasty.TestTree
+buildExamples :: Fixture.HasFixture => TaskSession -> LanguageExample -> Path.AbsRelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
   let fileSkips = fmap (tsDir </>) (languageSkips lang)
       dirSkips  = fmap (tsDir </>) (languageDirSkips lang)
@@ -170,6 +170,7 @@ main = withOptions testOptions $ \ config logger statter -> do
 
   rf <- Runfiles.create
   let ?runfiles = rf
+  let ?project = Path.relDir "semantic"
 
   let session = TaskSession config "-" False logger statter
 
