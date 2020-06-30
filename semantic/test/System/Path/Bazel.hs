@@ -7,6 +7,7 @@ module System.Path.Bazel
     absRelFile,
     bazelDir,
     HasBazel,
+    absRelDir,
   )
 where
 
@@ -25,3 +26,6 @@ absRelFile = bazelFile'
 
 bazelDir :: HasBazel => String -> Path.AbsDir
 bazelDir x = Path.absDir (Bazel.rlocation ?runfiles ("semantic/semantic/" <> x))
+
+absRelDir :: HasBazel => String -> Path.AbsRelDir
+absRelDir = Path.toAbsRel . bazelDir

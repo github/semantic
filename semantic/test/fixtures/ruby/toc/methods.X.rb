@@ -1,2 +1,2 @@
 def bar
-en
+end

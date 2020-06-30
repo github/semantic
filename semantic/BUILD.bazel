@@ -19,6 +19,10 @@ load(
     "STANDARD_EXECUTABLE_FLAGS",
     "STANDARD_GHC_WARNINGS",
 )
+load(
+    "//:build/example_repos.bzl",
+    "all_repo_deps",
+)
 
 haskell_toolchain_library(name = "ghc-prim")
 
@@ -178,6 +182,7 @@ haskell_test(
 
 haskell_test(
     name = "parse-examples",
+    timeout = "long",
     srcs = [
         "test/Examples.hs",
     ],
@@ -192,10 +197,7 @@ haskell_test(
         "test/fixtures/javascript/**/*.js",
         "test/fixtures/typescript/**/*.ts",
         "test/fixtures/cli/*.json",
-    ]) + [
-        "@golang//:src",
-        "@moby//:src",
-    ],
+    ]) + all_repo_deps,
     deps = semantic_common_dependencies + [
         ":fixtureshim",
         "//:base",

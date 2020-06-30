@@ -59,7 +59,7 @@ examples =
   , le "python" "**/*.py" pythonFileSkips mempty
   , le "ruby" "**/*.rb" rubySkips mempty
   , le "typescript" "**/*.[jt]s" typescriptSkips mempty
-  , le "typescript" "**/*.[jt]sx" tsxSkips mempty
+  -- , le "typescript" "**/*.[jt]sx" tsxSkips mempty
   ]
 
 goFileSkips :: [Path.RelFile]
@@ -131,29 +131,27 @@ typescriptSkips = Path.relFile <$>
   , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/regenerator.min.js"
   ]
 
-buildExamples :: Fixture.HasBazel => TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
+buildExamples :: Fixture.HasBazel => TaskSession -> LanguageExample -> Path.AbsRelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
-  pure $ Tasty.testGroup "examples"
-    [ HUnit.testCase "golang" $ do
-        for_ goFileSkips $ \fp -> do
-          does <- Path.doesFileExist fp
-          HUnit.assertBool ("Can't find " <> Path.toString fp) does
-    ]
-  -- let fileSkips = fmap (tsDir </>) (languageSkips lang)
-  --     dirSkips  = fmap (tsDir </>) (languageDirSkips lang)
-  -- files <- globDir1 (compile (languageExtension lang)) (Path.toString tsDir)
-  -- let paths = filter (\x -> Path.takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ Path.relFile <$> files
-  -- trees <- for paths $ \file -> do
-  --   pure . HUnit.testCase (Path.toString file) $ do
-  --     precise <- runTask session (runParse (parseSymbolsFilePath preciseLanguageModes file))
-  --     assertOK "precise" precise
-  -- pure (Tasty.testGroup (languageName lang) trees)
+  let fileSkips = fmap (tsDir </>) (languageSkips lang)
+      dirSkips  = fmap (tsDir </>) (languageDirSkips lang)
 
-  -- where
-  --   assertOK msg = either (\e -> HUnit.assertFailure (msg <> " failed to parse" <> show e)) (refuteErrors msg)
-  --   refuteErrors msg a = case toList (a^.files) of
-  --     [x] | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (msg <> " parse errors " <> show e)
-  --     _                                 -> pure ()
+
+
+  files <- globDir1 (compile (languageExtension lang)) (Path.toString tsDir)
+
+  let paths = filter (\x -> Path.takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ Path.absRel <$> files
+  trees <- for paths $ \file -> do
+    pure . HUnit.testCase (Path.toString file) $ do
+      precise <- runTask session (runParse (parseSymbolsFilePath preciseLanguageModes file))
+      assertOK "precise" precise
+  pure (Tasty.testGroup (languageName lang) trees)
+
+  where
+    assertOK msg = either (\e -> HUnit.assertFailure (msg <> " failed to parse" <> show e)) (refuteErrors msg)
+    refuteErrors msg a = case toList (a^.files) of
+      [x] | (e:_) <- toList (x^.errors) -> HUnit.assertFailure (msg <> " parse errors " <> show e)
+      _                                 -> pure ()
 
 data SortableSymbol = SortableSymbol Text.Text Int32 Int32 Int32 Int32
   deriving (Eq, Show, Ord)
@@ -168,7 +166,7 @@ testOptions = defaultOptions
 main :: IO ()
 -- main = putStrLn "nothing"
 main = withOptions testOptions $ \ config logger statter -> do
-  void $ Process.system "script/clone-example-repos"
+  -- void $ Process.system "script/clone-example-repos"
 
   rf <- Runfiles.create
   let ?runfiles = rf
@@ -176,7 +174,7 @@ main = withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
 
   allTests <- forConcurrently examples $ \lang@LanguageExample{..} -> do
-    let tsDir = Path.relDir "tmp" </> Path.relDir (languageName <> "-examples")
+    let tsDir = Fixture.absRelDir ".."
     buildExamples session lang tsDir
 
   Tasty.defaultMain $ Tasty.testGroup "parse-examples" allTests
@@ -188,6 +186,6 @@ parseSymbolsFilePath ::
   , Has Files sig m
   )
   => PerLanguageModes
-  -> Path.RelFile
+  -> Path.AbsRelFile
   -> m ParseTreeSymbolResponse
 parseSymbolsFilePath languageModes path = readBlob (File.fromPath path) >>= runReader languageModes . parseSymbols . pure @[]
