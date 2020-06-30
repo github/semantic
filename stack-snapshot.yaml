@@ -10,8 +10,8 @@ packages:
     commit: "e677228b1f9c69a9378c3f33ea9ca798b06831d3"
     sha256: "9d7510f7b303dc7269b16d2425a698b350e93f359d253ecc82fc7f711292fe28"
   - github: fused-effects/fused-effects-readline
-    commit: "ef7de14f5ba488d0ad4f705b956a5f580299cfd6"
-    sha256: "4d3297147679c33a679ae9d2c76417da16150d92861087e1edc38dc0e85d6f52"
+    commit: "d515e7126b65db33ec3fc0606057c277e2d1e2d8"
+    sha256: "de1b472e8337bc4c4b846c4aca8e23f47d63a8728c32dbdca6a29eaf7866e309"
   - semilattices-0.0.0.4
   - fused-effects-exceptions-1.0.0.0
   - fused-effects-resumable-0.1.0.0
