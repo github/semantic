@@ -215,6 +215,8 @@ new_git_repository(
     name = "tree-sitter-ruby",
     build_file_content = """
 exports_files(["src/node-types.json"])
+
+filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']), visibility = ["//visibility:public"])
 """,
     commit = "eb2b6225bfb80010f2e4cbd27db8c6f3775230b5",
     remote = "https://github.com/tree-sitter/tree-sitter-ruby.git",
@@ -235,6 +237,8 @@ new_git_repository(
     name = "tree-sitter-php",
     build_file_content = """
 exports_files(["src/node-types.json"])
+
+filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']), visibility = ["//visibility:public"])
 """,
     commit = "41a408d5b996ef54d8b9e1b9a2469fad00c1b52b",
     remote = "https://github.com/tree-sitter/tree-sitter-php.git",

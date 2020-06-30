@@ -40,7 +40,7 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files(glob(["{}"]))
 
-filegroup(name = "corpus", srcs = glob(['corpus/*.txt']))
+filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']))
 """.format(nodetypespath),
         strip_prefix = "{}-{}".format(name, version),
         urls = ["https://github.com/tree-sitter/{}/archive/v{}.tar.gz".format(name, version)],
@@ -87,6 +87,28 @@ def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
             "//:template-haskell",
             "//:text",
             "@stackage//:tree-sitter",
+            "@stackage//:tree-sitter-" + language,
+        ],
+    )
+
+def semantic_language_parsing_test(language):
+    haskell_test(
+        name = "test",
+        srcs = ["test/PreciseTest.hs"],
+        data = ["@tree-sitter-{}//:corpus".format(language)],
+        deps = [
+            ":semantic-{}".format(language),
+            "//:base",
+            "//:bytestring",
+            "//:text",
+            "//semantic:fixtureshim",
+            "//semantic-ast",
+            "@stackage//:bazel-runfiles",
+            "@stackage//:hedgehog",
+            "@stackage//:pathtype",
+            "@stackage//:tasty",
+            "@stackage//:tasty-hedgehog",
+            "@stackage//:tasty-hunit",
             "@stackage//:tree-sitter-" + language,
         ],
     )

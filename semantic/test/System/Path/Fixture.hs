@@ -7,6 +7,7 @@ module System.Path.Fixture
     bazelDir,
     HasFixture,
     absRelDir,
+    delay,
   )
 where
 
@@ -15,12 +16,20 @@ import Data.Proxy
 import GHC.Stack
 import GHC.TypeLits
 import qualified System.Path as Path
+import Control.Concurrent
+import System.IO
 
 type HasFixture =
   ( ?runfiles :: Bazel.Runfiles,
     ?project :: Path.RelDir,
     HasCallStack
   )
+
+delay :: String -> IO ()
+delay s = do
+  putStrLn s
+  hFlush stdout
+  threadDelay 10000000
 
 absFile :: (HasFixture) => String -> Path.AbsFile
 absFile x = Path.absFile (Bazel.rlocation ?runfiles ("semantic/" <> Path.toString ?project <> x))

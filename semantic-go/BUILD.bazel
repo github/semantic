@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 load(
     "//:build/common.bzl",
     "semantic_language_library",
+    "semantic_language_parsing_test",
 )
 load(
     "@rules_haskell//haskell:defs.bzl",
@@ -15,22 +16,4 @@ semantic_language_library(
     language = "go",
 )
 
-haskell_test(
-    name = "test",
-    srcs = ["test/PreciseTest.hs"],
-    data = ["@tree-sitter-go//:corpus"],
-    deps = [
-        ":semantic-go",
-        "//:base",
-        "//:bytestring",
-        "//:text",
-        "//semantic:fixtureshim",
-        "//semantic-ast",
-        "@stackage//:bazel-runfiles",
-        "@stackage//:hedgehog",
-        "@stackage//:pathtype",
-        "@stackage//:tasty",
-        "@stackage//:tasty-hedgehog",
-        "@stackage//:tasty-hunit",
-    ],
-)
+semantic_language_parsing_test(language = "go")
