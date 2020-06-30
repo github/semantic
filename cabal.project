@@ -31,3 +31,8 @@ source-repository-package
   type: git
   location: https://github.com/antitypical/fused-syntax.git
   tag: d11e14581217590a5c67f79cbaeee35ac8acee6a
+
+source-repository-package
+  type: git
+  location: https://github.com/fused-effects/fused-effects.git
+  tag: e677228b1f9c69a9378c3f33ea9ca798b06831d3
