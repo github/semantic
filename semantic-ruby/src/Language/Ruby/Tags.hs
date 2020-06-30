@@ -29,7 +29,6 @@ import Proto.Semantic as P
 import Source.Loc
 import Source.Range as Range
 import Source.Source as Source
-import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags t where
@@ -75,9 +74,7 @@ nameBlacklist =
 
 yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
 yieldTag name P.CALL _ _ _ | name `elem` nameBlacklist = pure ()
-yieldTag name kind ty loc srcLineRange = do
-  src <- ask @Source
-  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
+yieldTag name kind ty loc srcLineRange = Tags.yield name kind ty loc srcLineRange
 
 instance ToTags Rb.Class where
   tags
@@ -213,7 +210,7 @@ instance ToTags Rb.Lambda where
 instance ToTags Rb.If where
   tags Rb.If {condition = Parse.Success cond, consequence, alternative} = do
     tags cond
-    case consequence of 
+    case consequence of
       Just (Parse.Success cons) -> tags cons
       _ -> pure ()
     case alternative of
@@ -224,7 +221,7 @@ instance ToTags Rb.If where
 instance ToTags Rb.Elsif where
   tags Rb.Elsif {condition = Parse.Success cond, consequence, alternative} = do
     tags cond
-    case consequence of 
+    case consequence of
       Just (Parse.Success cons) -> tags cons
       _ -> pure ()
     case alternative of
@@ -235,7 +232,7 @@ instance ToTags Rb.Elsif where
 instance ToTags Rb.Unless where
   tags Rb.Unless {condition = Parse.Success cond, consequence, alternative} = do
     tags cond
-    case consequence of 
+    case consequence of
       Just (Parse.Success cons) -> tags cons
       _ -> pure ()
     case alternative of
