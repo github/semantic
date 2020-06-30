@@ -11,3 +11,5 @@ semantic_language_library(
     language = "ruby",
     nodetypes = "@tree-sitter-ruby//:src/node-types.json",
 )
+
+haskell_test
