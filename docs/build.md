@@ -40,6 +40,7 @@ If this seems complicated, don't worry: most of the time you'll be able to skip 
 1. **Don't generally run `bazel clean`**. Since Bazel builds are reproducible, there's very little reason to clean, unless somehow your whole cache got irrevocably corrupted.
 2. **You can load a REPL for any target by appending `@repl`.** (with the exception of the language packages, due to [this](https://github.com/tweag/rules_haskell/issues/1377)).
 3. **Some packages come with GHC and are not loaded from Stackage**. These include `base`, `containers`, and [others](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/8.10.1-notes.html?highlight=bytestring#included-libraries). To depend on those packages, you use `//:base`, `//:containers`, etc. They are specified in the `BAZEL.build` at the project root. You probably won't need to add any more.
+4. **Getting weird errors from the C compiler?** Try setting `export BAZEL_USE_CPP_ONLY_TOOLCHAIN=1` in your `.profile` or whatnot.
 
 ## Quick reference links
 
