@@ -1,4 +1,4 @@
-{-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
+{-# LANGUAGE CPP, DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
 module Main (main) where
 
 import           TreeSitter.Ruby
@@ -7,19 +7,20 @@ import           AST.Unmarshal
 import qualified Language.Ruby.AST as Ruby
 import qualified System.Path as Path
 import           Test.Tasty
-import qualified Bazel.Runfiles as Runfiles
 import qualified System.Path.Fixture as Fixture
 import System.IO
 import Control.Concurrent
 
 main :: IO ()
 main = do
-  rf <- Runfiles.create
-  -- dirs <- Path.absDir <$> Ruby.getTestCorpusDir
+#if BAZEL_BUILD
+  rf <- Fixture.create
   let ?project = Path.relDir "external/tree-sitter-ruby"
       ?runfiles = rf
   let dirs = Fixture.absRelDir "test/corpus"
-
+#else
+  dirs <- Path.absRel <$> Ruby.getTestCorpusDir
+#endif
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)
     >>= defaultMain . tests

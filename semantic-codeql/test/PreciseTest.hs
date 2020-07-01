@@ -8,17 +8,19 @@ import           Language.CodeQL.Grammar
 import qualified System.Path as Path
 import           Test.Tasty
 import qualified System.Path.Fixture as Fixture
-import qualified Bazel.Runfiles as Runfiles
 
 main :: IO ()
 main = do
-  rf <- Runfiles.create
-  -- dirs <- Path.absDir <$> Ruby.getTestCorpusDir
+#if BAZEL_BUILD
+  rf <- Fixture.create
   let ?project = Path.relDir "external/tree-sitter-ql"
       ?runfiles = rf
 
   let dirs = Fixture.absRelDir "test/corpus"
-      parse = parseByteString @CodeQL.Ql @() tree_sitter_ql
+#else
+  dirs <- Path.absDir <$> Ruby.getTestCorpusDir
+#endif
+  let parse = parseByteString @CodeQL.Ql @() tree_sitter_ql
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)
