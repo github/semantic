@@ -142,7 +142,6 @@ def semantic_language_parsing_test(language, semantic_package = "", ts_package =
             "//:base",
             "//:bytestring",
             "//:text",
-            "//semantic:fixtureshim",
             "//semantic-ast",
             "@stackage//:bazel-runfiles",
             "@stackage//:hedgehog",

@@ -133,17 +133,6 @@ haskell_binary(
     ],
 )
 
-# PT TODO: remove this
-haskell_library(
-    name = "fixtureshim",
-    srcs = ["test/System/Path/Fixture.hs"],
-    deps = [
-        "//:base",
-        "@stackage//:bazel-runfiles",
-        "@stackage//:pathtype",
-    ],
-)
-
 haskell_test(
     name = "spec",
     srcs = glob(
@@ -167,7 +156,6 @@ haskell_test(
         "test/fixtures/cli/*.json",
     ]),
     deps = semantic_common_dependencies + [
-        ":fixtureshim",
         "//:base",
         "//semantic",
         "//semantic-proto",
@@ -211,7 +199,6 @@ haskell_test(
         "test/fixtures/cli/*.json",
     ]) + SEMANTIC_EXTERNAL_TEST_REPOSITORIES,
     deps = semantic_common_dependencies + [
-        ":fixtureshim",
         "//:base",
         "//semantic",
         "//semantic-proto",

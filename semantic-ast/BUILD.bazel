@@ -31,6 +31,7 @@ haskell_library(
         "@stackage//:aeson",
         "@stackage//:aeson-pretty",
         "@stackage//:attoparsec",
+        "@stackage//:bazel-runfiles",
         "@stackage//:directory",
         "@stackage//:fused-effects",
         "@stackage//:hedgehog",

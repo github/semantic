@@ -18,7 +18,7 @@ main = do
   -- dirs <- Path.absDir <$> Ruby.getTestCorpusDir
   let ?project = Path.relDir "semantic-ruby"
       ?runfiles = rf
-  let dirs = Fixture.bazelDir "/../external/tree-sitter-ruby/test/corpus"
+  let dirs = Fixture.relDir "../external/tree-sitter-ruby/test/corpus"
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

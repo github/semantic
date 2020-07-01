@@ -17,7 +17,7 @@ main = do
   let ?project = Path.relDir "semantic-codeql"
       ?runfiles = rf
 
-  let dirs = Fixture.bazelDir "/../external/tree-sitter-ql/test/corpus"
+  let dirs = Fixture.relDir "../external/tree-sitter-ql/test/corpus"
       parse = parseByteString @CodeQL.Ql @() tree_sitter_ql
 
   readCorpusFiles' dirs

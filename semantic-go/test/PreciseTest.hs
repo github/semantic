@@ -17,7 +17,7 @@ main = do
   -- dirs <- Path.absDir <$> Go.getTestCorpusDir
   let ?project = Path.relDir "semantic-go"
       ?runfiles = rf
-  let dirs = Fixture.bazelDir "/../external/tree-sitter-go/corpus"
+  let dirs = Fixture.relDir "../external/tree-sitter-go/corpus"
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

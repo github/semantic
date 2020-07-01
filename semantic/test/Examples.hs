@@ -179,7 +179,7 @@ main = withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
 
   allTests <- forConcurrently examples $ \lang@LanguageExample{..} -> do
-    let tsDir = Fixture.absRelDir "/.."
+    let tsDir = Fixture.absRelDir ".."
     buildExamples session lang tsDir
 
   Tasty.defaultMain $ Tasty.testGroup "parse-examples" allTests

@@ -17,7 +17,7 @@ main = do
   let ?project = Path.relDir "semantic-python"
       ?runfiles = rf
 
-  let dirs = Fixture.bazelDir "/../external/tree-sitter-python/test/corpus"
+  let dirs = Fixture.relDir "../external/tree-sitter-python/test/corpus"
       parse = parseByteString @Py.Module @() tree_sitter_python
 
   readCorpusFiles' dirs

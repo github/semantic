@@ -4,7 +4,7 @@
 module System.Path.Fixture
   ( absFile,
     absRelFile,
-    bazelDir,
+    relDir,
     HasFixture,
     absRelDir,
     delay,
@@ -12,12 +12,11 @@ module System.Path.Fixture
 where
 
 import qualified Bazel.Runfiles as Bazel
-import Data.Proxy
-import GHC.Stack
-import GHC.TypeLits
-import qualified System.Path as Path
 import Control.Concurrent
+import GHC.Stack
 import System.IO
+import System.Path ((</>))
+import qualified System.Path as Path
 
 type HasFixture =
   ( ?runfiles :: Bazel.Runfiles,
@@ -32,13 +31,17 @@ delay s = do
   threadDelay 100000000
 
 absFile :: (HasFixture) => String -> Path.AbsFile
-absFile x = Path.absFile (Bazel.rlocation ?runfiles ("semantic/" <> Path.toString ?project <> x))
+absFile x = root </> Path.relDir "semantic" </> ?project </> Path.relFile x
+  where
+    root = Path.absDir (Bazel.rlocation ?runfiles ".")
 
 absRelFile :: (HasFixture) => String -> Path.AbsRelFile
 absRelFile = Path.toAbsRel . absFile
 
-bazelDir :: HasFixture => String -> Path.AbsDir
-bazelDir x = Path.absDir (Bazel.rlocation ?runfiles ("semantic/" <> Path.toString ?project <> x))
+relDir :: HasFixture => String -> Path.AbsDir
+relDir x = root </> Path.relDir "semantic" </> ?project </> Path.relDir x
+  where
+    root = Path.absDir (Bazel.rlocation ?runfiles ".")
 
 absRelDir :: HasFixture => String -> Path.AbsRelDir
-absRelDir = Path.toAbsRel . bazelDir
+absRelDir = Path.toAbsRel . relDir
