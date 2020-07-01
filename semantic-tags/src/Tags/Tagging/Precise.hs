@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 module Tags.Tagging.Precise
@@ -9,6 +10,7 @@ module Tags.Tagging.Precise
 , yield
 , runTagging
 , calculateLineAndSpans
+, countUtf16CodeUnits
 , surroundingLine
 , surroundingLineRange
 ) where
@@ -16,21 +18,20 @@ module Tags.Tagging.Precise
 import Control.Applicative
 import Control.Carrier.Reader
 import Control.Carrier.Writer.Strict
+import qualified Data.ByteString as B
+import Data.Char (ord)
 import Data.Functor.Identity
 import Data.Monoid (Endo (..))
 import Data.Text (Text)
 import qualified Data.Text as Text
-import Prelude hiding (span)
-import Source.Loc
-import Source.Span (Pos(..), start, end)
-import Source.Source as Source
-import qualified Source.Range as Range (start)
-import Tags.Tag
 import qualified Proto.Semantic as P
+import Source.Loc
+import qualified Source.Range as Range (start)
+import Source.Source as Source
+import Source.Span (Pos (..), end, start)
+import Tags.Tag
+import Prelude hiding (span)
 
-import qualified Data.ByteString as B
-import Data.Bits ((.&.))
-import Data.Char (ord)
 
 type Tags = Endo [Tag]
 
@@ -102,19 +103,20 @@ calculateLineAndSpans
         quota = 180 - Text.length rhs
         lhs = Text.stripStart . Text.take quota $ h
 
+data Counter = Counter { _skip :: Int, unCounter :: Int }
+
 countUtf16CodeUnits :: Source -> Int
-countUtf16CodeUnits = Text.foldr len 0 . Source.toText
+countUtf16CodeUnits = unCounter . B.foldl' count (Counter 0 0) . bytes
   where
-    -- Look at the integer representation of the Char enum, if masking that
-    -- integer with 0xFFFF returns a different integer we know it's a multi-byte
-    -- utf-16 character (2 code units).
-    --   0x04321 & 0xFFFF = 0x4321 -> 0x04321 == 0x4321 = true
-    --   0x54321 & 0xFFFF = 0x4321 -> 0x54321 == 0x4321 = false
-    len :: Char -> Int -> Int
-    len c acc =
-      let i = fromEnum c
-          x = if i .&. 0xFFFF == i then 1 else 2
-      in x + acc
+    count (Counter skip sum) !byte
+      | skip > 0     = Counter (pred skip) sum
+      | byte <= 0x7f = Counter 0 (1 + sum) -- takes 2 bytes (1 utf16 cu)
+      | byte <= 0xbf = error "not valid utf8, byte <= 0xbf"
+      | byte <= 0xdf = Counter 1 (1 + sum) -- takes 2 bytes (1 utf16 cu)
+      | byte <= 0xef = Counter 2 (1 + sum)
+      | byte <= 0xf7 = Counter 3 (2 + sum) -- takes 4 bytes (2 utf16 cu)
+      | otherwise    = error "not valid utf8"
+{-# INLINE countUtf16CodeUnits #-}
 
 -- | The Source of the entire surrounding line.
 surroundingLine :: Source -> Range -> Source

@@ -4,6 +4,7 @@ module Main
 ) where
 
 import Tags.Tagging.Precise
+import Data.Text (Text)
 import Source.Source as Source
 import Source.Loc
 import Source.Span
@@ -13,12 +14,36 @@ import Test.Tasty.HUnit
 main :: IO ()
 main = defaultMain $ testGroup "semantic-tags" [ testTree ]
 
--- Range start = 13 + *num bytes in char inside ''*
--- Span start col = 5 + *num bytes in char*
+src :: Text -> Source
+src = Source.fromText
 
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Tags.Tagging.Precise"
-  [ Tasty.testGroup "firstLineAndSpans"
+  [ Tasty.testGroup "countUtf16CodeUnits from utf8 encoded bytestring"
+    [ testCase "one byte" $ do
+        1 @=? countUtf16CodeUnits (src "a")
+
+    , testCase "null byte" $ do
+        1 @=? countUtf16CodeUnits (src "\0") -- NULL
+
+    , testCase "two bytes" $ do
+        1 @=? countUtf16CodeUnits (src "\x0080") -- ""
+        1 @=? countUtf16CodeUnits (src "à")
+
+    , testCase "three bytes" $ do
+        1 @=? countUtf16CodeUnits (src "\x0800") -- "ࠀ"
+
+    , testCase "four bytes" $ do
+        2 @=? countUtf16CodeUnits (src "𐀀")
+        2 @=? countUtf16CodeUnits (src "😀")
+
+    , testCase "multibyte" $ do
+        4 @=? countUtf16CodeUnits (src "👋🏻")
+    ]
+
+    -- Range start = 13 + *num bytes in char inside ''*
+    -- Span start col = 5 + *num bytes in char*
+  , Tasty.testGroup "firstLineAndSpans"
     [ testCase "one line" $
         let src = Source.fromText "def foo;end"
             loc = Loc (Range 4 7) (Span (Pos 0 4) (Pos 0 7))
