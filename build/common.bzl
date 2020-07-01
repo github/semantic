@@ -5,7 +5,14 @@ load(
     "haskell_library",
     "haskell_test",
 )
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load(
+    "@bazel_tools//tools/build_defs/repo:http.bzl",
+    "http_archive",
+)
+load(
+    "@bazel_tools//tools/build_defs/repo:git.bzl",
+    "new_git_repository",
+)
 
 DEVELOPMENT_GHC_FLAGS = ["-O0"]
 RELEASE_GHC_FLAGS = ["-O1"]
@@ -39,8 +46,10 @@ STANDARD_EXECUTABLE_FLAGS = [
     "-threaded",
 ]
 
+# These macros declare new packages.
+
 def tree_sitter_node_types_archive(name, version, sha256, urls = [], nodetypespath = "src/node-types.json"):
-    """Create a target for a tree-sitter grammar and export its node-types.json file."""
+    """Create a package for a tree-sitter grammar and export its node-types.json file/test corpus.."""
     http_archive(
         name = name,
         build_file_content = """
@@ -54,6 +63,22 @@ filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']))
         urls = ["https://github.com/tree-sitter/{}/archive/v{}.tar.gz".format(name, version)],
         sha256 = sha256,
     )
+
+def tree_sitter_node_types_git(name, commit, shallow_since):
+    """Create a package pinned off a Git repo. Prefer the node_types_archive call to this."""
+    new_git_repository(
+        name = name,
+        build_file_content = """
+exports_files(["src/node-types.json"])
+
+filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']), visibility = ["//visibility:public"])
+""",
+        commit = commit,
+        remote = "https://github.com/tree-sitter/{}.git".format(name),
+        shallow_since = shallow_since,
+    )
+
+# These macros declare library targets inside the language packages.
 
 def semantic_language_library(language, name, srcs, ts_package = "", nodetypes = "", **kwargs):
     """Create a new library target with dependencies needed for a language-AST project."""
