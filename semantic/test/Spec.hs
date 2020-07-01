@@ -1,4 +1,5 @@
 {-# LANGUAGE ImplicitParams #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
 module Main (allTests, legacySpecs, main, tests) where
 
