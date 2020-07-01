@@ -18,6 +18,7 @@ data Tag
       { tagName :: Text,
         tagSyntaxType :: P.SyntaxType,
         tagNodeType :: P.NodeType,
+        tagByteRange :: Range,
         tagOneIndexedSpan :: OneIndexedSpan,
         tagLine :: Text,
         tagUTF16CodeUnitSpan :: UTF16CodeUnitSpan

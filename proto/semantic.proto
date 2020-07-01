@@ -58,6 +58,7 @@ message Symbol {
   NodeType node_type = 6;
   SyntaxType syntax_type = 7;
   Span utf16_code_unit_span = 8;
+  ByteRange byte_range = 9;
 }
 
 message Docstring {
@@ -72,6 +73,11 @@ message Position {
 message Span {
   Position start = 1;
   Position end = 2;
+}
+
+message ByteRange {
+  int32 start = 1;
+  int32 end = 2;
 }
 
 message StackGraphFile {

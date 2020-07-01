@@ -4,7 +4,7 @@
 {-# OPTIONS_GHC -Wno-duplicate-exports#-}
 {-# OPTIONS_GHC -Wno-dodgy-exports#-}
 module Proto.Semantic (
-        Blob(), Docstring(), File(), NodeType(..), NodeType(),
+        Blob(), ByteRange(), Docstring(), File(), NodeType(..), NodeType(),
         NodeType'UnrecognizedValue, ParseError(), ParseTreeRequest(),
         ParseTreeSymbolResponse(), PingRequest(), PingResponse(),
         Position(), Span(), StackGraphFile(), StackGraphNode(),
@@ -247,6 +247,142 @@ instance Control.DeepSeq.NFData Blob where
                 (Control.DeepSeq.deepseq
                    (_Blob'path x__)
                    (Control.DeepSeq.deepseq (_Blob'language x__) ())))
+{- | Fields :
+     
+         * 'Proto.Semantic_Fields.start' @:: Lens' ByteRange Data.Int.Int32@
+         * 'Proto.Semantic_Fields.end' @:: Lens' ByteRange Data.Int.Int32@ -}
+data ByteRange
+  = ByteRange'_constructor {_ByteRange'start :: !Data.Int.Int32,
+                            _ByteRange'end :: !Data.Int.Int32,
+                            _ByteRange'_unknownFields :: !Data.ProtoLens.FieldSet}
+  deriving (Prelude.Eq, Prelude.Ord)
+instance Prelude.Show ByteRange where
+  showsPrec _ __x __s
+    = Prelude.showChar
+        '{'
+        (Prelude.showString
+           (Data.ProtoLens.showMessageShort __x) (Prelude.showChar '}' __s))
+instance Data.ProtoLens.Field.HasField ByteRange "start" Data.Int.Int32 where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _ByteRange'start (\ x__ y__ -> x__ {_ByteRange'start = y__}))
+        Prelude.id
+instance Data.ProtoLens.Field.HasField ByteRange "end" Data.Int.Int32 where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _ByteRange'end (\ x__ y__ -> x__ {_ByteRange'end = y__}))
+        Prelude.id
+instance Data.ProtoLens.Message ByteRange where
+  messageName _ = Data.Text.pack "github.semantic.ByteRange"
+  fieldsByTag
+    = let
+        start__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "start"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"start")) ::
+              Data.ProtoLens.FieldDescriptor ByteRange
+        end__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "end"
+              (Data.ProtoLens.ScalarField Data.ProtoLens.Int32Field ::
+                 Data.ProtoLens.FieldTypeDescriptor Data.Int.Int32)
+              (Data.ProtoLens.PlainField
+                 Data.ProtoLens.Optional (Data.ProtoLens.Field.field @"end")) ::
+              Data.ProtoLens.FieldDescriptor ByteRange
+      in
+        Data.Map.fromList
+          [(Data.ProtoLens.Tag 1, start__field_descriptor),
+           (Data.ProtoLens.Tag 2, end__field_descriptor)]
+  unknownFields
+    = Lens.Family2.Unchecked.lens
+        _ByteRange'_unknownFields
+        (\ x__ y__ -> x__ {_ByteRange'_unknownFields = y__})
+  defMessage
+    = ByteRange'_constructor
+        {_ByteRange'start = Data.ProtoLens.fieldDefault,
+         _ByteRange'end = Data.ProtoLens.fieldDefault,
+         _ByteRange'_unknownFields = []}
+  parseMessage
+    = let
+        loop :: ByteRange -> Data.ProtoLens.Encoding.Bytes.Parser ByteRange
+        loop x
+          = do end <- Data.ProtoLens.Encoding.Bytes.atEnd
+               if end then
+                   do (let missing = []
+                       in
+                         if Prelude.null missing then
+                             Prelude.return ()
+                         else
+                             Prelude.fail
+                               ((Prelude.++)
+                                  "Missing required fields: "
+                                  (Prelude.show (missing :: [Prelude.String]))))
+                      Prelude.return
+                        (Lens.Family2.over
+                           Data.ProtoLens.unknownFields (\ !t -> Prelude.reverse t) x)
+               else
+                   do tag <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                      case tag of
+                        8 -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          Prelude.fromIntegral
+                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
+                                       "start"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"start") y x)
+                        16
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (Prelude.fmap
+                                          Prelude.fromIntegral
+                                          Data.ProtoLens.Encoding.Bytes.getVarInt)
+                                       "end"
+                                loop (Lens.Family2.set (Data.ProtoLens.Field.field @"end") y x)
+                        wire
+                          -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
+                                        wire
+                                loop
+                                  (Lens.Family2.over
+                                     Data.ProtoLens.unknownFields (\ !t -> (:) y t) x)
+      in
+        (Data.ProtoLens.Encoding.Bytes.<?>)
+          (do loop Data.ProtoLens.defMessage) "ByteRange"
+  buildMessage
+    = \ _x
+        -> (Data.Monoid.<>)
+             (let
+                _v = Lens.Family2.view (Data.ProtoLens.Field.field @"start") _x
+              in
+                if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                    Data.Monoid.mempty
+                else
+                    (Data.Monoid.<>)
+                      (Data.ProtoLens.Encoding.Bytes.putVarInt 8)
+                      ((Prelude..)
+                         Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
+             ((Data.Monoid.<>)
+                (let _v = Lens.Family2.view (Data.ProtoLens.Field.field @"end") _x
+                 in
+                   if (Prelude.==) _v Data.ProtoLens.fieldDefault then
+                       Data.Monoid.mempty
+                   else
+                       (Data.Monoid.<>)
+                         (Data.ProtoLens.Encoding.Bytes.putVarInt 16)
+                         ((Prelude..)
+                            Data.ProtoLens.Encoding.Bytes.putVarInt Prelude.fromIntegral _v))
+                (Data.ProtoLens.Encoding.Wire.buildFieldSet
+                   (Lens.Family2.view Data.ProtoLens.unknownFields _x)))
+instance Control.DeepSeq.NFData ByteRange where
+  rnf
+    = \ x__
+        -> Control.DeepSeq.deepseq
+             (_ByteRange'_unknownFields x__)
+             (Control.DeepSeq.deepseq
+                (_ByteRange'start x__)
+                (Control.DeepSeq.deepseq (_ByteRange'end x__) ()))
 {- | Fields :
      
          * 'Proto.Semantic_Fields.docstring' @:: Lens' Docstring Data.Text.Text@ -}
@@ -3316,7 +3452,9 @@ instance Control.DeepSeq.NFData StackGraphResponse where
          * 'Proto.Semantic_Fields.nodeType' @:: Lens' Symbol NodeType@
          * 'Proto.Semantic_Fields.syntaxType' @:: Lens' Symbol SyntaxType@
          * 'Proto.Semantic_Fields.utf16CodeUnitSpan' @:: Lens' Symbol Span@
-         * 'Proto.Semantic_Fields.maybe'utf16CodeUnitSpan' @:: Lens' Symbol (Prelude.Maybe Span)@ -}
+         * 'Proto.Semantic_Fields.maybe'utf16CodeUnitSpan' @:: Lens' Symbol (Prelude.Maybe Span)@
+         * 'Proto.Semantic_Fields.byteRange' @:: Lens' Symbol ByteRange@
+         * 'Proto.Semantic_Fields.maybe'byteRange' @:: Lens' Symbol (Prelude.Maybe ByteRange)@ -}
 data Symbol
   = Symbol'_constructor {_Symbol'symbol :: !Data.Text.Text,
                          _Symbol'kind :: !Data.Text.Text,
@@ -3326,6 +3464,7 @@ data Symbol
                          _Symbol'nodeType :: !NodeType,
                          _Symbol'syntaxType :: !SyntaxType,
                          _Symbol'utf16CodeUnitSpan :: !(Prelude.Maybe Span),
+                         _Symbol'byteRange :: !(Prelude.Maybe ByteRange),
                          _Symbol'_unknownFields :: !Data.ProtoLens.FieldSet}
   deriving (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Symbol where
@@ -3402,6 +3541,18 @@ instance Data.ProtoLens.Field.HasField Symbol "maybe'utf16CodeUnitSpan" (Prelude
            _Symbol'utf16CodeUnitSpan
            (\ x__ y__ -> x__ {_Symbol'utf16CodeUnitSpan = y__}))
         Prelude.id
+instance Data.ProtoLens.Field.HasField Symbol "byteRange" ByteRange where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _Symbol'byteRange (\ x__ y__ -> x__ {_Symbol'byteRange = y__}))
+        (Data.ProtoLens.maybeLens Data.ProtoLens.defMessage)
+instance Data.ProtoLens.Field.HasField Symbol "maybe'byteRange" (Prelude.Maybe ByteRange) where
+  fieldOf _
+    = (Prelude..)
+        (Lens.Family2.Unchecked.lens
+           _Symbol'byteRange (\ x__ y__ -> x__ {_Symbol'byteRange = y__}))
+        Prelude.id
 instance Data.ProtoLens.Message Symbol where
   messageName _ = Data.Text.pack "github.semantic.Symbol"
   fieldsByTag
@@ -3472,6 +3623,14 @@ instance Data.ProtoLens.Message Symbol where
               (Data.ProtoLens.OptionalField
                  (Data.ProtoLens.Field.field @"maybe'utf16CodeUnitSpan")) ::
               Data.ProtoLens.FieldDescriptor Symbol
+        byteRange__field_descriptor
+          = Data.ProtoLens.FieldDescriptor
+              "byte_range"
+              (Data.ProtoLens.MessageField Data.ProtoLens.MessageType ::
+                 Data.ProtoLens.FieldTypeDescriptor ByteRange)
+              (Data.ProtoLens.OptionalField
+                 (Data.ProtoLens.Field.field @"maybe'byteRange")) ::
+              Data.ProtoLens.FieldDescriptor Symbol
       in
         Data.Map.fromList
           [(Data.ProtoLens.Tag 1, symbol__field_descriptor),
@@ -3481,7 +3640,8 @@ instance Data.ProtoLens.Message Symbol where
            (Data.ProtoLens.Tag 5, docs__field_descriptor),
            (Data.ProtoLens.Tag 6, nodeType__field_descriptor),
            (Data.ProtoLens.Tag 7, syntaxType__field_descriptor),
-           (Data.ProtoLens.Tag 8, utf16CodeUnitSpan__field_descriptor)]
+           (Data.ProtoLens.Tag 8, utf16CodeUnitSpan__field_descriptor),
+           (Data.ProtoLens.Tag 9, byteRange__field_descriptor)]
   unknownFields
     = Lens.Family2.Unchecked.lens
         _Symbol'_unknownFields
@@ -3495,7 +3655,7 @@ instance Data.ProtoLens.Message Symbol where
          _Symbol'nodeType = Data.ProtoLens.fieldDefault,
          _Symbol'syntaxType = Data.ProtoLens.fieldDefault,
          _Symbol'utf16CodeUnitSpan = Prelude.Nothing,
-         _Symbol'_unknownFields = []}
+         _Symbol'byteRange = Prelude.Nothing, _Symbol'_unknownFields = []}
   parseMessage
     = let
         loop :: Symbol -> Data.ProtoLens.Encoding.Bytes.Parser Symbol
@@ -3596,6 +3756,14 @@ instance Data.ProtoLens.Message Symbol where
                                 loop
                                   (Lens.Family2.set
                                      (Data.ProtoLens.Field.field @"utf16CodeUnitSpan") y x)
+                        74
+                          -> do y <- (Data.ProtoLens.Encoding.Bytes.<?>)
+                                       (do len <- Data.ProtoLens.Encoding.Bytes.getVarInt
+                                           Data.ProtoLens.Encoding.Bytes.isolate
+                                             (Prelude.fromIntegral len) Data.ProtoLens.parseMessage)
+                                       "byte_range"
+                                loop
+                                  (Lens.Family2.set (Data.ProtoLens.Field.field @"byteRange") y x)
                         wire
                           -> do !y <- Data.ProtoLens.Encoding.Wire.parseTaggedValueFromWire
                                         wire
@@ -3738,8 +3906,27 @@ instance Data.ProtoLens.Message Symbol where
                                                        (Data.ProtoLens.Encoding.Bytes.putBytes bs))
                                                Data.ProtoLens.encodeMessage
                                                _v))
-                                  (Data.ProtoLens.Encoding.Wire.buildFieldSet
-                                     (Lens.Family2.view Data.ProtoLens.unknownFields _x)))))))))
+                                  ((Data.Monoid.<>)
+                                     (case
+                                          Lens.Family2.view
+                                            (Data.ProtoLens.Field.field @"maybe'byteRange") _x
+                                      of
+                                        Prelude.Nothing -> Data.Monoid.mempty
+                                        (Prelude.Just _v)
+                                          -> (Data.Monoid.<>)
+                                               (Data.ProtoLens.Encoding.Bytes.putVarInt 74)
+                                               ((Prelude..)
+                                                  (\ bs
+                                                     -> (Data.Monoid.<>)
+                                                          (Data.ProtoLens.Encoding.Bytes.putVarInt
+                                                             (Prelude.fromIntegral
+                                                                (Data.ByteString.length bs)))
+                                                          (Data.ProtoLens.Encoding.Bytes.putBytes
+                                                             bs))
+                                                  Data.ProtoLens.encodeMessage
+                                                  _v))
+                                     (Data.ProtoLens.Encoding.Wire.buildFieldSet
+                                        (Lens.Family2.view Data.ProtoLens.unknownFields _x))))))))))
 instance Control.DeepSeq.NFData Symbol where
   rnf
     = \ x__
@@ -3760,7 +3947,8 @@ instance Control.DeepSeq.NFData Symbol where
                                (Control.DeepSeq.deepseq
                                   (_Symbol'syntaxType x__)
                                   (Control.DeepSeq.deepseq
-                                     (_Symbol'utf16CodeUnitSpan x__) ()))))))))
+                                     (_Symbol'utf16CodeUnitSpan x__)
+                                     (Control.DeepSeq.deepseq (_Symbol'byteRange x__) ())))))))))
 newtype SyntaxType'UnrecognizedValue
   = SyntaxType'UnrecognizedValue Data.Int.Int32
   deriving (Prelude.Eq, Prelude.Ord, Prelude.Show)

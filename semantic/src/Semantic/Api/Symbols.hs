@@ -78,6 +78,7 @@ parseSymbols blobs = do
             & P.line .~ tagLine tag
             & P.maybe'span ?~ converting # unOneIndexedSpan (tagOneIndexedSpan tag)
             & P.maybe'utf16CodeUnitSpan ?~ converting # unUTF16CodeUnitSpan (tagUTF16CodeUnitSpan tag)
+            & P.byteRange .~ bridging # tagByteRange tag
           where
             toKind = toTitle . pack . show . tagSyntaxType
 

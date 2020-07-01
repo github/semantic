@@ -51,7 +51,7 @@ yield name syntaxType nodeType loc _ = do
   src <- ask @Source
   let (line, span, lspSpan) = calculateLineAndSpans src loc
   tell . Endo . (:) $
-    Tag name syntaxType nodeType span line lspSpan
+    Tag name syntaxType nodeType (byteRange loc) span line lspSpan
 
 runTagging :: Source -> ReaderC Source (WriterC Tags Identity) () -> [Tag]
 runTagging source
