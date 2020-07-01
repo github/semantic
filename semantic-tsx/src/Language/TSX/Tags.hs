@@ -17,6 +17,7 @@ import AST.Token
 import AST.Traversable1
 import Control.Effect.Reader
 import Control.Effect.Writer
+import Control.Effect.State
 import Data.Foldable
 import Data.Text as Text
 import qualified Language.TSX.AST as Tsx
@@ -28,12 +29,14 @@ import qualified Tags.Tagging.Precise as Tags
 class ToTags t where
   tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m
     ) =>
     t Loc ->
     m ()
   default tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m,
       Traversable1 ToTags t
     ) =>
@@ -132,6 +135,7 @@ instance ToTags (Token sym n) where tags _ = pure ()
 
 gtags ::
   ( Has (Reader Source) sig m,
+    Has (State Tags.LineIndices) sig m,
     Has (Writer Tags.Tags) sig m,
     Traversable1 ToTags t
   ) =>
@@ -145,7 +149,7 @@ gtags = traverse1_ @ToTags (const (pure ())) tags
 nameBlacklist :: [Text]
 nameBlacklist = ["require"]
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag :: (Has (Reader Source) sig m, Has (State Tags.LineIndices) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
 yieldTag name P.CALL _ _ _ | name `elem` nameBlacklist = pure ()
 yieldTag name kind ty loc srcLineRange = Tags.yield name kind ty loc srcLineRange
 

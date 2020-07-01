@@ -1,4 +1,6 @@
+{-# LANGUAGE GeneralisedNewtypeDeriving #-}
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 module Tags.Tagging.Precise
@@ -7,9 +9,13 @@ module Tags.Tagging.Precise
 , OneIndexedSpan(..)
 , UTF16CodeUnitSpan(..)
 , ToTags(..)
+, LineIndices(..)
 , yield
 , runTagging
+, baselineCalculateLineAndSpans
+, calculateLineAndSpansPRVersion
 , calculateLineAndSpans
+, calculateLineAndSpans' -- For testing: TODO move to tests
 , countUtf16CodeUnits
 , surroundingLine
 , surroundingLineRange
@@ -18,19 +24,27 @@ module Tags.Tagging.Precise
 import Control.Applicative
 import Control.Carrier.Reader
 import Control.Carrier.Writer.Strict
+import Control.Carrier.State.Strict
 import qualified Data.ByteString as B
 import Data.Char (ord)
+import qualified Data.List as List
 import Data.Functor.Identity
 import Data.Monoid (Endo (..))
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Proto.Semantic as P
 import Source.Loc
 import qualified Source.Range as Range (start)
+import Control.DeepSeq
 import Source.Source as Source
 import Source.Span (Pos (..), end, start)
 import Tags.Tag
 import Prelude hiding (span)
+import Data.Map as Map
+import Data.IntMap as IntMap
+
+import Debug.Trace
 
 
 type Tags = Endo [Tag]
@@ -40,7 +54,7 @@ class ToTags t where
 
 
 yield ::
-  (Has (Reader Source) sig m, Has (Writer Tags) sig m) =>
+  (Has (State LineIndices) sig m, Has (Reader Source) sig m, Has (Writer Tags) sig m) =>
   Text ->         -- |^ Text of the identifier
   P.SyntaxType -> -- |^ Type of syntax
   P.NodeType ->   -- |^ Node type: definition or reference
@@ -49,28 +63,40 @@ yield ::
   m ()
 yield name syntaxType nodeType loc _ = do
   src <- ask @Source
-  let (line, span, lspSpan) = calculateLineAndSpans src loc
+  xs <- get @LineIndices
+  let (line, span, lspSpan, map) = calculateLineAndSpans src xs loc
+  put map
+  -- let (line, span, lspSpan) = baselineCalculateLineAndSpans src loc
   tell . Endo . (:) $
     Tag name syntaxType nodeType (byteRange loc) span line lspSpan
 
-runTagging :: Source -> ReaderC Source (WriterC Tags Identity) () -> [Tag]
+runTagging :: Source -> ReaderC Source (StateC LineIndices (WriterC Tags Identity)) () -> [Tag]
 runTagging source
   = ($ [])
   . appEndo
   . run
   . execWriter
+  . evalState (LineIndices mempty)
   . runReader source
 
--- | Takes a Loc (where the span's column offset is measured in bytes) and
--- returns two Spans: A 1-indexed span LSP friendly span (where column offset is
--- measure in utf16 code units).
-calculateLineAndSpans ::
+type UTF16CUCount = Int
+
+newtype LineIndices = LineIndices { unLineIndices :: Map.Map Int (Source, IntMap.IntMap UTF16CUCount) } -- NB: IntMap Key is a utf8 byteoffset
+  deriving (Eq, Show, NFData)
+
+baselineCalculateLineAndSpans :: Source -> Loc -> (Text, OneIndexedSpan, UTF16CodeUnitSpan)
+baselineCalculateLineAndSpans src Loc { byteRange = srcRange, span = span@Span { start = start@Pos {column = startCol}, end = end@Pos {column = endCol} } } = (line, toOneIndexed span, UTF16CodeUnitSpan (Span (Pos 0 0) (Pos 0 0))) --utf16Span)
+  where
+    line = Text.strip . Text.take 180 . Text.takeWhile (/= '\n') . Source.toText $ Source.slice src srcRange
+    toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = OneIndexedSpan $ Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
+
+calculateLineAndSpansPRVersion ::
   Source -> -- | ^ Source
   Loc ->    -- | ^ Location of identifier
   (Text, OneIndexedSpan, UTF16CodeUnitSpan)
-calculateLineAndSpans
+calculateLineAndSpansPRVersion
   src
-  Loc
+  loc@Loc
     { byteRange = srcRange,
       span =
         span@Span
@@ -103,8 +129,66 @@ calculateLineAndSpans
         quota = 180 - Text.length rhs
         lhs = Text.stripStart . Text.take quota $ h
 
-data Counter = Counter { _skip :: Int, unCounter :: Int }
+-- | For testing
+calculateLineAndSpans' :: Source -> Loc -> (Text, OneIndexedSpan, UTF16CodeUnitSpan)
+calculateLineAndSpans' src loc = let (a, b, c, _) = calculateLineAndSpans src (LineIndices mempty) loc in (a, b, c)
 
+-- | Takes a Loc (where the span's column offset is measured in bytes) and
+-- returns two Spans: A 1-indexed span LSP friendly span (where column offset is
+-- measure in utf16 code units).
+calculateLineAndSpans ::
+  Source -> -- | ^ Source
+  LineIndices ->
+  Loc ->    -- | ^ Location of identifier
+  (Text, OneIndexedSpan, UTF16CodeUnitSpan, LineIndices)
+calculateLineAndSpans
+  src
+  lineIndexes
+  loc@Loc
+    { byteRange = srcRange,
+      span =
+        span@Span
+          { start = start@(Pos startRow startCol),
+            end = end@(Pos _ endCol)
+          }
+    } = (line, toOneIndexed span, utf16Span, map')
+  where
+    -- NB: Important to limit to 180 characters after converting to text so as not to take in the middle of a multi-byte character.
+    -- line = Text.strip . Text.take 180 . Source.toText $ srcLine
+    line = sliceCenter180 startCol . Source.toText $ srcLine
+    -- srcLine = surroundingLine src srcRange
+    -- map = lineIndexes
+    (srcLine, map) = surroundingLine' src lineIndexes loc
+    toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = OneIndexedSpan $ Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
+    utf16Span = UTF16CodeUnitSpan $ Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset}
+
+    (utf16cpStartOffset, map') = countOffsetCached startSlice startCol map
+    utf16cpEndOffset = utf16cpStartOffset + countUtf16CodeUnits endSlice
+
+    countOffsetCached :: Source -> Int -> LineIndices -> (Int, LineIndices)
+    countOffsetCached slice colKey (LineIndices map) = case Map.lookup startRow map of
+      Nothing -> error "should always have this row in the map"
+      Just (s, countMap) ->
+        let c = case IntMap.lookupLE colKey countMap of
+                  Just (startOffset, count) -> count + countUtf16CodeUnits (Source.slice slice (Range startOffset colKey))
+                  Nothing -> countUtf16CodeUnits slice
+        in (c, LineIndices $ Map.insert startRow (s, IntMap.insert colKey c countMap) map)
+
+    -- NB: Slice out of the Source ByteString, NOT Text because Loc/Range is in units of bytes.
+    startSlice = Source.slice srcLine (Range 0 startCol)
+    endSlice = Source.slice srcLine (Range startCol endCol)
+
+    -- Slice out up to 180 characters around an index. Favors including the
+    -- identifier and all succeeding text before including any preceeding context
+    sliceCenter180 :: Int -> Text -> Text
+    sliceCenter180 start txt = lhs <> rhs
+      where
+        (h, t) = Text.splitAt start txt
+        rhs = Text.stripEnd . Text.take 180 $ t
+        quota = 180 - Text.length rhs
+        lhs = Text.stripStart . Text.take quota $ h
+
+data Counter = Counter { _skip :: Int, unCounter :: Int }
 countUtf16CodeUnits :: Source -> Int
 countUtf16CodeUnits = unCounter . B.foldl' count (Counter 0 0) . bytes
   where
@@ -135,3 +219,32 @@ surroundingLineRange src start = Range lineStart lineEnd
     lfChar = toEnum (ord '\n')
     crChar = toEnum (ord '\r')
     eof = Source.length src
+
+-- | The Source of the entire surrounding line.
+surroundingLine' :: Source -> LineIndices -> Loc -> (Source, LineIndices)
+surroundingLine' src li@(LineIndices m) (Loc (Range byteRangeStart _) (Span (Pos start _) _)) =
+  -- maybe (line, LineIndices (Map.insert start line m)) (, li) $ Map.lookup start m
+  case Map.lookup start m of
+    Just (line, _) -> (line, li)
+    Nothing -> (line, LineIndices (Map.insert start (line, mempty) m))
+
+  where
+    line = Source.slice src range
+    range = surroundingLineRange src byteRangeStart
+
+-- Slower than using elemIndex memchr(3)
+-- surroundingLine'' :: Source -> [Int] -> Loc -> Source
+-- surroundingLine'' src xs = fst . surroundingLineRange'' src xs
+
+-- surroundingLineRange'' :: Source -> [Int] -> Loc -> (Source, Range)
+-- surroundingLineRange'' src lineIndexes (Loc _ (Span (Pos row _) _)) = (Source.slice src range, range)
+--   where
+--     range = Range start end
+--     start = maybe 0 succ $ index (pred row) lineIndexes
+--     end = fromMaybe eof $ index row lineIndexes
+--     eof = Source.length src
+
+--     index :: Int -> [a] -> Maybe a
+--     index i xs | i < List.length xs, i >= 0 = Just (xs !! i)
+--                | otherwise             = Nothing
+--     {-# INLINE index #-}

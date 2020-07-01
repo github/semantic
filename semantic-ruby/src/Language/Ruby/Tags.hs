@@ -34,6 +34,7 @@ import qualified Tags.Tagging.Precise as Tags
 class ToTags t where
   tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m,
       Has (State [Text]) sig m
     ) =>
@@ -41,6 +42,7 @@ class ToTags t where
     m ()
   default tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m,
       Has (State [Text]) sig m,
       Traversable1 ToTags t
@@ -72,7 +74,7 @@ nameBlacklist =
     "lambda"
   ]
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag :: (Has (Reader Source) sig m, Has (State Tags.LineIndices) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
 yieldTag name P.CALL _ _ _ | name `elem` nameBlacklist = pure ()
 yieldTag name kind ty loc srcLineRange = Tags.yield name kind ty loc srcLineRange
 
@@ -137,6 +139,7 @@ instance ToTags Rb.Module where
 yieldMethodNameTag ::
   ( Has (State [Text]) sig m,
     Has (Reader Source) sig m,
+    Has (State Tags.LineIndices) sig m,
     Has (Writer Tags.Tags) sig m,
     Traversable1 ToTags t
   ) =>
@@ -330,6 +333,7 @@ instance ToTags Rb.Undef where
 
 introduceLocals ::
   ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
     Has (Writer Tags.Tags) sig m,
     Has (State [Text]) sig m
   ) =>
@@ -391,6 +395,7 @@ instance ToTags Rb.OperatorAssignment where
 
 gtags ::
   ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
     Has (Writer Tags.Tags) sig m,
     Has (State [Text]) sig m,
     Traversable1 ToTags t

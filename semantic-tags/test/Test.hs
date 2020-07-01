@@ -50,7 +50,7 @@ testTree = Tasty.testGroup "Tags.Tagging.Precise"
         in ( "def foo;end"
            , OneIndexedSpan $ Span (Pos 1 5) (Pos 1 8) -- one indexed, counting bytes
            , UTF16CodeUnitSpan $ Span (Pos 0 4) (Pos 0 7) -- zero-indexed, counting utf16 code units (lsp-style column offset)
-           ) @=? calculateLineAndSpans src loc
+           ) @=? calculateLineAndSpans' src loc
 
     , testCase "ascii" $
         let src = Source.fromText "def foo\n  'a'.hi\nend\n"
@@ -58,7 +58,7 @@ testTree = Tasty.testGroup "Tags.Tagging.Precise"
         in ( "'a'.hi"
            , OneIndexedSpan $ Span (Pos 2 7) (Pos 2 9) -- one indexed, counting bytes
            , UTF16CodeUnitSpan $ Span (Pos 1 6) (Pos 1 8) -- zero-indexed, counting utf16 code units (lsp-style column offset)
-           ) @=? calculateLineAndSpans src loc
+           ) @=? calculateLineAndSpans' src loc
 
     , testCase "unicode" $
         let src = Source.fromText "def foo\n  'à'.hi\nend\n"
@@ -66,7 +66,7 @@ testTree = Tasty.testGroup "Tags.Tagging.Precise"
         in ( "'à'.hi"
            , OneIndexedSpan $ Span (Pos 2 8) (Pos 2 10) -- one indexed, counting bytes
            , UTF16CodeUnitSpan $ Span (Pos 1 6) (Pos 1 8)  -- zero-indexed, counting utf16 code units (lsp-style column offset)
-           ) @=? calculateLineAndSpans src loc
+           ) @=? calculateLineAndSpans' src loc
 
     , testCase "multi code point unicode" $
         let src = Source.fromText "def foo\n  '💀'.hi\nend\n"
@@ -74,7 +74,7 @@ testTree = Tasty.testGroup "Tags.Tagging.Precise"
         in ( "'💀'.hi"
            , OneIndexedSpan $ Span (Pos 2 10) (Pos 2 12) -- one indexed, counting bytes
            , UTF16CodeUnitSpan $ Span (Pos 1 7) (Pos 1 9)   -- zero-indexed, counting utf16 code units (lsp-style column offset)
-           ) @=? calculateLineAndSpans src loc
+           ) @=? calculateLineAndSpans' src loc
 
     -- NB: This emoji (:man-woman-girl-girl:) cannot be entered into a string literal in haskell for some reason, you'll get:
     --   > lexical error in string/character literal at character '\8205'
@@ -87,6 +87,6 @@ testTree = Tasty.testGroup "Tags.Tagging.Precise"
         in ( "'\128104\8205\128105\8205\128103\8205\128103'.hi"
            , OneIndexedSpan $ Span (Pos 2 31) (Pos 2 33)  -- one indexed, counting bytes
            , UTF16CodeUnitSpan $ Span (Pos 1 16) (Pos 1 18)  -- zero-indexed, counting utf16 code units (lsp-style column offset)
-           ) @=? calculateLineAndSpans src loc
+           ) @=? calculateLineAndSpans' src loc
     ]
   ]

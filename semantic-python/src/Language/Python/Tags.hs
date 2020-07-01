@@ -17,6 +17,7 @@ import AST.Token
 import AST.Traversable1
 import Control.Effect.Reader
 import Control.Effect.Writer
+import Control.Effect.State
 import Data.Foldable
 import Data.Text as Text
 import qualified Language.Python.AST as Py
@@ -29,12 +30,14 @@ import qualified Tags.Tagging.Precise as Tags
 class ToTags t where
   tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m
     ) =>
     t Loc ->
     m ()
   default tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m,
       Traversable1 ToTags t
     ) =>
@@ -50,6 +53,7 @@ instance ToTags (Token sym n) where tags _ = pure ()
 
 keywordFunctionCall ::
   ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
     Has (Writer Tags.Tags) sig m,
     Traversable1 ToTags t
   ) =>
@@ -129,6 +133,7 @@ instance ToTags Py.Call where
 
 gtags ::
   ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
     Has (Writer Tags.Tags) sig m,
     Traversable1 ToTags t
   ) =>
