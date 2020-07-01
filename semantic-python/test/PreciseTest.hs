@@ -1,4 +1,4 @@
-{-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
+{-# LANGUAGE CPP, DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
 module Main (main) where
 
 import qualified System.Path as Path
@@ -7,18 +7,20 @@ import           TreeSitter.Python
 import qualified Language.Python.AST as Py
 import           AST.TestHelpers
 import           AST.Unmarshal
-import qualified Bazel.Runfiles as Runfiles
 import qualified System.Path.Fixture as Fixture
 
 main :: IO ()
 main = do
-  rf <- Runfiles.create
-  -- dirs <- Path.absDir <$> Ruby.getTestCorpusDir
+#if BAZEL_BUILD
+  rf <- Fixture.create
   let ?project = Path.relDir "external/tree-sitter-python"
       ?runfiles = rf
-
   let dirs = Fixture.absRelDir "test/corpus"
-      parse = parseByteString @Py.Module @() tree_sitter_python
+#else
+  dirs <- Path.absRel <$> Py.getTestCorpusDir
+#endif
+
+  let parse = parseByteString @Py.Module @() tree_sitter_python
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

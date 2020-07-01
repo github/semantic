@@ -51,6 +51,8 @@ common haskell
     -Wno-star-is-type
   if (impl(ghc >= 8.8))
     ghc-options: -Wno-missing-deriving-strategies
+  cpp-options:
+    -DBAZEL_BUILD=0
 
 
 library
@@ -94,7 +96,7 @@ library
   --              , trifecta >= 2 && <3
   --              , unordered-containers ^>= 0.2.10
 
-  -- other-modules: 
+  -- other-modules:
   --             Instances
             -- , Directive
 

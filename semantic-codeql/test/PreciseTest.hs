@@ -1,4 +1,4 @@
-{-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
+{-# LANGUAGE CPP, DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
 module Main (main) where
 
 import           AST.TestHelpers
@@ -18,7 +18,7 @@ main = do
 
   let dirs = Fixture.absRelDir "test/corpus"
 #else
-  dirs <- Path.absDir <$> Ruby.getTestCorpusDir
+  dirs <- Path.absRel <$> CodeQL.getTestCorpusDir
 #endif
   let parse = parseByteString @CodeQL.Ql @() tree_sitter_ql
 
