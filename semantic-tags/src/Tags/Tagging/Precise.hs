@@ -81,13 +81,14 @@ runTagging source
 
 type UTF16CUCount = Int
 
-newtype LineIndices = LineIndices { unLineIndices :: Map.Map Int (Source, IntMap.IntMap UTF16CUCount) } -- NB: IntMap Key is a utf8 byteoffset
+type LineCache = (Source, IntMap.IntMap UTF16CUCount)
+newtype LineIndices = LineIndices { unLineIndices :: Map.Map Int LineCache } -- NB: IntMap Key is a utf8 byteoffset
   deriving (Eq, Show, NFData)
 
 baselineCalculateLineAndSpans :: Source -> Loc -> (Text, OneIndexedSpan, UTF16CodeUnitSpan)
-baselineCalculateLineAndSpans src Loc { byteRange = srcRange, span = span@Span { start = start@Pos {column = startCol}, end = end@Pos {column = endCol} } } = (line, toOneIndexed span, UTF16CodeUnitSpan (Span (Pos 0 0) (Pos 0 0))) --utf16Span)
+baselineCalculateLineAndSpans src Loc { byteRange, span } = (line, toOneIndexed span, UTF16CodeUnitSpan (Span (Pos 0 0) (Pos 0 0))) --utf16Span)
   where
-    line = Text.strip . Text.take 180 . Text.takeWhile (/= '\n') . Source.toText $ Source.slice src srcRange
+    line = Text.strip . Text.take 180 . Text.takeWhile (/= '\n') . Source.toText $ Source.slice src byteRange
     toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = OneIndexedSpan $ Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
 
 calculateLineAndSpansPRVersion ::
@@ -96,7 +97,7 @@ calculateLineAndSpansPRVersion ::
   (Text, OneIndexedSpan, UTF16CodeUnitSpan)
 calculateLineAndSpansPRVersion
   src
-  loc@Loc
+  Loc
     { byteRange = srcRange,
       span =
         span@Span
@@ -145,8 +146,7 @@ calculateLineAndSpans
   src
   lineIndexes
   loc@Loc
-    { byteRange = srcRange,
-      span =
+    { span =
         span@Span
           { start = start@(Pos startRow startCol),
             end = end@(Pos _ endCol)
@@ -156,20 +156,16 @@ calculateLineAndSpans
     -- NB: Important to limit to 180 characters after converting to text so as not to take in the middle of a multi-byte character.
     -- line = Text.strip . Text.take 180 . Source.toText $ srcLine
     line = sliceCenter180 startCol . Source.toText $ srcLine
-    -- srcLine = surroundingLine src srcRange
-    -- map = lineIndexes
-    (srcLine, map) = surroundingLine' src lineIndexes loc
+    (srcLine, lineCache, map) = surroundingLine' src lineIndexes loc
     toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = OneIndexedSpan $ Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
     utf16Span = UTF16CodeUnitSpan $ Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset}
 
-    (utf16cpStartOffset, map') = countOffsetCached startSlice startCol map
+    (utf16cpStartOffset, map') = countOffsetCached startSlice lineCache startCol map
     utf16cpEndOffset = utf16cpStartOffset + countUtf16CodeUnits endSlice
 
-    countOffsetCached :: Source -> Int -> LineIndices -> (Int, LineIndices)
-    countOffsetCached slice colKey (LineIndices map) = case Map.lookup startRow map of
-      Nothing -> error "should always have this row in the map"
-      Just (s, countMap) ->
-        let c = case IntMap.lookupLE colKey countMap of
+    countOffsetCached :: Source -> LineCache -> Int -> LineIndices -> (Int, LineIndices)
+    countOffsetCached slice (s, countMap) colKey (LineIndices map)
+      = let c = case IntMap.lookupLE colKey countMap of
                   Just (startOffset, count) -> count + countUtf16CodeUnits (Source.slice slice (Range startOffset colKey))
                   Nothing -> countUtf16CodeUnits slice
         in (c, LineIndices $ Map.insert startRow (s, IntMap.insert colKey c countMap) map)
@@ -221,30 +217,11 @@ surroundingLineRange src start = Range lineStart lineEnd
     eof = Source.length src
 
 -- | The Source of the entire surrounding line.
-surroundingLine' :: Source -> LineIndices -> Loc -> (Source, LineIndices)
-surroundingLine' src li@(LineIndices m) (Loc (Range byteRangeStart _) (Span (Pos start _) _)) =
-  -- maybe (line, LineIndices (Map.insert start line m)) (, li) $ Map.lookup start m
-  case Map.lookup start m of
-    Just (line, _) -> (line, li)
-    Nothing -> (line, LineIndices (Map.insert start (line, mempty) m))
-
+surroundingLine' :: Source -> LineIndices -> Loc -> (Source, LineCache, LineIndices)
+surroundingLine' src li@(LineIndices map) (Loc (Range byteRangeStart _) (Span (Pos start _) _)) =
+  case Map.lookup start map of
+    Just cache@(line, _) -> (line, cache, li)
+    Nothing -> let cache = (line, mempty) in (line, cache, LineIndices (Map.insert start cache map))
   where
     line = Source.slice src range
     range = surroundingLineRange src byteRangeStart
-
--- Slower than using elemIndex memchr(3)
--- surroundingLine'' :: Source -> [Int] -> Loc -> Source
--- surroundingLine'' src xs = fst . surroundingLineRange'' src xs
-
--- surroundingLineRange'' :: Source -> [Int] -> Loc -> (Source, Range)
--- surroundingLineRange'' src lineIndexes (Loc _ (Span (Pos row _) _)) = (Source.slice src range, range)
---   where
---     range = Range start end
---     start = maybe 0 succ $ index (pred row) lineIndexes
---     end = fromMaybe eof $ index row lineIndexes
---     eof = Source.length src
-
---     index :: Int -> [a] -> Maybe a
---     index i xs | i < List.length xs, i >= 0 = Just (xs !! i)
---                | otherwise             = Nothing
---     {-# INLINE index #-}
