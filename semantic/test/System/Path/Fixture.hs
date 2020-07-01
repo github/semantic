@@ -29,7 +29,7 @@ delay :: String -> IO ()
 delay s = do
   putStrLn s
   hFlush stdout
-  threadDelay 10000000
+  threadDelay 100000000
 
 absFile :: (HasFixture) => String -> Path.AbsFile
 absFile x = Path.absFile (Bazel.rlocation ?runfiles ("semantic/" <> Path.toString ?project <> x))

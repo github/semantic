@@ -227,6 +227,8 @@ new_git_repository(
     name = "tree-sitter-ql",
     build_file_content = """
 exports_files(["src/node-types.json"])
+
+filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']), visibility = ["//visibility:public"])
 """,
     commit = "c0d674abed8836bb5a4770f547343ef100f88c24",
     remote = "https://github.com/tree-sitter/tree-sitter-ql.git",

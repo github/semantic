@@ -19,8 +19,6 @@ main = do
   let ?project = Path.relDir "semantic-ruby"
       ?runfiles = rf
   let dirs = Fixture.bazelDir "/../external/tree-sitter-ruby/test/corpus"
-  hFlush stdout
-  threadDelay 0
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

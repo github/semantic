@@ -4,6 +4,7 @@ package(default_visibility = ["//visibility:public"])
 load(
     "//:build/common.bzl",
     "semantic_language_library",
+    "semantic_language_parsing_test",
 )
 
 semantic_language_library(
@@ -17,3 +18,5 @@ semantic_language_library(
     ),
     language = "python",
 )
+
+semantic_language_parsing_test(language = "python")

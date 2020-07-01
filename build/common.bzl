@@ -47,10 +47,12 @@ filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']))
         sha256 = sha256,
     )
 
-def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
+def semantic_language_library(language, name, srcs, ts_package = "", nodetypes = "", **kwargs):
     """Create a new library target with dependencies needed for a language-AST project."""
     if nodetypes == "":
         nodetypes = "@tree-sitter-{}//:src/node-types.json".format(language)
+    if ts_package == "":
+        ts_package = language
     haskell_library(
         name = name,
         # We can't use Template Haskell to find out the location of the
@@ -63,7 +65,7 @@ def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
             '-DNODE_TYPES_PATH="../../../../$(rootpath {})"'.format(nodetypes),
         ],
         srcs = srcs,
-        extra_srcs = [nodetypes, "@tree-sitter-{}//:corpus".format(language)],
+        extra_srcs = [nodetypes, "@tree-sitter-{}//:corpus".format(ts_package)],
         deps = [
             "//:base",
             "//semantic-analysis",
@@ -91,11 +93,15 @@ def semantic_language_library(language, name, srcs, nodetypes = "", **kwargs):
         ],
     )
 
-def semantic_language_parsing_test(language):
+def semantic_language_parsing_test(language, semantic_package = "", ts_package = ""):
+    if semantic_package == "":
+        semantic_package = language
+    if ts_package == "":
+        ts_package = language
     haskell_test(
         name = "test",
         srcs = ["test/PreciseTest.hs"],
-        data = ["@tree-sitter-{}//:corpus".format(language)],
+        data = ["@tree-sitter-{}//:corpus".format(ts_package)],
         deps = [
             ":semantic-{}".format(language),
             "//:base",
@@ -109,6 +115,6 @@ def semantic_language_parsing_test(language):
             "@stackage//:tasty",
             "@stackage//:tasty-hedgehog",
             "@stackage//:tasty-hunit",
-            "@stackage//:tree-sitter-" + language,
+            "@stackage//:tree-sitter-" + semantic_package,
         ],
     )
