@@ -14,10 +14,10 @@ main :: IO ()
 main = do
   rf <- Runfiles.create
   -- dirs <- Path.absDir <$> Ruby.getTestCorpusDir
-  let ?project = Path.relDir "semantic-python"
+  let ?project = Path.relDir "external/tree-sitter-python"
       ?runfiles = rf
 
-  let dirs = Fixture.relDir "../external/tree-sitter-python/test/corpus"
+  let dirs = Fixture.absRelDir "test/corpus"
       parse = parseByteString @Py.Module @() tree_sitter_python
 
   readCorpusFiles' dirs

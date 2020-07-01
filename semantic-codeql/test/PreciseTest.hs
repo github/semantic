@@ -14,10 +14,10 @@ main :: IO ()
 main = do
   rf <- Runfiles.create
   -- dirs <- Path.absDir <$> Ruby.getTestCorpusDir
-  let ?project = Path.relDir "semantic-codeql"
+  let ?project = Path.relDir "external/tree-sitter-ql"
       ?runfiles = rf
 
-  let dirs = Fixture.relDir "../external/tree-sitter-ql/test/corpus"
+  let dirs = Fixture.absRelDir "test/corpus"
       parse = parseByteString @CodeQL.Ql @() tree_sitter_ql
 
   readCorpusFiles' dirs

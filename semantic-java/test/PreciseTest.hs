@@ -20,9 +20,9 @@ main :: IO ()
 main = do
   rf <- Runfiles.create
   -- dirs <- Path.absDir <$> Java.getTestCorpusDir
-  let ?project = Path.relDir "semantic-java"
+  let ?project = Path.relDir "external/tree-sitter-java"
       ?runfiles = rf
-  let dirs = Fixture.relDir "../external/tree-sitter-java/corpus"
+  let dirs = Fixture.absRelDir "corpus"
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)
     >>= defaultMain . tests

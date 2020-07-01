@@ -15,9 +15,9 @@ main :: IO ()
 main = do
   rf <- Runfiles.create
   -- dirs <- Path.absDir <$> Typescript.getTestCorpusDir
-  let ?project = Path.relDir "semantic-tsx"
+  let ?project = Path.relDir "external/semantic-typescript"
       ?runfiles = rf
-  let dirs = Fixture.relDir "../external/tree-sitter-typescript/tsx/corpus"
+  let dirs = Fixture.absRelDir "tsx/corpus"
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

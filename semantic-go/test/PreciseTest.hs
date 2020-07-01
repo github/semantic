@@ -15,9 +15,9 @@ main :: IO ()
 main = do
   rf <- Runfiles.create
   -- dirs <- Path.absDir <$> Go.getTestCorpusDir
-  let ?project = Path.relDir "semantic-go"
+  let ?project = Path.relDir "external/tree-sitter-go"
       ?runfiles = rf
-  let dirs = Fixture.relDir "../external/tree-sitter-go/corpus"
+  let dirs = Fixture.absRelDir "corpus"
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

@@ -2,8 +2,7 @@
 {-# LANGUAGE ImplicitParams #-}
 
 module System.Path.Fixture
-  ( absFile,
-    absRelFile,
+  ( absRelFile,
     relDir,
     HasFixture,
     absRelDir,
@@ -30,13 +29,12 @@ delay s = do
   hFlush stdout
   threadDelay 100000000
 
-absFile :: (HasFixture) => String -> Path.AbsFile
-absFile x = root </> Path.relDir "semantic" </> ?project </> Path.relFile x
+
+absRelFile :: (HasFixture) => String -> Path.AbsRelFile
+absRelFile x = Path.toAbsRel (root </> Path.relDir "semantic" </> ?project </> Path.relFile x)
   where
     root = Path.absDir (Bazel.rlocation ?runfiles ".")
 
-absRelFile :: (HasFixture) => String -> Path.AbsRelFile
-absRelFile = Path.toAbsRel . absFile
 
 relDir :: HasFixture => String -> Path.AbsDir
 relDir x = root </> Path.relDir "semantic" </> ?project </> Path.relDir x
