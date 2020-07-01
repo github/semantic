@@ -22,7 +22,7 @@ The first time you run `bazel build`, it'll take some time, as Bazel will compil
 | Build/run executable      | `cabal run semantic -- ARGS`        | `bazel run //semantic:exe -- ARGS` |
 | Load REPL component       | `script/ghci` and `:load`           | `bazel build //TARGET@repl`        |
 | Run tests                 | `cabal test all`                    | `bazel test //...`                 |
-| Build with optimizations  | `cabal build --flags="+release"`    | `bazel build -copt //...`          |
+| Build with optimizations  | `cabal build --flags="+release"`    | `bazel build -c opt //...`         |
 
 ## Adding a new dependency
 
