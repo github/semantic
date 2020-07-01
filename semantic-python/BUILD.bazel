@@ -5,6 +5,10 @@ load(
     "semantic_language_library",
     "semantic_language_parsing_test",
 )
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
 
 semantic_language_library(
     name = "semantic-python",
@@ -19,3 +23,15 @@ semantic_language_library(
 )
 
 semantic_language_parsing_test(language = "python")
+
+haskell_binary(
+    name = "bench",
+    srcs = glob(["bench/**/*.hs"]),
+    deps = [
+        ":semantic-python",
+        "//:base",
+        "//:bytestring",
+        "//semantic-ast",
+        "@stackage//:gauge",
+    ],
+)

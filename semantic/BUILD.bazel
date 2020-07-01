@@ -120,6 +120,23 @@ haskell_binary(
     ],
 )
 
+haskell_binary(
+    name = "bench",
+    srcs = glob(["bench/**/*.hs"]),
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS,
+    deps = [
+        ":semantic",
+        "//:base",
+        "//semantic-analysis",
+        "//semantic-proto",
+        "@stackage//:Glob",
+        "@stackage//:fused-effects",
+        "@stackage//:gauge",
+        "@stackage//:pathtype",
+    ],
+)
+
+# PT TODO: remove this
 haskell_library(
     name = "fixtureshim",
     srcs = ["test/System/Path/Fixture.hs"],

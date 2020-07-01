@@ -34,6 +34,7 @@ GHC_FLAGS = [
     "-Wno-all-missed-specialisations",
     "-Wno-star-is-type",
     "-Wno-missing-deriving-strategies",
+    "-DBAZEL_BUILD=1",
 ] + select(
     {
         "//:release": RELEASE_GHC_FLAGS,

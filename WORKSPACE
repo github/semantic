@@ -71,6 +71,7 @@ stack_snapshot(
         "fused-effects-readline",
         "fused-effects-resumable",
         "fused-syntax",
+        "gauge",
         "generic-lens",
         "generic-monoid",
         "hashable",
