@@ -1,6 +1,8 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ImplicitParams #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
 module Semantic.IO.Spec (spec) where
 
@@ -16,7 +18,7 @@ import qualified System.Path.Fixture as Fixture
 spec :: Fixture.HasFixture => Spec
 spec = do
 #if BAZEL_BUILD
-  rf <- Fixture.create
+  rf <- runIO Fixture.create
   let ?project = Path.relDir "semantic"
       ?runfiles = rf
 #endif

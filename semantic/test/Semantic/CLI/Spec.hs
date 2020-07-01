@@ -10,17 +10,15 @@ import           Semantic.Api hiding (Blob, File)
 import           Semantic.Task
 import           Serializing.Format
 import           System.IO.Unsafe
-import           System.Path ((</>))
 import qualified System.Path as Path
-import qualified System.Path.Fixture as Path
+import qualified System.Path.Fixture as Fixture
 import qualified System.Path.Directory as Path
 
 import SpecHelpers
 import Test.Tasty
 import Test.Tasty.Golden
 
--- TODO: Fix this, or throw it out entirely.
-testTree :: Path.HasFixture => TestTree
+testTree :: TestTree
 testTree = testGroup "Semantic.CLI"
   [ testGroup "parseTermBuilder" $ fmap testForParseFixture parseFixtures
   ]
