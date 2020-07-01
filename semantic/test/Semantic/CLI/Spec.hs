@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unused-imports #-}
+
 module Semantic.CLI.Spec (testTree) where
 
 import           Analysis.File
