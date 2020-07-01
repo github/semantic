@@ -1,4 +1,3 @@
-# Set all target’s visibility in this package to "public".
 package(default_visibility = ["//visibility:public"])
 
 load(
