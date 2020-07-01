@@ -231,7 +231,7 @@ tree_sitter_node_types_git(
 tree_sitter_node_types_git(
     name = "tree-sitter-php",
     commit = "41a408d5b996ef54d8b9e1b9a2469fad00c1b52b",
-    shallow_since = "",
+    shallow_since = "1591381188 -0400",
 )
 
 load("//:build/example_repos.bzl", "declare_example_repos")
