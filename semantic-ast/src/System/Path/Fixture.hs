@@ -14,11 +14,10 @@ where
 import Control.Concurrent
 import GHC.Stack
 import System.IO
-import System.Path ((</>))
 import qualified System.Path as Path
 
 #if BAZEL_BUILD
-
+import System.Path ((</>))
 import qualified Bazel.Runfiles as Bazel
 
 type HasFixture =
@@ -47,9 +46,6 @@ type HasFixture = HasCallStack
 
 create :: IO ()
 create = pure ()
-
-root :: HasFixture => Path.AbsRelDir
-root = Path.toAbsRel Path.currentDir
 
 absRelFile :: String -> Path.AbsRelFile
 absRelFile = Path.absRel
