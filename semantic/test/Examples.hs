@@ -139,6 +139,8 @@ buildExamples session lang tsDir = do
 
 
   files <- globDir1 (compile (languageExtension lang)) (Path.toString tsDir)
+  when (null files)
+    (fail ("Nothing in dir " <> Path.toString tsDir))
 
   let paths = filter (\x -> Path.takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ Path.absRel <$> files
   trees <- for paths $ \file -> do
@@ -175,7 +177,7 @@ main = withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
 
   allTests <- forConcurrently examples $ \lang@LanguageExample{..} -> do
-    let tsDir = Fixture.absRelDir ".."
+    let tsDir = Fixture.absRelDir "/.."
     buildExamples session lang tsDir
 
   Tasty.defaultMain $ Tasty.testGroup "parse-examples" allTests

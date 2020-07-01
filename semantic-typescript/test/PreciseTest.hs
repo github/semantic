@@ -17,7 +17,6 @@ main = do
   let ?project = Path.relDir "semantic-typescript"
       ?runfiles = rf
   let dirs = Fixture.bazelDir "/../external/tree-sitter-typescript/typescript/corpus"
-  Fixture.delay (Path.toString dirs)
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

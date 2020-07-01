@@ -20,7 +20,6 @@ main = do
   let dirs = Fixture.bazelDir "/../external/tree-sitter-python/test/corpus"
       parse = parseByteString @Py.Module @() tree_sitter_python
 
-  Fixture.delay (Path.toString dirs)
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)
     >>= defaultMain . tests

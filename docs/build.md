@@ -14,15 +14,16 @@ The first time you run `bazel build`, it'll take some time, as Bazel will compil
 
 ## `cabal` → `stack` cheatsheet
 
-| Operation                 | `cabal`                             | `bazel`                            |
-|---------------------------|-------------------------------------|------------------------------------|
-| Build all                 | `cabal build all`                   | `bazel build //...`                |
-| Build `TARGET` library    | `cabal build TARGET:lib`            | `bazel build //TARGET`             |
-| Build semantic executable | `cabal build semantic:exe:semantic` | `bazel build //semantic:exe`       |
-| Build/run executable      | `cabal run semantic -- ARGS`        | `bazel run //semantic:exe -- ARGS` |
-| Load REPL component       | `script/ghci` and `:load`           | `bazel build //TARGET@repl`        |
-| Run tests                 | `cabal test all`                    | `bazel test //...`                 |
-| Build with optimizations  | `cabal build --flags="+release"`    | `bazel build -c opt //...`         |
+| Operation                    | `cabal`                             | `bazel`                                             |
+|------------------------------|-------------------------------------|-----------------------------------------------------|
+| Build all                    | `cabal build all`                   | `bazel build //...`                                 |
+| Build `TARGET` library       | `cabal build TARGET:lib`            | `bazel build //TARGET`                              |
+| Build semantic executable    | `cabal build semantic:exe:semantic` | `bazel build //semantic:exe`                        |
+| Build/run executable         | `cabal run semantic -- ARGS`        | `bazel run //semantic:exe -- ARGS`                  |
+| Load REPL component          | `script/ghci` and `:load`           | `bazel build //TARGET@repl`                         |
+| Run tests                    | `cabal test all`                    | `bazel test //...`                                  |
+| Build with optimizations     | `cabal build --flags="+release"`    | `bazel build -c opt //...`                          |
+| Run all languages' AST tests | ETOOLONGTOWRITE                     | `bazel test --test_tag_filters=language-test //...` |
 
 ## Adding a new dependency
 
@@ -62,3 +63,7 @@ The default `.bazelrc` file imports a `.bazelrc.local` file if it's present; use
 We have two common custom rules, defined in `build/common.bzl`. The first, `tree_sitter_node_types_archive`, uses the `http_archive` rule to download a specified tree-sitter grammar's `node-types.json` file. These calls declare new top-level targets, so they're only present in the top-level `WORKSPACE` file. The second, `semantic_language_library`, takes care of the boilerplate associated with declaring a target for a `semantic-LANG` language package (as these packages' contents are identical, their target declarations are almost identical).
 
 For the purposes of setting up the examples upon which the `parse-examples` test depends, we have code in `build/example_repos.bzl` which defines them, checks them out, and computes the set of target names. You shouldn't need to change or modify this, unless you're adding new repos.
+
+## Protips
+
+* `bazel build --output_filter=REGEXP` does what it says on the tin.

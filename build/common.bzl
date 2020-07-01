@@ -110,6 +110,7 @@ def semantic_language_parsing_test(language, semantic_package = "", ts_package =
         name = "test",
         srcs = ["test/PreciseTest.hs"],
         data = ["@tree-sitter-{}//:corpus".format(ts_package)],
+        tags = ["language-test"],
         deps = [
             ":semantic-{}".format(language),
             "//:base",

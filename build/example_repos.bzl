@@ -89,8 +89,8 @@ _all_example_repos = {
         ],
         "commit": "c865d46736db4afff51690a712e35ed8e3899490",
         "repo": "pytorch/pytorch",
-        "since": "",
-        "excludes": ["1549068372 -0800"],
+        "since": "1549068372 -0800",
+        "excludes": [],
     },
     "certbot": {
         "data": [
