@@ -8,7 +8,7 @@ build --disk_cache=.bazel-cache/bazel-disk
 build --repository_cache=tmp/bazel-repo
 build --color=yes
 build --jobs=8
-
+common --compilation_mode=fastbuild
 
 # test environment does not propagate locales by default
 # some tests reads files written in UTF8, we need to propagate the correct

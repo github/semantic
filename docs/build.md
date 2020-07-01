@@ -20,8 +20,9 @@ The first time you run `bazel build`, it'll take some time, as Bazel will compil
 | Build `TARGET` library    | `cabal build TARGET:lib`            | `bazel build //TARGET`             |
 | Build semantic executable | `cabal build semantic:exe:semantic` | `bazel build //semantic:exe`       |
 | Build/run executable      | `cabal run semantic -- ARGS`        | `bazel run //semantic:exe -- ARGS` |
-| Load REPL component       | `script/ghci` and `:load`           | `bazel build //TARGET@repl`    |
+| Load REPL component       | `script/ghci` and `:load`           | `bazel build //TARGET@repl`        |
 | Run tests                 | `cabal test all`                    | `bazel test //...`                 |
+| Build with optimizations  | `cabal build --flags="+release"`    | `bazel build -copt //...`          |
 
 ## Adding a new dependency
 
@@ -53,7 +54,7 @@ The default `.bazelrc` file imports a `.bazelrc.local` file if it's present; use
 
 ## Shared variables
 
-* `STANDARD_GHC_WARNINGS`: the standard set of Cabal flags that all targets should use.
+* `GHC_FLAGS`: the standard set of Cabal flags that all targets should use.
 * `STANDARD_EXECUTABLE_FLAGS`: ditto, but with executable-specific flags.
 
 ## Custom rules

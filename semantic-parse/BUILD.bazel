@@ -8,7 +8,7 @@ load(
 )
 load(
     "//:build/common.bzl",
-    "STANDARD_GHC_WARNINGS",
+    "GHC_FLAGS",
 )
 
 # Doesn't build right now.
@@ -16,7 +16,7 @@ load(
 haskell_binary(
     name = "exe",
     srcs = ["app/Main.hs"],
-    compiler_flags = STANDARD_GHC_WARNINGS,
+    compiler_flags = GHC_FLAGS,
     deps = [
         "//:base",
         "//:bytestring",

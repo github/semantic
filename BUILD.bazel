@@ -34,6 +34,21 @@ haskell_toolchain_library(name = "template-haskell")
 
 haskell_toolchain_library(name = "transformers")
 
+config_setting(
+    name = "release",
+    values = {"compilation_mode": "opt"},
+)
+
+config_setting(
+    name = "development",
+    values = {"compilation_mode": "fastbuild"},
+)
+
+config_setting(
+    name = "debug",
+    values = {"compilation_mode": "dbg"},
+)
+
 haskell_repl(
     name = "hie-bios",
     collect_data = False,

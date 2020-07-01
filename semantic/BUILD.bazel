@@ -16,8 +16,8 @@ load(
 )
 load(
     "//:build/common.bzl",
+    "GHC_FLAGS",
     "STANDARD_EXECUTABLE_FLAGS",
-    "STANDARD_GHC_WARNINGS",
 )
 load(
     "//:build/example_repos.bzl",
@@ -55,7 +55,7 @@ semantic_common_dependencies = [
 haskell_library(
     name = "semantic",
     srcs = glob(["src/**/*.hs"]),
-    compiler_flags = STANDARD_GHC_WARNINGS + ["-XStrictData"],
+    compiler_flags = GHC_FLAGS + ["-XStrictData"],
     version = "0.11.0.0",
     deps = semantic_common_dependencies + [
         "//:base",
@@ -110,7 +110,7 @@ haskell_library(
 haskell_binary(
     name = "exe",
     srcs = glob(["app/**/*.hs"]),
-    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + ["-XStrictData"],
+    compiler_flags = GHC_FLAGS + STANDARD_EXECUTABLE_FLAGS + ["-XStrictData"],
     deps = [
         ":semantic",
         "//:base",
@@ -142,7 +142,7 @@ haskell_test(
             "test/System/Path/Fixture.hs",
         ],
     ),
-    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + [
+    compiler_flags = GHC_FLAGS + STANDARD_EXECUTABLE_FLAGS + [
         "-XStrictData",
     ],
     data = glob(include = [
@@ -186,7 +186,7 @@ haskell_test(
     srcs = [
         "test/Examples.hs",
     ],
-    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + [
+    compiler_flags = GHC_FLAGS + STANDARD_EXECUTABLE_FLAGS + [
         "-XStrictData",
     ],
     data = glob(include = [

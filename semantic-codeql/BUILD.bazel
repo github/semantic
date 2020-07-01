@@ -14,5 +14,6 @@ semantic_language_library(
 
 semantic_language_parsing_test(
     language = "codeql",
-    project = "ql",
+    semantic_package = "ql",
+    ts_package = "ql",
 )

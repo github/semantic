@@ -14,13 +14,13 @@ load(
 )
 load(
     "//:build/common.bzl",
-    "STANDARD_GHC_WARNINGS",
+    "GHC_FLAGS",
 )
 
 haskell_library(
     name = "semantic-analysis",
     srcs = glob(["src/**/*.hs"]),
-    compiler_flags = STANDARD_GHC_WARNINGS + ["-XOverloadedStrings"],
+    compiler_flags = GHC_FLAGS + ["-XOverloadedStrings"],
     deps = [
         "//:base",
         "//:containers",

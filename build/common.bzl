@@ -7,8 +7,10 @@ load(
 )
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-STANDARD_GHC_WARNINGS = [
-    "-O0",
+DEVELOPMENT_GHC_FLAGS = ["-O0"]
+RELEASE_GHC_FLAGS = ["-O1"]
+
+GHC_FLAGS = [
     "-v1",
     "-j8",
     "-fdiagnostics-color=always",
@@ -25,7 +27,13 @@ STANDARD_GHC_WARNINGS = [
     "-Wno-all-missed-specialisations",
     "-Wno-star-is-type",
     "-Wno-missing-deriving-strategies",
-]
+] + select(
+    {
+        "//:release": RELEASE_GHC_FLAGS,
+        "//:development": DEVELOPMENT_GHC_FLAGS,
+        "//:debug": DEVELOPMENT_GHC_FLAGS,
+    },
+)
 
 STANDARD_EXECUTABLE_FLAGS = [
     "-threaded",
@@ -58,10 +66,10 @@ def semantic_language_library(language, name, srcs, ts_package = "", nodetypes =
         # We can't use Template Haskell to find out the location of the
         # node-types.json files, but we can pass it in as a preprocessor
         # directive.
-        compiler_flags = STANDARD_GHC_WARNINGS + [
+        compiler_flags = GHC_FLAGS + [
             '-DNODE_TYPES_PATH="../../../../$(rootpath {})"'.format(nodetypes),
         ],
-        repl_ghci_args = STANDARD_GHC_WARNINGS + [
+        repl_ghci_args = GHC_FLAGS + [
             '-DNODE_TYPES_PATH="../../../../$(rootpath {})"'.format(nodetypes),
         ],
         srcs = srcs,

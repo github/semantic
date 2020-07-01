@@ -14,14 +14,14 @@ load(
 )
 load(
     "//:build/common.bzl",
+    "GHC_FLAGS",
     "STANDARD_EXECUTABLE_FLAGS",
-    "STANDARD_GHC_WARNINGS",
 )
 
 haskell_library(
     name = "semantic-source",
     srcs = glob(["src/**/*.hs"]),
-    compiler_flags = STANDARD_GHC_WARNINGS + ["-XOverloadedStrings"],
+    compiler_flags = GHC_FLAGS + ["-XOverloadedStrings"],
     deps = [
         "//:base",
         "//:bytestring",
@@ -44,7 +44,7 @@ haskell_test(
         "test/Source/Test.hs",
         "test/Test.hs",
     ],
-    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS,
+    compiler_flags = GHC_FLAGS + STANDARD_EXECUTABLE_FLAGS,
     deps = [
         ":semantic-source",
         "//:base",
