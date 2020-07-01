@@ -62,7 +62,7 @@ The variables that the scripts under `build/` export are SCREAMING_SNAKE_CASE. T
 
 ## Custom rules
 
-We have two common custom rules, defined in `build/common.bzl`. The first, `tree_sitter_node_types_archive`, uses the `http_archive` rule to download a specified tree-sitter grammar's `node-types.json` file. These calls declare new top-level targets, so they're only present in the top-level `WORKSPACE` file. The second, `semantic_language_library`, takes care of the boilerplate associated with declaring a target for a `semantic-LANG` language package (as these packages' contents are identical, their target declarations are almost identical).
+We have two common custom rules, defined in `build/common.bzl`. The first, `tree_sitter_node_types_release`, uses the `http_archive` rule to download a specified tree-sitter grammar's `node-types.json` file. These calls declare new top-level targets, so they're only present in the top-level `WORKSPACE` file. The second, `semantic_language_library`, takes care of the boilerplate associated with declaring a target for a `semantic-LANG` language package (as these packages' contents are identical, their target declarations are almost identical).
 
 For the purposes of setting up the examples upon which the `parse-examples` test depends, we have code in `build/example_repos.bzl` which defines them, checks them out, and computes the set of target names. You shouldn't need to change or modify this, unless you're adding new repos.
 

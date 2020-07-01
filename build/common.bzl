@@ -49,7 +49,7 @@ EXECUTABLE_FLAGS = [
 
 # These macros declare new packages.
 
-def tree_sitter_node_types_archive(name, version, sha256, urls = [], nodetypespath = "src/node-types.json"):
+def tree_sitter_node_types_release(name, version, sha256, urls = [], nodetypespath = "src/node-types.json"):
     """Create a package for a tree-sitter grammar and export its node-types.json file/test corpus.."""
     http_archive(
         name = name,
@@ -66,7 +66,7 @@ filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']))
     )
 
 def tree_sitter_node_types_git(name, commit, shallow_since):
-    """Create a package pinned off a Git repo. Prefer the node_types_archive call to this."""
+    """Create a package pinned off a Git repo. Prefer the node_types_release call to this."""
     new_git_repository(
         name = name,
         build_file_content = """
