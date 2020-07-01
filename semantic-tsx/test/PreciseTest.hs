@@ -8,16 +8,18 @@ import           AST.Unmarshal
 import qualified Language.TSX.AST as Tsx
 import qualified System.Path as Path
 import           Test.Tasty
-import qualified Bazel.Runfiles as Runfiles
 import qualified System.Path.Fixture as Fixture
 
 main :: IO ()
 main = do
-  rf <- Runfiles.create
-  -- dirs <- Path.absDir <$> Typescript.getTestCorpusDir
+#if BAZEL_BUILD
+  rf <- Fixture.create
   let ?project = Path.relDir "external/semantic-typescript"
       ?runfiles = rf
   let dirs = Fixture.absRelDir "tsx/corpus"
+#else
+  dirs <- Path.absRel <$> Typescript.getTestCorpusDir
+#endif
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

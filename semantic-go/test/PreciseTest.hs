@@ -1,4 +1,4 @@
-{-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
+{-# LANGUAGE CPP, DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
 module Main (main) where
 
 
@@ -8,16 +8,18 @@ import           AST.TestHelpers
 import           AST.Unmarshal
 import qualified System.Path as Path
 import           Test.Tasty
-import qualified Bazel.Runfiles as Runfiles
 import qualified System.Path.Fixture as Fixture
 
 main :: IO ()
 main = do
-  rf <- Runfiles.create
-  -- dirs <- Path.absDir <$> Go.getTestCorpusDir
+#if BAZEL_BUILD
+  rf <- Fixture.create
   let ?project = Path.relDir "external/tree-sitter-go"
       ?runfiles = rf
   let dirs = Fixture.absRelDir "corpus"
+#else
+  dirs <- Path.absRel <$> Go.getTestCorpusDir
+#endif
 
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

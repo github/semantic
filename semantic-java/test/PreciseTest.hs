@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE ImplicitParams #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
@@ -9,7 +10,6 @@ where
 
 import AST.TestHelpers
 import AST.Unmarshal
-import qualified Bazel.Runfiles as Runfiles
 import qualified Language.Java.AST as Java
 import qualified System.Path as Path
 import qualified System.Path.Fixture as Fixture
@@ -18,11 +18,15 @@ import TreeSitter.Java
 
 main :: IO ()
 main = do
-  rf <- Runfiles.create
-  -- dirs <- Path.absDir <$> Java.getTestCorpusDir
+#if BAZEL_BUILD
+  rf <- Fixture.create
+  --
   let ?project = Path.relDir "external/tree-sitter-java"
       ?runfiles = rf
   let dirs = Fixture.absRelDir "corpus"
+#else
+  dirs <- Path.absRel <$> Java.getTestCorpusDir
+#endif
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)
     >>= defaultMain . tests
