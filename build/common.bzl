@@ -42,7 +42,7 @@ GHC_FLAGS = [
     },
 )
 
-STANDARD_EXECUTABLE_FLAGS = [
+EXECUTABLE_FLAGS = [
     "-threaded",
 ]
 

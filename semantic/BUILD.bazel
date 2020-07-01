@@ -14,12 +14,12 @@ load(
 )
 load(
     "//:build/common.bzl",
+    "EXECUTABLE_FLAGS",
     "GHC_FLAGS",
-    "STANDARD_EXECUTABLE_FLAGS",
 )
 load(
     "//:build/example_repos.bzl",
-    "semantic_external_test_repositories",
+    "SEMANTIC_EXTERNAL_TEST_REPOSITORIES",
 )
 
 haskell_toolchain_library(name = "ghc-prim")
@@ -108,7 +108,7 @@ haskell_library(
 haskell_binary(
     name = "exe",
     srcs = glob(["app/**/*.hs"]),
-    compiler_flags = GHC_FLAGS + STANDARD_EXECUTABLE_FLAGS + ["-XStrictData"],
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS + ["-XStrictData"],
     deps = [
         ":semantic",
         "//:base",
@@ -140,7 +140,7 @@ haskell_test(
             "test/System/Path/Fixture.hs",
         ],
     ),
-    compiler_flags = GHC_FLAGS + STANDARD_EXECUTABLE_FLAGS + [
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS + [
         "-XStrictData",
     ],
     data = glob(include = [
@@ -184,7 +184,7 @@ haskell_test(
     srcs = [
         "test/Examples.hs",
     ],
-    compiler_flags = GHC_FLAGS + STANDARD_EXECUTABLE_FLAGS + [
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS + [
         "-XStrictData",
     ],
     data = glob(include = [
@@ -195,7 +195,7 @@ haskell_test(
         "test/fixtures/javascript/**/*.js",
         "test/fixtures/typescript/**/*.ts",
         "test/fixtures/cli/*.json",
-    ]) + semantic_external_test_repositories,
+    ]) + SEMANTIC_EXTERNAL_TEST_REPOSITORIES,
     deps = semantic_common_dependencies + [
         ":fixtureshim",
         "//:base",

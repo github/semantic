@@ -12,8 +12,8 @@ load(
 )
 load(
     "//:build/common.bzl",
+    "EXECUTABLE_FLAGS",
     "GHC_FLAGS",
-    "STANDARD_EXECUTABLE_FLAGS",
 )
 
 haskell_library(
@@ -42,7 +42,7 @@ haskell_test(
         "test/Source/Test.hs",
         "test/Test.hs",
     ],
-    compiler_flags = GHC_FLAGS + STANDARD_EXECUTABLE_FLAGS,
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS,
     deps = [
         ":semantic-source",
         "//:base",

@@ -56,7 +56,7 @@ The default `.bazelrc` file imports a `.bazelrc.local` file if it's present; use
 ## Shared variables
 
 * `GHC_FLAGS`: the standard set of Cabal flags that all targets should use.
-* `STANDARD_EXECUTABLE_FLAGS`: ditto, but with executable-specific flags.
+* `EXECUTABLE_FLAGS`: ditto, but with executable-specific flags.
 
 ## Custom rules
 

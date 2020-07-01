@@ -121,7 +121,7 @@ _all_example_repos = {
     },
 }
 
-semantic_external_test_repositories = ["@" + k + "//:src" for (k, v) in _all_example_repos.items()]
+SEMANTIC_EXTERNAL_TEST_REPOSITORIES = ["@" + k + "//:src" for (k, v) in _all_example_repos.items()]
 
 def _example_repo(name, data, excludes, commit, repo, since):
     new_git_repository(
