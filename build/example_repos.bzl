@@ -139,5 +139,5 @@ filegroup(
     )
 
 def declare_example_repos():
-    for k, v in _all_example_repos.items():
-        _example_repo(name = k, data = v["data"], excludes = v["excludes"], commit = v["commit"], repo = v["repo"], since = v["since"])
+    for k, kwargs in _all_example_repos.items():
+        _example_repo(name = k, **kwargs)

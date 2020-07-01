@@ -53,6 +53,8 @@ We give library targets the same name as their subproject. Test targets are call
 
 The default `.bazelrc` file imports a `.bazelrc.local` file if it's present; use that for any Bazel customizations you want.
 
+The variables that the scripts under `build/` export are SCREAMING_SNAKE_CASE. The functions are snake_case.
+
 ## Shared variables
 
 * `GHC_FLAGS`: the standard set of Cabal flags that all targets should use.
