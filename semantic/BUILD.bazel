@@ -5,7 +5,6 @@ load(
     "haskell_binary",
     "haskell_library",
     "haskell_test",
-    "haskell_toolchain_library",
 )
 load(
     "@rules_haskell//haskell:cabal.bzl",
@@ -21,8 +20,6 @@ load(
     "//:build/example_repos.bzl",
     "SEMANTIC_EXTERNAL_TEST_REPOSITORIES",
 )
-
-haskell_toolchain_library(name = "ghc-prim")
 
 semantic_common_dependencies = [
     "//:bytestring",
@@ -73,7 +70,7 @@ haskell_library(
         "//semantic-tags",
         "//semantic-tsx",
         "//semantic-typescript",
-        ":ghc-prim",
+        "//:ghc-prim",
         "@stackage//:ansi-terminal",
         "@stackage//:attoparsec",
         "@stackage//:bifunctors",

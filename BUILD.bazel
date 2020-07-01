@@ -45,6 +45,8 @@ haskell_toolchain_library(name = "deepseq")
 
 haskell_toolchain_library(name = "filepath")
 
+haskell_toolchain_library(name = "ghc-prim")
+
 haskell_toolchain_library(name = "text")
 
 haskell_toolchain_library(name = "haskeline")
