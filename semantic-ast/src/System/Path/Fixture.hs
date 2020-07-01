@@ -15,9 +15,9 @@ import Control.Concurrent
 import GHC.Stack
 import System.IO
 import qualified System.Path as Path
+import System.Path ((</>))
 
 #if BAZEL_BUILD
-import System.Path ((</>))
 import qualified Bazel.Runfiles as Bazel
 
 type HasFixture =
@@ -38,20 +38,19 @@ absRelFile x = Path.toAbsRel (root </> Path.relDir "semantic" </> ?project </> P
 absRelDir :: HasFixture => String -> Path.AbsRelDir
 absRelDir x = Path.toAbsRel (root </> Path.relDir "semantic" </> ?project </> Path.relDir x)
 
-
 #else
--- building under Cabal
 
+-- building under Cabal
 type HasFixture = HasCallStack
 
 create :: IO ()
 create = pure ()
 
 absRelFile :: String -> Path.AbsRelFile
-absRelFile = Path.absRel
+absRelFile x = Path.absRel "semantic" </> Path.relFile x
 
 absRelDir :: String -> Path.AbsRelDir
-absRelDir = Path.absRel
+absRelDir x = Path.absRel "semantic" </> Path.relDir x
 
 #endif
 

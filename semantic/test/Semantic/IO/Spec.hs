@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ImplicitParams #-}
 
@@ -10,20 +11,25 @@ import           Data.Blob as Blob
 import           Data.Handle
 import           SpecHelpers
 import qualified System.Path as Path
-import qualified Bazel.Runfiles as Bazel
+import qualified System.Path.Fixture as Fixture
 
-spec :: (?runfiles :: Bazel.Runfiles) => Spec
+spec :: Fixture.HasFixture => Spec
 spec = do
-  let fp x = Bazel.rlocation ?runfiles ("semantic/semantic/" <> x)
+#if BAZEL_BUILD
+  rf <- Fixture.create
+  let ?project = Path.relDir "semantic"
+      ?runfiles = rf
+#endif
   let blobsFromFilePath path = do
-        h <- openFileForReading (fp path)
+        h <- openFileForReading (Fixture.absRelFile path)
         blobs <- readBlobPairsFromHandle h
         pure blobs
   describe "readFile" $ do
+
     it "returns a blob for extant files" $ do
-      let path = Bazel.rlocation ?runfiles "semantic/semantic/test/fixtures/cli/diff.json"
-      Just blob <- readBlobFromFile (File (Path.absRel path) lowerBound Unknown)
-      blobFilePath blob `shouldBe` path
+      let path = Fixture.absRelFile "test/fixtures/cli/diff.json"
+      Just blob <- readBlobFromFile (File path lowerBound Unknown)
+      blobFilePath blob `shouldBe` Path.toString path
 
     it "throws for absent files" $ do
       readBlobFromFile (File (Path.absRel "/dev/doesnotexist") lowerBound Unknown) `shouldThrow` anyIOException
@@ -53,7 +59,7 @@ spec = do
 
 
     it "returns blobs for unsupported language" $ do
-      h <- openFileForReading (fp "test/fixtures/cli/diff-unsupported-language.json")
+      h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/diff-unsupported-language.json")
       blobs <- readBlobPairsFromHandle h
       let b' = Blob.fromSource (Path.relFile "test.kt") Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
       blobs `shouldBe` [Insert b']
@@ -63,26 +69,26 @@ spec = do
       blobs `shouldBe` [Compare a b]
 
     it "throws on blank input" $ do
-      h <- openFileForReading (fp "test/fixtures/cli/blank.json")
+      h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/blank.json")
       readBlobPairsFromHandle h `shouldThrow` jsonException
 
     it "throws if language field not given" $ do
-      h <- openFileForReading (fp "test/fixtures/cli/diff-no-language.json")
+      h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/diff-no-language.json")
       readBlobsFromHandle h `shouldThrow` jsonException
 
     it "throws if null on before and after" $ do
-      h <- openFileForReading (fp "test/fixtures/cli/diff-null-both-sides.json")
+      h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/diff-null-both-sides.json")
       readBlobPairsFromHandle h `shouldThrow` jsonException
 
   describe "readBlobsFromHandle" $ do
     it "returns blobs for valid JSON encoded parse input" $ do
-      h <- openFileForReading (fp "test/fixtures/cli/parse.json")
+      h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/parse.json")
       blobs <- readBlobsFromHandle h
       let a = Blob.fromSource (Path.relFile "method.rb") Ruby "def foo; end"
       blobs `shouldBe` [a]
 
     it "throws on blank input" $ do
-      h <- openFileForReading (fp "test/fixtures/cli/blank.json")
+      h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/blank.json")
       readBlobsFromHandle h `shouldThrow` jsonException
 
 jsonException :: Selector InvalidJSONException
