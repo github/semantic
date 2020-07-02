@@ -12,7 +12,7 @@ Assuming you're on macOS, run the script located at ~script/bootstrap-bazel~. Th
 
 The first time you run `bazel build`, it'll take some time, as Bazel will compile all of Stackage. Fear not: you won't have to do this again.
 
-## `cabal` → `stack` cheatsheet
+## `cabal` → `bazel` cheatsheet
 
 | Operation                    | `cabal`                             | `bazel`                                             |
 |------------------------------|-------------------------------------|-----------------------------------------------------|

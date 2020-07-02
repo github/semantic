@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP, DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 module Main (main) where
 
 import           AST.TestHelpers
