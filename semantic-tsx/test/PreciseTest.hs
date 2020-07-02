@@ -1,4 +1,5 @@
-{-# LANGUAGE DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
+{-# LANGUAGE CPP, DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 module Main (main) where
 
 
@@ -18,7 +19,7 @@ main = do
       ?runfiles = rf
   let dirs = Fixture.absRelDir "tsx/corpus"
 #else
-  dirs <- Path.absRel <$> Typescript.getTestCorpusDir
+  dirs <- Path.absRel <$> Tsx.getTestCorpusDir
 #endif
 
   readCorpusFiles' dirs
