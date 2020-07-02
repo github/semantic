@@ -183,12 +183,6 @@ tree_sitter_node_types_release(
 )
 
 tree_sitter_node_types_release(
-    name = "tree-sitter-rust",
-    sha256 = "8c34f19a9270ee60367ee235226ff1108341f944e0bd245cb47e1c2721f0c39b",
-    version = "0.16.1",
-)
-
-tree_sitter_node_types_release(
     name = "tree-sitter-go",
     sha256 = "7278f1fd4dc4de8a13b0f60407425d38c5cb3973e1938d3031a68e1e69bd0b75",
     version = "0.16.1",
@@ -232,6 +226,12 @@ tree_sitter_node_types_git(
     name = "tree-sitter-php",
     commit = "41a408d5b996ef54d8b9e1b9a2469fad00c1b52b",
     shallow_since = "1591381188 -0400",
+)
+
+tree_sitter_node_types_git(
+    name = "tree-sitter-rust",
+    commit = "ab40806a4583b84b9d5636f5a93c0ebfa45b2675",
+    shallow_since = "1583184357 -0800",
 )
 
 load("//:build/example_repos.bzl", "declare_example_repos")
