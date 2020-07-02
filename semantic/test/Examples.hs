@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ImplicitParams #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -29,7 +30,6 @@ import qualified System.Path as Path
 import qualified System.Path.Directory as Path
 import qualified System.Process as Process
 import qualified System.Path.Fixture as Fixture
-import qualified Bazel.Runfiles as Runfiles
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
@@ -172,9 +172,11 @@ main :: IO ()
 main = withOptions testOptions $ \ config logger statter -> do
   -- void $ Process.system "script/clone-example-repos"
 
-  rf <- Runfiles.create
+#if BAZEL_BUILD
+  rf <- Fixture.create
   let ?runfiles = rf
   let ?project = Path.relDir "semantic"
+#endif
 
   let session = TaskSession config "-" False logger statter
 
