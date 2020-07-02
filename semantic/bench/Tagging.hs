@@ -28,6 +28,7 @@ benchmarks = bgroup "tagging"
   [ bench "jquery" $ runTagging' (Path.relFile "semantic/test/fixtures/jquery-3.5.1.min.js")
   , bench "sinatra" $ runTagging' (Path.relFile "semantic/test/fixtures/base.rb")
   ]
+  -- Feel free to turn these on or write other benchmarks
   -- [ pythonBenchmarks
   -- , goBenchmarks
   -- , rubyBenchmarks
