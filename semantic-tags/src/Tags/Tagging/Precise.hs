@@ -12,10 +12,7 @@ module Tags.Tagging.Precise
 , LineIndices(..)
 , yield
 , runTagging
-, baselineCalculateLineAndSpans
-, calculateLineAndSpansPRVersion
 , calculateLineAndSpans
-, calculateLineAndSpans' -- For testing: TODO move to tests
 , countUtf16CodeUnits
 , surroundingLine
 , surroundingLineRange
@@ -27,10 +24,8 @@ import Control.Carrier.Writer.Strict
 import Control.Carrier.State.Strict
 import qualified Data.ByteString as B
 import Data.Char (ord)
-import qualified Data.List as List
 import Data.Functor.Identity
 import Data.Monoid (Endo (..))
-import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Proto.Semantic as P
@@ -43,8 +38,6 @@ import Tags.Tag
 import Prelude hiding (span)
 import Data.Map as Map
 import Data.IntMap as IntMap
-
-import Debug.Trace
 
 
 type Tags = Endo [Tag]
@@ -66,7 +59,6 @@ yield name syntaxType nodeType loc _ = do
   xs <- get @LineIndices
   let (line, span, lspSpan, map) = calculateLineAndSpans src xs loc
   put map
-  -- let (line, span, lspSpan) = baselineCalculateLineAndSpans src loc
   tell . Endo . (:) $
     Tag name syntaxType nodeType (byteRange loc) span line lspSpan
 
@@ -84,55 +76,6 @@ type UTF16CUCount = Int
 type LineCache = (Source, IntMap.IntMap UTF16CUCount)
 newtype LineIndices = LineIndices { unLineIndices :: Map.Map Int LineCache } -- NB: IntMap Key is a utf8 byteoffset
   deriving (Eq, Show, NFData)
-
-baselineCalculateLineAndSpans :: Source -> Loc -> (Text, OneIndexedSpan, UTF16CodeUnitSpan)
-baselineCalculateLineAndSpans src Loc { byteRange, span } = (line, toOneIndexed span, UTF16CodeUnitSpan (Span (Pos 0 0) (Pos 0 0))) --utf16Span)
-  where
-    line = Text.strip . Text.take 180 . Text.takeWhile (/= '\n') . Source.toText $ Source.slice src byteRange
-    toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = OneIndexedSpan $ Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
-
-calculateLineAndSpansPRVersion ::
-  Source -> -- | ^ Source
-  Loc ->    -- | ^ Location of identifier
-  (Text, OneIndexedSpan, UTF16CodeUnitSpan)
-calculateLineAndSpansPRVersion
-  src
-  Loc
-    { byteRange = srcRange,
-      span =
-        span@Span
-          { start = start@Pos {column = startCol},
-            end = end@Pos {column = endCol}
-          }
-    } = (line, toOneIndexed span, utf16Span)
-  where
-    -- NB: Important to limit to 180 characters after converting to text so as not to take in the middle of a multi-byte character.
-    -- line = Text.strip . Text.take 180 . Source.toText $ srcLine
-    line = sliceCenter180 startCol . Source.toText $ srcLine
-    srcLine = surroundingLine src srcRange
-    toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = OneIndexedSpan $ Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
-    utf16Span = UTF16CodeUnitSpan $ Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset}
-
-    utf16cpStartOffset = countUtf16CodeUnits startSlice
-    utf16cpEndOffset = utf16cpStartOffset + countUtf16CodeUnits endSlice
-
-    -- NB: Slice out of the Source ByteString, NOT Text because Loc/Range is in units of bytes.
-    startSlice = Source.slice srcLine (Range 0 startCol)
-    endSlice = Source.slice srcLine (Range startCol endCol)
-
-    -- Slice out up to 180 characters around an index. Favors including the
-    -- identifier and all succeeding text before including any preceeding context
-    sliceCenter180 :: Int -> Text -> Text
-    sliceCenter180 start txt = lhs <> rhs
-      where
-        (h, t) = Text.splitAt start txt
-        rhs = Text.stripEnd . Text.take 180 $ t
-        quota = 180 - Text.length rhs
-        lhs = Text.stripStart . Text.take quota $ h
-
--- | For testing
-calculateLineAndSpans' :: Source -> Loc -> (Text, OneIndexedSpan, UTF16CodeUnitSpan)
-calculateLineAndSpans' src loc = let (a, b, c, _) = calculateLineAndSpans src (LineIndices mempty) loc in (a, b, c)
 
 -- | Takes a Loc (where the span's column offset is measured in bytes) and
 -- returns two Spans: A 1-indexed span LSP friendly span (where column offset is

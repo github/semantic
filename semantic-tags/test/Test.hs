@@ -17,6 +17,10 @@ main = defaultMain $ testGroup "semantic-tags" [ testTree ]
 src :: Text -> Source
 src = Source.fromText
 
+-- | For testing
+calculateLineAndSpans' :: Source -> Loc -> (Text, OneIndexedSpan, UTF16CodeUnitSpan)
+calculateLineAndSpans' src loc = let (a, b, c, _) = calculateLineAndSpans src (LineIndices mempty) loc in (a, b, c)
+
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Tags.Tagging.Precise"
   [ Tasty.testGroup "countUtf16CodeUnits from utf8 encoded bytestring"
