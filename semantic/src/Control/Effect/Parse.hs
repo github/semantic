@@ -1,10 +1,8 @@
 {-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE StandaloneDeriving #-}
 module Control.Effect.Parse
 ( -- * Parse effect
   Parse(..)
@@ -25,20 +23,13 @@ import           Control.Exception (SomeException)
 import           Data.Bitraversable
 import           Data.Blob
 import           Data.Edit
+import           Data.Kind (Type)
 import           Data.Language
 import qualified Data.Map as Map
 import           Parsing.Parser
 
-data Parse m k
-  = forall term . Parse (Parser term) Blob (term -> m k)
-
-deriving instance Functor m => Functor (Parse m)
-
-instance HFunctor Parse where
-  hmap f (Parse parser blob k) = Parse parser blob (f . k)
-
-instance Effect Parse where
-  thread state handler (Parse parser blob k) = Parse parser blob (handler . (<$ state) . k)
+data Parse (m :: Type -> Type) k where
+  Parse :: Parser term -> Blob -> Parse m term
 
 
 -- | Parse a 'Blob' with the given 'Parser'.
@@ -46,7 +37,7 @@ parse :: Has Parse sig m
       => Parser term
       -> Blob
       -> m term
-parse parser blob = send (Parse parser blob pure)
+parse parser blob = send (Parse parser blob)
 
 
 -- | Select a parser for the given 'Language'.
