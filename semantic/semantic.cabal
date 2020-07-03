@@ -83,7 +83,6 @@ library
                      -- Effects
                      , Control.Effect.Interpose
                      , Control.Effect.Parse
-                     , Control.Effect.REPL
                      , Control.Effect.Sum.Project
                      , Control.Effect.Timeout
                      -- General datatype definitions & generic algorithms
