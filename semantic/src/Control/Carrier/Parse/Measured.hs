@@ -61,14 +61,14 @@ runParser ::
   -> m term
 runParser blob@Blob{..} parser = case parser of
 
-  UnmarshalParser language -> do
-    (time "parse.tree_sitter_precise_ast_parse" languageTag $ do
+  UnmarshalParser language ->
+    time "parse.tree_sitter_precise_ast_parse" languageTag $ do
       config <- asks config
-      executeParserAction (parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob))
-    `catchError` (\(SomeException e) -> do
+      executeParserAction (parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob)
+    `catchError` \(SomeException e) -> do
       writeStat (increment "parse.precise_ast_parse_failures" languageTag)
       writeLog Error "precise parsing failed" (("task", "parse") : ("exception", "\"" <> displayException e <> "\"") : languageTag)
-      throwError (SomeException e))
+      throwError (SomeException e)
 
   where
     languageTag = [("language" :: String, show (blobLanguage blob))]
