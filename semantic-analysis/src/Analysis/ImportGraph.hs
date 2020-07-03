@@ -1,11 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeApplications #-}
@@ -90,8 +89,7 @@ importGraph eval
 
 runFile
   :: forall term m sig
-  .  ( Effect sig
-     , Has Fresh sig m
+  .  ( Has Fresh sig m
      , Has (State (Heap (Value (Semi term)))) sig m
      , Monad term
      , forall a . Eq  a => Eq  (term a)
@@ -114,9 +112,9 @@ runFile eval file = traverse run file
 
 
 runDomain :: (term Addr -> m (Value (Semi term))) -> DomainC term m a -> m a
-runDomain eval (DomainC m) = runReader eval m
+runDomain eval = runReader eval . runDomainC
 
-newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Value (Semi term))) m a)
+newtype DomainC term m a = DomainC { runDomainC :: ReaderC (term Addr -> m (Value (Semi term))) m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail)
 
 instance MonadTrans (DomainC term) where
@@ -124,26 +122,26 @@ instance MonadTrans (DomainC term) where
 
 -- FIXME: decompose into a product domain and two atomic domains
 instance (Alternative m, Has (Env Addr :+: A.Heap Addr (Value (Semi term)) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m) => Algebra (A.Domain term Addr (Value (Semi term)) :+: sig) (DomainC term m) where
-  alg = \case
-    L (L (A.Unit     k)) -> k mempty
-    L (R (L (A.Bool _   k))) -> k mempty
-    L (R (L (A.AsBool   _ k))) -> k True <|> k False
-    L (R (R (L (A.String s k)))) -> k (Value (String s) mempty)
-    L (R (R (L (A.AsString _ k)))) -> k mempty
-    L (R (R (R (L (A.Lam b    k))))) -> do
+  alg hdl sig ctx = case sig of
+    L (L A.Unit) -> pure (mempty <$ ctx)
+    L (R (L (A.Bool _  ))) -> pure (mempty <$ ctx)
+    L (R (L (A.AsBool   _))) -> pure (True <$ ctx) <|> pure (False <$ ctx)
+    L (R (R (L (A.String s)))) -> pure (Value (String s) mempty <$ ctx)
+    L (R (R (L (A.AsString _)))) -> pure (mempty <$ ctx)
+    L (R (R (R (L (A.Lam b   ))))) -> do
       path <- ask
       span <- ask
-      k (Value (Closure path span b) mempty)
-    L (R (R (R (L (A.AsLam (Value v _) k))))) -> case v of
-      Closure _ _ b -> k b
-      String _      -> fail $ "expected closure, got String"
-      Abstract      -> fail $ "expected closure, got Abstract"
-    L (R (R (R (R (A.Record f k))))) -> do
+      pure (Value (Closure path span b) mempty <$ ctx)
+    L (R (R (R (L (A.AsLam (Value v _)))))) -> case v of
+      Closure _ _ b -> pure (b <$ ctx)
+      String _      -> fail "expected closure, got String"
+      Abstract      -> fail "expected closure, got Abstract"
+    L (R (R (R (R (A.Record f))))) -> do
       eval <- DomainC ask
       fields <- for f $ \ (k, t) -> do
         addr <- alloc @Addr k
         v <- lift (eval t)
         v <$ A.assign @Addr @(Value (Semi term)) addr v
-      k (fold fields)
-    L (R (R (R (R (A.AsRecord _ k))))) -> k []
-    R other -> DomainC (send (handleCoercible other))
+      pure (fold fields <$ ctx)
+    L (R (R (R (R (A.AsRecord _))))) -> pure ([] <$ ctx)
+    R other -> DomainC (alg (runDomainC . hdl) (R other) ctx)

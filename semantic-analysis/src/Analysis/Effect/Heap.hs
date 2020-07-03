@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
 module Analysis.Effect.Heap
 ( -- * Heap effect
   deref
@@ -11,19 +12,15 @@ module Analysis.Effect.Heap
 ) where
 
 import Control.Algebra
-import GHC.Generics (Generic1)
+import Data.Kind (Type)
 
 deref :: Has (Heap addr value) sig m => addr -> m (Maybe value)
-deref addr = send (Deref addr pure)
+deref addr = send (Deref addr)
 
 assign :: Has (Heap addr value) sig m => addr -> value -> m ()
-assign addr value = send (Assign addr value (pure ()))
+assign addr value = send (Assign addr value)
 
 
-data Heap addr value m k
-  = Deref addr (Maybe value -> m k)
-  | Assign addr value (m k)
-  deriving (Functor, Generic1)
-
-instance HFunctor (Heap addr value)
-instance Effect   (Heap addr value)
+data Heap addr value (m :: Type -> Type) k where
+  Deref :: addr -> Heap addr value m (Maybe value)
+  Assign :: addr -> value -> Heap addr value m ()

@@ -3,12 +3,12 @@
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeApplications #-}
@@ -50,8 +50,11 @@ import           Data.Void
 import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
 import           Source.Span
+import qualified Syntax.Algebra as Syntax
+import           Syntax.Functor
 import           Syntax.Module
 import           Syntax.Scope
+import qualified Syntax.Sum as Syntax
 import           Syntax.Term
 import           Syntax.Var (closed)
 import qualified System.Path as Path
@@ -99,14 +102,14 @@ deriving instance (Ord  a, forall a . Eq   a => Eq   (f a)
 deriving instance (Show a, forall a . Show a => Show (f a))          => Show (Polytype f a)
 
 
-forAll :: (Eq a, Has Polytype sig m) => a -> m a -> m a
-forAll n body = send (PForAll (abstract1 n body))
+forAll :: (Eq a, Syntax.Has Polytype sig m) => a -> m a -> m a
+forAll n body = Syntax.send (PForAll (abstract1 n body))
 
-forAlls :: (Eq a, Has Polytype sig m, Foldable t) => t a -> m a -> m a
+forAlls :: (Eq a, Syntax.Has Polytype sig m, Foldable t) => t a -> m a -> m a
 forAlls ns body = foldr forAll body ns
 
-generalize :: Term Monotype Meta -> Term (Polytype :+: Monotype) Void
-generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm R ty)))
+generalize :: Term Monotype Meta -> Term (Polytype Syntax.:+: Monotype) Void
+generalize ty = fromJust (closed (forAlls (IntSet.toList (mvs ty)) (hoistTerm Syntax.R ty)))
 
 
 typecheckingFlowInsensitive
@@ -118,7 +121,7 @@ typecheckingFlowInsensitive
      )
   -> [File (term Addr)]
   -> ( Heap Type
-     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype :+: Monotype) Void))]
+     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype Syntax.:+: Monotype) Void))]
      )
 typecheckingFlowInsensitive eval
   = run
@@ -128,8 +131,7 @@ typecheckingFlowInsensitive eval
   . traverse (runFile eval)
 
 runFile
-  :: ( Effect sig
-     , Has Fresh sig m
+  :: ( Has Fresh sig m
      , Has (State (Heap Type)) sig m
      , Has Intro.Intro syn term
      , Ord (term Addr)
@@ -211,9 +213,9 @@ substAll s a = a >>= \ i -> fromMaybe (pure i) (IntMap.lookup i s)
 
 
 runDomain :: (term Addr -> m Type) -> DomainC term m a -> m a
-runDomain eval (DomainC m) = runReader eval m
+runDomain eval = runReader eval . runDomainC
 
-newtype DomainC term m a = DomainC (ReaderC (term Addr -> m Type) m a)
+newtype DomainC term m a = DomainC { runDomainC :: ReaderC (term Addr -> m Type) m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail)
 
 instance MonadTrans (DomainC term) where
@@ -229,29 +231,27 @@ instance ( Alternative m
          , Has Intro.Intro syn term
          )
       => Algebra (A.Domain term Addr Type :+: sig) (DomainC term m) where
-  alg = \case
-    L (L (A.Unit       k)) -> k (Alg Unit)
-    L (R (L (A.Bool     _ k))) -> k (Alg Bool)
-    L (R (L (A.AsBool   t k))) -> do
+  alg hdl sig ctx = case sig of
+    L (L A.Unit) -> pure (Alg Unit <$ ctx)
+    L (R (L (A.Bool     _))) -> pure (Alg Bool <$ ctx)
+    L (R (L (A.AsBool   t))) -> do
       unify t (Alg Bool)
-      k True <|> k False
-    L (R (R (L (A.String   _ k)))) -> k (Alg String)
-    L (R (R (L (A.AsString t k)))) -> do
-      unify t (Alg String)
-      k mempty
-    L (R (R (R (L (A.Lam (Named n b) k))))) -> do
+      pure (True <$ ctx) <|> pure (False <$ ctx)
+    L (R (R (L (A.String   _)))) -> pure (Alg String <$ ctx)
+    L (R (R (L (A.AsString t)))) -> (mempty <$ ctx) <$ unify t (Alg String)
+    L (R (R (R (L (A.Lam (Named n b)))))) -> do
       eval <- DomainC ask
       addr <- alloc @Name n
       arg <- meta
       A.assign addr arg
       ty <- lift (eval (instantiate1 (pure n) b))
-      k (Alg (arg :-> ty))
-    L (R (R (R (L (A.AsLam    t k))))) -> do
+      pure (Alg (arg :-> ty) <$ ctx)
+    L (R (R (R (L (A.AsLam    t))))) -> do
       arg <- meta
       ret <- meta
       unify t (Alg (arg :-> ret))
       b <- concretize ret
-      k (Named (name mempty) (lift b)) where
+      pure (Named (name mempty) (lift b) <$ ctx) where
       concretize = \case
         Alg Unit       -> pure Intro.unit
         Alg Bool       -> pure (Intro.bool True) <|> pure (Intro.bool False)
@@ -259,16 +259,16 @@ instance ( Alternative m
         Alg (_ :-> b)  -> send . Intro.Lam . Named (name mempty) . lift <$> concretize b
         Alg (Record t) -> Intro.record <$> traverse (traverse concretize) (Map.toList t)
         t              -> fail $ "can’t concretize " <> show t -- FIXME: concretize type variables by incrementally solving constraints
-    L (R (R (R (R (A.Record fields k))))) -> do
+    L (R (R (R (R (A.Record fields))))) -> do
       eval <- DomainC ask
       fields' <- for fields $ \ (k, t) -> do
         addr <- alloc @Addr k
         v <- lift (eval t)
         (k, v) <$ A.assign addr v
       -- FIXME: should records reference types by address instead?
-      k (Alg (Record (Map.fromList fields')))
-    L (R (R (R (R (A.AsRecord t k))))) -> do
+      pure (Alg (Record (Map.fromList fields')) <$ ctx)
+    L (R (R (R (R (A.AsRecord t))))) -> do
       unify t (Alg (Record mempty))
-      k mempty -- FIXME: return whatever fields we have, when it’s actually a Record
+      pure (mempty <$ ctx) -- FIXME: return whatever fields we have, when it’s actually a Record
 
-    R other -> DomainC (send (handleCoercible other))
+    R other -> DomainC (alg (runDomainC . hdl) (R other) ctx)

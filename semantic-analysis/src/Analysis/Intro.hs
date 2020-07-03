@@ -16,6 +16,7 @@ import Control.Algebra
 import Data.Text (Text)
 import GHC.Generics (Generic1)
 import Syntax.Foldable
+import Syntax.Functor
 import Syntax.Module
 import Syntax.Scope
 import Syntax.Traversable

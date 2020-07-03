@@ -1,4 +1,9 @@
-{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.Carrier.Heap.Monovariant
 ( -- * Heap carrier
   HeapC(..)
@@ -6,15 +11,15 @@ module Analysis.Carrier.Heap.Monovariant
 , module Analysis.Effect.Heap
 ) where
 
-import Analysis.Effect.Heap
-import Control.Applicative (Alternative)
-import Control.Algebra
-import Control.Effect.State
-import Control.Monad ((>=>))
+import           Analysis.Effect.Heap
+import           Control.Algebra
+import           Control.Applicative (Alternative)
+import           Control.Effect.State
+import           Control.Monad ((>=>))
 import qualified Control.Monad.Fail as Fail
-import Data.List.NonEmpty (nonEmpty)
+import           Data.List.NonEmpty (nonEmpty)
 import qualified Data.Map as Map
-import Data.Monoid (Alt(..))
+import           Data.Monoid (Alt (..))
 import qualified Data.Set as Set
 
 newtype HeapC addr value m a = HeapC { runHeap :: m a }
@@ -26,6 +31,7 @@ instance ( Alternative m
          , Ord value
          )
       => Algebra (Heap addr value :+: sig) (HeapC addr value m) where
-  alg (L (Deref  addr       k)) = gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= maybe (pure Nothing) (getAlt . foldMap (Alt . pure . Just)) >>= k
-  alg (L (Assign addr value k)) = modify (Map.insertWith (<>) addr (Set.singleton value)) >> k
-  alg (R other)                 = HeapC (alg (handleCoercible other))
+  alg hdl sig ctx = case sig of
+    L (Deref  addr      ) -> gets (Map.lookup addr >=> nonEmpty . Set.toList) >>= fmap (<$ ctx) . maybe (pure Nothing) (getAlt . foldMap (Alt . pure . Just))
+    L (Assign addr value) -> ctx <$ modify (Map.insertWith (<>) addr (Set.singleton value))
+    R other               -> HeapC (alg (runHeap . hdl) other ctx)

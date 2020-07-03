@@ -1,6 +1,7 @@
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -8,7 +9,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeApplications #-}
@@ -85,7 +85,6 @@ concrete eval
 runFile
   :: forall term m sig
   .  ( Applicative term
-     , Effect sig
      , Has Fresh sig m
      , Has (A.Heap Addr (Concrete term)) sig m
      )
@@ -106,9 +105,9 @@ runFile eval file = traverse run file
 
 
 runDomain :: (term Addr -> m (Concrete term)) -> DomainC term m a -> m a
-runDomain eval (DomainC m) = runReader eval m
+runDomain eval = runReader eval . runDomainC
 
-newtype DomainC term m a = DomainC (ReaderC (term Addr -> m (Concrete term)) m a)
+newtype DomainC term m a = DomainC { runDomainC :: ReaderC (term Addr -> m (Concrete term)) m a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
 instance MonadTrans (DomainC term) where
@@ -122,35 +121,35 @@ instance ( Applicative term
          , MonadFail m
          )
       => Algebra (A.Domain term Addr (Concrete term) :+: sig) (DomainC term m) where
-  alg = \case
-    L (L (A.Unit k)) -> k Unit
-    L (R (L (A.Bool     b k))) -> k (Bool b)
-    L (R (L (A.AsBool   c k))) -> case c of
-      Bool   b -> k b
+  alg hdl sig ctx = case sig of
+    L (L A.Unit) -> pure (Unit <$ ctx)
+    L (R (L (A.Bool     b))) -> pure (Bool b <$ ctx)
+    L (R (L (A.AsBool   c))) -> case c of
+      Bool   b -> pure (b <$ ctx)
       _        -> fail "expected Bool"
-    L (R (R (L (A.String   s k)))) -> k (String s)
-    L (R (R (L (A.AsString c k)))) -> case c of
-      String s -> k s
+    L (R (R (L (A.String   s)))) -> pure (String s <$ ctx)
+    L (R (R (L (A.AsString c)))) -> case c of
+      String s -> pure (s <$ ctx)
       _        -> fail "expected String"
-    L (R (R (R (L (A.Lam      b k))))) -> do
+    L (R (R (R (L (A.Lam      b))))) -> do
       path <- ask
       span <- ask
-      k (Closure path span b)
-    L (R (R (R (L (A.AsLam    c k))))) -> case c of
-      Closure _ _ b -> k b
+      pure (Closure path span b <$ ctx)
+    L (R (R (R (L (A.AsLam    c))))) -> case c of
+      Closure _ _ b -> pure (b <$ ctx)
       _             -> fail "expected Closure"
-    L (R (R (R (R (A.Record fields k))))) -> do
+    L (R (R (R (R (A.Record fields))))) -> do
       eval <- DomainC ask
       fields' <- for fields $ \ (name, t) -> do
         addr <- A.alloc name
         v <- lift (eval t)
         A.assign @Addr @(Concrete term) addr v
         pure (name, addr)
-      k (Record (Map.fromList fields'))
-    L (R (R (R (R (A.AsRecord c k))))) -> case c of
-      Record fields -> k (map (fmap pure) (Map.toList fields))
+      pure (Record (Map.fromList fields') <$ ctx)
+    L (R (R (R (R (A.AsRecord c))))) -> case c of
+      Record fields -> pure (map (fmap pure) (Map.toList fields) <$ ctx)
       _             -> fail "expected Record"
-    R other -> DomainC (send (handleCoercible other))
+    R other -> DomainC (alg (runDomainC . hdl) (R other) ctx)
 
 
 -- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:
