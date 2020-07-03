@@ -1,13 +1,10 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
@@ -15,7 +12,6 @@ module Semantic.Task.Files
   ( Files
   , Destination (..)
   , Source (..)
-  , runFiles
   , readBlob
   , readBlobs
   , readBlobPairs
@@ -53,47 +49,34 @@ data Source blob where
 data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
 
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
-data Files (m :: * -> *) k
-  = forall a . Read (Source a)                                     (a -> m k)
-  | ReadProject (Maybe Path.AbsRelDir) Path.AbsRelFileDir Language [Path.AbsRelDir] (Project -> m k)
-  | FindFiles Path.AbsRelDir [String] [Path.AbsRelDir] ([Path.AbsRelFile] -> m k)
-  | Write Destination B.Builder                               (m k)
+data Files (m :: * -> *) k where
+  Read :: Source a -> Files m a
+  ReadProject :: Maybe Path.AbsRelDir -> Path.AbsRelFileDir -> Language -> [Path.AbsRelDir] -> Files m Project
+  FindFiles :: Path.AbsRelDir -> [String] -> [Path.AbsRelDir] -> Files m [Path.AbsRelFile]
+  Write :: Destination -> B.Builder -> Files m ()
 
-deriving instance Functor m => Functor (Files m)
 
-instance HFunctor Files where
-  hmap f (Read s k)                = Read s (f . k)
-  hmap f (ReadProject mp p l ps k) = ReadProject mp p l ps (f . k)
-  hmap f (FindFiles p s ps k)      = FindFiles p s ps (f . k)
-  hmap f (Write d b k)             = Write d b (f k)
-
-instance Effect Files where
-  thread state handler (Read s k)                = Read s (handler . (<$ state) . k)
-  thread state handler (ReadProject mp p l ps k) = ReadProject mp p l ps (handler . (<$ state) . k)
-  thread state handler (FindFiles p s ps k)      = FindFiles p s ps (handler . (<$ state) . k)
-  thread state handler (Write d b k)             = Write d b (handler . (<$ state) $ k)
-
--- | Run a 'Files' effect in 'IO'
-runFiles :: FilesC m a -> m a
-runFiles = runFilesC
-
-newtype FilesC m a = FilesC { runFilesC :: m a }
+newtype FilesC m a = FilesC
+  { -- | Run a 'Files' effect in 'IO'
+    runFiles :: m a
+  }
   deriving (Functor, Applicative, Monad, MonadFail, MonadIO)
 
 instance (Has (Error SomeException) sig m, MonadFail m, MonadIO m) => Algebra (Files :+: sig) (FilesC m) where
-  alg (R other) = FilesC (alg (handleCoercible other))
-  alg (L op) = case op of
-    Read (FromPath path) k                                    -> readBlobFromFile' path >>= k
-    Read (FromHandle handle) k                                -> readBlobsFromHandle handle >>= k
-    Read (FromPathPair p1 p2) k                               -> readFilePair p1 p2 >>= k
-    Read (FromPairHandle handle) k                            -> readBlobPairsFromHandle handle >>= k
-    ReadProject rootDir dir language excludeDirs k            -> readProjectFromPaths rootDir dir language excludeDirs >>= k
-    FindFiles dir exts excludeDirs k                          -> findFilesInDir dir exts excludeDirs >>= k
-    Write (ToPath path) builder k                             -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder)) >> k
-    Write (ToHandle (WriteHandle handle)) builder k           -> liftIO (B.hPutBuilder handle builder) >> k
+  alg hdl sig ctx = case sig of
+    L op -> (<$ ctx) <$> case op of
+      Read (FromPath path)                                    -> readBlobFromFile' path
+      Read (FromHandle handle)                                -> readBlobsFromHandle handle
+      Read (FromPathPair p1 p2)                               -> readFilePair p1 p2
+      Read (FromPairHandle handle)                            -> readBlobPairsFromHandle handle
+      ReadProject rootDir dir language excludeDirs            -> readProjectFromPaths rootDir dir language excludeDirs
+      FindFiles dir exts excludeDirs                          -> findFilesInDir dir exts excludeDirs
+      Write (ToPath path) builder                             -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
+      Write (ToHandle (WriteHandle handle)) builder           -> liftIO (B.hPutBuilder handle builder)
+    R other -> FilesC (alg (runFiles . hdl) other ctx)
 
 readBlob :: Has Files sig m => File Language -> m Blob
-readBlob file = send (Read (FromPath file) pure)
+readBlob file = send (Read (FromPath file))
 
 -- Various ways to read in files
 data FilesArg
@@ -102,20 +85,20 @@ data FilesArg
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: Has Files sig m => FilesArg -> m [Blob]
-readBlobs (FilesFromHandle handle) = send (Read (FromHandle handle) pure)
-readBlobs (FilesFromPaths paths)   = traverse (send . flip Read pure . FromPath) paths
+readBlobs (FilesFromHandle handle) = send (Read (FromHandle handle))
+readBlobs (FilesFromPaths paths)   = traverse (send . Read . FromPath) paths
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
 readBlobPairs :: Has Files sig m => Either (Handle 'IO.ReadMode) [(File Language, File Language)] -> m [BlobPair]
-readBlobPairs (Left handle) = send (Read (FromPairHandle handle) pure)
-readBlobPairs (Right paths) = traverse (send . flip Read pure . uncurry FromPathPair) paths
+readBlobPairs (Left handle) = send (Read (FromPairHandle handle))
+readBlobPairs (Right paths) = traverse (send . Read . uncurry FromPathPair) paths
 
 readProject :: Has Files sig m => Maybe Path.AbsRelDir -> Path.AbsRelFileDir -> Language -> [Path.AbsRelDir] -> m Project
-readProject rootDir dir lang excludeDirs = send (ReadProject rootDir dir lang excludeDirs pure)
+readProject rootDir dir lang excludeDirs = send (ReadProject rootDir dir lang excludeDirs)
 
 findFiles :: Has Files sig m => Path.AbsRelDir -> [String] -> [Path.AbsRelDir] -> m [Path.AbsRelFile]
-findFiles dir exts paths = send (FindFiles dir exts paths pure)
+findFiles dir exts paths = send (FindFiles dir exts paths)
 
 -- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.
 write :: Has Files sig m => Destination -> B.Builder -> m ()
-write dest builder = send (Write dest builder (pure ()))
+write dest builder = send (Write dest builder)
