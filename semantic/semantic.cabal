@@ -113,7 +113,6 @@ library
                      , Semantic.Distribute
                      , Semantic.Env
                      , Semantic.IO
-                     , Semantic.Resolution
                      , Semantic.Task
                      , Semantic.Task.Files
                      , Semantic.Telemetry

@@ -19,9 +19,6 @@ module Semantic.Task
 , Files.findFiles
 , Files.write
 , Files.FilesArg(..)
--- * Module Resolution
-, resolutionMap
-, Resolution
 -- * Telemetry
 , writeLog
 , writeStat
@@ -65,7 +62,6 @@ import           Data.ByteString.Builder
 import qualified Data.Flag as Flag
 import           Semantic.Config
 import           Semantic.Distribute
-import           Semantic.Resolution
 import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
 import           Serializing.Format
