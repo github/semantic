@@ -44,8 +44,9 @@ instance ( Has (Error SomeException) sig m
          , MonadIO m
          )
       => Algebra (Parse :+: sig) (ParseC m) where
-  alg (L (Parse parser blob k)) = runParser blob parser >>= k
-  alg (R other)                 = ParseC (alg (handleCoercible other))
+  alg hdl sig ctx = case sig of
+    L (Parse parser blob) -> (<$ ctx) <$> runParser blob parser
+    R other               -> ParseC (alg (runParse . hdl) other ctx)
 
 -- | Parse a 'Blob' in 'IO'.
 runParser ::
