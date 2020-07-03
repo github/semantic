@@ -12,8 +12,10 @@ packages:
   - github: fused-effects/fused-effects-readline
     commit: "3abfcb3a4d7e024b3da416289a6baf4d6ef2e4dc"
     sha256: "eed084f578879953bb5674d85c29fc00cb5cc396e8041cbd6f51af9dfe2b5e28"
+  - github: fused-effects/fused-effects-exceptions
+    commit: "e3a3dae17c89c427760eb53d996fc640311c898e"
+    sha256: "d8cf91a8e29f023debd21df3a03120078478e52e7ee4d01164d09ab1e4325a61"
   - semilattices-0.0.0.4
-  - fused-effects-exceptions-1.0.0.0
   - fused-effects-resumable-0.1.0.0
   - haskeline-0.8.0.0
   - tree-sitter-0.9.0.1
