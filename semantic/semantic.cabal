@@ -81,7 +81,6 @@ library
   exposed-modules:     Control.Carrier.Parse.Measured
                      , Control.Carrier.Parse.Simple
                      -- Effects
-                     , Control.Effect.Interpose
                      , Control.Effect.Parse
                      , Control.Effect.Sum.Project
                      , Control.Effect.Timeout
