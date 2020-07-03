@@ -36,7 +36,6 @@ semantic_common_dependencies = [
     "@stackage//:directory",
     "@stackage//:fused-effects",
     "@stackage//:fused-effects-exceptions",
-    "@stackage//:fused-effects-resumable",
     "@stackage//:hashable",
     "@stackage//:network",
     "@stackage//:pathtype",

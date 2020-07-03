@@ -16,7 +16,6 @@ packages:
     commit: "e3a3dae17c89c427760eb53d996fc640311c898e"
     sha256: "d8cf91a8e29f023debd21df3a03120078478e52e7ee4d01164d09ab1e4325a61"
   - semilattices-0.0.0.4
-  - fused-effects-resumable-0.1.0.0
   - haskeline-0.8.0.0
   - tree-sitter-0.9.0.1
   - tree-sitter-python-0.9.0.2

@@ -69,7 +69,6 @@ stack_snapshot(
         "fused-effects",
         "fused-effects-exceptions",
         "fused-effects-readline",
-        "fused-effects-resumable",
         "fused-syntax",
         "generic-lens",
         "generic-monoid",
