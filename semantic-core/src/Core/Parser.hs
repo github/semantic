@@ -11,7 +11,6 @@ module Core.Parser
 
 -- Consult @doc/grammar.md@ for an EBNF grammar.
 
-import           Control.Algebra
 import           Control.Applicative
 import           Control.Monad
 import           Core.Core ((:<-) (..), Core)
@@ -21,6 +20,7 @@ import qualified Data.Char as Char
 import           Data.Foldable (foldl')
 import           Data.Function
 import           Data.String
+import           Syntax.Algebra
 import           Text.Parser.LookAhead (LookAheadParsing)
 import qualified Text.Parser.Token as Token
 import qualified Text.Parser.Token.Highlight as Highlight
@@ -70,7 +70,7 @@ assign = application <**> (symbolic '=' *> rhs <|> pure id) <?> "assignment"
   where rhs = flip (Core..=) <$> application
 
 application :: (TokenParsing m, Has Core sig t, Monad m) => m (t Name)
-application = projection `chainl1` (pure (Core.$$))
+application = projection `chainl1` pure (Core.$$)
 
 projection :: (TokenParsing m, Has Core sig t, Monad m) => m (t Name)
 projection = foldl' (&) <$> atom <*> many (choice [ flip (Core..?)  <$ symbol ".?" <*> identifier
