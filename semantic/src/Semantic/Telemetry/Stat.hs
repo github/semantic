@@ -36,7 +36,7 @@ import           Data.List (intercalate)
 import           Data.List.Split (splitOneOf)
 import qualified Data.Time.Clock as Time
 import           Network.Socket
-    (Socket (..), SocketType (..), addrAddress, addrFamily, close, connect, defaultProtocol, getAddrInfo, socket)
+    (Socket, SocketType (..), addrAddress, addrFamily, close, connect, defaultProtocol, getAddrInfo, socket)
 import           Network.Socket.ByteString
 import           Numeric
 import           System.IO.Error
