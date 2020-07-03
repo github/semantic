@@ -1,4 +1,14 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RankNTypes, RecordWildCards, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Semantic.Telemetry
 (
   -- Async telemetry interface
@@ -55,7 +65,6 @@ import           Control.Exception
 import           Control.Monad.IO.Class
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
-import           GHC.Generics (Generic1)
 import           Semantic.Telemetry.AsyncQueue
 import           Semantic.Telemetry.Error
 import           Semantic.Telemetry.Log
@@ -118,11 +127,11 @@ queueStat q = liftIO . writeAsyncQueue q
 
 -- | A task which logs a message at a specific log level to stderr.
 writeLog :: Has Telemetry sig m => Level -> String -> [(String, String)] -> m ()
-writeLog level message pairs = send (WriteLog level message pairs (pure ()))
+writeLog level message pairs = send (WriteLog level message pairs)
 
 -- | A task which writes a stat.
 writeStat :: Has Telemetry sig m => Stat -> m ()
-writeStat stat = send (WriteStat stat (pure ()))
+writeStat stat = send (WriteStat stat)
 
 -- | A task which measures and stats the timing of another task.
 time :: (Has Telemetry sig m, MonadIO m) => String -> [(String, String)] -> m output -> m output
@@ -135,13 +144,9 @@ time' :: MonadIO m => m output -> m (output, Double)
 time' = withTiming'
 
 -- | Statting and logging effects.
-data Telemetry (m :: * -> *) k
-  = WriteStat Stat (m k)
-  | WriteLog Level String [(String, String)] (m k)
-  deriving (Functor, Generic1)
-
-instance HFunctor Telemetry
-instance Effect   Telemetry
+data Telemetry (m :: * -> *) k where
+  WriteStat :: Stat -> Telemetry m ()
+  WriteLog :: Level -> String -> [(String, String)] -> Telemetry m ()
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
 runTelemetry :: LogQueue -> StatQueue -> TelemetryC m a -> m a
@@ -151,12 +156,13 @@ newtype TelemetryC m a = TelemetryC { runTelemetryC :: ReaderC (LogQueue, StatQu
   deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance (Algebra sig m, MonadIO m) => Algebra (Telemetry :+: sig) (TelemetryC m) where
-  alg (L op) = do
-    queues <- TelemetryC ask
-    case op of
-      WriteStat stat k               -> queueStat (snd queues) stat *> k
-      WriteLog level message pairs k -> queueLogMessage (fst queues) level message pairs *> k
-  alg (R other) = TelemetryC (alg (R (handleCoercible other)))
+  alg hdl sig ctx = case sig of
+    L op -> do
+      queues <- TelemetryC (ask @(LogQueue, StatQueue))
+      case op of
+        WriteStat stat               -> ctx <$ queueStat (snd queues) stat
+        WriteLog level message pairs -> ctx <$ queueLogMessage (fst queues) level message pairs
+    R other -> TelemetryC (alg (runTelemetryC . hdl) (R other) ctx)
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
 ignoreTelemetry :: IgnoreTelemetryC m a -> m a
@@ -166,6 +172,7 @@ newtype IgnoreTelemetryC m a = IgnoreTelemetryC { runIgnoreTelemetryC :: m a }
   deriving (Applicative, Functor, Monad)
 
 instance Algebra sig m => Algebra (Telemetry :+: sig) (IgnoreTelemetryC m) where
-  alg (R other) = IgnoreTelemetryC . alg . handleCoercible $ other
-  alg (L (WriteStat _ k))    = k
-  alg (L (WriteLog _ _ _ k)) = k
+  alg hdl sig ctx = case sig of
+    L WriteStat{} -> pure ctx
+    L WriteLog{}  -> pure ctx
+    R other       -> IgnoreTelemetryC (alg (runIgnoreTelemetryC . hdl) other ctx)
