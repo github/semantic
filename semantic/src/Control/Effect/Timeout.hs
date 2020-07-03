@@ -14,7 +14,7 @@ import qualified System.Timeout as System
 --
 -- Any state changes in the action are discarded if the timeout fails.
 timeout :: Has (Lift IO) sig m => Duration -> m a -> m (Maybe a)
-timeout n m = liftWith $ \ ctx hdl
+timeout n m = liftWith $ \ hdl ctx
   -> maybe
      -- Restore the old state if it timed out.
      (Nothing <$ ctx)
