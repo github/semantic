@@ -29,7 +29,6 @@ module AST.Unmarshal
 
 import           AST.Token as TS
 import           AST.Parse
-import           Control.Algebra (send)
 import           Control.Carrier.Reader
 import           Control.Exception
 import           Control.Monad.IO.Class
