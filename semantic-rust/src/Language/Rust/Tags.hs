@@ -52,6 +52,10 @@ gtags
   -> m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag name kind ty loc srcLineRange = do
+  src <- ask @Source
+  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
