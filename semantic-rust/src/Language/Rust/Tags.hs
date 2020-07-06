@@ -18,6 +18,8 @@ import           Source.Loc
 import           Source.Source as Source
 import           Tags.Tag()
 import qualified Tags.Tagging.Precise as Tags
+import           Proto.Semantic as P
+
 
 class ToTags t where
   tags
@@ -54,27 +56,27 @@ instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
 instance ToTags Rust.ArrayType
-instance ToTags Rust.AssignmentExpression
+-- instance ToTags Rust.AssignmentExpression
 instance ToTags Rust.AssociatedType
 instance ToTags Rust.AsyncBlock
 instance ToTags Rust.AttributeItem
 instance ToTags Rust.AwaitExpression
 instance ToTags Rust.BaseFieldInitializer
 instance ToTags Rust.BinaryExpression
-instance ToTags Rust.Block
+-- instance ToTags Rust.Block
 instance ToTags Rust.BlockComment
 instance ToTags Rust.BooleanLiteral
 instance ToTags Rust.BoundedType
 instance ToTags Rust.BracketedType
 instance ToTags Rust.BreakExpression
-instance ToTags Rust.CallExpression
+-- instance ToTags Rust.CallExpression
 instance ToTags Rust.CapturedPattern
 instance ToTags Rust.CharLiteral
 instance ToTags Rust.ClosureExpression
 instance ToTags Rust.ClosureParameters
 instance ToTags Rust.CompoundAssignmentExpr
 instance ToTags Rust.ConstItem
-instance ToTags Rust.ConstParameter
+-- instance ToTags Rust.ConstParameter
 instance ToTags Rust.ConstrainedTypeParameter
 instance ToTags Rust.ContinueExpression
 instance ToTags Rust.Crate
@@ -87,13 +89,13 @@ instance ToTags Rust.EnumItem
 instance ToTags Rust.EnumVariant
 instance ToTags Rust.EnumVariantList
 instance ToTags Rust.EscapeSequence
-instance ToTags Rust.Expression
+-- instance ToTags Rust.Expression
 instance ToTags Rust.ExternCrateDeclaration
 instance ToTags Rust.ExternModifier
 instance ToTags Rust.FieldDeclaration
 instance ToTags Rust.FieldDeclarationList
 instance ToTags Rust.FieldExpression
-instance ToTags Rust.FieldIdentifier
+-- instance ToTags Rust.FieldIdentifier
 instance ToTags Rust.FieldInitializer
 instance ToTags Rust.FieldInitializerList
 instance ToTags Rust.FieldPattern
@@ -110,7 +112,7 @@ instance ToTags Rust.GenericFunction
 instance ToTags Rust.GenericType
 instance ToTags Rust.GenericTypeWithTurbofish
 instance ToTags Rust.HigherRankedTraitBound
-instance ToTags Rust.Identifier
+-- instance ToTags Rust.Identifier
 instance ToTags Rust.IfExpression
 instance ToTags Rust.IfLetExpression
 instance ToTags Rust.ImplItem
@@ -165,7 +167,7 @@ instance ToTags Rust.SelfParameter
 instance ToTags Rust.ShorthandFieldIdentifier
 instance ToTags Rust.ShorthandFieldInitializer
 instance ToTags Rust.SlicePattern
-instance ToTags Rust.SourceFile
+-- instance ToTags Rust.SourceFile
 instance ToTags Rust.StaticItem
 instance ToTags Rust.StringLiteral
 instance ToTags Rust.StructExpression
@@ -188,7 +190,7 @@ instance ToTags Rust.Type
 instance ToTags Rust.TypeArguments
 instance ToTags Rust.TypeBinding
 instance ToTags Rust.TypeCastExpression
-instance ToTags Rust.TypeIdentifier
+-- instance ToTags Rust.TypeIdentifier
 instance ToTags Rust.TypeItem
 instance ToTags Rust.TypeParameters
 instance ToTags Rust.UnaryExpression
