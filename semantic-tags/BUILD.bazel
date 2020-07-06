@@ -1,7 +1,5 @@
-# Set all target’s visibility in this package to "public".
 package(default_visibility = ["//visibility:public"])
 
-# Load rules_haskell rules.
 load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_binary",
@@ -14,13 +12,13 @@ load(
 )
 load(
     "//:build/common.bzl",
-    "STANDARD_GHC_WARNINGS",
+    "GHC_FLAGS",
 )
 
 haskell_library(
     name = "semantic-tags",
     srcs = glob(["src/**/*.hs"]),
-    compiler_flags = STANDARD_GHC_WARNINGS,
+    compiler_flags = GHC_FLAGS,
     deps = [
         "//:base",
         "//:text",

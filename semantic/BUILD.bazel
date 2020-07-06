@@ -1,13 +1,10 @@
-# Set all target’s visibility in this package to "public".
 package(default_visibility = ["//visibility:public"])
 
-# Load rules_haskell rules.
 load(
     "@rules_haskell//haskell:defs.bzl",
     "haskell_binary",
     "haskell_library",
     "haskell_test",
-    "haskell_toolchain_library",
 )
 load(
     "@rules_haskell//haskell:cabal.bzl",
@@ -16,11 +13,13 @@ load(
 )
 load(
     "//:build/common.bzl",
-    "STANDARD_EXECUTABLE_FLAGS",
-    "STANDARD_GHC_WARNINGS",
+    "EXECUTABLE_FLAGS",
+    "GHC_FLAGS",
 )
-
-haskell_toolchain_library(name = "ghc-prim")
+load(
+    "//:build/example_repos.bzl",
+    "SEMANTIC_EXTERNAL_TEST_REPOSITORIES",
+)
 
 semantic_common_dependencies = [
     "//:bytestring",
@@ -50,7 +49,7 @@ semantic_common_dependencies = [
 haskell_library(
     name = "semantic",
     srcs = glob(["src/**/*.hs"]),
-    compiler_flags = STANDARD_GHC_WARNINGS + ["-XStrictData"],
+    compiler_flags = GHC_FLAGS + ["-XStrictData"],
     version = "0.11.0.0",
     deps = semantic_common_dependencies + [
         "//:base",
@@ -69,7 +68,7 @@ haskell_library(
         "//semantic-tags",
         "//semantic-tsx",
         "//semantic-typescript",
-        ":ghc-prim",
+        "//:ghc-prim",
         "@stackage//:ansi-terminal",
         "@stackage//:attoparsec",
         "@stackage//:bifunctors",
@@ -105,7 +104,7 @@ haskell_library(
 haskell_binary(
     name = "exe",
     srcs = glob(["app/**/*.hs"]),
-    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + ["-XStrictData"],
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS + ["-XStrictData"],
     deps = [
         ":semantic",
         "//:base",
@@ -117,6 +116,22 @@ haskell_binary(
     ],
 )
 
+haskell_binary(
+    name = "bench",
+    srcs = glob(["bench/**/*.hs"]),
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS,
+    deps = [
+        ":semantic",
+        "//:base",
+        "//semantic-analysis",
+        "//semantic-proto",
+        "@stackage//:Glob",
+        "@stackage//:fused-effects",
+        "@stackage//:gauge",
+        "@stackage//:pathtype",
+    ],
+)
+
 haskell_test(
     name = "spec",
     srcs = glob(
@@ -124,9 +139,10 @@ haskell_test(
         exclude = [
             "test/fixtures/**/*.hs",
             "test/Examples.hs",
+            "test/System/Path/Fixture.hs",
         ],
     ),
-    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + [
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS + [
         "-XStrictData",
     ],
     data = glob(include = [
@@ -165,8 +181,11 @@ haskell_test(
 
 haskell_test(
     name = "parse-examples",
-    srcs = ["test/Examples.hs"],
-    compiler_flags = STANDARD_GHC_WARNINGS + STANDARD_EXECUTABLE_FLAGS + [
+    timeout = "long",
+    srcs = [
+        "test/Examples.hs",
+    ],
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS + [
         "-XStrictData",
     ],
     data = glob(include = [
@@ -177,7 +196,7 @@ haskell_test(
         "test/fixtures/javascript/**/*.js",
         "test/fixtures/typescript/**/*.ts",
         "test/fixtures/cli/*.json",
-    ]),
+    ]) + SEMANTIC_EXTERNAL_TEST_REPOSITORIES,
     deps = semantic_common_dependencies + [
         "//:base",
         "//semantic",

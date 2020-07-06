@@ -52,7 +52,7 @@ readCorpusFiles parent = do
   files <- globDir1 (compile "**/*.txt") (Path.toString dir)
   pure (Path.relPath <$> files)
 
-readCorpusFiles' :: Path.AbsDir ->  IO [Path.AbsRelFile]
+readCorpusFiles' :: Path.AbsRelDir ->  IO [Path.AbsRelFile]
 readCorpusFiles' dir = do
   files <- globDir1 (compile "**/*.txt") (Path.toString dir)
   pure (Path.file <$> files)

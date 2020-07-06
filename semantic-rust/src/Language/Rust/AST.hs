@@ -12,7 +12,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Language.Rust.AST
 ( module Language.Rust.AST
@@ -27,5 +27,5 @@ import qualified TreeSitter.Rust as Rust (getNodeTypesPath, getTestCorpusDir, tr
 #ifdef NODE_TYPES_PATH
 astDeclarationsForLanguage Rust.tree_sitter_rust NODE_TYPES_PATH
 #else
-runIO TSX.getNodeTypesPath >>= astDeclarationsForLanguage Rust.tree_sitter_rust
+runIO Rust.getNodeTypesPath >>= astDeclarationsForLanguage Rust.tree_sitter_rust
 #endif

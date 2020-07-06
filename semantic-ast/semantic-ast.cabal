@@ -34,6 +34,8 @@ common haskell
     -Wno-star-is-type
   if (impl(ghc >= 8.8))
     ghc-options: -Wno-missing-deriving-strategies
+  cpp-options:
+    -DBAZEL_BUILD=0
 
 library
   import:              haskell
@@ -49,6 +51,7 @@ library
     AST.Traversable1.Class
     AST.Unmarshal
     AST.TestHelpers
+    System.Path.Fixture
 
 
   -- other-modules:

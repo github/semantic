@@ -176,8 +176,8 @@ instance ToTags Java.FieldAccess
 instance ToTags Java.FieldDeclaration
 instance ToTags Java.FinallyClause
 instance ToTags Java.FloatingPointType
-instance ToTags Java.ForStatement
 instance ToTags Java.ForInit
+instance ToTags Java.ForStatement
 instance ToTags Java.FormalParameter
 instance ToTags Java.FormalParameters
 instance ToTags Java.GenericType
@@ -202,9 +202,9 @@ instance ToTags Java.MarkerAnnotation
 -- instance ToTags Java.MethodInvocation
 instance ToTags Java.MethodReference
 instance ToTags Java.Modifiers
-instance ToTags Java.ModuleName
 instance ToTags Java.ModuleDeclaration
 instance ToTags Java.ModuleDirective
+instance ToTags Java.ModuleName
 instance ToTags Java.NullLiteral
 instance ToTags Java.ObjectCreationExpression
 instance ToTags Java.OctalIntegerLiteral

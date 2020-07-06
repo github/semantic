@@ -139,7 +139,6 @@ instance ToTags Rust.MutPattern
 instance ToTags Rust.MutableSpecifier
 instance ToTags Rust.NegativeLiteral
 instance ToTags Rust.OptionalTypeParameter
-instance ToTags Rust.OrPattern
 instance ToTags Rust.OrderedFieldDeclarationList
 instance ToTags Rust.Parameter
 instance ToTags Rust.Parameters

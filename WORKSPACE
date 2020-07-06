@@ -70,6 +70,7 @@ stack_snapshot(
         "fused-effects-exceptions",
         "fused-effects-readline",
         "fused-syntax",
+        "gauge",
         "generic-lens",
         "generic-monoid",
         "haskeline",
@@ -153,46 +154,41 @@ haskell_cabal_binary(name = "happy", srcs = glob(["**"]), visibility = ["//visib
 
 load(
     "//:build/common.bzl",
-    "tree_sitter_node_types_archive",
+    "tree_sitter_node_types_git",
+    "tree_sitter_node_types_release",
 )
 
-tree_sitter_node_types_archive(
+tree_sitter_node_types_release(
     name = "tree-sitter-python",
     sha256 = "50d3fa560391dc4ab8d9a3466f68f2c6a4c12f9cc6421358d2c307023bd740ab",
     version = "0.16.0",
 )
 
-tree_sitter_node_types_archive(
+tree_sitter_node_types_release(
     name = "tree-sitter-php",
     sha256 = "d7f6b7dbba359f5129f08647ad4cf73a599abdec443c2b0e2cdbbaee56cf3750",
     version = "0.16.1",
 )
 
-tree_sitter_node_types_archive(
+tree_sitter_node_types_release(
     name = "tree-sitter-java",
     sha256 = "41af0051be7f9cfb2b85aece37979d1097fddf538b8984fb7726bf1edea4a7ce",
     version = "0.16.0",
 )
 
-tree_sitter_node_types_archive(
+tree_sitter_node_types_release(
     name = "tree-sitter-json",
     sha256 = "cbf0fefd2825a2db1770013111f49ec609c4fe090a8909e9780458629c22d1f4",
     version = "0.16.0",
 )
 
-tree_sitter_node_types_archive(
-    name = "tree-sitter-rust",
-    sha256 = "8c34f19a9270ee60367ee235226ff1108341f944e0bd245cb47e1c2721f0c39b",
-    version = "0.16.1",
-)
-
-tree_sitter_node_types_archive(
+tree_sitter_node_types_release(
     name = "tree-sitter-go",
     sha256 = "7278f1fd4dc4de8a13b0f60407425d38c5cb3973e1938d3031a68e1e69bd0b75",
     version = "0.16.1",
 )
 
-tree_sitter_node_types_archive(
+tree_sitter_node_types_release(
     name = "tree-sitter-typescript",
     nodetypespath = "**/src/node-types.json",
     sha256 = "3e1fc16daab965f21dc56a919b32a730e889ea2ba1330af5edc5950f4e6b18b6",
@@ -208,34 +204,36 @@ git_repository(
     shallow_since = "1593202797 -0400",
 )
 
-# We use new_git_repository here because tree-sitter-ruby doesn't
-# provide a Bazel build, so we hadcode its contents with build_file_contents.
+# These packages use node_types_git because they correspond to Hackage
+# tree-sitter-* parsers vendored not to a release of their C parser,
+# but to a given Git SHA. This works, but is a little specious, so we
+# should move these into node_types_release calls and fix the problems
+# that emerge when we target version releases.
 
-new_git_repository(
+tree_sitter_node_types_git(
     name = "tree-sitter-ruby",
-    build_file_content = """
-exports_files(["src/node-types.json"])
-""",
     commit = "eb2b6225bfb80010f2e4cbd27db8c6f3775230b5",
-    remote = "https://github.com/tree-sitter/tree-sitter-ruby.git",
     shallow_since = "1576688803 -0800",
 )
 
-new_git_repository(
+tree_sitter_node_types_git(
     name = "tree-sitter-ql",
-    build_file_content = """
-exports_files(["src/node-types.json"])
-""",
     commit = "c0d674abed8836bb5a4770f547343ef100f88c24",
-    remote = "https://github.com/tree-sitter/tree-sitter-ql.git",
     shallow_since = "1585868745 -0700",
 )
 
-new_git_repository(
+tree_sitter_node_types_git(
     name = "tree-sitter-php",
-    build_file_content = """
-exports_files(["src/node-types.json"])
-""",
     commit = "41a408d5b996ef54d8b9e1b9a2469fad00c1b52b",
-    remote = "https://github.com/tree-sitter/tree-sitter-php.git",
+    shallow_since = "1591381188 -0400",
 )
+
+tree_sitter_node_types_git(
+    name = "tree-sitter-rust",
+    commit = "ab40806a4583b84b9d5636f5a93c0ebfa45b2675",
+    shallow_since = "1583184357 -0800",
+)
+
+load("//:build/example_repos.bzl", "declare_example_repos")
+
+declare_example_repos()
