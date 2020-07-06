@@ -66,15 +66,3 @@ test-suite test
     , tasty-hedgehog  ^>= 1.0.0.1
     , tasty-hunit      >= 0.10 && <1
     , text
-
-benchmark benchmarks
-  import:              haskell
-  hs-source-dirs:      bench
-  type:                exitcode-stdio-1.0
-  main-is:             Main.hs
-  ghc-options:         -threaded -static -rtsopts
-  build-depends:       base
-                     , bytestring         ^>= 0.10.8.2
-                     , semantic-tags
-                     , semantic-source
-                     , gauge ^>= 0.2.5
