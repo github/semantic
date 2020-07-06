@@ -16,6 +16,7 @@ packages: semantic
           semantic-ruby
           semantic-rust
           semantic-scope-graph
+          semantic-source
           semantic-tags
           semantic-tsx
           semantic-typescript
