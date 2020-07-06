@@ -18,7 +18,6 @@ module Tags.Tagging.Precise
 , surroundingLineRange
 ) where
 
-import Control.Applicative
 import Control.Carrier.Reader
 import Control.Carrier.Writer.Strict
 import Control.Carrier.State.Strict
@@ -30,7 +29,6 @@ import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Proto.Semantic as P
 import Source.Loc
-import qualified Source.Range as Range (start)
 import Control.DeepSeq
 import Source.Source as Source
 import Source.Span (Pos (..), end, start)
@@ -99,7 +97,7 @@ calculateLineAndSpans
     -- NB: Important to limit to 180 characters after converting to text so as not to take in the middle of a multi-byte character.
     -- line = Text.strip . Text.take 180 . Source.toText $ srcLine
     line = sliceCenter180 startCol . Source.toText $ srcLine
-    (srcLine, lineCache, map) = surroundingLine' src lineIndexes loc
+    (srcLine, lineCache, map) = surroundingLine src lineIndexes loc
     toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = OneIndexedSpan $ Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
     utf16Span = UTF16CodeUnitSpan $ Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset}
 
@@ -142,29 +140,25 @@ countUtf16CodeUnits = unCounter . B.foldl' count (Counter 0 0) . bytes
 {-# INLINE countUtf16CodeUnits #-}
 
 -- | The Source of the entire surrounding line.
-surroundingLine :: Source -> Range -> Source
-surroundingLine src = Source.slice src . surroundingLineRange src . Range.start
+-- surroundingLine :: Source -> Range -> Source
+-- surroundingLine src = Source.slice src . surroundingLineRange src . Range.start
 
--- | Find the Range of the line surrounding the given Position where a line is defined by `\n`, `\r\n`, or `\r`.
-surroundingLineRange :: Source -> Int -> Range
-surroundingLineRange src start = Range lineStart lineEnd
-  where
-    lineStart = maybe 0 (start -) $ B.elemIndex lfChar precedingSource <|> B.elemIndex crChar precedingSource
-    precedingSource = B.reverse $ bytes (Source.slice src (Range 0 start))
-
-    lineEnd = maybe eof (start +) $ B.elemIndex crChar remainingSource <|> B.elemIndex lfChar remainingSource
-    remainingSource = bytes $ Source.slice src (Range start eof)
-
-    lfChar = toEnum (ord '\n')
-    crChar = toEnum (ord '\r')
-    eof = Source.length src
-
--- | The Source of the entire surrounding line.
-surroundingLine' :: Source -> LineIndices -> Loc -> (Source, LineCache, LineIndices)
-surroundingLine' src li@(LineIndices map) (Loc (Range byteRangeStart _) (Span (Pos start _) _)) =
+surroundingLine :: Source -> LineIndices -> Loc -> (Source, LineCache, LineIndices)
+surroundingLine src li@(LineIndices map) loc@(Loc _ (Span (Pos start _) _)) =
   case Map.lookup start map of
     Just cache@(line, _) -> (line, cache, li)
     Nothing -> let cache = (line, mempty) in (line, cache, LineIndices (Map.insert start cache map))
   where
     line = Source.slice src range
-    range = surroundingLineRange src byteRangeStart
+    range = surroundingLineRange src loc
+
+-- Take advantage of the fact that we already have the row information (where newlines are) from tree-sitter.
+surroundingLineRange :: Source -> Loc -> Range
+surroundingLineRange src (Loc (Range start _) (Span (Pos _ startCol) _)) = Range (start - startCol) lineEnd
+  where
+    lineEnd = maybe eof (start +) $ B.elemIndex lfChar remainingSource
+    -- remainingSource = bytes $ Source.slice src (Range start eof)
+    remainingSource = B.drop start (bytes src)
+
+    lfChar = toEnum (ord '\n')
+    eof = Source.length src
