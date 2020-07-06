@@ -71,8 +71,11 @@ runTagging source
 
 type UTF16CUCount = Int
 
+-- | LineCache is a cache of a line of source code and a map of byte offsets to utf16 code unit count.
 type LineCache = (Source, IntMap.IntMap UTF16CUCount)
-newtype LineIndices = LineIndices { unLineIndices :: Map.Map Int LineCache } -- NB: IntMap Key is a utf8 byteoffset
+
+-- | LineIndices is a cache of row to LineCache
+newtype LineIndices = LineIndices { unLineIndices :: Map.Map Int LineCache }
   deriving (Eq, Show, NFData)
 
 -- | Takes a Loc (where the span's column offset is measured in bytes) and
@@ -134,15 +137,12 @@ countUtf16CodeUnits = unCounter . B.foldl' count (Counter 0 0) . bytes
       | byte <= 0x7f = Counter 0 (1 + sum) -- takes 2 bytes (1 utf16 cu)
       | byte <= 0xbf = error "not valid utf8, byte <= 0xbf"
       | byte <= 0xdf = Counter 1 (1 + sum) -- takes 2 bytes (1 utf16 cu)
-      | byte <= 0xef = Counter 2 (1 + sum)
+      | byte <= 0xef = Counter 2 (1 + sum) -- takes 2 bytes (1 utf16 cu)
       | byte <= 0xf7 = Counter 3 (2 + sum) -- takes 4 bytes (2 utf16 cu)
       | otherwise    = error "not valid utf8"
 {-# INLINE countUtf16CodeUnits #-}
 
--- | The Source of the entire surrounding line.
--- surroundingLine :: Source -> Range -> Source
--- surroundingLine src = Source.slice src . surroundingLineRange src . Range.start
-
+-- | The Source of the entire surrounding line (cached).
 surroundingLine :: Source -> LineIndices -> Loc -> (Source, LineCache, LineIndices)
 surroundingLine src li@(LineIndices map) loc@(Loc _ (Span (Pos start _) _)) =
   case Map.lookup start map of
@@ -152,12 +152,13 @@ surroundingLine src li@(LineIndices map) loc@(Loc _ (Span (Pos start _) _)) =
     line = Source.slice src range
     range = surroundingLineRange src loc
 
--- Take advantage of the fact that we already have the row information (where newlines are) from tree-sitter.
+-- | The Range of the line surrounding the given location. (Takes advantage of
+-- the fact that we already have the row information (where newlines are) from
+-- tree-sitter.)
 surroundingLineRange :: Source -> Loc -> Range
 surroundingLineRange src (Loc (Range start _) (Span (Pos _ startCol) _)) = Range (start - startCol) lineEnd
   where
     lineEnd = maybe eof (start +) $ B.elemIndex lfChar remainingSource
-    -- remainingSource = bytes $ Source.slice src (Range start eof)
     remainingSource = B.drop start (bytes src)
 
     lfChar = toEnum (ord '\n')
