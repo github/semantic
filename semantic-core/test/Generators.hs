@@ -17,10 +17,10 @@ import           Hedgehog hiding (Var)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
-import           Control.Algebra
 import qualified Core.Core as Core
 import           Core.Name (Name, Named)
 import qualified Core.Name as Name
+import           Syntax.Algebra
 
 -- The 'prune' call here ensures that we don't spend all our time just generating
 -- fresh names for variables, since the length of variable names is not an
