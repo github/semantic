@@ -90,6 +90,19 @@ instance ToTags Rust.Block where
           yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
+instance ToTags Rust.CallExpression where
+  tags
+    t@Rust.CallExpression 
+      {
+        ann = loc@Loc {byteRange}
+        name = expr 
+      } = case expr of 
+      EPrj Rust.Arguments -> yield text ann
+      EPrj Rust.Expression -> yield text ann
+        where
+          yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+
+
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
