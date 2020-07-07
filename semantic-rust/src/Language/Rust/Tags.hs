@@ -72,11 +72,12 @@ instance ToTags Rust.SourceFile where
 
 
 instance ToTags Rust.AssignmentExpression where
-  tags t@Rust.AssignmentExpression {left} = do
-    left = EPrj (Rust.Expression (Prj Rust.Identifier {text})) -> yield text ann
-      where 
-        yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
-    tags _ = pure ()
+  tags
+    t@Rust.AssignmentExpression
+      { ann = loc@Loc {byteRange},
+        left = Parse.Success (Rust.Expression {text, ann})
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 
 instance ToTags Rust.Block where
