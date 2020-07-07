@@ -17,27 +17,27 @@ import AST.Token
 import AST.Traversable1
 import Control.Effect.Reader
 import Control.Effect.Writer
+import Control.Effect.State
 import Data.Foldable
-import Data.List.NonEmpty (NonEmpty (..))
-import Data.Maybe (listToMaybe)
 import Data.Text as Text
 import qualified Language.Python.AST as Py
 import Proto.Semantic as P
 import Source.Loc
 import Source.Range
 import Source.Source as Source
-import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags t where
   tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m
     ) =>
     t Loc ->
     m ()
   default tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m,
       Traversable1 ToTags t
     ) =>
@@ -53,6 +53,7 @@ instance ToTags (Token sym n) where tags _ = pure ()
 
 keywordFunctionCall ::
   ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
     Has (Writer Tags.Tags) sig m,
     Traversable1 ToTags t
   ) =>
@@ -61,7 +62,7 @@ keywordFunctionCall ::
   Range ->
   Text ->
   m ()
-keywordFunctionCall t loc range name = yieldTag name P.FUNCTION P.DEFINITION loc range Nothing >> gtags t
+keywordFunctionCall t loc range name = Tags.yield name P.FUNCTION P.DEFINITION loc range >> gtags t
 
 instance ToTags Py.String where
   tags Py.String {extraChildren} = for_ extraChildren $ \x -> case x of
@@ -99,11 +100,9 @@ instance ToTags Py.FunctionDefinition where
     t@Py.FunctionDefinition
       { ann = Loc {byteRange = Range {start}},
         name = Parse.Success (Py.Identifier {text, ann}),
-        body = Parse.Success (Py.Block {ann = Loc Range {start = end} _, extraChildren})
+        body = Parse.Success (Py.Block {ann = Loc Range {start = end} _})
       } = do
-      src <- ask @Source
-      let docs = listToMaybe extraChildren >>= docComment src
-      yieldTag text P.FUNCTION P.DEFINITION ann (Range start end) docs >> gtags t
+      Tags.yield text P.FUNCTION P.DEFINITION ann (Range start end) >> gtags t
   tags _ = pure ()
 
 instance ToTags Py.ClassDefinition where
@@ -111,11 +110,9 @@ instance ToTags Py.ClassDefinition where
     t@Py.ClassDefinition
       { ann = Loc {byteRange = Range {start}},
         name = Parse.Success (Py.Identifier {text, ann}),
-        body = Parse.Success (Py.Block {ann = Loc Range {start = end} _, extraChildren})
+        body = Parse.Success (Py.Block {ann = Loc Range {start = end} _})
       } = do
-      src <- ask @Source
-      let docs = listToMaybe extraChildren >>= docComment src
-      yieldTag text P.CLASS P.DEFINITION ann (Range start end) docs >> gtags t
+      Tags.yield text P.CLASS P.DEFINITION ann (Range start end) >> gtags t
   tags _ = pure ()
 
 instance ToTags Py.Call where
@@ -131,37 +128,12 @@ instance ToTags Py.Call where
           Prj Py.Call {function = Parse.Success (Py.PrimaryExpression expr')} -> match expr' -- Nested call expression like this in Python represent creating an instance of a class and calling it: e.g. AClass()()
           Prj (Py.ParenthesizedExpression _ (Parse.Success (Prj (Py.Expression (Prj (Py.PrimaryExpression expr')))))) -> match expr' -- Parenthesized expressions
           _ -> gtags t
-        yield name loc = yieldTag name P.CALL P.REFERENCE loc byteRange Nothing >> gtags t
+        yield name loc = Tags.yield name P.CALL P.REFERENCE loc byteRange >> gtags t
   tags _ = pure ()
-
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> Maybe Text -> m ()
-yieldTag name kind ty loc srcLineRange docs = do
-  src <- ask @Source
-  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) docs)
-
-docComment :: Source -> Parse.Err ((Py.CompoundStatement :+: Py.SimpleStatement) Loc) -> Maybe Text
-docComment
-  src
-  ( Parse.Success
-      ( R1
-          ( Py.SimpleStatement
-              ( Prj
-                  Py.ExpressionStatement
-                    { extraChildren =
-                        Parse.Success
-                          ( L1
-                              (Prj (Py.Expression (Prj (Py.PrimaryExpression (Prj Py.String {ann})))))
-                            )
-                          :| _
-                    }
-                )
-            )
-        )
-    ) = Just (toText (slice src (byteRange ann)))
-docComment _ _ = Nothing
 
 gtags ::
   ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
     Has (Writer Tags.Tags) sig m,
     Traversable1 ToTags t
   ) =>

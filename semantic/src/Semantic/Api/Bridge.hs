@@ -20,6 +20,7 @@ import qualified Proto.Semantic as API
 import           Proto.Semantic_Fields as P hiding (to)
 import qualified Source.Source as Source (fromText, toText, totalSpan)
 import qualified Source.Span as Source
+import qualified Source.Range as Source
 import qualified System.Path as Path
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
@@ -60,6 +61,11 @@ instance APIConvert API.Span Source.Span where
   converting = prism' toAPI fromAPI where
     toAPI Source.Span{..} = defMessage & P.maybe'start .~ (bridging #? start) & P.maybe'end .~ (bridging #? end)
     fromAPI span = Source.Span <$> (span^.maybe'start >>= preview bridging) <*> (span^.maybe'end >>= preview bridging)
+
+instance APIBridge API.ByteRange Source.Range where
+  bridging = iso fromAPI toAPI where
+    toAPI Source.Range{..} = defMessage & P.start .~ fromIntegral start & P.end .~ fromIntegral end
+    fromAPI range = Source.Range (fromIntegral (range^.start)) (fromIntegral (range^.end))
 
 instance APIBridge T.Text Data.Language where
   bridging = iso Data.textToLanguage Data.languageToText

@@ -15,13 +15,13 @@ PROFILE_DIR="$PROFILES_DIR/$TODAY/$NOW-$CURRENT_BRANCH-$HEAD_SHA/"
 OUTFILE="$PROFILE_DIR/profile.out.log"
 ERRFILE="$PROFILE_DIR/profile.err.log"
 
-cabal v2-build all
+cabal v2-build exe:semantic
 
 mkdir -p "$PROFILE_DIR"
 
 # NB: Do not try and use -N, it doesn't work and defaults to -N1.
 cores=$(sysctl -n machdep.cpu.core_count || echo 4)
-cabal v2-run semantic -- +RTS -sstderr -N$((cores * 2)) -A8m -n2m -p -s -h -i0.1 -L1000 -xt -RTS $@ > "$OUTFILE" 2> "$ERRFILE"
+cabal v2-run exe:semantic -- +RTS -sstderr -N$((cores * 2)) -A8m -n2m -p -s -h -i0.1 -L1000 -xt -RTS $@ > "$OUTFILE" 2> "$ERRFILE"
 
 profiteur semantic.prof || true
 
