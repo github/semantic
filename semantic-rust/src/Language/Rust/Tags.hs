@@ -131,6 +131,30 @@ instance ToTags Rust.FieldDeclaration where
         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
+instance ToTags Rust.FunctionItem where 
+  tags
+    t@Rust.FunctionItem {
+      ann = loc@Loc {byteRange},
+      body = Parse.Success (Rust.Block {text, ann}),
+      name = Parse.Success (Rust.Identifier {text, ann}),
+      parameters = Parse.Success (Rust.Parameters {text, ann})
+      returnType,
+      typeParameters,
+      extraChildren
+    } = do
+      tags 
+      case returnType of
+        Just (Parse.Success (Rust.Type)) -> yield text ann
+        _ -> pure ()
+      case typeParameters of
+        Just (Parse.Success (Rust.TypeParameters)) -> yield text ann
+        _ -> pure () 
+      case extraChildren of 
+        EPrj Rust.FunctionModifiers -> yield text ann 
+        EPrj Rust.VisibilityModifier -> yield text ann
+        EPrj Rust.WhereClause -> yield text ann
+      where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
