@@ -282,7 +282,7 @@ instance ToTags Rust.FragmentSpecifier
 -- instance ToTags Rust.FunctionModifiers
 -- instance ToTags Rust.FunctionSignatureItem
 -- instance ToTags Rust.FunctionType
-instance ToTags Rust.GenericFunction
+-- instance ToTags Rust.GenericFunction
 instance ToTags Rust.GenericType
 instance ToTags Rust.GenericTypeWithTurbofish
 instance ToTags Rust.HigherRankedTraitBound
