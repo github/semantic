@@ -262,10 +262,10 @@ instance ToTags Rust.ForExpression
 instance ToTags Rust.ForLifetimes
 instance ToTags Rust.ForeignModItem
 instance ToTags Rust.FragmentSpecifier
-instance ToTags Rust.FunctionItem
-instance ToTags Rust.FunctionModifiers
-instance ToTags Rust.FunctionSignatureItem
-instance ToTags Rust.FunctionType
+-- instance ToTags Rust.FunctionItem
+-- instance ToTags Rust.FunctionModifiers
+-- instance ToTags Rust.FunctionSignatureItem
+-- instance ToTags Rust.FunctionType
 instance ToTags Rust.GenericFunction
 instance ToTags Rust.GenericType
 instance ToTags Rust.GenericTypeWithTurbofish
