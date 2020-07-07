@@ -115,9 +115,9 @@ testTree = Tasty.testGroup "Tags.Tagging.Precise"
         line180chars
             @=? slice180 (Pos 0 180) line240chars
 
-    , testCase "240 chars at position 181" $ do
-        "function(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof module.exports?module.exports=e.document?t(e,!0):function(e){if(!e.document)throw new Error(\"jQuery requires a "
-            @=? slice180 (Pos 0 181) line240chars
+    , testCase "240 chars at position 182" $ do
+        "unction(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof module.exports?module.exports=e.document?t(e,!0):function(e){if(!e.document)throw new Error(\"jQuery requires a w"
+            @=? slice180 (Pos 0 182) line240chars
     ]
   ]
 
