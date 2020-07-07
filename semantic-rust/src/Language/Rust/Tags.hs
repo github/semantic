@@ -210,6 +210,20 @@ instance ToTags Rust.FunctionType where
   tags _ = pure ()
 
 
+instance ToTags Rust.GenericFunction where 
+  tags t@Rust.GenericFunction 
+    {
+      ann = loc@Loc {byteRange},
+      function,
+      typeArgs = Parse.Success (Rust.TypeArguments {text, ann})
+    } = do
+      case function of 
+        EPrj Rust.FieldExpression -> yield text ann
+        EPrj Rust.Identifier -> yield text ann
+        EPrj Rust.ScopedIdentifier -> yield text ann
+    where
+      yield name ann = yieldTag function P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 
 instance ToTags Rust.AbstractType
