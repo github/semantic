@@ -12,6 +12,7 @@ module Tags.Tagging.Precise
 , runTagging
 , calculateLineAndSpans
 , countUtf16CodeUnits
+, slice180
 , surroundingLine
 , surroundingLineRange
 ) where
@@ -69,7 +70,7 @@ runTagging source
 type UTF16CUCount = Int
 
 -- | LineCache is a cache of a line of source code and a map of byte offsets to utf16 code unit count.
-type LineCache = (Source, IntMap.IntMap UTF16CUCount)
+type LineCache = (Source, Text, IntMap.IntMap UTF16CUCount)
 
 -- | LineIndices is a cache of row to LineCache
 newtype LineIndices = LineIndices { unLineIndices :: Map.Map Int LineCache }
@@ -94,10 +95,8 @@ calculateLineAndSpans
           }
     } = (line, toOneIndexed span, utf16Span, map')
   where
-    -- NB: Important to limit to 180 characters after converting to text so as not to take in the middle of a multi-byte character.
-    -- line = Text.strip . Text.take 180 . Source.toText $ srcLine
-    line = sliceCenter180 startCol . Source.toText $ srcLine
-    (srcLine, lineCache, map) = surroundingLine src lineIndexes loc
+    line = slice180 end srcText
+    (srcLine, srcText, lineCache, map) = surroundingLine src lineIndexes loc
     toOneIndexed (Span (Pos l1 c1) (Pos l2 c2)) = OneIndexedSpan $ Span (Pos (l1 + 1) (c1 + 1)) (Pos (l2 + 1) (c2 + 1))
     utf16Span = UTF16CodeUnitSpan $ Span start {column = utf16cpStartOffset} end {column = utf16cpEndOffset}
 
@@ -105,25 +104,22 @@ calculateLineAndSpans
     utf16cpEndOffset = utf16cpStartOffset + countUtf16CodeUnits endSlice
 
     countOffsetCached :: Source -> LineCache -> Int -> LineIndices -> (Int, LineIndices)
-    countOffsetCached slice (s, countMap) colKey (LineIndices map)
+    countOffsetCached slice (s, t, countMap) colKey (LineIndices map)
       = let c = case IntMap.lookupLE colKey countMap of
                   Just (startOffset, count) -> count + countUtf16CodeUnits (Source.slice slice (Range startOffset colKey))
                   Nothing -> countUtf16CodeUnits slice
-        in (c, LineIndices $ Map.insert startRow (s, IntMap.insert colKey c countMap) map)
+        in (c, LineIndices $ Map.insert startRow (s, t, IntMap.insert colKey c countMap) map)
 
     -- NB: Slice out of the Source ByteString, NOT Text because Loc/Range is in units of bytes.
     startSlice = Source.slice srcLine (Range 0 startCol)
     endSlice = Source.slice srcLine (Range startCol endCol)
 
-    -- Slice out up to 180 characters around an index. Favors including the
-    -- identifier and all succeeding text before including any preceeding context
-    sliceCenter180 :: Int -> Text -> Text
-    sliceCenter180 start txt = lhs <> rhs
-      where
-        (h, t) = Text.splitAt start txt
-        rhs = Text.stripEnd . Text.take 180 $ t
-        quota = 180 - Text.length rhs
-        lhs = Text.stripStart . Text.take quota $ h
+-- NB: Important to limit to 180 characters after converting to text so as not to take in the middle of a multi-byte character.
+slice180 :: Pos -> Text -> Text
+slice180 (Pos _ end) = Text.strip . Text.take 180 . drop
+  where
+    drop | end > 180 = Text.drop (end - 180)
+         | otherwise = id
 
 data Counter = Counter { _skip :: Int, unCounter :: Int }
 countUtf16CodeUnits :: Source -> Int
@@ -140,12 +136,13 @@ countUtf16CodeUnits = unCounter . B.foldl' count (Counter 0 0) . bytes
 {-# INLINE countUtf16CodeUnits #-}
 
 -- | The Source of the entire surrounding line (cached).
-surroundingLine :: Source -> LineIndices -> Loc -> (Source, LineCache, LineIndices)
+surroundingLine :: Source -> LineIndices -> Loc -> (Source, Text, LineCache, LineIndices)
 surroundingLine src li@(LineIndices map) loc@(Loc _ (Span (Pos start _) _)) =
   case Map.lookup start map of
-    Just cache@(line, _) -> (line, cache, li)
-    Nothing -> let cache = (line, mempty) in (line, cache, LineIndices (Map.insert start cache map))
+    Just cache@(line, lineText, _) -> (line, lineText, cache, li)
+    Nothing -> let cache = (line, lineText, mempty) in (line, lineText, cache, LineIndices (Map.insert start cache map))
   where
+    lineText = Source.toText line
     line = Source.slice src range
     range = surroundingLineRange src loc
 
