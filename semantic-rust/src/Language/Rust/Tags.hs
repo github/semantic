@@ -209,7 +209,7 @@ instance ToTags Rust.ExternModifier
 -- instance ToTags Rust.FieldDeclaration
 instance ToTags Rust.FieldDeclarationList
 instance ToTags Rust.FieldExpression
--- instance ToTags Rust.FieldIdentifier
+instance ToTags Rust.FieldIdentifier
 instance ToTags Rust.FieldInitializer
 instance ToTags Rust.FieldInitializerList
 instance ToTags Rust.FieldPattern
