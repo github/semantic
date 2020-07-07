@@ -1,7 +1,5 @@
 {-# LANGUAGE GeneralisedNewtypeDeriving #-}
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE TupleSections #-}
-{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 module Tags.Tagging.Precise
 ( Tags
@@ -29,7 +27,6 @@ import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Proto.Semantic as P
 import Source.Loc
-import Control.DeepSeq
 import Source.Source as Source
 import Source.Span (Pos (..), end, start)
 import Tags.Tag
@@ -76,7 +73,7 @@ type LineCache = (Source, IntMap.IntMap UTF16CUCount)
 
 -- | LineIndices is a cache of row to LineCache
 newtype LineIndices = LineIndices { unLineIndices :: Map.Map Int LineCache }
-  deriving (Eq, Show, NFData)
+  deriving (Eq, Show)
 
 -- | Takes a Loc (where the span's column offset is measured in bytes) and
 -- returns two Spans: A 1-indexed span LSP friendly span (where column offset is

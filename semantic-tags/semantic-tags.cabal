@@ -48,8 +48,7 @@ library
     , semantic-source    ^>= 0.1.0
     , semantic-proto     ^>= 0
     , text               ^>= 1.2.3.1
-    , containers
-    , deepseq
+    , containers         ^>= 0.6.0.1
   hs-source-dirs:      src
 
 test-suite test
@@ -58,11 +57,11 @@ test-suite test
   hs-source-dirs: test
   main-is: Test.hs
   build-depends:
-      base
+      base            >= 4.13 && < 5
     , hedgehog        ^>= 1
+    , semantic-source ^>= 0.1.0
     , semantic-tags
-    , semantic-source
     , tasty            >= 1.2 && <2
     , tasty-hedgehog  ^>= 1.0.0.1
     , tasty-hunit      >= 0.10 && <1
-    , text
+    , text            ^>= 1.2.3.1
