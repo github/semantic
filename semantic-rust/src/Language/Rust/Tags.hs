@@ -68,7 +68,7 @@ instance ToTags Rust.SourceFile where
   tags _ = pure ()
 
 instance ToTags Rust.AssignmentExpression where
-  tags t@Rust.Assignment {left} = do
+  tags t@Rust.AssignmentExpression {left} = do
     left = EPrj (Rust.Expression (Prj Rust.Identifier {text})) -> yield text ann
       where 
         yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
