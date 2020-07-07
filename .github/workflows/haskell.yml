@@ -56,6 +56,7 @@ jobs:
       run: |
         cabal v2-build --project-file=cabal.project.ci semantic:exe:semantic
         cabal v2-run   --project-file=cabal.project.ci semantic:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-tags:test
         cabal v2-run   --project-file=cabal.project.ci semantic-codeql:test
         cabal v2-run   --project-file=cabal.project.ci semantic-core:test
         cabal v2-run   --project-file=cabal.project.ci semantic-go:test
