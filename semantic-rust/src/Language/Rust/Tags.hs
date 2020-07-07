@@ -94,7 +94,7 @@ instance ToTags Rust.CallExpression where
   tags
     t@Rust.CallExpression 
       {
-        ann = loc@Loc {byteRange}
+        ann = loc@Loc {byteRange},
         name = expr 
       } = case expr of 
       EPrj Rust.Arguments -> yield text ann
