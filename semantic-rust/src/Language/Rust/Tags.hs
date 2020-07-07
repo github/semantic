@@ -78,6 +78,18 @@ instance ToTags Rust.AssignmentExpression where
     tags _ = pure ()
 
 
+instance ToTags Rust.Block where
+  tags
+    t@Rust.Block
+      { extraChildren,
+        ann = loc@Loc {byteRange}
+      } = case extraChildren of
+      EPrj Rust.DeclarationStatement -> yield text ann
+      EPrj Rust.Expression -> yield text ann
+        where
+          yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
