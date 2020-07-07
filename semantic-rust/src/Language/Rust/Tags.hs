@@ -156,6 +156,13 @@ instance ToTags Rust.FunctionItem where
       where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
+instance ToTags Rust.FunctionModifiers where 
+  tags t@Rust.FunctionModifiers {
+    ann = loc@Loc {byteRange},
+    extraChildren = Parse.Success (Rust.ExternModifier {text, ann})
+  } = yieldTag body P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+
+
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
