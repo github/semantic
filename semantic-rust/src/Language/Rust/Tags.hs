@@ -142,7 +142,7 @@ instance ToTags Rust.CharLiteral
 instance ToTags Rust.ClosureParameters
 instance ToTags Rust.CompoundAssignmentExpr
 instance ToTags Rust.ConstItem
--- instance ToTags Rust.ConstParameter
+instance ToTags Rust.ConstParameter
 instance ToTags Rust.ConstrainedTypeParameter
 instance ToTags Rust.ContinueExpression
 instance ToTags Rust.Crate
