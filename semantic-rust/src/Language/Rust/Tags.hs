@@ -16,6 +16,7 @@ import qualified AST.Unmarshal as TS
 import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Effect.Writer
+import           Data.Text as Text
 import qualified Language.Rust.AST as Rust
 import           Source.Loc
 import           Source.Source as Source
