@@ -103,6 +103,14 @@ instance ToTags Rust.CallExpression where
           yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 
 
+instance ToTags Rust.ClosureExpression where
+  tags
+    t@Rust.ClosureExpression
+      { ann = loc@Loc {byteRange},
+        args = Parse.Success (Rust.Arguments {text, ann}),
+        expr = Parse.Success (Rust.Expression {text, ann})
+      } = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
