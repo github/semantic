@@ -207,6 +207,8 @@ instance ToTags Rust.FunctionType where
         EPrj Rust.ForModifiers -> yield text ann
       where
         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
 
 
 
