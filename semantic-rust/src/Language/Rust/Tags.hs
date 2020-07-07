@@ -109,9 +109,12 @@ instance ToTags Rust.ClosureExpression where
   tags
     t@Rust.ClosureExpression
       { ann = loc@Loc {byteRange},
-        args = Parse.Success (Rust.Arguments {text, ann}),
-        expr = Parse.Success (Rust.Expression {text, ann})
-      } = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+        body = Parse.Success (Rust.Expression {text, ann}),
+        parameters = Parse.Success (Rust.ClosureParameters {text, ann}),
+        returnType = (Parse.Success (Rust.Type {text, ann}))
+      } = yieldTag body P.METHOD P.DEFINITION ann byteRange >> gtags t
+  tags _ -> pure ()
+
 
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
