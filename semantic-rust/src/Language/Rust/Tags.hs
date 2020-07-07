@@ -133,7 +133,7 @@ instance ToTags Rust.BreakExpression
 -- instance ToTags Rust.CallExpression
 instance ToTags Rust.CapturedPattern
 instance ToTags Rust.CharLiteral
-instance ToTags Rust.ClosureExpression
+-- instance ToTags Rust.ClosureExpression
 instance ToTags Rust.ClosureParameters
 instance ToTags Rust.CompoundAssignmentExpr
 instance ToTags Rust.ConstItem
