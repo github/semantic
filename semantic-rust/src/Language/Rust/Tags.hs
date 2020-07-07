@@ -56,15 +56,18 @@ yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text ->
 yieldTag name kind ty loc srcLineRange = do
   src <- ask @Source
   Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
-instance ToTags Rust.SourceFile where 
-  tags t@Rust.SourceFile
-    { extraChildren
-    , ann = loc@Loc {byteRange} 
-    } = case extraChildren of 
-    EPrj Rust.DeclarationStatement {declarationStmt} -> yield text ann
-    EPrj Rust.Expression {expr} -> yield text ann
-      where 
-      yield name ann = yieldTag name P.MODULE P.DEFINITION ann byteRange >> gtags t
+
+
+instance ToTags Rust.SourceFile where
+  tags
+    t@Rust.SourceFile
+      { extraChildren,
+        ann = loc@Loc {byteRange}
+      } = case extraChildren of
+      EPrj Rust.DeclarationStatement -> yield text ann
+      EPrj Rust.Expression -> yield text ann
+        where
+          yield name ann = yieldTag name P.MODULE P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags Rust.AssignmentExpression where
