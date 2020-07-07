@@ -98,12 +98,9 @@ instance ToTags Rust.CallExpression where
     t@Rust.CallExpression 
       {
         ann = loc@Loc {byteRange},
-        name = expr 
-      } = case expr of 
-      EPrj Rust.Arguments -> yield text ann
-      EPrj Rust.Expression -> yield text ann
-        where
-          yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+        args = Parse.Success (Rust.Arguments {text, ann}),
+        expr = Parse.Success (Rust.Expression {text, ann})
+      } = yieldTag expr P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 
 
 instance ToTags Rust.ClosureExpression where
