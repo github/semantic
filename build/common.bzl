@@ -50,7 +50,7 @@ EXECUTABLE_FLAGS = [
 # Now we start declaring macros to help us with common patterns
 # such as pulling tree-sitter grammars from releases/git hashes.
 
-def tree_sitter_node_types_release(name, version, sha256, urls = [], nodetypespath = ""):
+def tree_sitter_node_types_release(name, version, sha256):
     """Create a package for a tree-sitter grammar and export its node-types.json file/test corpus.."""
     http_archive(
         name = name,
@@ -72,7 +72,7 @@ def tree_sitter_node_types_git(name, commit, shallow_since):
 
 # These macros declare library targets inside the language packages.
 
-def semantic_language_library(language, name, srcs, ts_package = "", nodetypes = "", **kwargs):
+def semantic_language_library(language, name, srcs, ts_package = "", nodetypes = ""):
     """Create a new library target with dependencies needed for a language-AST project."""
     if nodetypes == "":
         nodetypes = "@tree-sitter-{}//:src/node-types.json".format(language)

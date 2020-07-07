@@ -190,7 +190,6 @@ tree_sitter_node_types_release(
 
 tree_sitter_node_types_release(
     name = "tree-sitter-typescript",
-    nodetypespath = "**/src/node-types.json",
     sha256 = "3e1fc16daab965f21dc56a919b32a730e889ea2ba1330af5edc5950f4e6b18b6",
     version = "0.16.2",
 )
