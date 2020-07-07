@@ -93,4 +93,34 @@ testTree = Tasty.testGroup "Tags.Tagging.Precise"
            , UTF16CodeUnitSpan $ Span (Pos 1 16) (Pos 1 18)  -- zero-indexed, counting utf16 code units (lsp-style column offset)
            ) @=? calculateLineAndSpans' src loc
     ]
+  , Tasty.testGroup "slice180"
+    [ testCase "shorter than 180 chars" $ do
+        "def foo" @=? slice180 (Pos 0 0) "def foo"
+
+    , testCase "180 chars at position 0" $ do
+        line180chars @=? slice180 (Pos 0 0) line180chars
+
+    , testCase "180 chars at position 179" $ do
+        line180chars @=? slice180 (Pos 0 179) line180chars
+
+    , testCase "240 chars at position 0" $ do
+        line180chars
+            @=? slice180 (Pos 0 0) line240chars
+
+    , testCase "240 chars at position 179" $ do
+        line180chars
+            @=? slice180 (Pos 0 179) line240chars
+
+    , testCase "240 chars at position 180" $ do
+        line180chars
+            @=? slice180 (Pos 0 180) line240chars
+
+    , testCase "240 chars at position 181" $ do
+        "function(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof module.exports?module.exports=e.document?t(e,!0):function(e){if(!e.document)throw new Error(\"jQuery requires a "
+            @=? slice180 (Pos 0 181) line240chars
+    ]
   ]
+
+  where
+    line180chars = "!function(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof module.exports?module.exports=e.document?t(e,!0):function(e){if(!e.document)throw new Error(\"jQuery requires a"
+    line240chars = "!function(e,t){\"use strict\";\"object\"==typeof module&&\"object\"==typeof module.exports?module.exports=e.document?t(e,!0):function(e){if(!e.document)throw new Error(\"jQuery requires a window with a document\");return t(e)}:t(e)}(\"undefined\"!=ty"
