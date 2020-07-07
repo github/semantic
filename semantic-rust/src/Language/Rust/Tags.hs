@@ -286,7 +286,7 @@ instance ToTags Rust.FragmentSpecifier
 instance ToTags Rust.GenericType
 instance ToTags Rust.GenericTypeWithTurbofish
 instance ToTags Rust.HigherRankedTraitBound
--- instance ToTags Rust.Identifier
+instance ToTags Rust.Identifier
 instance ToTags Rust.IfExpression
 instance ToTags Rust.IfLetExpression
 instance ToTags Rust.ImplItem
