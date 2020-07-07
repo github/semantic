@@ -64,8 +64,8 @@ instance ToTags Rust.SourceFile where
       { extraChildren,
         ann = loc@Loc {byteRange}
       } = case extraChildren of
-      EPrj Rust.DeclarationStatement -> yield text ann
-      EPrj Rust.Expression -> yield text ann
+      EPrj (Rust.DeclarationStatement {text, ann}) -> yield text ann
+      EPrj (Rust.Expression {text, ann}) -> yield text ann
         where
           yield name ann = yieldTag name P.MODULE P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
