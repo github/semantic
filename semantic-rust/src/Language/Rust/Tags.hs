@@ -117,6 +117,7 @@ instance ToTags Rust.ClosureExpression where
       } = yieldTag body P.METHOD P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
+
 instance ToTags Rust.FieldDeclaration where
   tags
     t@Rust.FieldDeclaration
@@ -130,6 +131,7 @@ instance ToTags Rust.FieldDeclaration where
       where
         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
+
 
 instance ToTags Rust.FunctionItem where 
   tags
@@ -155,6 +157,7 @@ instance ToTags Rust.FunctionItem where
         EPrj Rust.WhereClause -> yield text ann
       where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
+
 
 instance ToTags Rust.FunctionModifiers where
   tags
