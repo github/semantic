@@ -117,6 +117,20 @@ instance ToTags Rust.ClosureExpression where
       } = yieldTag body P.METHOD P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
+instance ToTags Rust.FieldDeclaration where
+  tags
+    t@Rust.FieldDeclaration
+      { ann = loc@Loc {byteRange},
+        name = Parse.Success (Rust.FieldIdentifier {text, ann}),
+        type' = Parse.Success (Rust.Type {text, ann}),
+        extraChildren
+      } = case extraChildren of
+      Just (Parse.Success (Rust.VisibilityModifier)) -> yield text ann
+      _ -> pure ()
+      where
+        yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
 
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
