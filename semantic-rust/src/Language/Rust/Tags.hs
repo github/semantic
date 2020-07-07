@@ -155,7 +155,7 @@ instance ToTags Rust.EnumItem
 instance ToTags Rust.EnumVariant
 instance ToTags Rust.EnumVariantList
 instance ToTags Rust.EscapeSequence
--- instance ToTags Rust.Expression
+instance ToTags Rust.Expression
 instance ToTags Rust.ExternCrateDeclaration
 instance ToTags Rust.ExternModifier
 instance ToTags Rust.FieldDeclaration
