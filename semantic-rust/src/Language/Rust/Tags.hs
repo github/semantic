@@ -158,7 +158,7 @@ instance ToTags Rust.EscapeSequence
 instance ToTags Rust.Expression
 instance ToTags Rust.ExternCrateDeclaration
 instance ToTags Rust.ExternModifier
-instance ToTags Rust.FieldDeclaration
+-- instance ToTags Rust.FieldDeclaration
 instance ToTags Rust.FieldDeclarationList
 instance ToTags Rust.FieldExpression
 -- instance ToTags Rust.FieldIdentifier
