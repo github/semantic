@@ -165,24 +165,25 @@ instance ToTags Rust.FunctionModifiers where
   tags _ = pure ()
 
 
-instance ToTags Rust.FunctionSignatureItem where 
+instance ToTags Rust.FunctionSignatureItem where
   tags
-    t@Rust.FunctionSignatureItem 
+    t@Rust.FunctionSignatureItem
       { ann = loc@Loc {byteRange},
-        name, 
+        name,
         parameters = Parse.Success (Rust.Parameters {text, ann}),
         returnType = Parse.Success (Rust.Type {text, ann}),
         typeParameters = Parse.Success (Rust.TypeParameters {text, ann}),
-        extraChildren    
+        extraChildren
       } = do
-        case name of 
-          EPrj (Rust.Identifier) -> yield text ann
-          EPrj (Rust.Metavariable) -> yield text ann
-        case extraChildren of 
-          EPrj Rust.FunctionModifiers -> yield text ann
-          EPrj Rust.VisibilityModifier -> yield text ann
-          EPrj Rust.WhereClause -> yield text ann
-      where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+      case name of
+        EPrj (Rust.Identifier) -> yield text ann
+        EPrj (Rust.Metavariable) -> yield text ann
+      case extraChildren of
+        EPrj Rust.FunctionModifiers -> yield text ann
+        EPrj Rust.VisibilityModifier -> yield text ann
+        EPrj Rust.WhereClause -> yield text ann
+      where
+        yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 
