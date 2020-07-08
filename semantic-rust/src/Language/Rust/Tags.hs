@@ -76,18 +76,6 @@ gtags = traverse1_ @ToTags (const (pure ())) tags
 --   Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
 
--- instance ToTags Rust.SourceFile where
---   tags
---     t@Rust.SourceFile
---       { extraChildren,
---         ann = loc@Loc {byteRange}
---       } = case extraChildren of
---       EPrj (Rust.DeclarationStatement {text, ann}) -> yield text ann
---       EPrj (Rust.Expression {text, ann}) -> yield text ann
---         where
---           yield name ann = yieldTag name P.MODULE P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
-
 
 -- instance ToTags Rust.AssignmentExpression where
 --   tags
