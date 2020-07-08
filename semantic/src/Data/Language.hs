@@ -33,6 +33,7 @@ aLaCarteLanguageModes = PerLanguageModes
   , tsxMode = ALaCarte
   , javascriptMode = ALaCarte
   , jsxMode = ALaCarte
+  , rustMode = ALaCarte
   }
 
 preciseLanguageModes :: PerLanguageModes
