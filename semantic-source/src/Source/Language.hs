@@ -105,6 +105,7 @@ forPath path =
   let spurious lang = lang `elem` [ "Hack" -- .php files
                                   , "GCC Machine Description" -- .md files
                                   , "XML" -- .tsx files
+                                  , "RenderScript" -- .rs files
                                   ]
       allResults = Lingo.languageName <$> Lingo.languagesForPath (Path.toString path)
   in case filter (not . spurious) allResults of
