@@ -345,7 +345,7 @@ instance ToTags Rust.MatchPattern
 instance ToTags Rust.MetaArguments
 instance ToTags Rust.MetaItem
 instance ToTags Rust.Metavariable
-instance ToTags Rust.ModItem
+-- instance ToTags Rust.ModItem
 instance ToTags Rust.MutPattern
 instance ToTags Rust.MutableSpecifier
 instance ToTags Rust.NegativeLiteral
