@@ -102,6 +102,9 @@ instance ShowTermBy 'Precise TSX.Term where
 instance ShowTermBy 'Precise TypeScript.Term where
   showTermBy = serialize Show . void . TypeScript.getTerm
 
+instance ShowTermBy 'Precise Rust.Term where
+  showTermBy = serialize Show . void . Rust.getTerm
+
 sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)
 sexprTermParsers = preciseParsers
 
