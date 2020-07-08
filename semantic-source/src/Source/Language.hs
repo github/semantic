@@ -36,6 +36,7 @@ data Language
     | PHP
     | Python
     | Ruby
+    | Rust
     | TypeScript
     | TSX
     | CodeQL
@@ -81,6 +82,9 @@ instance SLanguage 'Python where
 instance SLanguage 'Ruby where
   reflect _ = Ruby
 
+instance SLanguage 'Rust where
+  reflect _ = Rust
+
 instance SLanguage 'TypeScript where
   reflect _ = TypeScript
 
@@ -121,6 +125,7 @@ languageToText = \case
   PHP -> "PHP"
   Python -> "Python"
   Ruby -> "Ruby"
+  Rust -> "Rust"
   TypeScript -> "TypeScript"
   TSX -> "TSX"
 
@@ -137,6 +142,7 @@ textToLanguage = \case
   "PHP" -> PHP
   "Python" -> Python
   "Ruby" -> Ruby
+  "Rust" -> Rust
   "TypeScript" -> TypeScript
   "TSX" -> TSX
   _ -> Unknown
