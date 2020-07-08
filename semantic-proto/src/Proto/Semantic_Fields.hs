@@ -38,6 +38,12 @@ blobs ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "blobs" a) =>
   Lens.Family2.LensLike' f s a
 blobs = Data.ProtoLens.Field.field @"blobs"
+byteRange ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "byteRange" a) =>
+  Lens.Family2.LensLike' f s a
+byteRange = Data.ProtoLens.Field.field @"byteRange"
 column ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "column" a) =>
@@ -128,6 +134,12 @@ line ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "line" a) =>
   Lens.Family2.LensLike' f s a
 line = Data.ProtoLens.Field.field @"line"
+maybe'byteRange ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "maybe'byteRange" a) =>
+  Lens.Family2.LensLike' f s a
+maybe'byteRange = Data.ProtoLens.Field.field @"maybe'byteRange"
 maybe'docs ::
   forall f s a.
   (Prelude.Functor f,
@@ -152,6 +164,13 @@ maybe'start ::
    Data.ProtoLens.Field.HasField s "maybe'start" a) =>
   Lens.Family2.LensLike' f s a
 maybe'start = Data.ProtoLens.Field.field @"maybe'start"
+maybe'utf16CodeUnitSpan ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "maybe'utf16CodeUnitSpan" a) =>
+  Lens.Family2.LensLike' f s a
+maybe'utf16CodeUnitSpan
+  = Data.ProtoLens.Field.field @"maybe'utf16CodeUnitSpan"
 name ::
   forall f s a.
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "name" a) =>
@@ -244,6 +263,12 @@ to ::
   (Prelude.Functor f, Data.ProtoLens.Field.HasField s "to" a) =>
   Lens.Family2.LensLike' f s a
 to = Data.ProtoLens.Field.field @"to"
+utf16CodeUnitSpan ::
+  forall f s a.
+  (Prelude.Functor f,
+   Data.ProtoLens.Field.HasField s "utf16CodeUnitSpan" a) =>
+  Lens.Family2.LensLike' f s a
+utf16CodeUnitSpan = Data.ProtoLens.Field.field @"utf16CodeUnitSpan"
 vec'blobs ::
   forall f s a.
   (Prelude.Functor f,

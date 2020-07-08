@@ -47,19 +47,14 @@ EXECUTABLE_FLAGS = [
     "-threaded",
 ]
 
-# These macros declare new packages.
+# Now we start declaring macros to help us with common patterns
+# such as pulling tree-sitter grammars from releases/git hashes.
 
-def tree_sitter_node_types_release(name, version, sha256, urls = [], nodetypespath = "src/node-types.json"):
+def tree_sitter_node_types_release(name, version, sha256):
     """Create a package for a tree-sitter grammar and export its node-types.json file/test corpus.."""
     http_archive(
         name = name,
-        build_file_content = """
-package(default_visibility = ["//visibility:public"])
-
-exports_files(glob(["{}"]))
-
-filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']))
-""".format(nodetypespath),
+        build_file = "//:build/tree_sitter.bzl",
         strip_prefix = "{}-{}".format(name, version),
         urls = ["https://github.com/tree-sitter/{}/archive/v{}.tar.gz".format(name, version)],
         sha256 = sha256,
@@ -69,11 +64,7 @@ def tree_sitter_node_types_git(name, commit, shallow_since):
     """Create a package pinned off a Git repo. Prefer the node_types_release call to this."""
     new_git_repository(
         name = name,
-        build_file_content = """
-exports_files(["src/node-types.json"])
-
-filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']), visibility = ["//visibility:public"])
-""",
+        build_file = "//:build/tree_sitter.bzl",
         commit = commit,
         remote = "https://github.com/tree-sitter/{}.git".format(name),
         shallow_since = shallow_since,
@@ -81,7 +72,7 @@ filegroup(name = "corpus", srcs = glob(['**/corpus/*.txt']), visibility = ["//vi
 
 # These macros declare library targets inside the language packages.
 
-def semantic_language_library(language, name, srcs, ts_package = "", nodetypes = "", **kwargs):
+def semantic_language_library(language, name, srcs, ts_package = "", nodetypes = ""):
     """Create a new library target with dependencies needed for a language-AST project."""
     if nodetypes == "":
         nodetypes = "@tree-sitter-{}//:src/node-types.json".format(language)

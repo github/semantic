@@ -21,6 +21,8 @@ haskell_library(
     compiler_flags = GHC_FLAGS,
     deps = [
         "//:base",
+        "//:bytestring",
+        "//:containers",
         "//:text",
         "//semantic-proto",
         "//semantic-source",
