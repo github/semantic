@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: ghc ${{ matrix.ghc }}
+    name: Bazel
     runs-on: ubuntu-latest
     strategy:
 
@@ -20,15 +20,12 @@ jobs:
 
     - uses: actions/cache@v1
       id: cache-cabal
-      name: Cache Cabal artifacts
+      name: Cache Bazel artifacts
       with:
         path: .bazel-cache
-        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-${{ hashFiles('semantic-*/**/*.hs') }}-${{ hashFiles('**/BUILD.bazel') }}
+        key: ${{ runner.os }}-bazel-${{ hashFiles('semantic-*/**/*.hs') }}-${{ hashFiles('**/BUILD.bazel') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-
-          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-
-          ${{ runner.os }}-${{ matrix.ghc }}-
-          ${{ runner.os }}-
+          ${{ runner.os }}-bazel-
 
     - name: Build & test
       run: |
