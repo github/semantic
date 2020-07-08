@@ -36,6 +36,12 @@ load(
     "rules_haskell_toolchains",
 )
 
+git_repository(
+    name = "haskell-tree-sitter",
+    branch = "master",
+    remote = "https://github.com/tree-sitter/haskell-tree-sitter.git",
+)
+
 # Download a GHC binary distribution from haskell.org and register it as a toolchain.
 rules_haskell_toolchains(version = "8.8.3")
 
@@ -60,11 +66,16 @@ stack_snapshot(
         "ansi-terminal",
         "async",
         "attoparsec",
+        "base",
         "bazel-runfiles",
         "bifunctors",
+        "bytestring",
+        "containers",
+        "deepseq",
         "directory",
         "directory-tree",
         "doctest",
+        "filepath",
         "foldl",
         "fused-effects",
         "fused-effects-exceptions",
@@ -75,6 +86,7 @@ stack_snapshot(
         "generic-lens",
         "generic-monoid",
         "hashable",
+        "haskeline",
         "hedgehog",
         "hostname",
         "hscolour",
@@ -93,6 +105,7 @@ stack_snapshot(
         "pretty-simple",
         "prettyprinter",
         "prettyprinter-ansi-terminal",
+        "process",
         "proto-lens",
         "proto-lens-jsonpb",
         "proto-lens-runtime",
@@ -112,12 +125,13 @@ stack_snapshot(
         "tasty-hedgehog",
         "tasty-hspec",
         "tasty-hunit",
+        "template-haskell",
         "temporary",
         "terminal-size",
+        "text",
         "time",
         "transformers",
         "tree-sitter",
-        "tree-sitter-go",
         "tree-sitter-java",
         "tree-sitter-json",
         "tree-sitter-php",
@@ -135,6 +149,10 @@ stack_snapshot(
         "yaml",
     ],
     tools = ["@happy"],
+    vendored_packages = {
+        #"tree-sitter-python": "@tree-sitter-python//"
+        "tree-sitter-go": "@tree-sitter-go//:tree-sitter-go",
+    },
 )
 
 # Download Happy and make it accessible to the build process.
@@ -155,7 +173,14 @@ haskell_cabal_binary(name = "happy", srcs = glob(["**"]), visibility = ["//visib
 load(
     "//:build/common.bzl",
     "tree_sitter_node_types_git",
+    "tree_sitter_node_types_hackage",
     "tree_sitter_node_types_release",
+)
+
+tree_sitter_node_types_hackage(
+    name = "tree-sitter-go",
+    sha256 = "364a0ae4e683bda1e348fa85c6828cad72122af155560b680f6052852d98db6c",
+    version = "0.5.0.1",
 )
 
 tree_sitter_node_types_release(
@@ -182,11 +207,11 @@ tree_sitter_node_types_release(
     version = "0.16.0",
 )
 
-tree_sitter_node_types_release(
-    name = "tree-sitter-go",
-    sha256 = "7278f1fd4dc4de8a13b0f60407425d38c5cb3973e1938d3031a68e1e69bd0b75",
-    version = "0.16.1",
-)
+# tree_sitter_node_types_release(
+#     name = "tree-sitter-go",
+#     sha256 = "7278f1fd4dc4de8a13b0f60407425d38c5cb3973e1938d3031a68e1e69bd0b75",
+#     version = "0.16.1",
+# )
 
 tree_sitter_node_types_release(
     name = "tree-sitter-typescript",

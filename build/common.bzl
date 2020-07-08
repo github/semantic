@@ -70,6 +70,38 @@ def tree_sitter_node_types_git(name, commit, shallow_since):
         shallow_since = shallow_since,
     )
 
+_attempt = """
+package(default_visibility = ["//visibility:public"])
+
+load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_library")
+load("@stackage//:packages.bzl", "packages")
+exports_files(glob(["**/node-types.json"]))
+
+alias(
+   name = "src/node-types.json",
+   actual = ":vendor/{}/src/node-types.json",
+)
+
+haskell_cabal_library(
+    name = "{}",
+    version = packages["{}"].version,
+    srcs = glob(["**"]),
+    deps = packages["{}"].deps,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(name = "corpus", srcs = glob(["**/corpus/*.txt"]))
+"""
+
+def tree_sitter_node_types_hackage(name, version, sha256):
+    http_archive(
+        name = name,
+        build_file_content = _attempt.format(name, name, name, name),
+        urls = ["https://hackage.haskell.org/package/{}-{}/{}-{}.tar.gz".format(name, version, name, version)],
+        strip_prefix = "{}-{}".format(name, version),
+        sha256 = sha256,
+    )
+
 # These macros declare library targets inside the language packages.
 
 def semantic_language_library(language, name, srcs, ts_package = "", nodetypes = ""):
