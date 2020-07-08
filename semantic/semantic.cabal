@@ -163,6 +163,7 @@ library
                      , semantic-python ^>= 0
                      , semantic-codeql ^>= 0
                      , semantic-ruby ^>= 0
+                     , semantic-rust ^>= 0
                      , semantic-proto ^>= 0
                      , semantic-scope-graph ^>= 0
                      , semantic-tags ^>= 0
