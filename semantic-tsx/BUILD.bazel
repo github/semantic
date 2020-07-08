@@ -19,5 +19,3 @@ semantic_language_parsing_test(
     semantic_package = "tsx",
     ts_package = "typescript",
 )
-
-tree
