@@ -20,6 +20,7 @@ module Parsing.Parser
 , pythonParser
 , codeQLParserPrecise
 , rubyParser
+, rustParser
 , tsxParser
 , typescriptParser
   -- * Modes by term type
@@ -40,6 +41,7 @@ import qualified Language.JSON as JSON
 import qualified Language.PHP as PHPPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Ruby as RubyPrecise
+import qualified Language.Rust as RustPrecise
 import qualified Language.TSX as TSXPrecise
 import qualified Language.TypeScript as TypeScriptPrecise
 import           Prelude hiding (fail)
@@ -109,6 +111,9 @@ codeQLParserPrecise = (CodeQL, SomeParser (UnmarshalParser @CodeQLPrecise.Term C
 rubyParser :: c RubyPrecise.Term => (Language, SomeParser c Loc)
 rubyParser = (Ruby, SomeParser (UnmarshalParser @RubyPrecise.Term RubyPrecise.tree_sitter_ruby))
 
+rustParser :: c RustPrecise.Term => (Language, SomeParser c Loc)
+rustParser = (Rust, SomeParser (UnmarshalParser @RustPrecise.Term RustPrecise.tree_sitter_rust))
+
 tsxParser :: c TSXPrecise.Term => (Language, SomeParser c Loc)
 tsxParser = (TSX, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_sitter_tsx))
 
@@ -124,6 +129,7 @@ type family TermMode term where
   TermMode PythonPrecise.Term     = 'Precise
   TermMode CodeQLPrecise.Term     = 'Precise
   TermMode RubyPrecise.Term       = 'Precise
+  TermMode RustPrecise.Term       = 'Precise
   TermMode TypeScriptPrecise.Term = 'Precise
   TermMode TSXPrecise.Term        = 'Precise
   TermMode _                      = 'ALaCarte
@@ -135,6 +141,7 @@ preciseParsers
      , c PythonPrecise.Term
      , c CodeQLPrecise.Term
      , c RubyPrecise.Term
+     , c RustPrecise.Term
      , c GoPrecise.Term
      , c PHPPrecise.Term
      , c TypeScriptPrecise.Term
@@ -150,6 +157,7 @@ preciseParsers = Map.fromList
   , phpParserPrecise
   , codeQLParserPrecise
   , rubyParser
+  , rustParser
   , tsxParser
   , typescriptParser
   , javaParser
