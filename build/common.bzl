@@ -59,14 +59,14 @@ exports_files(glob(["**/node-types.json"]))
 
 alias(
    name = "src/node-types.json",
-   actual = "{}",
+   actual = "{node_types_path}",
 )
 
 haskell_cabal_library(
-    name = "{}",
-    version = "{}",
+    name = "{name}",
+    version = "{version}",
     srcs = glob(["**"]),
-    deps = packages["{}"].deps,
+    deps = packages["{name}"].deps,
     visibility = ["//visibility:public"],
 )
 
@@ -78,11 +78,17 @@ def tree_sitter_node_types_hackage(name, version, sha256, node_types_path = ""):
 
     if node_types_path == "":
         node_types_path = ":vendor/{}/src/node-types.json".format(name)
+
+    info = {
+        "name": name,
+        "version": version,
+        "node_types_path": node_types_path,
+    }
     http_archive(
         name = name,
-        build_file_content = _tree_sitter_language_build.format(node_types_path, name, version, name, name),
-        urls = ["https://hackage.haskell.org/package/{}-{}/{}-{}.tar.gz".format(name, version, name, version)],
-        strip_prefix = "{}-{}".format(name, version),
+        build_file_content = _tree_sitter_language_build.format(**info),
+        urls = ["https://hackage.haskell.org/package/{name}-{version}/{name}-{version}.tar.gz".format(**info)],
+        strip_prefix = "{name}-{version}".format(**info),
         sha256 = sha256,
     )
 
