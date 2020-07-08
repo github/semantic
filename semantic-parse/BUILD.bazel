@@ -1,0 +1,28 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+load(
+    "//:build/common.bzl",
+    "GHC_FLAGS",
+)
+
+haskell_binary(
+    name = "exe",
+    srcs = ["app/Main.hs"],
+    compiler_flags = GHC_FLAGS,
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:text",
+        "//semantic-ast",
+        "//semantic-python",
+        "//semantic-source",
+        "@stackage//:aeson",
+        "@stackage//:aeson-pretty",
+        "@stackage//:optparse-applicative",
+        "@stackage//:pretty-simple",
+    ],
+)

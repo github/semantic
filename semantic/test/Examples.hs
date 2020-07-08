@@ -1,5 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ImplicitParams #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
@@ -25,7 +27,9 @@ import           Data.Traversable
 import           System.FilePath.Glob
 import           System.Path ((</>))
 import qualified System.Path as Path
+import qualified System.Path.Directory as Path
 import qualified System.Process as Process
+import qualified System.Path.Fixture as Fixture
 import qualified Test.Tasty as Tasty
 import qualified Test.Tasty.HUnit as HUnit
 
@@ -55,7 +59,7 @@ examples =
   , le "python" "**/*.py" pythonFileSkips mempty
   , le "ruby" "**/*.rb" rubySkips mempty
   , le "typescript" "**/*.[jt]s" typescriptSkips mempty
-  , le "typescript" "**/*.[jt]sx" tsxSkips mempty
+  -- , le "typescript" "**/*.[jt]sx" tsxSkips mempty
   ]
 
 goFileSkips :: [Path.RelFile]
@@ -127,12 +131,20 @@ typescriptSkips = Path.relFile <$>
   , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/regenerator.min.js"
   ]
 
-buildExamples :: TaskSession -> LanguageExample -> Path.RelDir -> IO Tasty.TestTree
+
+
+buildExamples :: Fixture.HasFixture => TaskSession -> LanguageExample -> Path.AbsRelDir -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
   let fileSkips = fmap (tsDir </>) (languageSkips lang)
       dirSkips  = fmap (tsDir </>) (languageDirSkips lang)
+
+
+
   files <- globDir1 (compile (languageExtension lang)) (Path.toString tsDir)
-  let paths = filter (\x -> Path.takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ Path.relFile <$> files
+  when (null files)
+    (fail ("Nothing in dir " <> Path.toString tsDir))
+
+  let paths = filter (\x -> Path.takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ Path.absRel <$> files
   trees <- for paths $ \file -> do
     pure . HUnit.testCase (Path.toString file) $ do
       precise <- runTask session (runParse (parseSymbolsFilePath preciseLanguageModes file))
@@ -158,12 +170,18 @@ testOptions = defaultOptions
 main :: IO ()
 -- main = putStrLn "nothing"
 main = withOptions testOptions $ \ config logger statter -> do
-  void $ Process.system "script/clone-example-repos"
+  -- void $ Process.system "script/clone-example-repos"
+
+#if BAZEL_BUILD
+  rf <- Fixture.create
+  let ?runfiles = rf
+  let ?project = Path.relDir "semantic"
+#endif
 
   let session = TaskSession config "-" False logger statter
 
   allTests <- forConcurrently examples $ \lang@LanguageExample{..} -> do
-    let tsDir = Path.relDir "tmp" </> Path.relDir (languageName <> "-examples")
+    let tsDir = Fixture.absRelDir ".."
     buildExamples session lang tsDir
 
   Tasty.defaultMain $ Tasty.testGroup "parse-examples" allTests
@@ -175,6 +193,6 @@ parseSymbolsFilePath ::
   , Has Files sig m
   )
   => PerLanguageModes
-  -> Path.RelFile
+  -> Path.AbsRelFile
   -> m ParseTreeSymbolResponse
 parseSymbolsFilePath languageModes path = readBlob (File.fromPath path) >>= runReader languageModes . parseSymbols . pure @[]

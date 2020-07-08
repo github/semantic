@@ -1,0 +1,37 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "//:build/common.bzl",
+    "semantic_language_library",
+    "semantic_language_parsing_test",
+)
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+)
+
+semantic_language_library(
+    name = "semantic-python",
+    srcs = glob(
+        include = ["src/**/*.hs"],
+        exclude = [
+            "src/Language/Python/Core.hs",
+            "src/Language/Python/ScopeGraph.hs",
+        ],
+    ),
+    language = "python",
+)
+
+semantic_language_parsing_test(language = "python")
+
+haskell_binary(
+    name = "bench",
+    srcs = glob(["bench/**/*.hs"]),
+    deps = [
+        ":semantic-python",
+        "//:base",
+        "//:bytestring",
+        "//semantic-ast",
+        "@stackage//:gauge",
+    ],
+)

@@ -1,0 +1,21 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "//:build/common.bzl",
+    "semantic_language_library",
+    "semantic_language_parsing_test",
+)
+
+semantic_language_library(
+    name = "semantic-tsx",
+    srcs = glob(["src/**/*.hs"]),
+    language = "tsx",
+    nodetypes = "@tree-sitter-typescript//:tsx/src/node-types.json",
+    ts_package = "typescript",
+)
+
+semantic_language_parsing_test(
+    language = "tsx",
+    semantic_package = "tsx",
+    ts_package = "typescript",
+)

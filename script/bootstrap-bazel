@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e pipefail
+
+echo "Installing Bazel..."
+brew install bazel
+mkdir -p .bazel-cache/bazel-disk || true
+mkdir .bazel-cache/bazel-repo || true

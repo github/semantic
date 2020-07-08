@@ -1,0 +1,25 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_library",
+)
+load(
+    "@rules_haskell//haskell:cabal.bzl",
+    "haskell_cabal_binary",
+    "haskell_cabal_library",
+)
+
+haskell_library(
+    name = "semantic-proto",
+    srcs = glob(["src/**/*.hs"]),
+    deps = [
+        "//:base",
+        "//:text",
+        "@stackage//:aeson",
+        "@stackage//:proto-lens",
+        "@stackage//:proto-lens-jsonpb",
+        "@stackage//:proto-lens-runtime",
+    ],
+)

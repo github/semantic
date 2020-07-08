@@ -1,0 +1,26 @@
+resolver: lts-15.13
+packages:
+  - github: antitypical/fused-syntax
+    commit: "d11e14581217590a5c67f79cbaeee35ac8acee6a"
+    sha256: "e84d4812c4a6a4a6d76a684fa7adda7b8b42cded4e3b19c73212a848e1130f09"
+  - github: tclem/proto-lens-jsonpb
+    commit: "5d40444be689bef1e12cbe38da0261283775ec64"
+    sha256: "39f783f07aeb64614aadb6ee618d000051c46cc9f511277d87feea6cba8fe955"
+  - github: fused-effects/fused-effects-readline
+    commit: "331545c7633955d8e930656f2093c16aa9f8d7a0"
+    sha256: "2b00acb099f179d961838c82155cde64a7da44b2f93ff4d1562e102380907959"
+  - semilattices-0.0.0.4
+  - fused-effects-1.0.2.0
+  - fused-effects-exceptions-1.0.0.0
+  - fused-effects-resumable-0.1.0.0
+  - tree-sitter-0.9.0.1
+  - tree-sitter-python-0.9.0.2
+  - tree-sitter-ruby-0.5.0.2
+  - tree-sitter-rust-0.1.0.0
+  - tree-sitter-go-0.5.0.1
+  - tree-sitter-java-0.7.0.1
+  - tree-sitter-typescript-0.5.0.1
+  - tree-sitter-tsx-0.5.0.1
+  - tree-sitter-json-0.7.0.1
+  - tree-sitter-php-0.5.0.0
+  - tree-sitter-ql-0.1.0.3

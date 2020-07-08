@@ -13,7 +13,8 @@ import           Language.Python.Grammar
 import           AST.Unmarshal
 
 main :: IO ()
-main = getArgs >>= defaultMain . map (bench <*> nfIO . (() <$) . parseFile)
+main = do
+  getArgs >>= defaultMain . map (bench <*> nfIO . (() <$) . parseFile)
 
 parseFile :: FilePath -> IO (Py.Module ())
 parseFile = either die pure <=< parseByteString @Py.Module @() tree_sitter_python <=< B.readFile

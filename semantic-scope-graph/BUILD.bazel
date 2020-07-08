@@ -1,0 +1,38 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_library",
+)
+load(
+    "@rules_haskell//haskell:cabal.bzl",
+    "haskell_cabal_binary",
+    "haskell_cabal_library",
+)
+load(
+    "//:build/common.bzl",
+    "GHC_FLAGS",
+)
+
+haskell_library(
+    name = "semantic-scope-graph",
+    srcs = glob(["src/**/*.hs"]),
+    compiler_flags = GHC_FLAGS + ["-XOverloadedStrings"],
+    deps = [
+        "//:base",
+        "//:containers",
+        "//:text",
+        "//semantic-analysis",
+        "//semantic-source",
+        "@stackage//:aeson",
+        "@stackage//:algebraic-graphs",
+        "@stackage//:fused-effects",
+        "@stackage//:generic-lens",
+        "@stackage//:generic-monoid",
+        "@stackage//:hashable",
+        "@stackage//:lens",
+        "@stackage//:pathtype",
+        "@stackage//:semilattices",
+    ],
+)

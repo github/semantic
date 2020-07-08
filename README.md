@@ -71,6 +71,16 @@ cabal v2-test
 cabal v2-run semantic -- --help
 ```
 
+You can also use the [Bazel](https://bazel.build) build system for development. To learn more about Bazel and why it might give you a better development experience, check the documentation at `docs/build.md`.
+
+``` bash
+git clone git@github.com:github/semantic.git
+cd semantic
+script/bootstrap-bazel
+bazel build //...
+```
+
+
  `stack` as a build tool is not officially supported; there is [unofficial `stack.yaml` support](https://github.com/jkachmar/semantic-stack-yaml) available, though we cannot make guarantees as to its stability.
 
 [nix]: https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html

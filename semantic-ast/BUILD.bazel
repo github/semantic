@@ -1,0 +1,48 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_library",
+)
+load(
+    "@rules_haskell//haskell:cabal.bzl",
+    "haskell_cabal_binary",
+    "haskell_cabal_library",
+)
+load(
+    "//:build/common.bzl",
+    "GHC_FLAGS",
+)
+
+haskell_library(
+    name = "semantic-ast",
+    srcs = glob(["src/**/*.hs"]),
+    compiler_flags = GHC_FLAGS + ["-XOverloadedStrings"],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:filepath",
+        "//:template-haskell",
+        "//:text",
+        "//semantic-source",
+        "@stackage//:Glob",
+        "@stackage//:aeson",
+        "@stackage//:aeson-pretty",
+        "@stackage//:attoparsec",
+        "@stackage//:bazel-runfiles",
+        "@stackage//:directory",
+        "@stackage//:fused-effects",
+        "@stackage//:hedgehog",
+        "@stackage//:optparse-applicative",
+        "@stackage//:pathtype",
+        "@stackage//:pretty-simple",
+        "@stackage//:tasty",
+        "@stackage//:tasty-hedgehog",
+        "@stackage//:tasty-hunit",
+        "@stackage//:tree-sitter",
+        "@stackage//:tree-sitter-python",
+        "@stackage//:unordered-containers",
+    ],
+)

@@ -38,6 +38,8 @@ common haskell
     -Wno-missed-specialisations
     -Wno-all-missed-specialisations
     -Wno-star-is-type
+  cpp-options:
+    -DBAZEL_BUILD=0
   if (impl(ghc >= 8.8))
     ghc-options: -Wno-missing-deriving-strategies
 
@@ -72,7 +74,6 @@ common dependencies
                      , streaming ^>= 0.2.2.0
                      , text ^>= 1.2.3.1
                      , unix ^>= 2.7.2.2
-                     , lingo ^>= 0.3.2.0
 
 common executable-flags
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m"

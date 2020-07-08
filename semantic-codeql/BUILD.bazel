@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "//:build/common.bzl",
+    "semantic_language_library",
+    "semantic_language_parsing_test",
+)
+
+semantic_language_library(
+    name = "semantic-codeql",
+    srcs = glob(["src/**/*.hs"]),
+    language = "ql",
+)
+
+semantic_language_parsing_test(
+    language = "codeql",
+    semantic_package = "ql",
+    ts_package = "ql",
+)

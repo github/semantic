@@ -1,0 +1,31 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_binary",
+    "haskell_library",
+)
+load(
+    "@rules_haskell//haskell:cabal.bzl",
+    "haskell_cabal_binary",
+    "haskell_cabal_library",
+)
+load(
+    "//:build/common.bzl",
+    "GHC_FLAGS",
+)
+
+haskell_library(
+    name = "semantic-tags",
+    srcs = glob(["src/**/*.hs"]),
+    compiler_flags = GHC_FLAGS,
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:text",
+        "//semantic-proto",
+        "//semantic-source",
+        "@stackage//:fused-effects",
+    ],
+)

@@ -1,0 +1,61 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_library",
+    "haskell_test",
+)
+load(
+    "@rules_haskell//haskell:cabal.bzl",
+    "haskell_cabal_binary",
+    "haskell_cabal_library",
+)
+load(
+    "//:build/common.bzl",
+    "EXECUTABLE_FLAGS",
+    "GHC_FLAGS",
+)
+
+haskell_library(
+    name = "semantic-core",
+    srcs = glob(["src/**/*.hs"]),
+    compiler_flags = GHC_FLAGS,
+    deps = [
+        "//:base",
+        "//:text",
+        "//semantic-analysis",
+        "//semantic-source",
+        "@stackage//:fused-effects",
+        "@stackage//:fused-syntax",
+        "@stackage//:hashable",
+        "@stackage//:parsers",
+        "@stackage//:pathtype",
+        "@stackage//:prettyprinter",
+        "@stackage//:prettyprinter-ansi-terminal",
+        "@stackage//:trifecta",
+        "@stackage//:unordered-containers",
+    ],
+)
+
+haskell_test(
+    name = "test",
+    srcs = glob([
+        "test/*.hs",
+        "test/Source/Test.hs",
+    ]),
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS,
+    deps = [
+        "//:base",
+        "//:text",
+        "//semantic-analysis",
+        "//semantic-core",
+        "//semantic-source",
+        "@stackage//:fused-effects",
+        "@stackage//:fused-syntax",
+        "@stackage//:hedgehog",
+        "@stackage//:tasty",
+        "@stackage//:tasty-hedgehog",
+        "@stackage//:tasty-hunit",
+        "@stackage//:trifecta",
+    ],
+)

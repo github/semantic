@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
@@ -14,6 +15,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
 module Language.JSON.AST
 ( module Language.JSON.AST
@@ -25,4 +27,8 @@ import           Language.Haskell.TH.Syntax (runIO)
 import           Prelude hiding (String)
 import qualified TreeSitter.JSON as JSON (getNodeTypesPath, getTestCorpusDir, tree_sitter_json)
 
+#ifdef NODE_TYPES_PATH
+astDeclarationsForLanguage JSON.tree_sitter_json NODE_TYPES_PATH
+#else
 runIO JSON.getNodeTypesPath >>= astDeclarationsForLanguage JSON.tree_sitter_json
+#endif

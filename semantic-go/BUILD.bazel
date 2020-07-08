@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "//:build/common.bzl",
+    "semantic_language_library",
+    "semantic_language_parsing_test",
+)
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_test",
+)
+
+semantic_language_library(
+    name = "semantic-go",
+    srcs = glob(["src/**/*.hs"]),
+    language = "go",
+)
+
+semantic_language_parsing_test(language = "go")

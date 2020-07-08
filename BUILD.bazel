@@ -1,0 +1,66 @@
+# This build file specifies the packages from GHC bindists that
+# we want to use, as well as the top-level hie-bios REPL target
+# that the tooling uses. You probably don't need to edit it.
+
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_repl",
+    "haskell_toolchain_library",
+)
+
+# You can specify what kind of compilation mode you want by providing
+# --compilation_mode=MODE to `bazel build`, where MODE is one of
+# 'fastbuild', 'dbg', or 'opt'. We declare targets corresponding to this
+# setting, which are used in common.bzl to vary compiler flags based
+# on the compilation mode. Note that you can also just write `-c opt`
+# if you're not into writing out compilation_mode.
+
+config_setting(
+    name = "release",
+    values = {"compilation_mode": "opt"},
+)
+
+config_setting(
+    name = "development",
+    values = {"compilation_mode": "fastbuild"},
+)
+
+config_setting(
+    name = "debug",
+    values = {"compilation_mode": "dbg"},
+)
+
+# The GHC bindists provide us with a set of builtin libraries.
+# We use them rather than looking up those in stackage.
+
+haskell_toolchain_library(name = "base")
+
+haskell_toolchain_library(name = "bytestring")
+
+haskell_toolchain_library(name = "containers")
+
+haskell_toolchain_library(name = "deepseq")
+
+haskell_toolchain_library(name = "filepath")
+
+haskell_toolchain_library(name = "ghc-prim")
+
+haskell_toolchain_library(name = "text")
+
+haskell_toolchain_library(name = "haskeline")
+
+haskell_toolchain_library(name = "process")
+
+haskell_toolchain_library(name = "template-haskell")
+
+haskell_toolchain_library(name = "transformers")
+
+# This repl target is used by hie-bios + ghcide.
+
+haskell_repl(
+    name = "hie-bios",
+    collect_data = False,
+    deps = ["//semantic"],
+)

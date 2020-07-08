@@ -61,6 +61,7 @@ runTagging :: PerLanguageModes -> Path.RelDir -> String -> Benchmarkable
 runTagging mode dir glob = nfIO . withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
   files <- globDir1 (compile glob) (Path.toString dir)
+  when (null files) (fail ("No files in " <> Path.toString dir))
   let paths = Path.relFile <$> files
   for_ paths (runTask session . runParse . parseSymbolsFilePath mode >=> either throwIO pure)
 

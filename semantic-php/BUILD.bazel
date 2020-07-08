@@ -1,0 +1,12 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "//:build/common.bzl",
+    "semantic_language_library",
+)
+
+semantic_language_library(
+    name = "semantic-php",
+    srcs = glob(["src/**/*.hs"]),
+    language = "php",
+)

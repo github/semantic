@@ -1,0 +1,55 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "@rules_haskell//haskell:defs.bzl",
+    "haskell_library",
+    "haskell_test",
+)
+load(
+    "@rules_haskell//haskell:cabal.bzl",
+    "haskell_cabal_binary",
+    "haskell_cabal_library",
+)
+load(
+    "//:build/common.bzl",
+    "EXECUTABLE_FLAGS",
+    "GHC_FLAGS",
+)
+
+haskell_library(
+    name = "semantic-source",
+    srcs = glob(["src/**/*.hs"]),
+    compiler_flags = GHC_FLAGS + ["-XOverloadedStrings"],
+    deps = [
+        "//:base",
+        "//:bytestring",
+        "//:containers",
+        "//:deepseq",
+        "//:filepath",
+        "//:text",
+        "@lingo",
+        "@stackage//:aeson",
+        "@stackage//:generic-monoid",
+        "@stackage//:hashable",
+        "@stackage//:pathtype",
+        "@stackage//:semilattices",
+    ],
+)
+
+haskell_test(
+    name = "test",
+    srcs = [
+        "test/Source/Test.hs",
+        "test/Test.hs",
+    ],
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS,
+    deps = [
+        ":semantic-source",
+        "//:base",
+        "//:text",
+        "@stackage//:hedgehog",
+        "@stackage//:tasty",
+        "@stackage//:tasty-hedgehog",
+        "@stackage//:tasty-hunit",
+    ],
+)
