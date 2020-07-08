@@ -143,3 +143,6 @@ instance SExprTermBy 'Precise TSX.Term where
 
 instance SExprTermBy 'Precise TypeScript.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . TypeScript.getTerm
+
+instance SExprTermBy 'Precise Rust.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . Rust.getTerm
