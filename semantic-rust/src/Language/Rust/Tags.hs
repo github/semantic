@@ -75,6 +75,19 @@ yieldTag name kind ty loc srcLineRange = do
   src <- ask @Source
   Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
+instance ToTags Rust.ModItem where 
+  tags 
+    t@Rust.ModItem 
+      {
+        ann = loc@Loc {byteRange},
+        body,
+        name = Parse.Success (Rust.Identifier)
+      } = do
+        yieldTag name ann 
+        case body of 
+          Just (Parse.Success decls) -> gtags decls
+          _ -> pure ()
+  tags _ = pure ()
 
 -- instance ToTags Rust.AssignmentExpression where
 --   tags
