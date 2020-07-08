@@ -20,6 +20,7 @@ RELEASE_GHC_FLAGS = ["-O1"]
 GHC_FLAGS = [
     "-v1",
     "-j8",
+    "-fPIC",
     "-fdiagnostics-color=always",
     "-ferror-spans",
     "-Weverything",
