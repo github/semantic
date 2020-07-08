@@ -135,16 +135,18 @@ stack_snapshot(
     ],
     tools = ["@happy"],
     vendored_packages = {
-        "tree-sitter-json": "@tree-sitter-json//:tree-sitter-json",
-        "tree-sitter-ql": "@tree-sitter-ql//:tree-sitter-ql",
-        "tree-sitter-tsx": "@tree-sitter-tsx//:tree-sitter-tsx",
-        "tree-sitter-typescript": "@tree-sitter-typescript//:tree-sitter-typescript",
-        "tree-sitter-php": "@tree-sitter-php//:tree-sitter-php",
-        "tree-sitter-ruby": "@tree-sitter-ruby//:tree-sitter-ruby",
-        "tree-sitter-rust": "@tree-sitter-rust//:tree-sitter-rust",
-        "tree-sitter-java": "@tree-sitter-java//:tree-sitter-java",
-        "tree-sitter-python": "@tree-sitter-python//:tree-sitter-python",
-        "tree-sitter-go": "@tree-sitter-go//:tree-sitter-go",
+        "tree-sitter-{}".format(name): "@tree-sitter-{name}//:tree-sitter-{name}".format(name = name)
+        for name in [
+            "json",
+            "ql",
+            "tsx",
+            "typescript",
+            "php",
+            "ruby",
+            "rust",
+            "java",
+            "python",
+        ]
     },
 )
 
