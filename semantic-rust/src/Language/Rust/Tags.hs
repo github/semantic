@@ -225,29 +225,27 @@ instance ToTags Rust.GenericFunction where
         yield name ann = yieldTag function P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
-
 instance ToTags Rust.LetDeclaration where
   tags
-    t@Rust.LetDeclaration 
+    t@Rust.LetDeclaration
       { ann = loc@Loc {byteRange},
         pattern = Parse.Success (Rust.Pattern {text, ann}),
         type',
         value,
         extraChildren
-      } = do 
-  case type' of
-    Just (Parse.Success (Rust.Type)) -> yield text ann
-    _ -> pure ()
-  case value of
-    Just (Parse.Success (Rust.Expression)) -> yield text ann
-    _ -> pure ()
-  case extraChildren of 
-    Just (Parse.Success (Rust.MutableSpecifier)) -> yield text ann
-    _ -> pure ()
-    where
-      yield value ann = yieldTag value P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ + pure ()
-
+      } = do
+      case type' of
+        Just (Parse.Success (Rust.Type)) -> yield text ann
+        _ -> pure ()
+      case value of
+        Just (Parse.Success (Rust.Expression)) -> yield text ann
+        _ -> pure ()
+      case extraChildren of
+        Just (Parse.Success (Rust.MutableSpecifier)) -> yield text ann
+        _ -> pure ()
+      where
+        yield value ann = yieldTag value P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
