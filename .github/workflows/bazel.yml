@@ -31,5 +31,7 @@ jobs:
 
     - name: Build & test
       run: |
+        export BAZEL_USE_CPP_ONLY_TOOLCHAIN=1
+        echo $BAZEL_USE_CPP_ONLY_TOOLCHAIN
         bazel build //...
         bazel test //...
