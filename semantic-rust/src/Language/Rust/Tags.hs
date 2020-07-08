@@ -1,9 +1,12 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+
 module Language.Rust.Tags
 ( ToTags(..)
 ) where
@@ -56,218 +59,229 @@ gtags
   -> m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
-yieldTag name kind ty loc srcLineRange = do
-  src <- ask @Source
-  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
+-- enum SyntaxType {
+--   FUNCTION = 0;
+--   METHOD = 1;
+--   CLASS = 2;
+--   MODULE = 3;
+--   CALL = 4;
+--   TYPE = 5;
+--   INTERFACE = 6;
+--   IMPLEMENTATION = 7;
+-- }
+
+-- yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+-- yieldTag name kind ty loc srcLineRange = do
+--   src <- ask @Source
+--   Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
 
-instance ToTags Rust.SourceFile where
-  tags
-    t@Rust.SourceFile
-      { extraChildren,
-        ann = loc@Loc {byteRange}
-      } = case extraChildren of
-      EPrj (Rust.DeclarationStatement {text, ann}) -> yield text ann
-      EPrj (Rust.Expression {text, ann}) -> yield text ann
-        where
-          yield name ann = yieldTag name P.MODULE P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.SourceFile where
+--   tags
+--     t@Rust.SourceFile
+--       { extraChildren,
+--         ann = loc@Loc {byteRange}
+--       } = case extraChildren of
+--       EPrj (Rust.DeclarationStatement {text, ann}) -> yield text ann
+--       EPrj (Rust.Expression {text, ann}) -> yield text ann
+--         where
+--           yield name ann = yieldTag name P.MODULE P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 
-instance ToTags Rust.AssignmentExpression where
-  tags
-    t@Rust.AssignmentExpression
-      { ann = loc@Loc {byteRange},
-        left = Parse.Success (Rust.Expression {text, ann})
-      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.AssignmentExpression where
+--   tags
+--     t@Rust.AssignmentExpression
+--       { ann = loc@Loc {byteRange},
+--         left = Parse.Success (Rust.Expression {text, ann})
+--       } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 
-instance ToTags Rust.Block where
-  tags
-    t@Rust.Block
-      { extraChildren,
-        ann = loc@Loc {byteRange}
-      } = case extraChildren of
-      EPrj Rust.DeclarationStatement -> yield text ann
-      EPrj Rust.Expression -> yield text ann
-        where
-          yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.Block where
+--   tags
+--     t@Rust.Block
+--       { extraChildren,
+--         ann = loc@Loc {byteRange}
+--       } = case extraChildren of
+--       EPrj Rust.DeclarationStatement -> yield text ann
+--       EPrj Rust.Expression -> yield text ann
+--         where
+--           yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 
-instance ToTags Rust.CallExpression where
-  tags
-    t@Rust.CallExpression 
-      {
-        ann = loc@Loc {byteRange},
-        args = Parse.Success (Rust.Arguments {text, ann}),
-        expr = Parse.Success (Rust.Expression {text, ann})
-      } = yieldTag expr P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+-- instance ToTags Rust.CallExpression where
+--   tags
+--     t@Rust.CallExpression 
+--       {
+--         ann = loc@Loc {byteRange},
+--         args = Parse.Success (Rust.Arguments {text, ann}),
+--         expr = Parse.Success (Rust.Expression {text, ann})
+--       } = yieldTag expr P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 
 
-instance ToTags Rust.ClosureExpression where
-  tags
-    t@Rust.ClosureExpression
-      { ann = loc@Loc {byteRange},
-        body = Parse.Success (Rust.Expression {text, ann}),
-        parameters = Parse.Success (Rust.ClosureParameters {text, ann}),
-        returnType = Parse.Success (Rust.Type {text, ann})
-      } = yieldTag body P.METHOD P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.ClosureExpression where
+--   tags
+--     t@Rust.ClosureExpression
+--       { ann = loc@Loc {byteRange},
+--         body = Parse.Success (Rust.Expression {text, ann}),
+--         parameters = Parse.Success (Rust.ClosureParameters {text, ann}),
+--         returnType = Parse.Success (Rust.Type {text, ann})
+--       } = yieldTag body P.METHOD P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 
-instance ToTags Rust.FieldDeclaration where
-  tags
-    t@Rust.FieldDeclaration
-      { ann = loc@Loc {byteRange},
-        name = Parse.Success (Rust.FieldIdentifier {text, ann}),
-        type' = Parse.Success (Rust.Type {text, ann}),
-        extraChildren
-      } = case extraChildren of
-      Just (Parse.Success (Rust.VisibilityModifier)) -> yield text ann
-      _ -> pure ()
-      where
-        yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.FieldDeclaration where
+--   tags
+--     t@Rust.FieldDeclaration
+--       { ann = loc@Loc {byteRange},
+--         name = Parse.Success (Rust.FieldIdentifier {text, ann}),
+--         type' = Parse.Success (Rust.Type {text, ann}),
+--         extraChildren
+--       } = case extraChildren of
+--       Just (Parse.Success (Rust.VisibilityModifier)) -> yield text ann
+--       _ -> pure ()
+--       where
+--         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 
-instance ToTags Rust.FunctionItem where 
-  tags
-    t@Rust.FunctionItem {
-      ann = loc@Loc {byteRange},
-      body = Parse.Success (Rust.Block {text, ann}),
-      name = Parse.Success (Rust.Identifier {text, ann}),
-      parameters = Parse.Success (Rust.Parameters {text, ann})
-      returnType,
-      typeParameters,
-      extraChildren
-    } = do
-      tags 
-      case returnType of
-        Just (Parse.Success (Rust.Type)) -> yield text ann
-        _ -> pure ()
-      case typeParameters of
-        Just (Parse.Success (Rust.TypeParameters)) -> yield text ann
-        _ -> pure () 
-      case extraChildren of 
-        EPrj Rust.FunctionModifiers -> yield text ann 
-        EPrj Rust.VisibilityModifier -> yield text ann
-        EPrj Rust.WhereClause -> yield text ann
-      where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.FunctionItem where 
+--   tags
+--     t@Rust.FunctionItem {
+--       ann = loc@Loc {byteRange},
+--       body = Parse.Success (Rust.Block {text, ann}),
+--       name = Parse.Success (Rust.Identifier {text, ann}),
+--       parameters = Parse.Success (Rust.Parameters {text, ann})
+--       returnType,
+--       typeParameters,
+--       extraChildren
+--     } = do
+--       tags 
+--       case returnType of
+--         Just (Parse.Success (Rust.Type)) -> yield text ann
+--         _ -> pure ()
+--       case typeParameters of
+--         Just (Parse.Success (Rust.TypeParameters)) -> yield text ann
+--         _ -> pure () 
+--       case extraChildren of 
+--         EPrj Rust.FunctionModifiers -> yield text ann 
+--         EPrj Rust.VisibilityModifier -> yield text ann
+--         EPrj Rust.WhereClause -> yield text ann
+--       where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 
-instance ToTags Rust.FunctionModifiers where
-  tags
-    t@Rust.FunctionModifiers
-      { ann = loc@Loc {byteRange},
-        extraChildren = Parse.Success (Rust.ExternModifier {text, ann})
-      } = yieldTag body P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.FunctionModifiers where
+--   tags
+--     t@Rust.FunctionModifiers
+--       { ann = loc@Loc {byteRange},
+--         extraChildren = Parse.Success (Rust.ExternModifier {text, ann})
+--       } = yieldTag body P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 
-instance ToTags Rust.FunctionSignatureItem where
-  tags
-    t@Rust.FunctionSignatureItem
-      { ann = loc@Loc {byteRange},
-        name,
-        parameters = Parse.Success (Rust.Parameters {text, ann}),
-        returnType = Parse.Success (Rust.Type {text, ann}),
-        typeParameters = Parse.Success (Rust.TypeParameters {text, ann}),
-        extraChildren
-      } = do
-      case name of
-        EPrj (Rust.Identifier) -> yield text ann
-        EPrj (Rust.Metavariable) -> yield text ann
-      case extraChildren of
-        EPrj Rust.FunctionModifiers -> yield text ann
-        EPrj Rust.VisibilityModifier -> yield text ann
-        EPrj Rust.WhereClause -> yield text ann
-      where
-        yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.FunctionSignatureItem where
+--   tags
+--     t@Rust.FunctionSignatureItem
+--       { ann = loc@Loc {byteRange},
+--         name,
+--         parameters = Parse.Success (Rust.Parameters {text, ann}),
+--         returnType = Parse.Success (Rust.Type {text, ann}),
+--         typeParameters = Parse.Success (Rust.TypeParameters {text, ann}),
+--         extraChildren
+--       } = do
+--       case name of
+--         EPrj (Rust.Identifier) -> yield text ann
+--         EPrj (Rust.Metavariable) -> yield text ann
+--       case extraChildren of
+--         EPrj Rust.FunctionModifiers -> yield text ann
+--         EPrj Rust.VisibilityModifier -> yield text ann
+--         EPrj Rust.WhereClause -> yield text ann
+--       where
+--         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 
-instance ToTags Rust.FunctionType where
-  tags
-    t@Rust.FunctionType
-      { ann = loc@Loc {byteRange},
-        parameters = Parse.Success (Rust.Parameters {text, ann}),
-        returnType = Parse.Success (Rust.Type {text, ann}),
-        trait,
-        extraChildren
-      } = do
-      case trait of
-        EPrj Rust.ScopedTypeIdentifier -> yield text ann
-        EPrj Rust.TypeIdentifier -> yield text ann
-      case extraChildren of
-        EPrj Rust.ForLifetimes -> yield text ann
-        EPrj Rust.ForModifiers -> yield text ann
-      where
-        yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.FunctionType where
+--   tags
+--     t@Rust.FunctionType
+--       { ann = loc@Loc {byteRange},
+--         parameters = Parse.Success (Rust.Parameters {text, ann}),
+--         returnType = Parse.Success (Rust.Type {text, ann}),
+--         trait,
+--         extraChildren
+--       } = do
+--       case trait of
+--         EPrj Rust.ScopedTypeIdentifier -> yield text ann
+--         EPrj Rust.TypeIdentifier -> yield text ann
+--       case extraChildren of
+--         EPrj Rust.ForLifetimes -> yield text ann
+--         EPrj Rust.ForModifiers -> yield text ann
+--       where
+--         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 
-instance ToTags Rust.GenericFunction where
-  tags
-    t@Rust.GenericFunction
-      { ann = loc@Loc {byteRange},
-        function,
-        typeArgs = Parse.Success (Rust.TypeArguments {text, ann})
-      } = do
-      case function of
-        EPrj Rust.FieldExpression -> yield text ann
-        EPrj Rust.Identifier -> yield text ann
-        EPrj Rust.ScopedIdentifier -> yield text ann
-      where
-        yield name ann = yieldTag function P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.GenericFunction where
+--   tags
+--     t@Rust.GenericFunction
+--       { ann = loc@Loc {byteRange},
+--         function,
+--         typeArgs = Parse.Success (Rust.TypeArguments {text, ann})
+--       } = do
+--       case function of
+--         EPrj Rust.FieldExpression -> yield text ann
+--         EPrj Rust.Identifier -> yield text ann
+--         EPrj Rust.ScopedIdentifier -> yield text ann
+--       where
+--         yield name ann = yieldTag function P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
-instance ToTags Rust.LetDeclaration where
-  tags
-    t@Rust.LetDeclaration
-      { ann = loc@Loc {byteRange},
-        pattern = Parse.Success (Rust.Pattern {text, ann}),
-        type',
-        value,
-        extraChildren
-      } = do
-      case type' of
-        Just (Parse.Success (Rust.Type)) -> yield text ann
-        _ -> pure ()
-      case value of
-        Just (Parse.Success (Rust.Expression)) -> yield text ann
-        _ -> pure ()
-      case extraChildren of
-        Just (Parse.Success (Rust.MutableSpecifier)) -> yield text ann
-        _ -> pure ()
-      where
-        yield value ann = yieldTag value P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
+-- instance ToTags Rust.LetDeclaration where
+--   tags
+--     t@Rust.LetDeclaration
+--       { ann = loc@Loc {byteRange},
+--         pattern = Parse.Success (Rust.Pattern {text, ann}),
+--         type',
+--         value,
+--         extraChildren
+--       } = do
+--       case type' of
+--         Just (Parse.Success (Rust.Type)) -> yield text ann
+--         _ -> pure ()
+--       case value of
+--         Just (Parse.Success (Rust.Expression)) -> yield text ann
+--         _ -> pure ()
+--       case extraChildren of
+--         Just (Parse.Success (Rust.MutableSpecifier)) -> yield text ann
+--         _ -> pure ()
+--       where
+--         yield value ann = yieldTag value P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+--   tags _ = pure ()
 
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
 instance ToTags Rust.ArrayType
--- instance ToTags Rust.AssignmentExpression
+instance ToTags Rust.AssignmentExpression -- this
 instance ToTags Rust.AssociatedType
 instance ToTags Rust.AsyncBlock
 instance ToTags Rust.AttributeItem
 instance ToTags Rust.AwaitExpression
 instance ToTags Rust.BaseFieldInitializer
 instance ToTags Rust.BinaryExpression
--- instance ToTags Rust.Block
+instance ToTags Rust.Block -- this 
 instance ToTags Rust.BlockComment
 instance ToTags Rust.BooleanLiteral
 instance ToTags Rust.BoundedType
 instance ToTags Rust.BracketedType
 instance ToTags Rust.BreakExpression
--- instance ToTags Rust.CallExpression
+instance ToTags Rust.CallExpression -- this
 instance ToTags Rust.CapturedPattern
 instance ToTags Rust.CharLiteral
--- instance ToTags Rust.ClosureExpression
+instance ToTags Rust.ClosureExpression -- this
 instance ToTags Rust.ClosureParameters
 instance ToTags Rust.CompoundAssignmentExpr
 instance ToTags Rust.ConstItem
@@ -287,7 +301,7 @@ instance ToTags Rust.EscapeSequence
 instance ToTags Rust.Expression
 instance ToTags Rust.ExternCrateDeclaration
 instance ToTags Rust.ExternModifier
--- instance ToTags Rust.FieldDeclaration
+instance ToTags Rust.FieldDeclaration -- this
 instance ToTags Rust.FieldDeclarationList
 instance ToTags Rust.FieldExpression
 instance ToTags Rust.FieldIdentifier
@@ -299,11 +313,11 @@ instance ToTags Rust.ForExpression
 instance ToTags Rust.ForLifetimes
 instance ToTags Rust.ForeignModItem
 instance ToTags Rust.FragmentSpecifier
--- instance ToTags Rust.FunctionItem
--- instance ToTags Rust.FunctionModifiers
--- instance ToTags Rust.FunctionSignatureItem
--- instance ToTags Rust.FunctionType
--- instance ToTags Rust.GenericFunction
+instance ToTags Rust.FunctionItem -- this
+instance ToTags Rust.FunctionModifiers  -- this
+instance ToTags Rust.FunctionSignatureItem -- this
+instance ToTags Rust.FunctionType -- this
+instance ToTags Rust.GenericFunction -- this
 instance ToTags Rust.GenericType
 instance ToTags Rust.GenericTypeWithTurbofish
 instance ToTags Rust.HigherRankedTraitBound
@@ -314,15 +328,15 @@ instance ToTags Rust.ImplItem
 instance ToTags Rust.IndexExpression
 instance ToTags Rust.InnerAttributeItem
 instance ToTags Rust.IntegerLiteral
--- instance ToTags Rust.LetDeclaration
+instance ToTags Rust.LetDeclaration --this
 instance ToTags Rust.Lifetime
 instance ToTags Rust.LineComment
 instance ToTags Rust.Literal
 instance ToTags Rust.LiteralPattern
 instance ToTags Rust.LoopExpression
 instance ToTags Rust.LoopLabel
-instance ToTags Rust.MacroDefinition
-instance ToTags Rust.MacroInvocation
+instance ToTags Rust.MacroDefinition --this
+instance ToTags Rust.MacroInvocation --this
 instance ToTags Rust.MacroRule
 instance ToTags Rust.MatchArm
 instance ToTags Rust.MatchBlock
@@ -362,7 +376,7 @@ instance ToTags Rust.SelfParameter
 instance ToTags Rust.ShorthandFieldIdentifier
 instance ToTags Rust.ShorthandFieldInitializer
 instance ToTags Rust.SlicePattern
--- instance ToTags Rust.SourceFile
+instance ToTags Rust.SourceFile --this
 instance ToTags Rust.StaticItem
 instance ToTags Rust.StringLiteral
 instance ToTags Rust.StructExpression
@@ -385,8 +399,8 @@ instance ToTags Rust.Type
 instance ToTags Rust.TypeArguments
 instance ToTags Rust.TypeBinding
 instance ToTags Rust.TypeCastExpression
--- instance ToTags Rust.TypeIdentifier
-instance ToTags Rust.TypeItem
+instance ToTags Rust.TypeIdentifier --this
+instance ToTags Rust.TypeItem --this
 instance ToTags Rust.TypeParameters
 instance ToTags Rust.UnaryExpression
 instance ToTags Rust.UnionItem
