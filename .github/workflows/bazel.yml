@@ -1,4 +1,4 @@
-name: Haskell CI
+name: Bazel CI
 
 on:
   # Trigger the workflow on push or pull request,
