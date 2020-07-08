@@ -79,12 +79,12 @@ exports_files(glob(["**/node-types.json"]))
 
 alias(
    name = "src/node-types.json",
-   actual = ":vendor/{}/src/node-types.json",
+   actual = "{}",
 )
 
 haskell_cabal_library(
     name = "{}",
-    version = packages["{}"].version,
+    version = "{}",
     srcs = glob(["**"]),
     deps = packages["{}"].deps,
     visibility = ["//visibility:public"],
@@ -93,10 +93,12 @@ haskell_cabal_library(
 filegroup(name = "corpus", srcs = glob(["**/corpus/*.txt"]))
 """
 
-def tree_sitter_node_types_hackage(name, version, sha256):
+def tree_sitter_node_types_hackage(name, version, sha256, node_types_path = ""):
+    if node_types_path == "":
+        node_types_path = ":vendor/{}/src/node-types.json".format(name)
     http_archive(
         name = name,
-        build_file_content = _attempt.format(name, name, name, name),
+        build_file_content = _attempt.format(node_types_path, name, version, name, name),
         urls = ["https://hackage.haskell.org/package/{}-{}/{}-{}.tar.gz".format(name, version, name, version)],
         strip_prefix = "{}-{}".format(name, version),
         sha256 = sha256,

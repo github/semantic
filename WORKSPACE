@@ -132,15 +132,10 @@ stack_snapshot(
         "time",
         "transformers",
         "tree-sitter",
-        "tree-sitter-java",
         "tree-sitter-json",
-        "tree-sitter-php",
-        "tree-sitter-python",
         "tree-sitter-ql",
-        "tree-sitter-ruby",
         "tree-sitter-rust",
         "tree-sitter-tsx",
-        "tree-sitter-typescript",
         "trifecta",
         "unix",
         "unliftio-core",
@@ -150,7 +145,11 @@ stack_snapshot(
     ],
     tools = ["@happy"],
     vendored_packages = {
-        #"tree-sitter-python": "@tree-sitter-python//"
+        "tree-sitter-typescript": "@tree-sitter-typescript//:tree-sitter-typescript",
+        "tree-sitter-php": "@tree-sitter-php//:tree-sitter-php",
+        "tree-sitter-ruby": "@tree-sitter-ruby//:tree-sitter-ruby",
+        "tree-sitter-java": "@tree-sitter-java//:tree-sitter-java",
+        "tree-sitter-python": "@tree-sitter-python//:tree-sitter-python",
         "tree-sitter-go": "@tree-sitter-go//:tree-sitter-go",
     },
 )
@@ -183,40 +182,35 @@ tree_sitter_node_types_hackage(
     version = "0.5.0.1",
 )
 
-tree_sitter_node_types_release(
+tree_sitter_node_types_hackage(
     name = "tree-sitter-python",
-    sha256 = "50d3fa560391dc4ab8d9a3466f68f2c6a4c12f9cc6421358d2c307023bd740ab",
-    version = "0.16.0",
+    sha256 = "36aca4989a9f8b52d6af1586e6eecc8c3a8db2b5643f64ef13ab3d284c266522",
+    version = "0.9.0.2",
 )
 
-tree_sitter_node_types_release(
+tree_sitter_node_types_hackage(
     name = "tree-sitter-php",
-    sha256 = "d7f6b7dbba359f5129f08647ad4cf73a599abdec443c2b0e2cdbbaee56cf3750",
-    version = "0.16.1",
+    sha256 = "d7a050948fcea3b740924520c5d0e00e9b239949eff831527a736c5421c912a3",
+    version = "0.5.0.0",
 )
 
-tree_sitter_node_types_release(
+tree_sitter_node_types_hackage(
     name = "tree-sitter-java",
-    sha256 = "41af0051be7f9cfb2b85aece37979d1097fddf538b8984fb7726bf1edea4a7ce",
-    version = "0.16.0",
+    sha256 = "9978b56af40c0c66688c17a193761e9c21f7cbbb7e2e299cb7b99f42bd355dfc",
+    version = "0.7.0.1",
 )
 
-tree_sitter_node_types_release(
+tree_sitter_node_types_hackage(
     name = "tree-sitter-json",
-    sha256 = "cbf0fefd2825a2db1770013111f49ec609c4fe090a8909e9780458629c22d1f4",
-    version = "0.16.0",
+    sha256 = "2b16e68afdc8c56bfac81b88dcd495fc8da6ba9df89347249f1785f1077965e5",
+    version = "0.7.0.1",
 )
 
-# tree_sitter_node_types_release(
-#     name = "tree-sitter-go",
-#     sha256 = "7278f1fd4dc4de8a13b0f60407425d38c5cb3973e1938d3031a68e1e69bd0b75",
-#     version = "0.16.1",
-# )
-
-tree_sitter_node_types_release(
+tree_sitter_node_types_hackage(
     name = "tree-sitter-typescript",
-    sha256 = "3e1fc16daab965f21dc56a919b32a730e889ea2ba1330af5edc5950f4e6b18b6",
-    version = "0.16.2",
+    node_types_path = ":vendor/tree-sitter-typescript/typescript/src/node-types.json",
+    sha256 = "19a036ed413c9da66de8fc3826a413c30278d8490603aeb9465caf3707553d19",
+    version = "0.5.0.1",
 )
 
 # Download lingo (which has its own Bazel build instructions).
@@ -234,10 +228,10 @@ git_repository(
 # should move these into node_types_release calls and fix the problems
 # that emerge when we target version releases.
 
-tree_sitter_node_types_git(
+tree_sitter_node_types_hackage(
     name = "tree-sitter-ruby",
-    commit = "eb2b6225bfb80010f2e4cbd27db8c6f3775230b5",
-    shallow_since = "1576688803 -0800",
+    sha256 = "d7e9cb06d37b5ee3be500a7f19ce09b6e846958195eff465d2b03d3218807690",
+    version = "0.5.0.2",
 )
 
 tree_sitter_node_types_git(
@@ -246,16 +240,10 @@ tree_sitter_node_types_git(
     shallow_since = "1585868745 -0700",
 )
 
-tree_sitter_node_types_git(
-    name = "tree-sitter-php",
-    commit = "41a408d5b996ef54d8b9e1b9a2469fad00c1b52b",
-    shallow_since = "1591381188 -0400",
-)
-
-tree_sitter_node_types_git(
+tree_sitter_node_types_hackage(
     name = "tree-sitter-rust",
-    commit = "ab40806a4583b84b9d5636f5a93c0ebfa45b2675",
-    shallow_since = "1583184357 -0800",
+    sha256 = "",
+    version = "0.1.0.0",
 )
 
 load("//:build/example_repos.bzl", "declare_example_repos")
