@@ -42,6 +42,10 @@ common haskell
     -DBAZEL_BUILD=0
   if (impl(ghc >= 8.8))
     ghc-options: -Wno-missing-deriving-strategies
+  if (impl(ghc >= 8.10))
+    ghc-options:
+      -Wno-missing-safe-haskell-mode
+      -Wno-prepositive-qualified-module
 
 
 -- Except in case of vendored dependencies, these deps should be expressed
