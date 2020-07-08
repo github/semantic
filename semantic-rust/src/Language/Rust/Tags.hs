@@ -23,7 +23,7 @@ import           Data.Text as Text
 import qualified Language.Rust.AST as Rust
 import           Source.Loc
 import           Source.Source as Source
-import           Tags.Tag()
+import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 import           Proto.Semantic as P
 
