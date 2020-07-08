@@ -36,12 +36,6 @@ load(
     "rules_haskell_toolchains",
 )
 
-git_repository(
-    name = "haskell-tree-sitter",
-    branch = "master",
-    remote = "https://github.com/tree-sitter/haskell-tree-sitter.git",
-)
-
 # Download a GHC binary distribution from haskell.org and register it as a toolchain.
 rules_haskell_toolchains(version = "8.8.3")
 

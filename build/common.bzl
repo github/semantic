@@ -74,6 +74,8 @@ filegroup(name = "corpus", srcs = glob(["**/corpus/*.txt"]))
 """
 
 def tree_sitter_node_types_hackage(name, version, sha256, node_types_path = ""):
+    """Download a tree-sitter language package from Hackage and build/expose its library and corpus."""
+
     if node_types_path == "":
         node_types_path = ":vendor/{}/src/node-types.json".format(name)
     http_archive(
