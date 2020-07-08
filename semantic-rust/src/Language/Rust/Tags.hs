@@ -363,7 +363,7 @@ instance ToTags Rust.SelfParameter
 instance ToTags Rust.ShorthandFieldIdentifier
 instance ToTags Rust.ShorthandFieldInitializer
 instance ToTags Rust.SlicePattern
-instance ToTags Rust.SourceFile --this
+instance ToTags Rust.SourceFile
 instance ToTags Rust.StaticItem
 instance ToTags Rust.StringLiteral
 instance ToTags Rust.StructExpression
