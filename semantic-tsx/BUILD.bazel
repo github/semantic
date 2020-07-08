@@ -10,8 +10,8 @@ semantic_language_library(
     name = "semantic-tsx",
     srcs = glob(["src/**/*.hs"]),
     language = "tsx",
-    nodetypes = "@tree-sitter-typescript//:tsx/src/node-types.json",
-    ts_package = "typescript",
+    nodetypes = "@tree-sitter-tsx//:vendor/tree-sitter-typescript/tsx/src/node-types.json",
+    ts_package = "tsx",
 )
 
 semantic_language_parsing_test(
@@ -19,3 +19,5 @@ semantic_language_parsing_test(
     semantic_package = "tsx",
     ts_package = "typescript",
 )
+
+tree

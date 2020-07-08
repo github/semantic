@@ -132,10 +132,6 @@ stack_snapshot(
         "time",
         "transformers",
         "tree-sitter",
-        "tree-sitter-json",
-        "tree-sitter-ql",
-        "tree-sitter-rust",
-        "tree-sitter-tsx",
         "trifecta",
         "unix",
         "unliftio-core",
@@ -145,9 +141,13 @@ stack_snapshot(
     ],
     tools = ["@happy"],
     vendored_packages = {
+        "tree-sitter-json": "@tree-sitter-json//:tree-sitter-json",
+        "tree-sitter-ql": "@tree-sitter-ql//:tree-sitter-ql",
+        "tree-sitter-tsx": "@tree-sitter-tsx//:tree-sitter-tsx",
         "tree-sitter-typescript": "@tree-sitter-typescript//:tree-sitter-typescript",
         "tree-sitter-php": "@tree-sitter-php//:tree-sitter-php",
         "tree-sitter-ruby": "@tree-sitter-ruby//:tree-sitter-ruby",
+        "tree-sitter-rust": "@tree-sitter-rust//:tree-sitter-rust",
         "tree-sitter-java": "@tree-sitter-java//:tree-sitter-java",
         "tree-sitter-python": "@tree-sitter-python//:tree-sitter-python",
         "tree-sitter-go": "@tree-sitter-go//:tree-sitter-go",
@@ -171,9 +171,7 @@ haskell_cabal_binary(name = "happy", srcs = glob(["**"]), visibility = ["//visib
 
 load(
     "//:build/common.bzl",
-    "tree_sitter_node_types_git",
     "tree_sitter_node_types_hackage",
-    "tree_sitter_node_types_release",
 )
 
 tree_sitter_node_types_hackage(
@@ -213,20 +211,12 @@ tree_sitter_node_types_hackage(
     version = "0.5.0.1",
 )
 
-# Download lingo (which has its own Bazel build instructions).
-
-git_repository(
-    name = "lingo",
-    commit = "6614b9afe1a519364491c170d6b06ff5cd96153a",
-    remote = "https://github.com/tclem/lingo-haskell.git",
-    shallow_since = "1593202797 -0400",
+tree_sitter_node_types_hackage(
+    name = "tree-sitter-tsx",
+    node_types_path = ":vendor/tree-sitter-typescript/tsx/src/node-types.json",
+    sha256 = "",
+    version = "0.5.0.1",
 )
-
-# These packages use node_types_git because they correspond to Hackage
-# tree-sitter-* parsers vendored not to a release of their C parser,
-# but to a given Git SHA. This works, but is a little specious, so we
-# should move these into node_types_release calls and fix the problems
-# that emerge when we target version releases.
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-ruby",
@@ -234,16 +224,25 @@ tree_sitter_node_types_hackage(
     version = "0.5.0.2",
 )
 
-tree_sitter_node_types_git(
+tree_sitter_node_types_hackage(
     name = "tree-sitter-ql",
-    commit = "c0d674abed8836bb5a4770f547343ef100f88c24",
-    shallow_since = "1585868745 -0700",
+    sha256 = "fdc3ad5351318fcfeebd7ecb0099a5e3eeac030ec5037f71c1634ab5da94ae6b",
+    version = "0.1.0.3",
 )
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-rust",
-    sha256 = "",
+    sha256 = "522968fa22ad2e9720012b74487e77c91693572d81b157acdb0e116c535848ad",
     version = "0.1.0.0",
+)
+
+# Download lingo (which has its own Bazel build instructions).
+
+git_repository(
+    name = "lingo",
+    commit = "6614b9afe1a519364491c170d6b06ff5cd96153a",
+    remote = "https://github.com/tclem/lingo-haskell.git",
+    shallow_since = "1593202797 -0400",
 )
 
 load("//:build/example_repos.bzl", "declare_example_repos")
