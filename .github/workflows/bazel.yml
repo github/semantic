@@ -1,4 +1,4 @@
-name: Bazel CI
+name:  CI
 
 on:
   # Trigger the workflow on push or pull request,
@@ -12,6 +12,9 @@ jobs:
   build:
     name: Bazel
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ghc: ["8.8.3"]
 
     steps:
     - uses: actions/checkout@v2
