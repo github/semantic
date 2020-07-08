@@ -16,6 +16,7 @@ import qualified System.Path as Path
 
 import qualified Analysis.File as File
 import           Data.Flag
+import           Data.Either (fromRight)
 import           Proto.Semantic as P hiding (Blob)
 import           Semantic.Api.Symbols (parseSymbols)
 import           Semantic.Config as Config
@@ -24,10 +25,19 @@ import           Semantic.Task.Files
 
 benchmarks :: Benchmark
 benchmarks = bgroup "tagging"
-  [ pythonBenchmarks
-  , goBenchmarks
-  , rubyBenchmarks
+  [ bench "jquery" $ runTagging' (Path.relFile "semantic/test/fixtures/jquery-3.5.1.min.js")
+  , bench "sinatra" $ runTagging' (Path.relFile "semantic/test/fixtures/base.rb")
   ]
+  -- Feel free to turn these on or write other benchmarks
+  -- [ pythonBenchmarks
+  -- , goBenchmarks
+  -- , rubyBenchmarks
+  -- ]
+
+runTagging' :: Path.RelFile -> Benchmarkable
+runTagging' path = nfIO . withOptions testOptions $ \ config logger statter -> do
+  let session = TaskSession config "-" False logger statter
+  runTask session (runParse (parseSymbolsFilePath preciseLanguageModes path)) >>= either throwIO pure
 
 pythonBenchmarks :: Benchmark
 pythonBenchmarks = bgroup "python"

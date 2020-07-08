@@ -17,23 +17,24 @@ import AST.Token
 import AST.Traversable1
 import Control.Effect.Reader
 import Control.Effect.Writer
-import Data.Text (Text)
+import Control.Effect.State
 import qualified Language.PHP.AST as PHP
 import Proto.Semantic as P
 import Source.Loc
 import Source.Source as Source
-import Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags t where
   tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m
     ) =>
     t Loc ->
     m ()
   default tags ::
     ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
       Has (Writer Tags.Tags) sig m,
       Traversable1 ToTags t
     ) =>
@@ -49,6 +50,7 @@ instance (ToTags l, ToTags r) => ToTags (l :+: r) where
 
 gtags ::
   ( Has (Reader Source) sig m,
+      Has (State Tags.LineIndices) sig m,
     Has (Writer Tags.Tags) sig m,
     Traversable1 ToTags t
   ) =>
@@ -56,17 +58,12 @@ gtags ::
   m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
-yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
-yieldTag name kind ty loc srcLineRange = do
-  src <- ask @Source
-  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
-
 instance ToTags PHP.FunctionDefinition where
   tags
     t@PHP.FunctionDefinition
       { PHP.ann = Loc {byteRange},
         PHP.name = Parse.Success (PHP.Name {text, ann})
-      } = yieldTag text P.METHOD P.DEFINITION ann byteRange >> gtags t
+      } = Tags.yield text P.METHOD P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags PHP.MethodDeclaration where
@@ -74,7 +71,7 @@ instance ToTags PHP.MethodDeclaration where
     t@PHP.MethodDeclaration
       { PHP.ann = Loc {byteRange},
         PHP.name = Parse.Success (PHP.Name {text, ann})
-      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+      } = Tags.yield text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 instance ToTags PHP.FunctionCallExpression where
@@ -84,7 +81,7 @@ instance ToTags PHP.FunctionCallExpression where
         PHP.function = func
       } = match func
       where
-        yield name loc = yieldTag name P.CALL P.REFERENCE loc byteRange >> gtags t
+        yield name loc = Tags.yield name P.CALL P.REFERENCE loc byteRange >> gtags t
         match expr = case expr of
           EPrj PHP.VariableName {extraChildren = Parse.Success (PHP.Name {text, ann})} -> yield text ann *> gtags t
           EPrj PHP.QualifiedName {extraChildren = [EPrj PHP.Name {text, ann}]} -> yield text ann *> gtags t
@@ -96,7 +93,7 @@ instance ToTags PHP.MemberCallExpression where
     t@PHP.MemberCallExpression
       { PHP.ann = Loc {byteRange},
         PHP.name = Parse.Success (Prj PHP.Name {text, ann})
-      } = yieldTag text P.CALL P.REFERENCE ann byteRange >> gtags t
+      } = Tags.yield text P.CALL P.REFERENCE ann byteRange >> gtags t
   tags t = gtags t
 
 

@@ -76,8 +76,9 @@ parseSymbols blobs = do
             & P.nodeType .~ tagNodeType tag
             & P.syntaxType .~ tagSyntaxType tag
             & P.line .~ tagLine tag
-            & P.maybe'span ?~ converting # Loc.span (tagLoc tag)
-            & P.maybe'docs .~ fmap (flip (set P.docstring) defMessage) (tagDocs tag)
+            & P.maybe'span ?~ converting # unOneIndexedSpan (tagOneIndexedSpan tag)
+            & P.maybe'utf16CodeUnitSpan ?~ converting # unUTF16CodeUnitSpan (tagUTF16CodeUnitSpan tag)
+            & P.byteRange .~ bridging # tagByteRange tag
           where
             toKind = toTitle . pack . show . tagSyntaxType
 

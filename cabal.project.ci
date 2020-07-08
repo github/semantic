@@ -16,6 +16,7 @@ packages: semantic
           semantic-ruby
           semantic-rust
           semantic-scope-graph
+          semantic-source
           semantic-tags
           semantic-tsx
           semantic-typescript
@@ -67,6 +68,9 @@ package semantic-ruby
   ghc-options: -Werror
 
 package semantic-scope-graph
+  ghc-options: -Werror
+
+package semantic-source
   ghc-options: -Werror
 
 package semantic-tags

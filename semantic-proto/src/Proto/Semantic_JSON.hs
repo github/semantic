@@ -251,6 +251,8 @@ instance FromJSONPB Symbol where
     docs' <- obj A..:? "docs"
     nodeType' <- obj .: "nodeType"
     syntaxType' <- obj .: "syntaxType"
+    utf16CodeUnitSpan' <- obj A..:? "utf16CodeUnitSpan"
+    byteRange' <- obj A..:? "byteRange"
     pure $ defMessage
       & P.symbol .~ symbol'
       & P.kind .~ kind'
@@ -259,6 +261,8 @@ instance FromJSONPB Symbol where
       & P.maybe'docs .~ docs'
       & P.nodeType .~ nodeType'
       & P.syntaxType .~ syntaxType'
+      & P.maybe'utf16CodeUnitSpan .~ utf16CodeUnitSpan'
+      & P.maybe'byteRange .~ byteRange'
 
 instance ToJSONPB Symbol where
   toJSONPB x = object
@@ -269,6 +273,8 @@ instance ToJSONPB Symbol where
     , "docs" .= (x^.maybe'docs)
     , "nodeType" .= (x^.nodeType)
     , "syntaxType" .= (x^.syntaxType)
+    , "utf16CodeUnitSpan" .= (x^.maybe'utf16CodeUnitSpan)
+    , "byteRange" .= (x^.maybe'byteRange)
     ]
   toEncodingPB x = pairs
     [ "symbol" .= (x^.symbol)
@@ -278,6 +284,8 @@ instance ToJSONPB Symbol where
     , "docs" .= (x^.maybe'docs)
     , "nodeType" .= (x^.nodeType)
     , "syntaxType" .= (x^.syntaxType)
+    , "utf16CodeUnitSpan" .= (x^.maybe'utf16CodeUnitSpan)
+    , "byteRange" .= (x^.maybe'byteRange)
     ]
 
 instance FromJSON Symbol where
@@ -355,6 +363,31 @@ instance FromJSON Span where
   parseJSON = parseJSONPB
 
 instance ToJSON Span where
+  toJSON = toAesonValue
+  toEncoding = toAesonEncoding
+
+instance FromJSONPB ByteRange where
+  parseJSONPB = withObject "ByteRange" $ \obj -> do
+    start' <- obj .: "start"
+    end' <- obj .: "end"
+    pure $ defMessage
+      & P.start .~ start'
+      & P.end .~ end'
+
+instance ToJSONPB ByteRange where
+  toJSONPB x = object
+    [ "start" .= (x^.start)
+    , "end" .= (x^.end)
+    ]
+  toEncodingPB x = pairs
+    [ "start" .= (x^.start)
+    , "end" .= (x^.end)
+    ]
+
+instance FromJSON ByteRange where
+  parseJSON = parseJSONPB
+
+instance ToJSON ByteRange where
   toJSON = toAesonValue
   toEncoding = toAesonEncoding
 
