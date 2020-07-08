@@ -34,6 +34,7 @@ import qualified Language.Python as Python
 import qualified Language.Ruby as Ruby
 import qualified Language.TSX as TSX
 import qualified Language.TypeScript as TypeScript
+import qualified Language.Rust as Rust
 import Parsing.Parser
 import Semantic.Config
 import Semantic.Task
