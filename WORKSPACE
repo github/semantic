@@ -137,15 +137,16 @@ stack_snapshot(
     vendored_packages = {
         "tree-sitter-{}".format(name): "@tree-sitter-{name}//:tree-sitter-{name}".format(name = name)
         for name in [
+            "go",
+            "java",
             "json",
-            "ql",
-            "tsx",
-            "typescript",
             "php",
+            "python",
+            "ql",
             "ruby",
             "rust",
-            "java",
-            "python",
+            "tsx",
+            "typescript",
         ]
     },
 )
@@ -210,7 +211,7 @@ tree_sitter_node_types_hackage(
 tree_sitter_node_types_hackage(
     name = "tree-sitter-tsx",
     node_types_path = ":vendor/tree-sitter-typescript/tsx/src/node-types.json",
-    sha256 = "",
+    sha256 = "56060c8d12acda0218cc3185c041b8bc7e0a13a0863ab4f1ca133a54078630de",
     version = "0.5.0.1",
 )
 
