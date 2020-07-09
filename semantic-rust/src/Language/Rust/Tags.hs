@@ -176,27 +176,6 @@ instance ToTags Rust.CallExpression where
 --         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 --   tags _ = pure ()
 
-
--- instance ToTags Rust.FunctionType where
---   tags
---     t@Rust.FunctionType
---       { ann = loc@Loc {byteRange},
---         parameters = Parse.Success (Rust.Parameters {text, ann}),
---         returnType = Parse.Success (Rust.Type {text, ann}),
---         trait,
---         extraChildren
---       } = do
---       case trait of
---         EPrj Rust.ScopedTypeIdentifier -> yield text ann
---         EPrj Rust.TypeIdentifier -> yield text ann
---       case extraChildren of
---         EPrj Rust.ForLifetimes -> yield text ann
---         EPrj Rust.ForModifiers -> yield text ann
---       where
---         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
-
-
 -- instance ToTags Rust.GenericFunction where
 --   tags
 --     t@Rust.GenericFunction
@@ -289,7 +268,7 @@ instance ToTags Rust.FragmentSpecifier
 -- instance ToTags Rust.FunctionItem
 instance ToTags Rust.FunctionModifiers
 instance ToTags Rust.FunctionSignatureItem -- this
-instance ToTags Rust.FunctionType -- this
+instance ToTags Rust.FunctionType
 instance ToTags Rust.GenericFunction -- this
 instance ToTags Rust.GenericType
 instance ToTags Rust.GenericTypeWithTurbofish
