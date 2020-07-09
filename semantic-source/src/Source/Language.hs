@@ -36,10 +36,10 @@ data Language
     | PHP
     | Python
     | Ruby
-    | Rust
     | TypeScript
     | TSX
     | CodeQL
+    | Rust
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum)
 
 -- | Reifies a proxied type-level 'Language' to a value.
@@ -82,11 +82,11 @@ instance SLanguage 'Python where
 instance SLanguage 'Ruby where
   reflect _ = Ruby
 
-instance SLanguage 'Rust where
-  reflect _ = Rust
-
 instance SLanguage 'TypeScript where
   reflect _ = TypeScript
+
+instance SLanguage 'Rust where
+  reflect _ = Rust
 
 instance FromJSON Language where
   parseJSON = withText "Language" $ \l ->
@@ -126,9 +126,9 @@ languageToText = \case
   PHP -> "PHP"
   Python -> "Python"
   Ruby -> "Ruby"
-  Rust -> "Rust"
   TypeScript -> "TypeScript"
   TSX -> "TSX"
+  Rust -> "Rust"
 
 textToLanguage :: T.Text -> Language
 textToLanguage = \case
@@ -143,7 +143,7 @@ textToLanguage = \case
   "PHP" -> PHP
   "Python" -> Python
   "Ruby" -> Ruby
-  "Rust" -> Rust
   "TypeScript" -> TypeScript
   "TSX" -> TSX
+  "Rust" -> Rust
   _ -> Unknown
