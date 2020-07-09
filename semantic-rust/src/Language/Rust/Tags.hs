@@ -82,11 +82,11 @@ instance ToTags Rust.ModItem where
         ann = loc@Loc {byteRange},
         body,
         name = Parse.Success (Rust.Identifier {text, ann})
-      } = do
-        yieldTag name ann 
+      } = do 
         case body of 
           Just (Parse.Success decls) -> gtags decls
           _ -> pure ()
+        where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 -- instance ToTags Rust.AssignmentExpression where
