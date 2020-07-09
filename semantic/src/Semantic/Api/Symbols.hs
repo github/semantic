@@ -86,4 +86,4 @@ tagsForBlob :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m [
 tagsForBlob blob = parseWith toTagsParsers (pure . tags (blobSource blob)) blob
   where
     toTagsParsers :: Map Language (Parser.SomeParser ToTags Loc)
-    toTagsParsers = Parser.preciseParsers
+    toTagsParsers = Parser.allParsers

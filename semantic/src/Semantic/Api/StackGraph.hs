@@ -119,7 +119,7 @@ graphForBlob :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m 
 graphForBlob blob = parseWith toStackGraphParsers (pure . toStackGraph blob) blob
   where
     toStackGraphParsers :: Map Language (Parser.SomeParser ToStackGraph Loc)
-    toStackGraphParsers = Parser.preciseParsers
+    toStackGraphParsers = Parser.allParsers
 
 class ToStackGraph term where
   toStackGraph :: Blob -> term Loc -> TempStackGraph

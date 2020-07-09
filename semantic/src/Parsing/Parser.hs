@@ -4,47 +4,46 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
--- TODO: Now that a la carte syntax has been removed, this whole abstraction is of perhaps questionable utility
-
 module Parsing.Parser
-( Parser(..)
-  -- * Parsers
-  -- $abstract
-, SomeParser(..)
-, goParser
-, javaParser
-, javascriptParser
-, jsonParser
-, jsxParser
-, phpParserPrecise
-, pythonParser
-, codeQLParserPrecise
-, rubyParser
-, tsxParser
-, typescriptParser
-  -- * Modes by term type
-, TermMode
-  -- * Canonical sets of parsers
-, preciseParsers
-) where
+  ( Parser (..),
 
-import           AST.Unmarshal
-import           Data.Language
-import           Data.Map (Map)
+    -- * Parsers
+    -- $abstract
+    SomeParser (..),
+    goParser,
+    javaParser,
+    javascriptParser,
+    jsonParser,
+    jsxParser,
+    phpParser,
+    pythonParser,
+    codeQLParser,
+    rubyParser,
+    tsxParser,
+    typescriptParser,
+
+    -- * Canonical sets of parsers
+    allParsers,
+  )
+where
+
+import AST.Unmarshal
+import Data.Language
+import Data.Map (Map)
 import qualified Data.Map as Map
-import           Foreign.Ptr
-import qualified Language.CodeQL as CodeQLPrecise
-import qualified Language.Go as GoPrecise
-import qualified Language.Java as Java
+import Foreign.Ptr
+import qualified Language.CodeQL as CodeQL
+import qualified Language.Go as Go
 import qualified Language.JSON as JSON
-import qualified Language.PHP as PHPPrecise
-import qualified Language.Python as PythonPrecise
-import qualified Language.Ruby as RubyPrecise
-import qualified Language.TSX as TSXPrecise
-import qualified Language.TypeScript as TypeScriptPrecise
-import           Prelude hiding (fail)
-import           Source.Loc
+import qualified Language.Java as Java
+import qualified Language.PHP as PHP
+import qualified Language.Python as Python
+import qualified Language.Ruby as Ruby
+import qualified Language.TSX as TSX
+import qualified Language.TypeScript as TypeScript
+import Source.Loc
 import qualified TreeSitter.Language as TS (Language)
+import Prelude hiding (fail)
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
@@ -62,19 +61,18 @@ data Parser term where
 --
 -- @
 -- isFancy :: (Carrier sig m, Member Parse sig) => Blob -> m Bool
--- isFancy = parseWith (preciseParsers @Fancy) (pure . isTermFancy) -- slow compiles!
+-- isFancy = parseWith (allParsers @Fancy) (pure . isTermFancy) -- slow compiles!
 -- @
 --
 -- Good:
 --
 -- @
 -- fancyParsers :: 'Map' 'Language' ('SomeParser' Fancy 'Loc')
--- fancyParsers = preciseParsers
+-- fancyParsers = allParsers
 --
 -- isFancy :: (Carrier sig m, Member Parse sig) => Blob -> m Bool
 -- isFancy = parseWith fancyParsers (pure . isTermFancy) -- much faster compiles
 -- @
-
 
 -- | A parser producing terms of existentially-quantified type under some constraint @c@.
 --
@@ -82,75 +80,63 @@ data Parser term where
 data SomeParser c a where
   SomeParser :: c t => Parser (t a) -> SomeParser c a
 
-goParser :: c GoPrecise.Term => (Language, SomeParser c Loc)
-goParser = (Go, SomeParser (UnmarshalParser @GoPrecise.Term GoPrecise.tree_sitter_go))
+goParser :: c Go.Term => (Language, SomeParser c Loc)
+goParser = (Go, SomeParser (UnmarshalParser @Go.Term Go.tree_sitter_go))
 
 javaParser :: c Java.Term => (Language, SomeParser c Loc)
 javaParser = (Java, SomeParser (UnmarshalParser @Java.Term Java.tree_sitter_java))
 
-javascriptParser :: c TSXPrecise.Term => (Language, SomeParser c Loc)
-javascriptParser = (JavaScript, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_sitter_tsx))
+javascriptParser :: c TSX.Term => (Language, SomeParser c Loc)
+javascriptParser = (JavaScript, SomeParser (UnmarshalParser @TSX.Term TSX.tree_sitter_tsx))
 
 jsonParser :: c JSON.Term => (Language, SomeParser c Loc)
 jsonParser = (JSON, SomeParser (UnmarshalParser @JSON.Term JSON.tree_sitter_json))
 
-jsxParser :: c TSXPrecise.Term => (Language, SomeParser c Loc)
-jsxParser = (JSX, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_sitter_tsx))
+jsxParser :: c TSX.Term => (Language, SomeParser c Loc)
+jsxParser = (JSX, SomeParser (UnmarshalParser @TSX.Term TSX.tree_sitter_tsx))
 
-phpParserPrecise :: c PHPPrecise.Term => (Language, SomeParser c Loc)
-phpParserPrecise = (PHP, SomeParser (UnmarshalParser @PHPPrecise.Term PHPPrecise.tree_sitter_php))
+phpParser :: c PHP.Term => (Language, SomeParser c Loc)
+phpParser = (PHP, SomeParser (UnmarshalParser @PHP.Term PHP.tree_sitter_php))
 
-pythonParser :: c PythonPrecise.Term => (Language, SomeParser c Loc)
-pythonParser = (Python, SomeParser (UnmarshalParser @PythonPrecise.Term PythonPrecise.tree_sitter_python))
+pythonParser :: c Python.Term => (Language, SomeParser c Loc)
+pythonParser = (Python, SomeParser (UnmarshalParser @Python.Term Python.tree_sitter_python))
 
-codeQLParserPrecise :: c CodeQLPrecise.Term => (Language, SomeParser c Loc)
-codeQLParserPrecise = (CodeQL, SomeParser (UnmarshalParser @CodeQLPrecise.Term CodeQLPrecise.tree_sitter_ql))
+codeQLParser :: c CodeQL.Term => (Language, SomeParser c Loc)
+codeQLParser = (CodeQL, SomeParser (UnmarshalParser @CodeQL.Term CodeQL.tree_sitter_ql))
 
-rubyParser :: c RubyPrecise.Term => (Language, SomeParser c Loc)
-rubyParser = (Ruby, SomeParser (UnmarshalParser @RubyPrecise.Term RubyPrecise.tree_sitter_ruby))
+rubyParser :: c Ruby.Term => (Language, SomeParser c Loc)
+rubyParser = (Ruby, SomeParser (UnmarshalParser @Ruby.Term Ruby.tree_sitter_ruby))
 
-tsxParser :: c TSXPrecise.Term => (Language, SomeParser c Loc)
-tsxParser = (TSX, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_sitter_tsx))
+tsxParser :: c TSX.Term => (Language, SomeParser c Loc)
+tsxParser = (TSX, SomeParser (UnmarshalParser @TSX.Term TSX.tree_sitter_tsx))
 
-typescriptParser :: c TypeScriptPrecise.Term => (Language, SomeParser c Loc)
-typescriptParser = (TypeScript, SomeParser (UnmarshalParser @TypeScriptPrecise.Term TypeScriptPrecise.tree_sitter_typescript))
+typescriptParser :: c TypeScript.Term => (Language, SomeParser c Loc)
+typescriptParser = (TypeScript, SomeParser (UnmarshalParser @TypeScript.Term TypeScript.tree_sitter_typescript))
 
--- | A type family selecting the language mode for a given term type.
-type family TermMode term where
-  TermMode GoPrecise.Term         = 'Precise
-  TermMode Java.Term              = 'Precise
-  TermMode JSON.Term              = 'Precise
-  TermMode PHPPrecise.Term        = 'Precise
-  TermMode PythonPrecise.Term     = 'Precise
-  TermMode CodeQLPrecise.Term     = 'Precise
-  TermMode RubyPrecise.Term       = 'Precise
-  TermMode TypeScriptPrecise.Term = 'Precise
-  TermMode TSXPrecise.Term        = 'Precise
-  TermMode _                      = 'ALaCarte
-
--- | The canonical set of parsers producing precise terms.
-preciseParsers
-  :: ( c Java.Term
-     , c JSON.Term
-     , c PythonPrecise.Term
-     , c CodeQLPrecise.Term
-     , c RubyPrecise.Term
-     , c GoPrecise.Term
-     , c PHPPrecise.Term
-     , c TypeScriptPrecise.Term
-     , c TSXPrecise.Term
-     )
-  => Map Language (SomeParser c Loc)
-preciseParsers = Map.fromList
-  [ goParser
-  , javascriptParser
-  , jsonParser
-  , jsxParser
-  , pythonParser
-  , phpParserPrecise
-  , codeQLParserPrecise
-  , rubyParser
-  , tsxParser
-  , typescriptParser
-  , javaParser
-  ]
+-- | The canonical set of parsers producing  terms.
+allParsers ::
+  ( c Java.Term,
+    c JSON.Term,
+    c Python.Term,
+    c CodeQL.Term,
+    c Ruby.Term,
+    c Go.Term,
+    c PHP.Term,
+    c TypeScript.Term,
+    c TSX.Term
+  ) =>
+  Map Language (SomeParser c Loc)
+allParsers =
+  Map.fromList
+    [ goParser,
+      javascriptParser,
+      jsonParser,
+      jsxParser,
+      pythonParser,
+      phpParser,
+      codeQLParser,
+      rubyParser,
+      tsxParser,
+      typescriptParser,
+      javaParser
+    ]
