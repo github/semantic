@@ -110,7 +110,7 @@ forPath path =
       allResults = Lingo.languageName <$> Lingo.languagesForPath (Path.toString path)
   in case filter (not . spurious) allResults of
     [result] -> textToLanguage result
-    _        -> Unknown
+    _        -> Unknown -- TODO: throw an exception indicating ambiguous extension 
 
 languageToText :: Language -> T.Text
 languageToText = \case

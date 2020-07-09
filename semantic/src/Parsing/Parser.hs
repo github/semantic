@@ -20,9 +20,9 @@ module Parsing.Parser
 , pythonParser
 , codeQLParserPrecise
 , rubyParser
-, rustParser
 , tsxParser
 , typescriptParser
+, rustParser
   -- * Modes by term type
 , TermMode
   -- * Canonical sets of parsers
@@ -111,14 +111,14 @@ codeQLParserPrecise = (CodeQL, SomeParser (UnmarshalParser @CodeQLPrecise.Term C
 rubyParser :: c RubyPrecise.Term => (Language, SomeParser c Loc)
 rubyParser = (Ruby, SomeParser (UnmarshalParser @RubyPrecise.Term RubyPrecise.tree_sitter_ruby))
 
-rustParser :: c RustPrecise.Term => (Language, SomeParser c Loc)
-rustParser = (Rust, SomeParser (UnmarshalParser @RustPrecise.Term RustPrecise.tree_sitter_rust))
-
 tsxParser :: c TSXPrecise.Term => (Language, SomeParser c Loc)
 tsxParser = (TSX, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_sitter_tsx))
 
 typescriptParser :: c TypeScriptPrecise.Term => (Language, SomeParser c Loc)
 typescriptParser = (TypeScript, SomeParser (UnmarshalParser @TypeScriptPrecise.Term TypeScriptPrecise.tree_sitter_typescript))
+
+rustParser :: c RustPrecise.Term => (Language, SomeParser c Loc)
+rustParser = (Rust, SomeParser (UnmarshalParser @RustPrecise.Term RustPrecise.tree_sitter_rust))
 
 -- | A type family selecting the language mode for a given term type.
 type family TermMode term where
@@ -129,9 +129,9 @@ type family TermMode term where
   TermMode PythonPrecise.Term     = 'Precise
   TermMode CodeQLPrecise.Term     = 'Precise
   TermMode RubyPrecise.Term       = 'Precise
-  TermMode RustPrecise.Term       = 'Precise
   TermMode TypeScriptPrecise.Term = 'Precise
   TermMode TSXPrecise.Term        = 'Precise
+  TermMode RustPrecise.Term       = 'Precise
   TermMode _                      = 'ALaCarte
 
 -- | The canonical set of parsers producing precise terms.
@@ -141,11 +141,11 @@ preciseParsers
      , c PythonPrecise.Term
      , c CodeQLPrecise.Term
      , c RubyPrecise.Term
-     , c RustPrecise.Term
      , c GoPrecise.Term
      , c PHPPrecise.Term
      , c TypeScriptPrecise.Term
      , c TSXPrecise.Term
+     , c RustPrecise.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
@@ -157,8 +157,8 @@ preciseParsers = Map.fromList
   , phpParserPrecise
   , codeQLParserPrecise
   , rubyParser
-  , rustParser
   , tsxParser
   , typescriptParser
   , javaParser
+  , rustParser
   ]
