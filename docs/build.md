@@ -42,6 +42,7 @@ If this seems complicated, don't worry: most of the time you'll be able to skip 
 3. **Some packages come with GHC and are not loaded from Stackage**. These include `base`, `containers`, and [others](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/8.10.1-notes.html?highlight=bytestring#included-libraries). To depend on those packages, you use `//:base`, `//:containers`, etc. They are specified in the `BAZEL.build` at the project root. You probably won't need to add any more.
 4. **Getting weird errors from the C compiler?** Try setting `export BAZEL_USE_CPP_ONLY_TOOLCHAIN=1` in your `.profile` or whatnot.
 
+
 ## Quick reference links
 
 * **Bazel manual**: https://docs.bazel.build/versions/3.3.0/bazel-overview.html
