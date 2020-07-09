@@ -41,6 +41,8 @@ import Serializing.Format (Format)
 import Source.Loc as Loc
 import Tags.Tagging.Precise
 
+-- dummy commit
+
 parseSymbolsBuilder :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
 parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
