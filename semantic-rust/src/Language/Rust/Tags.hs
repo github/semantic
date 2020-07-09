@@ -95,21 +95,22 @@ instance ToTags Rust.FunctionItem where
       { 
         ann = loc@Loc {byteRange},
         returnType,
-        body = Parse.Success (Rust.Block {text, ann}),
+        body = Parse.Success block,
         name,
-        parameters = Parse.Success (Rust.Parameters {text, ann}),
+        parameters = Parse.Success parameters,
         typeParameters
       } = do
-      tags
-      case name of
-        EPrj (Rust.Identifier {text, ann}) -> gtags t
-        EPrj (Rust.Metavariable {text, ann}) -> gtags t
       case returnType of
-        Just (Parse.Success (Rust.Type)) -> gtags t
+        Just (Parse.Success type') -> gtags type'
         _ -> pure ()
       case typeParameters of
-        Just (Parse.Success (Rust.TypeParameters)) -> gtags t
+        Just (Parse.Success typeParams) -> gtags typeParams
         _ -> pure ()
+      case name of
+        EPrj (Rust.Identifier {text, ann}) -> yield text ann
+        EPrj (Rust.Metavariable {text, ann}) -> yield text ann
+        _ -> pure ()
+      gtags block
       where
         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
