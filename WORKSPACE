@@ -16,11 +16,24 @@ load(
 )
 
 # Download rules_haskell and make it accessible as "@rules_haskell".
-http_archive(
+#
+# Note: the git_repository clause is a workaround until rules_haskell#1349 [1]
+# is merged and released.  Once it's merged, change the branch below to
+# `master`.  One it's released, revert back to the http_archive clause with an
+# updated version.
+#
+# [1] https://github.com/tweag/rules_haskell/issues/1349
+#
+# http_archive(
+#     name = "rules_haskell",
+#     sha256 = "56a8e6337df8802f1e0e7d2b3d12d12d5d96c929c8daecccc5738a0f41d9c1e4",
+#     strip_prefix = "rules_haskell-0.12",
+#     urls = ["https://github.com/tweag/rules_haskell/archive/v0.12.tar.gz"],
+# )
+git_repository(
     name = "rules_haskell",
-    sha256 = "56a8e6337df8802f1e0e7d2b3d12d12d5d96c929c8daecccc5738a0f41d9c1e4",
-    strip_prefix = "rules_haskell-0.12",
-    urls = ["https://github.com/tweag/rules_haskell/archive/v0.12.tar.gz"],
+    remote = "https://github.com/tweag/rules_haskell",
+    branch = "fix-bindist",
 )
 
 load(
@@ -37,7 +50,10 @@ load(
 )
 
 # Download a GHC binary distribution from haskell.org and register it as a toolchain.
-rules_haskell_toolchains(version = "8.8.3")
+rules_haskell_toolchains(
+    locale = "en_US.UTF-8",
+    version = "8.8.3",
+)
 
 load(
     "@rules_haskell//haskell:cabal.bzl",
