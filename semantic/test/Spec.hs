@@ -3,7 +3,6 @@
 
 module Main (allTests, legacySpecs, main, tests) where
 
-import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Graph.Spec
 import qualified Data.Language.Spec
 import qualified Data.Semigroup.App.Spec
@@ -47,7 +46,6 @@ allTests = do
 legacySpecs :: Fixture.HasFixture => Spec
 legacySpecs = parallel $ do
   describe "Data.Graph" Data.Graph.Spec.spec
-  describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
   describe "Tags.Spec" Tags.Spec.spec
   describe "Semantic" Semantic.Spec.spec
   describe "Semantic.IO" Semantic.IO.Spec.spec
