@@ -75,6 +75,7 @@ yieldTag name kind ty loc srcLineRange = do
   src <- ask @Source
   Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
 
+
 instance ToTags Rust.ModItem where 
   tags 
     t@Rust.ModItem 
@@ -88,6 +89,7 @@ instance ToTags Rust.ModItem where
           _ -> pure ()
         where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
+
 
 instance ToTags Rust.FunctionItem where
   tags
@@ -114,28 +116,6 @@ instance ToTags Rust.FunctionItem where
       where
         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
-
-
--- instance ToTags Rust.AssignmentExpression where
---   tags
---     t@Rust.AssignmentExpression
---       { ann = loc@Loc {byteRange},
---         left = Parse.Success (Rust.Expression {text, ann})
---       } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
-
-
--- instance ToTags Rust.Block where
---   tags
---     t@Rust.Block
---       { extraChildren,
---         ann = loc@Loc {byteRange}
---       } = case extraChildren of
---       EPrj Rust.DeclarationStatement -> yield text ann
---       EPrj Rust.Expression -> yield text ann
---         where
---           yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
 
 
 -- instance ToTags Rust.CallExpression where
@@ -269,7 +249,7 @@ instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
 instance ToTags Rust.ArrayType
-instance ToTags Rust.AssignmentExpression -- this
+instance ToTags Rust.AssignmentExpression
 instance ToTags Rust.AssociatedType
 instance ToTags Rust.AsyncBlock
 instance ToTags Rust.AttributeItem
