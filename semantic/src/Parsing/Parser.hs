@@ -28,7 +28,6 @@ module Parsing.Parser
 where
 
 import AST.Unmarshal
-import Data.Language
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Foreign.Ptr
@@ -41,6 +40,7 @@ import qualified Language.Python as Python
 import qualified Language.Ruby as Ruby
 import qualified Language.TSX as TSX
 import qualified Language.TypeScript as TypeScript
+import Source.Language
 import Source.Loc
 import qualified TreeSitter.Language as TS (Language)
 import Prelude hiding (fail)

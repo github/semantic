@@ -23,7 +23,6 @@ import Control.Monad.IO.Class
 import Data.Blob
 import Data.ByteString.Builder
 import Data.Either
-import Data.Language
 import Data.Map.Strict (Map)
 import qualified Language.CodeQL as CodeQL
 import qualified Language.Go as Go
@@ -39,6 +38,7 @@ import Semantic.Config
 import Semantic.Task
 import Serializing.Format hiding (JSON)
 import qualified Serializing.SExpression.Precise as SExpr.Precise (serializeSExpression)
+import Source.Language
 import Source.Loc
 
 

@@ -25,8 +25,8 @@ import           Control.Exception (SomeException)
 import           Data.Bitraversable
 import           Data.Blob
 import           Data.Edit
-import           Data.Language
 import qualified Data.Map as Map
+import           Source.Language
 import           Parsing.Parser
 
 data Parse m k

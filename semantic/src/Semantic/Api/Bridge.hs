@@ -12,7 +12,7 @@ import           Analysis.File
 import           Control.Lens
 import qualified Data.Blob as Data
 import           Data.Either
-import qualified Data.Language as Data
+import qualified Source.Language as Source
 import           Data.ProtoLens (defMessage)
 import qualified Data.Text as T
 import           Data.Text.Lens
@@ -67,8 +67,8 @@ instance APIBridge API.ByteRange Source.Range where
     toAPI Source.Range{..} = defMessage & P.start .~ fromIntegral start & P.end .~ fromIntegral end
     fromAPI range = Source.Range (fromIntegral (range^.start)) (fromIntegral (range^.end))
 
-instance APIBridge T.Text Data.Language where
-  bridging = iso Data.textToLanguage Data.languageToText
+instance APIBridge T.Text Source.Language where
+  bridging = iso Source.textToLanguage Source.languageToText
 
 instance APIBridge API.Blob Data.Blob where
   bridging = iso apiBlobToBlob blobToApiBlob where

@@ -16,7 +16,6 @@ import           Control.Lens
 import           Data.Blob
 import           Data.Int
 import           Data.Map.Strict (Map)
-import           Data.Language
 import           Data.Foldable
 import           Data.ProtoLens (defMessage)
 import           Semantic.Api.Bridge
@@ -24,6 +23,7 @@ import           Proto.Semantic as P hiding (Blob)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
 import           Data.Text (Text, pack)
+import           Source.Language
 import           Source.Loc as Loc
 import           Semantic.Task
 import qualified Parsing.Parser as Parser

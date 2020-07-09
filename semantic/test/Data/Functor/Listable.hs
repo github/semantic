@@ -18,9 +18,9 @@ module Data.Functor.Listable
 import qualified Analysis.Name as Name
 import Data.Bifunctor.Join
 import Data.Edit
-import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Text as T (Text, pack)
+import qualified Source.Language as Language
 import Source.Loc
 import Source.Span
 import Test.LeanCheck
