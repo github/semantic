@@ -118,14 +118,16 @@ instance ToTags Rust.FunctionItem where
   tags _ = pure ()
 
 
--- instance ToTags Rust.CallExpression where
---   tags
---     t@Rust.CallExpression 
---       {
---         ann = loc@Loc {byteRange},
---         args = Parse.Success (Rust.Arguments {text, ann}),
---         expr = Parse.Success (Rust.Expression {text, ann})
---       } = yieldTag expr P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+
+instance ToTags Rust.CallExpression where
+  tags
+    t@Rust.CallExpression 
+      {
+        ann = loc@Loc {byteRange},
+        function = Parse.Success expr,
+        arguments = Parse.Success args
+      } = gtags expr
+  tags _ = pure ()
 
 
 -- instance ToTags Rust.ClosureExpression where
@@ -262,7 +264,7 @@ instance ToTags Rust.BooleanLiteral
 instance ToTags Rust.BoundedType
 instance ToTags Rust.BracketedType
 instance ToTags Rust.BreakExpression
-instance ToTags Rust.CallExpression -- this
+-- instance ToTags Rust.CallExpression
 instance ToTags Rust.CapturedPattern
 instance ToTags Rust.CharLiteral
 instance ToTags Rust.ClosureExpression -- this
