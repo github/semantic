@@ -321,8 +321,8 @@ instance ToTags Rust.Literal
 instance ToTags Rust.LiteralPattern
 instance ToTags Rust.LoopExpression
 instance ToTags Rust.LoopLabel
-instance ToTags Rust.MacroDefinition --this
-instance ToTags Rust.MacroInvocation --this
+instance ToTags Rust.MacroDefinition
+instance ToTags Rust.MacroInvocation
 instance ToTags Rust.MacroRule
 instance ToTags Rust.MatchArm
 instance ToTags Rust.MatchBlock
