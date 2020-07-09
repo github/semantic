@@ -256,7 +256,7 @@ instance ToTags Rust.AttributeItem
 instance ToTags Rust.AwaitExpression
 instance ToTags Rust.BaseFieldInitializer
 instance ToTags Rust.BinaryExpression
-instance ToTags Rust.Block -- this 
+instance ToTags Rust.Block
 instance ToTags Rust.BlockComment
 instance ToTags Rust.BooleanLiteral
 instance ToTags Rust.BoundedType
