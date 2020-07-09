@@ -118,7 +118,6 @@ instance ToTags Rust.FunctionItem where
   tags _ = pure ()
 
 
-
 instance ToTags Rust.CallExpression where
   tags
     t@Rust.CallExpression 
@@ -153,18 +152,6 @@ instance ToTags Rust.CallExpression where
 --       _ -> pure ()
 --       where
 --         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
-
-
-
-
-
--- instance ToTags Rust.FunctionModifiers where
---   tags
---     t@Rust.FunctionModifiers
---       { ann = loc@Loc {byteRange},
---         extraChildren = Parse.Success (Rust.ExternModifier {text, ann})
---       } = yieldTag body P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 --   tags _ = pure ()
 
 
@@ -300,7 +287,7 @@ instance ToTags Rust.ForLifetimes
 instance ToTags Rust.ForeignModItem
 instance ToTags Rust.FragmentSpecifier
 -- instance ToTags Rust.FunctionItem
-instance ToTags Rust.FunctionModifiers  -- this
+instance ToTags Rust.FunctionModifiers
 instance ToTags Rust.FunctionSignatureItem -- this
 instance ToTags Rust.FunctionType -- this
 instance ToTags Rust.GenericFunction -- this
