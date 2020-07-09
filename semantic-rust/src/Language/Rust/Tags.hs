@@ -89,6 +89,32 @@ instance ToTags Rust.ModItem where
         where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
+instance ToTags Rust.FunctionItem where
+  tags
+    t@Rust.FunctionItem
+      { 
+        ann = loc@Loc {byteRange},
+        returnType,
+        body = Parse.Success (Rust.Block {text, ann}),
+        name,
+        parameters = Parse.Success (Rust.Parameters {text, ann}),
+        typeParameters
+      } = do
+      tags
+      case name of
+        EPrj (Rust.Identifier {text, ann}) -> gtags t
+        EPrj (Rust.Metavariable {text, ann}) -> gtags t
+      case returnType of
+        Just (Parse.Success (Rust.Type)) -> gtags t
+        _ -> pure ()
+      case typeParameters of
+        Just (Parse.Success (Rust.TypeParameters)) -> gtags t
+        _ -> pure ()
+      where
+        yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
+
 -- instance ToTags Rust.AssignmentExpression where
 --   tags
 --     t@Rust.AssignmentExpression
@@ -147,30 +173,7 @@ instance ToTags Rust.ModItem where
 --   tags _ = pure ()
 
 
--- instance ToTags Rust.FunctionItem where 
---   tags
---     t@Rust.FunctionItem {
---       ann = loc@Loc {byteRange},
---       body = Parse.Success (Rust.Block {text, ann}),
---       name = Parse.Success (Rust.Identifier {text, ann}),
---       parameters = Parse.Success (Rust.Parameters {text, ann})
---       returnType,
---       typeParameters,
---       extraChildren
---     } = do
---       tags 
---       case returnType of
---         Just (Parse.Success (Rust.Type)) -> yield text ann
---         _ -> pure ()
---       case typeParameters of
---         Just (Parse.Success (Rust.TypeParameters)) -> yield text ann
---         _ -> pure () 
---       case extraChildren of 
---         EPrj Rust.FunctionModifiers -> yield text ann 
---         EPrj Rust.VisibilityModifier -> yield text ann
---         EPrj Rust.WhereClause -> yield text ann
---       where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
+
 
 
 -- instance ToTags Rust.FunctionModifiers where
@@ -313,7 +316,7 @@ instance ToTags Rust.ForExpression
 instance ToTags Rust.ForLifetimes
 instance ToTags Rust.ForeignModItem
 instance ToTags Rust.FragmentSpecifier
-instance ToTags Rust.FunctionItem -- this
+-- instance ToTags Rust.FunctionItem
 instance ToTags Rust.FunctionModifiers  -- this
 instance ToTags Rust.FunctionSignatureItem -- this
 instance ToTags Rust.FunctionType -- this
