@@ -155,26 +155,24 @@ instance ToTags Rust.CallExpression where
 --   tags _ = pure ()
 
 
--- instance ToTags Rust.FunctionSignatureItem where
---   tags
---     t@Rust.FunctionSignatureItem
---       { ann = loc@Loc {byteRange},
---         name,
---         parameters = Parse.Success (Rust.Parameters {text, ann}),
---         returnType = Parse.Success (Rust.Type {text, ann}),
---         typeParameters = Parse.Success (Rust.TypeParameters {text, ann}),
---         extraChildren
---       } = do
---       case name of
---         EPrj (Rust.Identifier) -> yield text ann
---         EPrj (Rust.Metavariable) -> yield text ann
---       case extraChildren of
---         EPrj Rust.FunctionModifiers -> yield text ann
---         EPrj Rust.VisibilityModifier -> yield text ann
---         EPrj Rust.WhereClause -> yield text ann
---       where
---         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
+instance ToTags Rust.FunctionSignatureItem where
+  tags
+    t@Rust.FunctionSignatureItem
+      { ann = loc@Loc {byteRange},
+        returnType,
+        name,
+        parameters = Parse.Success params,
+        typeParameters
+      } = do
+        case returnType of 
+          Just (Parse.Success type') -> gtags type'
+          _ -> pure ()
+        case name of
+          EPrj (Rust.Identifier {text, ann}) -> yield text ann
+          EPrj metavar -> gtags metavar
+      where
+        yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 -- instance ToTags Rust.GenericFunction where
 --   tags
@@ -267,7 +265,7 @@ instance ToTags Rust.ForeignModItem
 instance ToTags Rust.FragmentSpecifier
 -- instance ToTags Rust.FunctionItem
 instance ToTags Rust.FunctionModifiers
-instance ToTags Rust.FunctionSignatureItem -- this
+-- instance ToTags Rust.FunctionSignatureItem
 instance ToTags Rust.FunctionType
 instance ToTags Rust.GenericFunction -- this
 instance ToTags Rust.GenericType
