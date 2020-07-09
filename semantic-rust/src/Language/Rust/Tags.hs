@@ -81,7 +81,7 @@ instance ToTags Rust.ModItem where
       {
         ann = loc@Loc {byteRange},
         body,
-        name = Parse.Success (Rust.Identifier)
+        name = Parse.Success (Rust.Identifier {text, ann})
       } = do
         yieldTag name ann 
         case body of 
