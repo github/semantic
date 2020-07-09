@@ -22,8 +22,10 @@ jobs:
       name: Cache Bazel artifacts
       with:
         path: .bazel-cache
-        key: ${{ runner.os }}-bazel-${{ hashFiles('semantic-*/**/*.hs') }}-${{ hashFiles('**/BUILD.bazel') }}
+        key: ${{ runner.os }}-bazel-${{ hashFiles('semantic-*/**/*.hs') }}-${{ hashFiles('**/*.bazel') }}-${{ hashFiles('**/*.bzl') }}
         restore-keys: |
+          ${{ runner.os }}-bazel-${{ hashFiles('semantic-*/**/*.hs') }}-${{ hashFiles('**/*.bazel') }}-
+          ${{ runner.os }}-bazel-${{ hashFiles('semantic-*/**/*.hs') }}-
           ${{ runner.os }}-bazel-
 
     - name: Build & test
