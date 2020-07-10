@@ -26,7 +26,6 @@ import Control.Lens
 import Data.Blob
 import Data.ByteString.Builder
 import Data.Foldable
-import Data.Language
 import Data.Map.Strict (Map)
 import Data.ProtoLens (defMessage)
 import Data.Text (pack, toTitle)
@@ -38,6 +37,7 @@ import Semantic.Api.Bridge
 import Semantic.Config
 import Semantic.Task
 import Serializing.Format (Format)
+import Source.Language
 import Source.Loc as Loc
 import Tags.Tagging.Precise
 

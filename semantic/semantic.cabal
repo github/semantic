@@ -100,7 +100,6 @@ library
                      , Data.Graph.Algebraic
                      , Data.Handle
                      , Data.History
-                     , Data.Language
                      , Data.Map.Monoidal
                      , Data.Maybe.Exts
                      , Data.Semigroup.App

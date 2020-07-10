@@ -1,12 +1,12 @@
 module Data.Language.Spec (testTree) where
 
-import           Data.Language as Language
+import           Source.Language as Language
 import qualified System.Path as Path
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
 testTree :: TestTree
-testTree = testGroup "Data.Language"
+testTree = testGroup "Source.Language"
   [ testCase "languageForFilePath works for languages with ambiguous lingo extensions" $ do
       Language.forPath (Path.relFile "foo.php") @=? PHP
       Language.forPath (Path.relFile "foo.md" ) @=? Markdown
