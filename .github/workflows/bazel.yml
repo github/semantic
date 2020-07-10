@@ -24,6 +24,7 @@ jobs:
         path: |
           .bazel-cache
           bin
+          bazel-out/k8-fastbuild/bin
         key: ${{ runner.os }}-bazel-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-bazel-
