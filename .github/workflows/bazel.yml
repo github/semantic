@@ -22,14 +22,12 @@ jobs:
       name: Cache Bazel artifacts
       with:
         path: .bazel-cache
-        key: ${{ runner.os }}-bazel-${{ hashFiles('semantic-*/**/*.hs') }}-${{ hashFiles('**/*.bazel') }}-${{ hashFiles('**/*.bzl') }}
+        key: ${{ runner.os }}-bazel-${{ hashFiles('**/*.hs') }}-${{ hashFiles('**/*.{bazel,bzl}') }}-${{ hashFiles('{WORKSPACE,.bazelrc}') }}
         restore-keys: |
-          ${{ runner.os }}-bazel-${{ hashFiles('semantic-*/**/*.hs') }}-${{ hashFiles('**/*.bazel') }}-
-          ${{ runner.os }}-bazel-${{ hashFiles('semantic-*/**/*.hs') }}-
           ${{ runner.os }}-bazel-
 
     - name: Build & test
       run: |
         bazel build --config=ci //semantic:all
         bazel test --config=ci --test_tag_filters=language-test //...
-        bazel test //semantic-source //semantic:spec
+        bazel test --config=ci //semantic-source //semantic:spec
