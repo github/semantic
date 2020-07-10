@@ -129,17 +129,6 @@ instance ToTags Rust.CallExpression where
   tags _ = pure ()
 
 
--- instance ToTags Rust.ClosureExpression where
---   tags
---     t@Rust.ClosureExpression
---       { ann = loc@Loc {byteRange},
---         body = Parse.Success (Rust.Expression {text, ann}),
---         parameters = Parse.Success (Rust.ClosureParameters {text, ann}),
---         returnType = Parse.Success (Rust.Type {text, ann})
---       } = yieldTag body P.METHOD P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
-
-
 -- instance ToTags Rust.FieldDeclaration where
 --   tags
 --     t@Rust.FieldDeclaration
@@ -233,7 +222,7 @@ instance ToTags Rust.BreakExpression
 -- instance ToTags Rust.CallExpression
 instance ToTags Rust.CapturedPattern
 instance ToTags Rust.CharLiteral
-instance ToTags Rust.ClosureExpression -- this
+instance ToTags Rust.ClosureExpression
 instance ToTags Rust.ClosureParameters
 instance ToTags Rust.CompoundAssignmentExpr
 instance ToTags Rust.ConstItem
