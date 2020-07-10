@@ -103,6 +103,7 @@ _all_example_repos = {
         ],
         "commit": "c3e6b9017926f44a76e2b966c4dd35fa84c4cd3b",
         "repo": "ruby/spec",
+        "sha256": "33206954ff6fdbf5b872298efc2697c18ad5371eb55007d54f95c08ec7f46bb4",
     },
     "desktop": {
         "data": [
