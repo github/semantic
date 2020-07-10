@@ -134,8 +134,10 @@ filegroup(
 )
 """.format(data, excludes),
         commit = commit,
+        sha256 = sha256,
         remote = "https://github.com/{}.git".format(repo),
         shallow_since = since,
+        verbose = True,
     )
 
 def declare_example_repos():
