@@ -174,6 +174,17 @@ instance ToTags Rust.GenericFunction where
   tags _ = pure ()
 
 
+instance ToTags Rust.StructItem where 
+  tags 
+    t@Rust.StructItem
+      {
+        ann = loc@Loc {byteRange},
+        body, 
+        name = Parse.Success (Rust.TypeIdentifier {text, ann})
+      } = yieldTag text P.FUNCTION P.REFERENCE ann byteRange >> gtags t 
+        
+
+
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
@@ -293,7 +304,7 @@ instance ToTags Rust.SourceFile
 instance ToTags Rust.StaticItem
 instance ToTags Rust.StringLiteral
 instance ToTags Rust.StructExpression
-instance ToTags Rust.StructItem
+-- instance ToTags Rust.StructItem
 instance ToTags Rust.StructPattern
 instance ToTags Rust.Super
 instance ToTags Rust.TokenBindingPattern
