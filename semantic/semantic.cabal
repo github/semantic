@@ -183,7 +183,6 @@ test-suite test
                      , Semantic.Stat.Spec
                      , Tags.Spec
                      , SpecHelpers
-                     , Test.Hspec.LeanCheck
                      , Generators
                      , Properties
   build-depends:
