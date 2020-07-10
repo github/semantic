@@ -8,13 +8,6 @@ workspace(name = "semantic")
 # Load the repository rule to download an http archive.
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Load the ability to check out a git repository.
-load(
-    "@bazel_tools//tools/build_defs/repo:git.bzl",
-    "git_repository",
-    "new_git_repository",
-)
-
 # Download rules_haskell and make it accessible as "@rules_haskell".
 #
 # Note: the git_repository clause is a workaround until rules_haskell#1349 [1]
