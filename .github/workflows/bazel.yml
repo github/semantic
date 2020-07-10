@@ -24,10 +24,10 @@ jobs:
         path: |
           .bazel-cache
           tmp/bazel-repo
-        key: ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('.bazelrc'} }}-${{ hashFiles('**/*.b?z?l') }}-${{ hashFiles('semantic-*/**/*.hs') }}
+        key: ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('.bazelrc') }}-${{ hashFiles('**/*.b?z?l') }}-${{ hashFiles('semantic-*/**/*.hs') }}
         restore-keys: |
-          ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('.bazelrc'} }}-${{ hashFiles('**/*.b?z?l') }}-
-          ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('.bazelrc'} }}-
+          ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('.bazelrc') }}-${{ hashFiles('**/*.b?z?l') }}-
+          ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('.bazelrc') }}-
           ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE') }}-
           ${{ runner.os }}-bazel-
 
