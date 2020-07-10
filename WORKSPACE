@@ -29,11 +29,11 @@ load(
 #     strip_prefix = "rules_haskell-0.12",
 #     urls = ["https://github.com/tweag/rules_haskell/archive/v0.12.tar.gz"],
 # )
-git_repository(
+http_archive(
     name = "rules_haskell",
-    commit = "abaec6502a4474f10b3c367fb5e90173ee0e349c",
-    remote = "https://github.com/tweag/rules_haskell",
-    shallow_since = "1594376866 +0000",
+    sha256 = "78d017aa732b430c0681fff4514503af78a8d8c44df165e603a9433745b16e5e",
+    strip_prefix = "rules_haskell-abaec6502a4474f10b3c367fb5e90173ee0e349c",
+    urls = ["https://github.com/tweag/rules_haskell/archive/abaec6502a4474f10b3c367fb5e90173ee0e349c.tar.gz"],
 )
 
 load(
@@ -251,11 +251,11 @@ tree_sitter_node_types_hackage(
 
 # Download lingo (which has its own Bazel build instructions).
 
-git_repository(
+http_archive(
     name = "lingo",
-    commit = "6614b9afe1a519364491c170d6b06ff5cd96153a",
-    remote = "https://github.com/tclem/lingo-haskell.git",
-    shallow_since = "1593202797 -0400",
+    sha256 = "32a5e2d66e4620ff7004acab4802dc948b852ce26725012283a85d41af97275f",
+    strip_prefix = "lingo-haskell-6614b9afe1a519364491c170d6b06ff5cd96153a",
+    urls = ["https://github.com/tclem/lingo-haskell/archive/6614b9afe1a519364491c170d6b06ff5cd96153a.tar.gz"],
 )
 
 load("//:build/example_repos.bzl", "declare_example_repos")
