@@ -182,6 +182,20 @@ instance ToTags Rust.GenericFunction where
           yield function ann = yieldTag function P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
+instance ToTags Rust.StaticItem where 
+  tags 
+    t@Rust.StaticItem
+    {
+      ann = loc@Loc {byteRange},
+      value,
+      name = Parse.Success (Rust.Identifier {text, ann}),
+      type' 
+    } = do 
+      case value of
+        Just (Parse.Success expr) -> gtags expr 
+        _ -> pure ()
+    where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+        
 
 instance ToTags Rust.StructItem where 
   tags 
@@ -327,7 +341,7 @@ instance ToTags Rust.ShorthandFieldIdentifier
 instance ToTags Rust.ShorthandFieldInitializer
 instance ToTags Rust.SlicePattern
 instance ToTags Rust.SourceFile
-instance ToTags Rust.StaticItem
+-- instance ToTags Rust.StaticItem
 instance ToTags Rust.StringLiteral
 instance ToTags Rust.StructExpression
 -- instance ToTags Rust.StructItem
