@@ -18,6 +18,7 @@ jobs:
       if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
     - uses: actions/cache@v2
+      id: caching-stage
       name: Cache Bazel artifacts
       with:
         path: |
@@ -25,9 +26,6 @@ jobs:
           tmp/bazel-repo
         key: ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE'} }}-${{ hashFiles('.bazelrc'} }}-${{ hashFiles('**/*.b?z?l') }}-${{ hashFiles('semantic-*/**/*.hs') }}
         restore-keys: |
-          ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE'} }}-${{ hashFiles('.bazelrc'} }}-${{ hashFiles('**/*.b?z?l') }}-
-          ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE'} }}-${{ hashFiles('.bazelrc'} }}-
-          ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE'} }}-
           ${{ runner.os }}-bazel-
 
     - name: Build & test
