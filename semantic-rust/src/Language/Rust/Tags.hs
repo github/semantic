@@ -174,20 +174,22 @@ instance ToTags Rust.FunctionSignatureItem where
         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
--- instance ToTags Rust.GenericFunction where
---   tags
---     t@Rust.GenericFunction
---       { ann = loc@Loc {byteRange},
---         function,
---         typeArgs = Parse.Success (Rust.TypeArguments {text, ann})
---       } = do
---       case function of
---         EPrj Rust.FieldExpression -> yield text ann
---         EPrj Rust.Identifier -> yield text ann
---         EPrj Rust.ScopedIdentifier -> yield text ann
---       where
---         yield name ann = yieldTag function P.FUNCTION P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
+instance ToTags Rust.GenericFunction where
+  tags
+    t@Rust.GenericFunction
+      { ann = loc@Loc {byteRange},
+        function,
+        typeArguments = Parse.Success typeArgs
+      } = do
+        case function of
+          EPrj (Rust.Identifier {text, ann}) -> yield text ann
+          _ -> pure ()
+        gtags t
+        where
+          yield function ann = yieldTag function P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
+
 
 -- instance ToTags Rust.LetDeclaration where
 --   tags
@@ -267,7 +269,7 @@ instance ToTags Rust.FragmentSpecifier
 instance ToTags Rust.FunctionModifiers
 -- instance ToTags Rust.FunctionSignatureItem
 instance ToTags Rust.FunctionType
-instance ToTags Rust.GenericFunction -- this
+-- instance ToTags Rust.GenericFunction
 instance ToTags Rust.GenericType
 instance ToTags Rust.GenericTypeWithTurbofish
 instance ToTags Rust.HigherRankedTraitBound
