@@ -32,7 +32,6 @@ import           Data.ByteString.Builder (Builder, toLazyByteString)
 import           Data.ByteString.Lazy (toStrict)
 import           Data.Edit as X
 import           Data.Foldable (toList)
-import           Data.Functor.Listable as X
 import           Data.Language as X hiding (Precise)
 import           Data.List.NonEmpty as X (NonEmpty (..))
 import           Data.Maybe as X
@@ -56,8 +55,6 @@ import           System.Exit (die)
 import qualified System.Path as Path
 import           Test.Hspec as X (Spec, SpecWith, around, context, describe, it, parallel, pendingWith, runIO, xit)
 import           Test.Hspec.Expectations as X
-import           Test.Hspec.LeanCheck as X
-import           Test.LeanCheck as X
 
 instance Lower X.Span where
   lowerBound = Source.Span.point (Pos 1 1)
