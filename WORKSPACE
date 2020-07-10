@@ -18,9 +18,8 @@ load(
 # Download rules_haskell and make it accessible as "@rules_haskell".
 #
 # Note: the git_repository clause is a workaround until rules_haskell#1349 [1]
-# is merged and released.  Once it's merged, change the branch below to
-# `master`.  One it's released, revert back to the http_archive clause with an
-# updated version.
+# is released.  One it's released, revert back to the http_archive clause with
+# an updated version.
 #
 # [1] https://github.com/tweag/rules_haskell/issues/1349
 #
@@ -33,7 +32,7 @@ load(
 git_repository(
     name = "rules_haskell",
     remote = "https://github.com/tweag/rules_haskell",
-    branch = "fix-bindist",
+    commit = "abaec6502a4474f10b3c367fb5e90173ee0e349c",
 )
 
 load(
