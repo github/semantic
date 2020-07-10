@@ -169,7 +169,7 @@ instance ToTags Rust.FunctionSignatureItem where
           _ -> pure ()
         case name of
           EPrj (Rust.Identifier {text, ann}) -> yield text ann
-          EPrj metavar -> gtags metavar
+          EPrj (Rust.Metavariable {text, ann}) -> yield text ann
       where
         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
