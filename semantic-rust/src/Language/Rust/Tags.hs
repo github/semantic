@@ -174,24 +174,6 @@ instance ToTags Rust.GenericFunction where
   tags _ = pure ()
 
 
-instance ToTags Rust.LetDeclaration where
-  tags
-    t@Rust.LetDeclaration
-      { ann = loc@Loc {byteRange},
-        pattern = Parse.Success ptrn,
-        type',
-        value
-      } = do
-      case type' of
-        Just (Parse.Success (Rust.Type a)) -> yield text ann
-        _ -> pure ()
-      case value of
-        Just (Parse.Success (Rust.Expression a)) -> yield text ann
-        _ -> pure ()
-      where
-        yield value ann = yieldTag value P.FUNCTION P.DEFINITION ann byteRange >> gtags t
-  tags _ = pure ()
-
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
@@ -259,7 +241,7 @@ instance ToTags Rust.ImplItem
 instance ToTags Rust.IndexExpression
 instance ToTags Rust.InnerAttributeItem
 instance ToTags Rust.IntegerLiteral
--- instance ToTags Rust.LetDeclaration
+instance ToTags Rust.LetDeclaration
 instance ToTags Rust.Lifetime
 instance ToTags Rust.LineComment
 instance ToTags Rust.Literal
