@@ -96,12 +96,9 @@ library
                      , Data.Edit
                      , Data.Error
                      , Data.Flag
-                     , Data.Functor.Classes.Generic
                      , Data.Graph.Algebraic
                      , Data.Handle
-                     , Data.History
                      , Data.Language
-                     , Data.Map.Monoidal
                      , Data.Maybe.Exts
                      , Data.Semigroup.App
                      -- Parser glue
@@ -201,8 +198,7 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Data.Functor.Classes.Generic.Spec
-                     , Data.Functor.Listable
+  other-modules:       Data.Functor.Listable
                      , Data.Graph.Spec
                      , Data.Language.Spec
                      , Data.Semigroup.App.Spec
