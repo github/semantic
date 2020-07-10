@@ -183,6 +183,14 @@ instance ToTags Rust.StructItem where
         name = Parse.Success (Rust.TypeIdentifier {text, ann})
       } = yieldTag text P.FUNCTION P.REFERENCE ann byteRange >> gtags t 
         
+instance ToTags Rust.UnionItem where 
+  tags 
+    t@Rust.UnionItem
+      {
+        ann = loc@Loc {byteRange},
+        body,
+        name = Parse.Success (Rust.TypeIdentifier {text, ann})
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 
 
 instance ToTags Rust.AbstractType
@@ -327,7 +335,7 @@ instance ToTags Rust.TypeIdentifier --this
 instance ToTags Rust.TypeItem --this
 instance ToTags Rust.TypeParameters
 instance ToTags Rust.UnaryExpression
-instance ToTags Rust.UnionItem
+-- instance ToTags Rust.UnionItem
 instance ToTags Rust.UnitExpression
 instance ToTags Rust.UnitType
 instance ToTags Rust.UnsafeBlock
