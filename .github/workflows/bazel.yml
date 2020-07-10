@@ -17,11 +17,10 @@ jobs:
     - uses: actions/checkout@v2
       if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
-    - name: Download/cache bazel bersion
+    - name: Download/cache bazel version
       run: |
         curl -LO "https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel-3.1.0-linux-x86_64"
-        mkdir "bin/" || true
-        mv bazel-3.0.0-linux-x86_64 "bin/bazel"
+        mv bazel-3.1.0-linux-x86_64 "bin/bazel"
         chmod +x "bin/bazel"
 
     - uses: actions/cache@v2
