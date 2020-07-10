@@ -31,8 +31,9 @@ load(
 # )
 git_repository(
     name = "rules_haskell",
-    remote = "https://github.com/tweag/rules_haskell",
     commit = "abaec6502a4474f10b3c367fb5e90173ee0e349c",
+    remote = "https://github.com/tweag/rules_haskell",
+    shallow_since = "1594376866 +0000",
 )
 
 load(

@@ -11,7 +11,7 @@ _all_example_repos = {
         ],
         "commit": "058851c5cfc98f50f11237b1c13d77cfd1f40475",
         "repo": "numpy/numpy",
-        "since": "",
+        "since": "1536047875 +0300",
         "excludes": [],
     },
     "python": {
@@ -35,7 +35,7 @@ _all_example_repos = {
         ],
         "commit": "0b5b4a66ef99c8b91569dd9b9b34911834689d3f",
         "repo": "pallets/flask",
-        "since": "",
+        "since": "1548424614 -0800",
         "excludes": [],
     },
     "httpie": {
@@ -44,7 +44,7 @@ _all_example_repos = {
         ],
         "commit": "358342d1c915d6462a080a77aefbb20166d0bd5d",
         "repo": "jakubroztocil/httpie",
-        "since": "",
+        "since": "1547033444 +0100",
         "excludes": [],
     },
     "keras": {
@@ -62,7 +62,7 @@ _all_example_repos = {
         ],
         "commit": "64bde6582d9b49e9345d9b8df16aaa26dc372d13",
         "repo": "requests/requests",
-        "since": "",
+        "since": "1548096627 -0600",
         "excludes": [],
     },
     "scikit-learn": {
@@ -71,7 +71,7 @@ _all_example_repos = {
         ],
         "commit": "d0f63a760d9993a7f68cfc5e1a075700d67c53d3",
         "repo": "scikit-learn/scikit-learn",
-        "since": "",
+        "since": "1549039144 +0100",
         "excludes": [],
     },
     "scrapy": {
@@ -107,7 +107,7 @@ _all_example_repos = {
         ],
         "commit": "c3e6b9017926f44a76e2b966c4dd35fa84c4cd3b",
         "repo": "ruby/spec",
-        "since": "",
+        "since": "1501155617 +0200",
         "excludes": [],
     },
     "desktop": {
