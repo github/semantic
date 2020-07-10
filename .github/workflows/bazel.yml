@@ -36,6 +36,5 @@ jobs:
 
     - name: Build & test
       run: |
-        bin/bazel build --config=ci //semantic:all
         bin/bazel test --config=ci --test_tag_filters=language-test //...
         bin/bazel test --config=ci //semantic-source //semantic:spec
