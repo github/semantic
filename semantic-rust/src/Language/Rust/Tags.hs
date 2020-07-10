@@ -201,6 +201,15 @@ instance ToTags Rust.UnionItem where
         name = Parse.Success (Rust.TypeIdentifier {text, ann})
       } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
 
+instance ToTags Rust.TraitItem where 
+  tags 
+    t@Rust.TraitItem
+      {
+        ann = loc@Loc {byteRange},
+        body,
+        name = Parse.Success (Rust.TypeIdentifier {text, ann})
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+
 
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
@@ -330,7 +339,7 @@ instance ToTags Rust.TokenRepetitionPattern
 instance ToTags Rust.TokenTree
 instance ToTags Rust.TokenTreePattern
 instance ToTags Rust.TraitBounds
-instance ToTags Rust.TraitItem
+-- instance ToTags Rust.TraitItem
 instance ToTags Rust.TryExpression
 instance ToTags Rust.TupleExpression
 instance ToTags Rust.TuplePattern
