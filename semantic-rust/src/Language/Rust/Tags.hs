@@ -129,19 +129,14 @@ instance ToTags Rust.CallExpression where
   tags _ = pure ()
 
 
--- instance ToTags Rust.FieldDeclaration where
---   tags
---     t@Rust.FieldDeclaration
---       { ann = loc@Loc {byteRange},
---         name = Parse.Success (Rust.FieldIdentifier {text, ann}),
---         type' = Parse.Success (Rust.Type {text, ann}),
---         extraChildren
---       } = case extraChildren of
---       Just (Parse.Success (Rust.VisibilityModifier)) -> yield text ann
---       _ -> pure ()
---       where
---         yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
---   tags _ = pure ()
+instance ToTags Rust.FieldDeclaration where
+  tags
+    t@Rust.FieldDeclaration
+      { ann = loc@Loc {byteRange},
+        name = Parse.Success (Rust.FieldIdentifier {text, ann}),
+        type' = Parse.Success type''
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
 
 
 instance ToTags Rust.FunctionSignatureItem where
@@ -242,7 +237,7 @@ instance ToTags Rust.EscapeSequence
 instance ToTags Rust.Expression
 instance ToTags Rust.ExternCrateDeclaration
 instance ToTags Rust.ExternModifier
-instance ToTags Rust.FieldDeclaration -- this
+-- instance ToTags Rust.FieldDeclaration
 instance ToTags Rust.FieldDeclarationList
 instance ToTags Rust.FieldExpression
 instance ToTags Rust.FieldIdentifier
