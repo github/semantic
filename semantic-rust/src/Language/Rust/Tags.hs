@@ -128,6 +128,15 @@ instance ToTags Rust.CallExpression where
       } = gtags expr
   tags _ = pure ()
 
+instance ToTags Rust.EnumItem where 
+  tags 
+    t@Rust.EnumItem
+      {
+        ann = loc@Loc {byteRange},
+        body = Parse.Success bod,
+        name = Parse.Success (Rust.TypeIdentifier {text, ann})
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+
 
 instance ToTags Rust.FieldDeclaration where
   tags
@@ -226,7 +235,7 @@ instance ToTags Rust.DeclarationStatement
 instance ToTags Rust.DynamicType
 instance ToTags Rust.EmptyStatement
 instance ToTags Rust.EmptyType
-instance ToTags Rust.EnumItem
+-- instance ToTags Rust.EnumItem
 instance ToTags Rust.EnumVariant
 instance ToTags Rust.EnumVariantList
 instance ToTags Rust.EscapeSequence
