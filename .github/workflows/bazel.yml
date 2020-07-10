@@ -20,7 +20,7 @@ jobs:
     - name: Download/cache bazel bersion
       run: |
         curl -LO "https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel-3.1.0-linux-x86_64"
-        mkdir "bin/"
+        mkdir "bin/" || true
         mv bazel-3.0.0-linux-x86_64 "bin/bazel"
         chmod +x "bin/bazel"
 
