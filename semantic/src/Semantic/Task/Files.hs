@@ -33,9 +33,9 @@ import           Data.Blob
 import           Data.Blob.IO
 import qualified Data.ByteString.Builder as B
 import           Data.Handle
-import           Data.Language
 import           Prelude hiding (readFile)
 import           Semantic.IO
+import           Source.Language (Language)
 import qualified System.IO as IO hiding (withBinaryFile)
 import qualified System.Path as Path
 import qualified System.Path.IO as IO (withBinaryFile)

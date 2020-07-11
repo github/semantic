@@ -8,7 +8,6 @@ import           Control.Carrier.Parse.Measured
 import           Control.Exception (throwIO)
 import           Control.Monad
 import           Data.Foldable
-import           Data.Language (PerLanguageModes (..), preciseLanguageModes)
 import           Gauge
 import           System.FilePath.Glob
 import qualified System.Path as Path
@@ -35,33 +34,33 @@ benchmarks = bgroup "tagging"
 runTagging' :: Path.RelFile -> Benchmarkable
 runTagging' path = nfIO . withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
-  runTask session (runParse (parseSymbolsFilePath preciseLanguageModes path)) >>= either throwIO pure
+  runTask session (runParse (parseSymbolsFilePath path)) >>= either throwIO pure
 
 pythonBenchmarks :: Benchmark
 pythonBenchmarks = bgroup "python"
-  [ bench "precise" $ runTagging preciseLanguageModes pyDir "*.py"
+  [ bench "precise" $ runTagging pyDir "*.py"
   ]
   where pyDir = Path.relDir "tmp/python-examples/keras/keras"
 
 goBenchmarks :: Benchmark
 goBenchmarks = bgroup "go"
-  [ bench "precise" $ runTagging preciseLanguageModes dir "*.go"
+  [ bench "precise" $ runTagging dir "*.go"
   ]
   where dir = Path.relDir "tmp/go-examples/go/src/database/sql"
 
 rubyBenchmarks :: Benchmark
 rubyBenchmarks = bgroup "ruby"
-  [ bench "precise" $ runTagging preciseLanguageModes dir "*.rb"
+  [ bench "precise" $ runTagging dir "*.rb"
   ]
   where dir = Path.relDir "tmp/ruby-examples/ruby_spec/command_line"
 
-runTagging :: PerLanguageModes -> Path.RelDir -> String -> Benchmarkable
-runTagging mode dir glob = nfIO . withOptions testOptions $ \ config logger statter -> do
+runTagging :: Path.RelDir -> String -> Benchmarkable
+runTagging dir glob = nfIO . withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
   files <- globDir1 (compile glob) (Path.toString dir)
   when (null files) (fail ("No files in " <> Path.toString dir))
   let paths = Path.relFile <$> files
-  for_ paths (runTask session . runParse . parseSymbolsFilePath mode >=> either throwIO pure)
+  for_ paths (runTask session . runParse . parseSymbolsFilePath >=> either throwIO pure)
 
 parseSymbolsFilePath ::
   ( Has (Error SomeException) sig m
@@ -69,10 +68,9 @@ parseSymbolsFilePath ::
   , Has Parse sig m
   , Has Files sig m
   )
-  => PerLanguageModes
-  -> Path.RelFile
+  => Path.RelFile
   -> m ParseTreeSymbolResponse
-parseSymbolsFilePath languageModes path = readBlob (File.fromPath path) >>= runReader languageModes . parseSymbols . pure @[]
+parseSymbolsFilePath path = readBlob (File.fromPath path) >>= parseSymbols . pure @[]
 
 testOptions :: Config.Options
 testOptions = defaultOptions

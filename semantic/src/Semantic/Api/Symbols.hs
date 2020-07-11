@@ -13,28 +13,28 @@ module Semantic.Api.Symbols
   )
 where
 
-import Control.Effect.Error
-import Control.Effect.Parse
-import Control.Effect.Reader
-import Control.Exception
-import Control.Lens
-import Data.Blob
-import Data.ByteString.Builder
-import Data.Foldable
-import Data.Language
-import Data.Map.Strict (Map)
-import Data.ProtoLens (defMessage)
-import Data.Text (pack, toTitle)
+import           Control.Effect.Error
+import           Control.Effect.Parse
+import           Control.Effect.Reader
+import           Control.Exception
+import           Control.Lens
+import           Data.Blob
+import           Data.ByteString.Builder
+import           Data.Foldable
+import           Data.Map.Strict (Map)
+import           Data.ProtoLens (defMessage)
+import           Data.Text (pack, toTitle)
 import qualified Parsing.Parser as Parser
-import Proto.Semantic as P hiding (Blob)
-import Proto.Semantic_Fields as P
-import Proto.Semantic_JSON ()
-import Semantic.Api.Bridge
-import Semantic.Config
-import Semantic.Task
-import Serializing.Format (Format)
-import Source.Loc as Loc
-import Tags.Tagging.Precise
+import           Proto.Semantic as P hiding (Blob)
+import           Proto.Semantic_Fields as P
+import           Proto.Semantic_JSON ()
+import           Semantic.Api.Bridge
+import           Semantic.Config
+import           Semantic.Task
+import           Serializing.Format (Format)
+import           Source.Language
+import           Source.Loc as Loc
+import           Tags.Tagging.Precise
 
 parseSymbolsBuilder :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
 parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format

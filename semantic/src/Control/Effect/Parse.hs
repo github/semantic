@@ -24,9 +24,9 @@ import           Data.Bitraversable
 import           Data.Blob
 import           Data.Edit
 import           Data.Kind (Type)
-import           Data.Language
 import qualified Data.Map as Map
 import           Parsing.Parser
+import           Source.Language (Language (..))
 
 data Parse (m :: Type -> Type) k where
   Parse :: Parser term -> Blob -> Parse m term
