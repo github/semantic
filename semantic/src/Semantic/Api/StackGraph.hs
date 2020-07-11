@@ -14,19 +14,19 @@ import           Control.Effect.Parse
 import           Control.Exception
 import           Control.Lens
 import           Data.Blob
+import           Data.Foldable
 import           Data.Int
 import           Data.Map.Strict (Map)
-import           Data.Language
-import           Data.Foldable
 import           Data.ProtoLens (defMessage)
-import           Semantic.Api.Bridge
+import           Data.Text (Text, pack)
+import qualified Parsing.Parser as Parser
 import           Proto.Semantic as P hiding (Blob)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
-import           Data.Text (Text, pack)
-import           Source.Loc as Loc
+import           Semantic.Api.Bridge
 import           Semantic.Task
-import qualified Parsing.Parser as Parser
+import           Source.Language
+import           Source.Loc as Loc
 
 parseStackGraph :: ( Has (Error SomeException) sig m
                    , Has Distribute sig m

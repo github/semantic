@@ -20,7 +20,6 @@ import           Control.Monad
 import           Data.Blob
 import           Data.Foldable
 import           Data.Int
-import           Data.Language (LanguageMode (..), PerLanguageModes (..), preciseLanguageModes)
 import           Data.List
 import qualified Data.Text as Text
 import           Data.Traversable
@@ -147,7 +146,7 @@ buildExamples session lang tsDir = do
   let paths = filter (\x -> Path.takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ Path.absRel <$> files
   trees <- for paths $ \file -> do
     pure . HUnit.testCase (Path.toString file) $ do
-      precise <- runTask session (runParse (parseSymbolsFilePath preciseLanguageModes file))
+      precise <- runTask session (runParse (parseSymbolsFilePath file))
       assertOK "precise" precise
   pure (Tasty.testGroup (languageName lang) trees)
 
@@ -192,7 +191,6 @@ parseSymbolsFilePath ::
   , Has Parse sig m
   , Has Files sig m
   )
-  => PerLanguageModes
-  -> Path.AbsRelFile
+  => Path.AbsRelFile
   -> m ParseTreeSymbolResponse
-parseSymbolsFilePath languageModes path = readBlob (File.fromPath path) >>= runReader languageModes . parseSymbols . pure @[]
+parseSymbolsFilePath path = readBlob (File.fromPath path) >>= parseSymbols . pure @[]

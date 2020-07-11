@@ -22,14 +22,11 @@ module Parsing.Parser
 , rubyParser
 , tsxParser
 , typescriptParser
-  -- * Modes by term type
-, TermMode
   -- * Canonical sets of parsers
 , preciseParsers
 ) where
 
 import           AST.Unmarshal
-import           Data.Language
 import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Foreign.Ptr
@@ -43,6 +40,7 @@ import qualified Language.Ruby as RubyPrecise
 import qualified Language.TSX as TSXPrecise
 import qualified Language.TypeScript as TypeScriptPrecise
 import           Prelude hiding (fail)
+import           Source.Language (Language (..))
 import           Source.Loc
 import qualified TreeSitter.Language as TS (Language)
 
@@ -114,19 +112,6 @@ tsxParser = (TSX, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_s
 
 typescriptParser :: c TypeScriptPrecise.Term => (Language, SomeParser c Loc)
 typescriptParser = (TypeScript, SomeParser (UnmarshalParser @TypeScriptPrecise.Term TypeScriptPrecise.tree_sitter_typescript))
-
--- | A type family selecting the language mode for a given term type.
-type family TermMode term where
-  TermMode GoPrecise.Term         = 'Precise
-  TermMode Java.Term              = 'Precise
-  TermMode JSON.Term              = 'Precise
-  TermMode PHPPrecise.Term        = 'Precise
-  TermMode PythonPrecise.Term     = 'Precise
-  TermMode CodeQLPrecise.Term     = 'Precise
-  TermMode RubyPrecise.Term       = 'Precise
-  TermMode TypeScriptPrecise.Term = 'Precise
-  TermMode TSXPrecise.Term        = 'Precise
-  TermMode _                      = 'ALaCarte
 
 -- | The canonical set of parsers producing precise terms.
 preciseParsers

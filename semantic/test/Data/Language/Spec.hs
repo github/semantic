@@ -1,6 +1,6 @@
 module Data.Language.Spec (testTree) where
 
-import           Data.Language as Language
+import           Source.Language as Language
 import qualified System.Path as Path
 import           Test.Tasty
 import           Test.Tasty.HUnit

@@ -25,9 +25,9 @@ import           Control.Exception (SomeException)
 import           Data.Bitraversable
 import           Data.Blob
 import           Data.Edit
-import           Data.Language
 import qualified Data.Map as Map
 import           Parsing.Parser
+import           Source.Language (Language (..))
 
 data Parse m k
   = forall term . Parse (Parser term) Blob (term -> m k)

@@ -8,7 +8,6 @@ import           Control.Exception
 import qualified Data.Flag as Flag
 import           Data.Foldable
 import           Data.Handle
-import qualified Data.Language as Language
 import           Data.List (intercalate)
 import           Options.Applicative hiding (style)
 import           Semantic.Api hiding (File)
@@ -19,6 +18,7 @@ import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
 import           Serializing.Format
+import qualified Source.Language as Language
 import           System.Exit (die)
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
