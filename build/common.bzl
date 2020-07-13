@@ -50,24 +50,46 @@ EXECUTABLE_FLAGS = [
 # Now we start declaring macros to help us with common patterns
 # such as pulling tree-sitter grammars from releases/git hashes.
 
-def tree_sitter_node_types_release(name, version, sha256):
-    """Create a package for a tree-sitter grammar and export its node-types.json file/test corpus.."""
+_tree_sitter_language_build = """
+package(default_visibility = ["//visibility:public"])
+
+load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_library")
+load("@stackage//:packages.bzl", "packages")
+exports_files(glob(["**/node-types.json"]))
+
+alias(
+   name = "src/node-types.json",
+   actual = "{node_types_path}",
+)
+
+haskell_cabal_library(
+    name = "{name}",
+    version = "{version}",
+    srcs = glob(["**"]),
+    deps = packages["{name}"].deps,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(name = "corpus", srcs = glob(["**/corpus/*.txt"]))
+"""
+
+def tree_sitter_node_types_hackage(name, version, sha256, node_types_path = ""):
+    """Download a tree-sitter language package from Hackage and build/expose its library and corpus."""
+
+    if node_types_path == "":
+        node_types_path = ":vendor/{}/src/node-types.json".format(name)
+
+    info = {
+        "name": name,
+        "version": version,
+        "node_types_path": node_types_path,
+    }
     http_archive(
         name = name,
-        build_file = "//:build/tree_sitter.bzl",
-        strip_prefix = "{}-{}".format(name, version),
-        urls = ["https://github.com/tree-sitter/{}/archive/v{}.tar.gz".format(name, version)],
+        build_file_content = _tree_sitter_language_build.format(**info),
+        urls = ["https://hackage.haskell.org/package/{name}-{version}/{name}-{version}.tar.gz".format(**info)],
+        strip_prefix = "{name}-{version}".format(**info),
         sha256 = sha256,
-    )
-
-def tree_sitter_node_types_git(name, commit, shallow_since):
-    """Create a package pinned off a Git repo. Prefer the node_types_release call to this."""
-    new_git_repository(
-        name = name,
-        build_file = "//:build/tree_sitter.bzl",
-        commit = commit,
-        remote = "https://github.com/tree-sitter/{}.git".format(name),
-        shallow_since = shallow_since,
     )
 
 # These macros declare library targets inside the language packages.

@@ -10,7 +10,7 @@ semantic_language_library(
     name = "semantic-typescript",
     srcs = glob(["src/**/*.hs"]),
     language = "typescript",
-    nodetypes = "@tree-sitter-typescript//:typescript/src/node-types.json",
+    nodetypes = "@tree-sitter-typescript//:vendor/tree-sitter-typescript/typescript/src/node-types.json",
 )
 
 semantic_language_parsing_test(language = "typescript")
