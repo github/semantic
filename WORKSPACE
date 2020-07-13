@@ -102,7 +102,6 @@ stack_snapshot(
         "hspec",
         "hspec-core",
         "hspec-expectations",
-        "leancheck",
         "lens",
         "network",
         "network-uri",
