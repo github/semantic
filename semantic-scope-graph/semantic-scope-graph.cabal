@@ -40,7 +40,7 @@ library
     , aeson
     , algebraic-graphs    >= 0.3 && < 0.5
     , containers
-    , fused-effects      ^>= 1.0
+    , fused-effects      ^>= 1.1
     , generic-monoid
     , generic-lens
     , hashable
