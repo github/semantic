@@ -22,6 +22,7 @@ module Parsing.Parser
 , rubyParser
 , tsxParser
 , typescriptParser
+, rustParser
   -- * Modes by term type
 , TermMode
   -- * Canonical sets of parsers
@@ -40,6 +41,7 @@ import qualified Language.JSON as JSON
 import qualified Language.PHP as PHPPrecise
 import qualified Language.Python as PythonPrecise
 import qualified Language.Ruby as RubyPrecise
+import qualified Language.Rust as RustPrecise
 import qualified Language.TSX as TSXPrecise
 import qualified Language.TypeScript as TypeScriptPrecise
 import           Prelude hiding (fail)
@@ -115,6 +117,9 @@ tsxParser = (TSX, SomeParser (UnmarshalParser @TSXPrecise.Term TSXPrecise.tree_s
 typescriptParser :: c TypeScriptPrecise.Term => (Language, SomeParser c Loc)
 typescriptParser = (TypeScript, SomeParser (UnmarshalParser @TypeScriptPrecise.Term TypeScriptPrecise.tree_sitter_typescript))
 
+rustParser :: c RustPrecise.Term => (Language, SomeParser c Loc)
+rustParser = (Rust, SomeParser (UnmarshalParser @RustPrecise.Term RustPrecise.tree_sitter_rust))
+
 -- | A type family selecting the language mode for a given term type.
 type family TermMode term where
   TermMode GoPrecise.Term         = 'Precise
@@ -126,6 +131,7 @@ type family TermMode term where
   TermMode RubyPrecise.Term       = 'Precise
   TermMode TypeScriptPrecise.Term = 'Precise
   TermMode TSXPrecise.Term        = 'Precise
+  TermMode RustPrecise.Term       = 'Precise
   TermMode _                      = 'ALaCarte
 
 -- | The canonical set of parsers producing precise terms.
@@ -139,6 +145,7 @@ preciseParsers
      , c PHPPrecise.Term
      , c TypeScriptPrecise.Term
      , c TSXPrecise.Term
+     , c RustPrecise.Term
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
@@ -153,4 +160,5 @@ preciseParsers = Map.fromList
   , tsxParser
   , typescriptParser
   , javaParser
+  , rustParser
   ]

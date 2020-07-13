@@ -17,6 +17,7 @@ data PerLanguageModes = PerLanguageModes
   , tsxMode        :: LanguageMode
   , javascriptMode :: LanguageMode
   , jsxMode        :: LanguageMode
+  , rustMode       :: LanguageMode
   }
   deriving (Eq, Ord, Show)
 
@@ -32,6 +33,7 @@ aLaCarteLanguageModes = PerLanguageModes
   , tsxMode = ALaCarte
   , javascriptMode = ALaCarte
   , jsxMode = ALaCarte
+  , rustMode = ALaCarte
   }
 
 preciseLanguageModes :: PerLanguageModes
@@ -43,6 +45,7 @@ preciseLanguageModes = PerLanguageModes
   , tsxMode = Precise
   , javascriptMode = Precise
   , jsxMode = Precise
+  , rustMode = Precise
   }
 
 data LanguageMode

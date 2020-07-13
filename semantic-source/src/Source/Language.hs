@@ -39,6 +39,7 @@ data Language
     | TypeScript
     | TSX
     | CodeQL
+    | Rust
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Enum)
 
 -- | Reifies a proxied type-level 'Language' to a value.
@@ -84,6 +85,9 @@ instance SLanguage 'Ruby where
 instance SLanguage 'TypeScript where
   reflect _ = TypeScript
 
+instance SLanguage 'Rust where
+  reflect _ = Rust
+
 instance FromJSON Language where
   parseJSON = withText "Language" $ \l ->
     pure $ textToLanguage l
@@ -101,11 +105,12 @@ forPath path =
   let spurious lang = lang `elem` [ "Hack" -- .php files
                                   , "GCC Machine Description" -- .md files
                                   , "XML" -- .tsx files
+                                  , "RenderScript" -- .rs files
                                   ]
       allResults = Lingo.languageName <$> Lingo.languagesForPath (Path.toString path)
   in case filter (not . spurious) allResults of
     [result] -> textToLanguage result
-    _        -> Unknown
+    _        -> Unknown -- TODO: throw an exception indicating ambiguous extension 
 
 languageToText :: Language -> T.Text
 languageToText = \case
@@ -123,6 +128,7 @@ languageToText = \case
   Ruby -> "Ruby"
   TypeScript -> "TypeScript"
   TSX -> "TSX"
+  Rust -> "Rust"
 
 textToLanguage :: T.Text -> Language
 textToLanguage = \case
@@ -139,4 +145,5 @@ textToLanguage = \case
   "Ruby" -> Ruby
   "TypeScript" -> TypeScript
   "TSX" -> TSX
+  "Rust" -> Rust
   _ -> Unknown

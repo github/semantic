@@ -47,6 +47,7 @@ Available options:
 | JSX            | ✅    | ✅           | |
 | TSX            | ✅    | ✅           | |
 | CodeQL         | ✅    | ✅           | |
+| Rust           | ✅    | ✅           | |
 | Haskell        | 🚧    | 🚧           | |
 
 † Used for [code navigation](https://help.github.com/en/github/managing-files-in-a-repository/navigating-code-on-github) on github.com.

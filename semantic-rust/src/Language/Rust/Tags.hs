@@ -1,23 +1,32 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+
 module Language.Rust.Tags
 ( ToTags(..)
 ) where
 
 import           AST.Element
+import qualified AST.Parse as Parse
 import           AST.Token
 import           AST.Traversable1
+import qualified AST.Unmarshal as TS
 import           Control.Effect.Reader
+import           Control.Effect.State
 import           Control.Effect.Writer
+import           Data.Text as Text
 import qualified Language.Rust.AST as Rust
 import           Source.Loc
 import           Source.Source as Source
-import           Tags.Tag()
+import           Tags.Tag
 import qualified Tags.Tagging.Precise as Tags
+import           Proto.Semantic as P
+
 
 class ToTags t where
   tags
@@ -50,6 +59,172 @@ gtags
   -> m ()
 gtags = traverse1_ @ToTags (const (pure ())) tags
 
+-- enum SyntaxType {
+--   FUNCTION = 0;
+--   METHOD = 1;
+--   CLASS = 2;
+--   MODULE = 3;
+--   CALL = 4;
+--   TYPE = 5;
+--   INTERFACE = 6;
+--   IMPLEMENTATION = 7;
+-- }
+
+yieldTag :: (Has (Reader Source) sig m, Has (Writer Tags.Tags) sig m) => Text -> P.SyntaxType -> P.NodeType -> Loc -> Range -> m ()
+yieldTag name kind ty loc srcLineRange = do
+  src <- ask @Source
+  Tags.yield (Tag name kind ty loc (Tags.firstLine src srcLineRange) Nothing)
+
+
+instance ToTags Rust.ModItem where 
+  tags 
+    t@Rust.ModItem 
+      {
+        ann = loc@Loc {byteRange},
+        body,
+        name = Parse.Success (Rust.Identifier {text, ann})
+      } = do 
+        case body of 
+          Just (Parse.Success decls) -> gtags decls
+          _ -> pure ()
+        where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
+
+instance ToTags Rust.FunctionItem where
+  tags
+    t@Rust.FunctionItem
+      { 
+        ann = loc@Loc {byteRange},
+        returnType,
+        body = Parse.Success block,
+        name,
+        parameters = Parse.Success parameters,
+        typeParameters
+      } = do
+      case returnType of
+        Just (Parse.Success type') -> gtags type'
+        _ -> pure ()
+      case typeParameters of
+        Just (Parse.Success typeParams) -> gtags typeParams
+        _ -> pure ()
+      case name of
+        EPrj (Rust.Identifier {text, ann}) -> yield text ann
+        EPrj (Rust.Metavariable {text, ann}) -> yield text ann
+        _ -> pure ()
+      gtags block
+      where
+        yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
+
+instance ToTags Rust.CallExpression where
+  tags
+    t@Rust.CallExpression 
+      {
+        ann = loc@Loc {byteRange},
+        function = Parse.Success expr,
+        arguments = Parse.Success args
+      } = gtags expr
+  tags _ = pure ()
+
+instance ToTags Rust.EnumItem where 
+  tags 
+    t@Rust.EnumItem
+      {
+        ann = loc@Loc {byteRange},
+        body = Parse.Success bod,
+        name = Parse.Success (Rust.TypeIdentifier {text, ann})
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+
+
+instance ToTags Rust.FieldDeclaration where
+  tags
+    t@Rust.FieldDeclaration
+      { ann = loc@Loc {byteRange},
+        name = Parse.Success (Rust.FieldIdentifier {text, ann}),
+        type' = Parse.Success type''
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
+
+instance ToTags Rust.FunctionSignatureItem where
+  tags
+    t@Rust.FunctionSignatureItem
+      { ann = loc@Loc {byteRange},
+        returnType,
+        name,
+        parameters = Parse.Success params,
+        typeParameters
+      } = do
+        case returnType of 
+          Just (Parse.Success type') -> gtags type'
+          _ -> pure ()
+        case name of
+          EPrj (Rust.Identifier {text, ann}) -> yield text ann
+          EPrj (Rust.Metavariable {text, ann}) -> yield text ann
+      where
+        yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
+instance ToTags Rust.GenericFunction where
+  tags
+    t@Rust.GenericFunction
+      { ann = loc@Loc {byteRange},
+        function,
+        typeArguments = Parse.Success typeArgs
+      } = do
+        case function of
+          EPrj (Rust.Identifier {text, ann}) -> yield text ann
+          _ -> pure ()
+        gtags t
+        where
+          yield function ann = yieldTag function P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+  tags _ = pure ()
+
+instance ToTags Rust.StaticItem where 
+  tags 
+    t@Rust.StaticItem
+    {
+      ann = loc@Loc {byteRange},
+      value,
+      name = Parse.Success (Rust.Identifier {text, ann}),
+      type' 
+    } = do 
+      case value of
+        Just (Parse.Success expr) -> gtags expr 
+        _ -> pure ()
+    where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+        
+
+instance ToTags Rust.StructItem where 
+  tags 
+    t@Rust.StructItem
+      {
+        ann = loc@Loc {byteRange},
+        body, 
+        name = Parse.Success (Rust.TypeIdentifier {text, ann})
+      } = yieldTag text P.FUNCTION P.REFERENCE ann byteRange >> gtags t 
+        
+instance ToTags Rust.UnionItem where 
+  tags 
+    t@Rust.UnionItem
+      {
+        ann = loc@Loc {byteRange},
+        body,
+        name = Parse.Success (Rust.TypeIdentifier {text, ann})
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+
+instance ToTags Rust.TraitItem where 
+  tags 
+    t@Rust.TraitItem
+      {
+        ann = loc@Loc {byteRange},
+        body,
+        name = Parse.Success (Rust.TypeIdentifier {text, ann})
+      } = yieldTag text P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+
+
 instance ToTags Rust.AbstractType
 instance ToTags Rust.Arguments
 instance ToTags Rust.ArrayExpression
@@ -67,7 +242,7 @@ instance ToTags Rust.BooleanLiteral
 instance ToTags Rust.BoundedType
 instance ToTags Rust.BracketedType
 instance ToTags Rust.BreakExpression
-instance ToTags Rust.CallExpression
+-- instance ToTags Rust.CallExpression
 instance ToTags Rust.CapturedPattern
 instance ToTags Rust.CharLiteral
 instance ToTags Rust.ClosureExpression
@@ -83,14 +258,14 @@ instance ToTags Rust.DeclarationStatement
 instance ToTags Rust.DynamicType
 instance ToTags Rust.EmptyStatement
 instance ToTags Rust.EmptyType
-instance ToTags Rust.EnumItem
+-- instance ToTags Rust.EnumItem
 instance ToTags Rust.EnumVariant
 instance ToTags Rust.EnumVariantList
 instance ToTags Rust.EscapeSequence
 instance ToTags Rust.Expression
 instance ToTags Rust.ExternCrateDeclaration
 instance ToTags Rust.ExternModifier
-instance ToTags Rust.FieldDeclaration
+-- instance ToTags Rust.FieldDeclaration
 instance ToTags Rust.FieldDeclarationList
 instance ToTags Rust.FieldExpression
 instance ToTags Rust.FieldIdentifier
@@ -102,11 +277,11 @@ instance ToTags Rust.ForExpression
 instance ToTags Rust.ForLifetimes
 instance ToTags Rust.ForeignModItem
 instance ToTags Rust.FragmentSpecifier
-instance ToTags Rust.FunctionItem
+-- instance ToTags Rust.FunctionItem
 instance ToTags Rust.FunctionModifiers
-instance ToTags Rust.FunctionSignatureItem
+-- instance ToTags Rust.FunctionSignatureItem
 instance ToTags Rust.FunctionType
-instance ToTags Rust.GenericFunction
+-- instance ToTags Rust.GenericFunction
 instance ToTags Rust.GenericType
 instance ToTags Rust.GenericTypeWithTurbofish
 instance ToTags Rust.HigherRankedTraitBound
@@ -134,7 +309,7 @@ instance ToTags Rust.MatchPattern
 instance ToTags Rust.MetaArguments
 instance ToTags Rust.MetaItem
 instance ToTags Rust.Metavariable
-instance ToTags Rust.ModItem
+-- instance ToTags Rust.ModItem
 instance ToTags Rust.MutPattern
 instance ToTags Rust.MutableSpecifier
 instance ToTags Rust.NegativeLiteral
@@ -166,10 +341,10 @@ instance ToTags Rust.ShorthandFieldIdentifier
 instance ToTags Rust.ShorthandFieldInitializer
 instance ToTags Rust.SlicePattern
 instance ToTags Rust.SourceFile
-instance ToTags Rust.StaticItem
+-- instance ToTags Rust.StaticItem
 instance ToTags Rust.StringLiteral
 instance ToTags Rust.StructExpression
-instance ToTags Rust.StructItem
+-- instance ToTags Rust.StructItem
 instance ToTags Rust.StructPattern
 instance ToTags Rust.Super
 instance ToTags Rust.TokenBindingPattern
@@ -178,7 +353,7 @@ instance ToTags Rust.TokenRepetitionPattern
 instance ToTags Rust.TokenTree
 instance ToTags Rust.TokenTreePattern
 instance ToTags Rust.TraitBounds
-instance ToTags Rust.TraitItem
+-- instance ToTags Rust.TraitItem
 instance ToTags Rust.TryExpression
 instance ToTags Rust.TupleExpression
 instance ToTags Rust.TuplePattern
@@ -188,11 +363,11 @@ instance ToTags Rust.Type
 instance ToTags Rust.TypeArguments
 instance ToTags Rust.TypeBinding
 instance ToTags Rust.TypeCastExpression
-instance ToTags Rust.TypeIdentifier
-instance ToTags Rust.TypeItem
+instance ToTags Rust.TypeIdentifier --this
+instance ToTags Rust.TypeItem --this
 instance ToTags Rust.TypeParameters
 instance ToTags Rust.UnaryExpression
-instance ToTags Rust.UnionItem
+-- instance ToTags Rust.UnionItem
 instance ToTags Rust.UnitExpression
 instance ToTags Rust.UnitType
 instance ToTags Rust.UnsafeBlock

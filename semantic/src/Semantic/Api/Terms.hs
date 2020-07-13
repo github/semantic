@@ -34,6 +34,7 @@ import qualified Language.Python as Python
 import qualified Language.Ruby as Ruby
 import qualified Language.TSX as TSX
 import qualified Language.TypeScript as TypeScript
+import qualified Language.Rust as Rust
 import Parsing.Parser
 import Semantic.Config
 import Semantic.Task
@@ -102,6 +103,9 @@ instance ShowTermBy 'Precise TSX.Term where
 instance ShowTermBy 'Precise TypeScript.Term where
   showTermBy = serialize Show . void . TypeScript.getTerm
 
+instance ShowTermBy 'Precise Rust.Term where
+  showTermBy = serialize Show . void . Rust.getTerm
+
 sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)
 sexprTermParsers = preciseParsers
 
@@ -140,3 +144,6 @@ instance SExprTermBy 'Precise TSX.Term where
 
 instance SExprTermBy 'Precise TypeScript.Term where
   sexprTermBy = SExpr.Precise.serializeSExpression . TypeScript.getTerm
+
+instance SExprTermBy 'Precise Rust.Term where
+  sexprTermBy = SExpr.Precise.serializeSExpression . Rust.getTerm
