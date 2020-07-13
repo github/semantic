@@ -65,7 +65,7 @@ library
     , containers                  ^>= 0.6
     , filepath
     , fused-effects               ^>= 1.1
-    , fused-effects-readline        ^>= 0
+    , fused-effects-readline      ^>= 0.1
     , fused-syntax
     , hashable
     , haskeline                   ^>= 0.7.5

@@ -33,11 +33,6 @@ source-repository-package
   location: https://github.com/antitypical/fused-syntax.git
   tag: 4a383d57c8fd7592f54a33f43eb9666314a6e80e
 
-source-repository-package
-  type: git
-  location: https://github.com/fused-effects/fused-effects-readline.git
-  tag: df72fcd0053c27f3e0132c4b15886453697dfa76
-
 -- Treat warnings as errors for CI builds
 package semantic
   ghc-options: -Werror

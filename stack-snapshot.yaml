@@ -6,11 +6,9 @@ packages:
   - github: tclem/proto-lens-jsonpb
     commit: "5d40444be689bef1e12cbe38da0261283775ec64"
     sha256: "39f783f07aeb64614aadb6ee618d000051c46cc9f511277d87feea6cba8fe955"
-  - github: fused-effects/fused-effects-readline
-    commit: "df72fcd0053c27f3e0132c4b15886453697dfa76"
-    sha256: "e3f3deba355205e1dd5cf0e259c597214d045fc1905705e42af2bcea72f643ad"
   - fused-effects-1.1.0.0
   - fused-effects-exceptions-1.1.0.0
+  - fused-effects-readline-0.1.0.0
   - semilattices-0.0.0.4
   - haskeline-0.8.0.0
   - tree-sitter-0.9.0.1
