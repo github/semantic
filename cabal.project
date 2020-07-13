@@ -37,8 +37,3 @@ source-repository-package
   type: git
   location: https://github.com/fused-effects/fused-effects-readline.git
   tag: df72fcd0053c27f3e0132c4b15886453697dfa76
-
-source-repository-package
-  type: git
-  location: https://github.com/fused-effects/fused-effects-exceptions.git
-  tag: aaaee45efc9453e797a191be937b81a8d8fc149f
