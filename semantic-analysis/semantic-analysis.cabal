@@ -67,19 +67,10 @@ library
     , algebraic-graphs            ^>= 0.3
     , base                         >= 4.13 && < 5
     , containers                  ^>= 0.6
-    , filepath
     , fused-effects               ^>= 1.1
-    , fused-effects-readline      ^>= 0.1
     , fused-syntax
     , hashable
-    , haskeline                    >= 0.7 && < 0.9
-    , hashable
-    , lingo                       ^>= 0.3.2.0
     , pathtype                    ^>= 0.8.1
-    , prettyprinter                >= 1.2 && < 2
-    , prettyprinter-ansi-terminal ^>= 1.1.1
     , semantic-source             ^>= 0.1.0
-    , semilattices
-    , terminal-size               ^>= 0.3
     , text                        ^>= 1.2.3.1
     , transformers                ^>= 0.5
