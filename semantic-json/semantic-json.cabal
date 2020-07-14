@@ -47,6 +47,10 @@ common haskell
     -Wno-star-is-type
   if (impl(ghc >= 8.8))
     ghc-options: -Wno-missing-deriving-strategies
+  if (impl(ghc >= 8.10))
+    ghc-options:
+      -Wno-missing-safe-haskell-mode
+      -Wno-prepositive-qualified-module
   cpp-options:
     -DBAZEL_BUILD=0
 
