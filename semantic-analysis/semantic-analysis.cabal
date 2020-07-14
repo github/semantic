@@ -68,7 +68,7 @@ library
     , fused-effects-readline      ^>= 0.1
     , fused-syntax
     , hashable
-    , haskeline                   ^>= 0.7.5
+    , haskeline                    >= 0.7 && < 0.9
     , hashable
     , lingo                       ^>= 0.3.2.0
     , pathtype                    ^>= 0.8.1

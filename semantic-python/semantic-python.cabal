@@ -20,7 +20,7 @@ tested-with:         GHC == 8.6.5
 
 common haskell
   default-language:    Haskell2010
-  build-depends:       base ^>= 4.13
+  build-depends:       base  >= 4.13 && < 5
                      , fused-effects ^>= 1.1
                      , fused-syntax
                      , parsers ^>= 0.12.10
@@ -32,7 +32,7 @@ common haskell
                      , semantic-tags ^>= 0.0
                     --  , semantic-scope-graph ^>= 0.0
                      , semilattices ^>= 0
-                     , template-haskell ^>= 2.15
+                     , template-haskell  >= 2.15 && < 2.17
                      , text ^>= 1.2.3
                      , tree-sitter ^>= 0.9
                      , tree-sitter-python ^>= 0.9.0.2
@@ -67,7 +67,8 @@ library
     -- Language.Python.ScopeGraph
     Language.Python.Tags
   hs-source-dirs: src
-  build-depends: lens ^>= 4.18
+  build-depends:
+    , lens >= 4.17 && < 4.20
 
 -- test-suite compiling
 --   import: haskell

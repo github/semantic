@@ -56,7 +56,7 @@ library
 
   -- other-modules:
   -- other-extensions:
-  build-depends:       base ^>= 4.13
+  build-depends:       base                  >= 4.13 && < 5
                      , aeson                ^>= 1.4.2.0
                      , aeson-pretty         ^>= 0.8.8
                      , bytestring           ^>= 0.10.9
@@ -66,7 +66,7 @@ library
                      , fused-effects        ^>= 1.1
                      , tree-sitter          ^>= 0.9.0.0
                      , semantic-source      ^>= 0.1.0
-                     , template-haskell     ^>= 2.15
+                     , template-haskell      >= 2.15 && < 2.17
                      , bytestring           ^>= 0.10.8.2
                      , optparse-applicative >= 0.14.3 && < 0.16
                      , pretty-simple        ^>= 3.1.0.0
