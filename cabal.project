@@ -26,7 +26,7 @@ packages: semantic
 source-repository-package
   type: git
   location: https://github.com/tclem/proto-lens-jsonpb
-  tag: 5d40444be689bef1e12cbe38da0261283775ec64
+  tag: 38860f20378ff8960f609c92c5fd40da708995da
 
 source-repository-package
   type: git
