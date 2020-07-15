@@ -59,8 +59,6 @@ withDistribute :: MonadUnliftIO m => DistributeC m a -> m a
 withDistribute r = withUnliftIO (`runDistribute` r)
 
 instance MonadUnliftIO m => MonadUnliftIO (LiftC m) where
-  askUnliftIO = LiftC $ withUnliftIO $ \u -> pure (UnliftIO (unliftIO u . runM))
-  {-# INLINE askUnliftIO #-}
   withRunInIO inner = LiftC $ withRunInIO $ \run -> inner (run . runM)
   {-# INLINE withRunInIO #-}
 
