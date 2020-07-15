@@ -98,7 +98,6 @@ library
                      , Data.Flag
                      , Data.Graph.Algebraic
                      , Data.Handle
-                     , Data.Language
                      , Data.Maybe.Exts
                      , Data.Semigroup.App
                      -- Parser glue

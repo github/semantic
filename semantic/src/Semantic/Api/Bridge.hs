@@ -12,15 +12,15 @@ import           Analysis.File
 import           Control.Lens
 import qualified Data.Blob as Data
 import           Data.Either
-import qualified Data.Language as Data
 import           Data.ProtoLens (defMessage)
 import qualified Data.Text as T
 import           Data.Text.Lens
 import qualified Proto.Semantic as API
 import           Proto.Semantic_Fields as P hiding (to)
+import qualified Source.Language as Data
+import qualified Source.Range as Source
 import qualified Source.Source as Source (fromText, toText, totalSpan)
 import qualified Source.Span as Source
-import qualified Source.Range as Source
 import qualified System.Path as Path
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.

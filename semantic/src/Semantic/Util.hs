@@ -18,10 +18,10 @@ import           Control.Carrier.Parse.Simple
 import           Control.Effect.Reader
 import           Control.Exception hiding (evaluate)
 import           Control.Monad
-import qualified Data.Language as Language
 import           Parsing.Parser
 import           Semantic.Config
 import           Semantic.Task
+import qualified Source.Language as Language
 import           Source.Span (Pos (..), point)
 import           System.Exit (die)
 import qualified System.Path as Path

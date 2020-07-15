@@ -32,7 +32,6 @@ import           Data.ByteString.Builder (Builder, toLazyByteString)
 import           Data.ByteString.Lazy (toStrict)
 import           Data.Edit as X
 import           Data.Foldable (toList)
-import           Data.Language as X hiding (Precise)
 import           Data.List.NonEmpty as X (NonEmpty (..))
 import           Data.Maybe as X
 import           Data.Monoid as X (First (..), Last (..), Monoid (..))
@@ -47,6 +46,7 @@ import           Semantic.Config (Config (..), optionsLogLevel)
 import           Semantic.Task as X
 import           Semantic.Telemetry (LogQueue, StatQueue)
 import           Semantic.Util as X
+import           Source.Language as X
 import           Source.Range as X hiding (end, point, start)
 import           Source.Source as X (Source)
 import           Source.Span as X hiding (HasSpan (..), end, point, start)
@@ -66,7 +66,7 @@ runBuilder = toStrict . toLazyByteString
 parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
 parseFilePath session path = do
   blob <- readBlobFromFile (File.fromPath path)
-  res <- runTask session . runParse (configTreeSitterParseTimeout (config session)) . runReader defaultLanguageModes $ parseTermBuilder TermSExpression (toList blob)
+  res <- runTask session . runParse (configTreeSitterParseTimeout (config session)) $ parseTermBuilder TermSExpression (toList blob)
   pure (runBuilder <$> res)
 
 runParseWithConfig :: Has (Reader Config) sig m => ParseC m a -> m a
