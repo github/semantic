@@ -68,7 +68,8 @@ newtype DistributeC m a = DistributeC { runDistributeC :: ReaderC (UnliftIO m) m
 -- This can be simpler if we add an instance to fused-effects that takes
 -- care of this folderol for us (then we can justt derive the MonadUnliftIO instance)
 instance (MonadIO m, Algebra sig m) => MonadUnliftIO (DistributeC m) where
-  askUnliftIO = DistributeC . ReaderC $ \ u -> pure (UnliftIO (runDistribute u))
+  withRunInIO inner = DistributeC . ReaderC $ \ u -> liftIO $ inner (unliftIO u . runReader u . runDistributeC)
+  {-# INLINE withRunInIO #-}
 
 instance (Algebra sig m, MonadIO m) => Algebra (Distribute :+: sig) (DistributeC m) where
   alg hdl sig ctx = case sig of
