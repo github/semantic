@@ -53,8 +53,8 @@ instance Applicative Result where
   _ <*> (Todo b) = Todo b
   pure = Complete
 
-todo :: (Show a, Applicative m) => a -> m (Result b)
-todo = pure . Todo . pure . show
+todo :: Show a => a -> b
+todo = error . show
 
 complete :: (Monoid b, Applicative m) => m (Result b)
 complete = pure (Complete mempty)
