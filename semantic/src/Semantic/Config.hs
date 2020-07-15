@@ -79,7 +79,7 @@ infoOptions :: Options
 infoOptions = defaultOptions { optionsLogLevel = Just Info }
 
 defaultConfig :: Options -> IO Config
-defaultConfig options@Options{..} = do
+defaultConfig options = do
   pid <- getProcessID
   hostName <- getHostName
   isTerminal <- hIsTerminalDevice stdout

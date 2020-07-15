@@ -4,7 +4,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -55,10 +54,10 @@ parseTermBuilder TermShow        = distributeFoldMap (parseWith showTermParsers 
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 quietTerm :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, MonadIO m) => Blob -> m Builder
-quietTerm blob = showTiming blob <$> time' (parseWith showTermParsers (fmap (const (Right ())) . showTerm) blob `catchError` timingError)
+quietTerm blob = showTiming <$> time' (parseWith showTermParsers (fmap (const (Right ())) . showTerm) blob `catchError` timingError)
   where
     timingError (SomeException e) = pure (Left (show e))
-    showTiming Blob{..} (res, duration) =
+    showTiming (res, duration) =
       let status = if isLeft res then "ERR" else "OK"
       in stringUtf8 (status <> "\t" <> show (blobLanguage blob) <> "\t" <> blobFilePath blob <> "\t" <> show duration <> " ms\n")
 

@@ -3,7 +3,6 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 -- | A carrier for 'Parse' effects suitable for use in the repl, tests, etc.
@@ -50,7 +49,7 @@ runParser
   -> Blob
   -> Parser term
   -> m term
-runParser timeout blob@Blob{..} parser = case parser of
+runParser timeout blob parser = case parser of
   UnmarshalParser language ->
     parseToPreciseAST timeout timeout language blob
       >>= either (throwError . SomeException) pure
