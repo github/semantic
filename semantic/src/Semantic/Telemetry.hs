@@ -116,7 +116,7 @@ queueLogMessage q@AsyncQueue{..} level message pairs
 
 -- | Queue an error to be reported.
 queueErrorReport :: MonadIO io => ErrorQueue -> SomeException -> [(String, String)] -> io ()
-queueErrorReport q@AsyncQueue{..} message = liftIO . writeAsyncQueue q . ErrorReport message
+queueErrorReport q message = liftIO . writeAsyncQueue q . ErrorReport message
 
 -- | Queue a stat to be sent to statsd.
 queueStat :: MonadIO io => StatQueue -> Stat -> io ()
