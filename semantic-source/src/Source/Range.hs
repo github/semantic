@@ -25,10 +25,6 @@ data Range = Range
 instance Hashable Range
 instance NFData   Range
 
-
-
--- $
--- prop> a <> (b <> c) === (a <> b) <> (c :: Range)
 instance Semigroup Range where
   Range start1 end1 <> Range start2 end2 = Range (min start1 start2) (max end1 end2)
 
@@ -60,9 +56,3 @@ type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
 lens :: (s -> a) -> (s -> a -> s) -> Lens' s a
 lens get put afa s = fmap (put s) (afa (get s))
 {-# INLINE lens #-}
-
-
--- $setup
--- >>> import Test.QuickCheck
--- >>> instance Arbitrary Range where arbitrary = Range <$> arbitrary <*> arbitrary ; shrink (Range s e) = Range <$> shrink s <*> shrink e
-
