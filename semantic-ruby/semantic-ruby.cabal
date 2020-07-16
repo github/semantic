@@ -20,18 +20,6 @@ tested-with:         GHC == 8.6.5
 
 common haskell
   default-language:    Haskell2010
-  build-depends:
-    , base  >= 4.13 && < 5
-    , fused-effects ^>= 1.1
-    , semantic-ast
-    , semantic-proto ^>= 0
-    , semantic-source ^>= 0.1.0
-    , semantic-tags ^>= 0.0
-    , template-haskell  >= 2.15 && < 2.17
-    , text ^>= 1.2.3
-    , tree-sitter ^>= 0.9
-    , tree-sitter-ruby ^>= 0.5.0.2
-
   ghc-options:
     -Weverything
     -Wno-missing-local-signatures
@@ -61,6 +49,17 @@ library
     Language.Ruby.Grammar
     Language.Ruby.Tags
   hs-source-dirs: src
+  build-depends:
+    , base  >= 4.13 && < 5
+    , fused-effects ^>= 1.1
+    , semantic-ast
+    , semantic-proto ^>= 0
+    , semantic-source ^>= 0.1.0
+    , semantic-tags ^>= 0.0
+    , template-haskell  >= 2.15 && < 2.17
+    , text ^>= 1.2.3
+    , tree-sitter ^>= 0.9
+    , tree-sitter-ruby ^>= 0.5.0.2
 
 test-suite test
   import:           haskell
@@ -69,15 +68,11 @@ test-suite test
   main-is:          PreciseTest.hs
   build-depends:
     , base
-    , bytestring ^>= 0.10.8.2
-    , hedgehog >= 0.6 && <2
     , pathtype ^>= 0.8.1
     , semantic-ast
     , semantic-ruby
     , tasty
-    , tasty-hedgehog
-    , tasty-hunit
-    , text
+    , tree-sitter-ruby ^>= 0.5.0.2
 
 executable benchmarks
   import:              haskell
@@ -91,9 +86,10 @@ executable benchmarks
     , bytestring
     , gauge ^>= 0.2.5
     , Glob
-    , lens >= 4.17 && < 4.20
     , pathtype ^>= 0.8.1
+    , semantic-ast
     , semantic-ruby
+    , tree-sitter-ruby ^>= 0.5.0.2
 
 executable tree-sitter-ruby
   import: haskell
@@ -103,4 +99,6 @@ executable tree-sitter-ruby
   build-depends:
     , base
     , bytestring
+    , semantic-ast
     , semantic-ruby
+    , tree-sitter-ruby ^>= 0.5.0.2

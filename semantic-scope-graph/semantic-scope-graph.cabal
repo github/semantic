@@ -36,8 +36,8 @@ library
     Data.Module
     Data.ScopeGraph
   build-depends:
-      base                >= 4.13 && < 5
     , aeson
+    , base                >= 4.13 && < 5
     , containers
     , fused-effects      ^>= 1.1
     , generic-lens

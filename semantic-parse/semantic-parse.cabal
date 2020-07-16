@@ -44,18 +44,16 @@ executable semantic-parse
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:       base
-                     , semantic-ast
-                     , tree-sitter ^>= 0.9.0.0
-                     , semantic-source ^>= 0.1.0
-                     , tree-sitter-python ^>= 0.9.0.1
-                     , bytestring
-                     , optparse-applicative
-                     , pretty-simple
-                     , aeson
-                     , bytestring
-                     , aeson-pretty
-                     , semantic-python
-                     , text
+  build-depends:
+    , aeson
+    , aeson-pretty
+    , base
+    , bytestring
+    , optparse-applicative
+    , pretty-simple
+    , semantic-ast
+    , semantic-python
+    , semantic-source ^>= 0.1.0
+    , tree-sitter-python ^>= 0.9.0.1
   hs-source-dirs:      app
   default-language:    Haskell2010

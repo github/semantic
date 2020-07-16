@@ -52,7 +52,7 @@ library
     Source.Source
     Source.Span
   build-depends:
-      aeson          ^>= 1.4.2.0
+    , aeson          ^>= 1.4.2.0
     , base            >= 4.12 && < 5
     , bytestring     ^>= 0.10.8.2
     , deepseq        ^>= 1.4.4.0
@@ -70,7 +70,7 @@ test-suite doctest
   type: exitcode-stdio-1.0
   main-is: Doctest.hs
   build-depends:
-      base
+    , base
     , doctest          >= 0.7 && <1.0
     , QuickCheck
     , semantic-source
@@ -84,7 +84,7 @@ test-suite test
   other-modules:
     Source.Test
   build-depends:
-      base
+    , base
     , hedgehog        ^>= 1
     , semantic-source
     , tasty            >= 1.2 && <2

@@ -46,13 +46,13 @@ library
     Tags.Tag
     Tags.Tagging.Precise
   build-depends:
-      base                >= 4.13 && < 5
+    , base                >= 4.13 && < 5
     , bytestring         ^>= 0.10.8.2
-    , fused-effects      ^>= 1.1
-    , semantic-source    ^>= 0.1.0
-    , semantic-proto     ^>= 0
-    , text               ^>= 1.2.3.1
     , containers         ^>= 0.6.0.1
+    , fused-effects      ^>= 1.1
+    , semantic-proto     ^>= 0
+    , semantic-source    ^>= 0.1.0
+    , text               ^>= 1.2.3.1
   hs-source-dirs:      src
 
 test-suite test
@@ -61,11 +61,9 @@ test-suite test
   hs-source-dirs: test
   main-is: Test.hs
   build-depends:
-      base            >= 4.13 && < 5
-    , hedgehog        ^>= 1
+    , base             >= 4.13 && < 5
     , semantic-source ^>= 0.1.0
     , semantic-tags
     , tasty            >= 1.2 && <2
-    , tasty-hedgehog  ^>= 1.0.0.1
     , tasty-hunit      >= 0.10 && <1
     , text            ^>= 1.2.3.1
