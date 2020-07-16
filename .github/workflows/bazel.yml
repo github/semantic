@@ -40,5 +40,6 @@ jobs:
 
     - name: Build & test
       run: |
-        bin/bazel test --config=ci --test_tag_filters=language-test //...
+        bin/bazel test --config=ci --test_tag_filters=language-test //... --explain=/tmp/explanation
         bin/bazel test --config=ci //semantic-source //semantic:spec
+        cat /tmp/explanation
