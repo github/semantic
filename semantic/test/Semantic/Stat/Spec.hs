@@ -18,7 +18,7 @@ withSocketPair = bracket create release
         release (client, server) = close client >> close server
 
 withEnvironment :: String -> String -> IO () -> IO ()
-withEnvironment key value = bracket (setEnv key value) (const (unsetEnv key)) . const
+withEnvironment key value = bracket_ (setEnv key value) (unsetEnv key)
 
 -- NOTE: These cannot easily run in parallel because we test things like
 -- setting/unsetting the environment.
