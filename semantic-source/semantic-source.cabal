@@ -65,17 +65,6 @@ library
     , text           ^>= 1.2.3.1
   hs-source-dirs: src
 
-test-suite doctest
-  import: haskell
-  type: exitcode-stdio-1.0
-  main-is: Doctest.hs
-  build-depends:
-    , base
-    , doctest          >= 0.7 && <1.0
-    , QuickCheck
-    , semantic-source
-  hs-source-dirs: test
-
 test-suite test
   import: haskell
   type: exitcode-stdio-1.0
