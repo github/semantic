@@ -46,6 +46,8 @@ function flags {
 
   echo "-optP-Wno-macro-redefined"
 
+  echo "-DBAZEL_BUILD=0"
+
   # .hs source dirs
   # TODO: would be nice to figure this out from cabal.project & the .cabal files
   echo "-isemantic/app"
