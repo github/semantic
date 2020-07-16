@@ -47,7 +47,6 @@ module Core.Core
 , stripAnnotations
 ) where
 
-import Control.Algebra
 import Control.Applicative (Alternative (..))
 import Core.Name
 import Data.Bifunctor (Bifunctor (..))
@@ -58,7 +57,9 @@ import Data.Text (Text)
 import GHC.Generics (Generic1)
 import GHC.Stack
 import Source.Span
+import Syntax.Algebra
 import Syntax.Foldable
+import Syntax.Functor
 import Syntax.Module
 import Syntax.Scope
 import Syntax.Stack

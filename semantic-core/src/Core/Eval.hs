@@ -2,7 +2,6 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
@@ -21,7 +20,6 @@ import qualified Analysis.Effect.Domain as A
 import           Analysis.Effect.Env as A
 import           Analysis.Effect.Heap as A
 import           Analysis.File
-import           Control.Algebra
 import           Control.Applicative (Alternative (..))
 import           Control.Effect.Fail
 import           Control.Effect.Reader
@@ -33,11 +31,13 @@ import           Data.Maybe (fromMaybe, isJust)
 import           GHC.Stack
 import           Prelude hiding (fail)
 import           Source.Span
+import qualified Syntax.Algebra as Syntax
 import           Syntax.Scope
+import qualified Syntax.Sum as Syntax
 import qualified Syntax.Term as Term
 import qualified System.Path as Path
 
-type Term = Term.Term (Ann Span :+: Core)
+type Term = Term.Term (Ann Span Syntax.:+: Core)
 
 eval :: forall address value m sig
      .  ( Has (A.Domain Term address value) sig m
@@ -52,7 +52,7 @@ eval :: forall address value m sig
      -> (Term address -> m value)
 eval eval = \case
   Term.Var n -> deref' n n
-  Term.Alg (R c) -> case c of
+  Term.Alg (Syntax.R c) -> case c of
     Rec (Named n b) -> do
       addr <- A.alloc @address n
       v <- A.bind n addr (eval (instantiate1 (pure addr) b))
@@ -92,7 +92,7 @@ eval eval = \case
       b' <- eval b
       addr <- ref a
       b' <$ A.assign addr b'
-  Term.Alg (L (Ann span c)) -> local (const span) (eval c)
+  Term.Alg (Syntax.L (Ann span c)) -> local (const span) (eval c)
   where freeVariable s = fail ("free variable: " <> s)
         uninitialized s = fail ("uninitialized variable: " <> s)
         invalidRef s = fail ("invalid ref: " <> s)
@@ -101,7 +101,7 @@ eval eval = \case
 
         ref = \case
           Term.Var n -> pure n
-          Term.Alg (R c) -> case c of
+          Term.Alg (Syntax.R c) -> case c of
             If c t e -> do
               c' <- eval c >>= A.asBool
               if c' then ref t else ref e
@@ -109,33 +109,33 @@ eval eval = \case
               a' <- eval a >>= A.asRecord
               maybe (freeVariable (show b)) ref (lookup b a')
             c -> invalidRef (show c)
-          Term.Alg (L (Ann span c)) -> local (const span) (ref c)
+          Term.Alg (Syntax.L (Ann span c)) -> local (const span) (ref c)
 
 
-prog1 :: Has Core sig t => File (t Name)
+prog1 :: Syntax.Has Core sig t => File (t Name)
 prog1 = fromBody $ Core.lam (named' "foo")
   (    named' "bar" :<- pure "foo"
   >>>= Core.if' (pure "bar")
     (Core.bool False)
     (Core.bool True))
 
-prog2 :: Has Core sig t => File (t Name)
+prog2 :: Syntax.Has Core sig t => File (t Name)
 prog2 = fromBody $ fileBody prog1 $$ Core.bool True
 
-prog3 :: Has Core sig t => File (t Name)
+prog3 :: Syntax.Has Core sig t => File (t Name)
 prog3 = fromBody $ lams [named' "foo", named' "bar", named' "quux"]
   (Core.if' (pure "quux")
     (pure "bar")
     (pure "foo"))
 
-prog4 :: Has Core sig t => File (t Name)
+prog4 :: Syntax.Has Core sig t => File (t Name)
 prog4 = fromBody
   (    named' "foo" :<- Core.bool True
   >>>= Core.if' (pure "foo")
     (Core.bool True)
     (Core.bool False))
 
-prog5 :: (Has (Ann Span) sig t, Has Core sig t) => File (t Name)
+prog5 :: (Syntax.Has (Ann Span) sig t, Syntax.Has Core sig t) => File (t Name)
 prog5 = fromBody $ ann (do'
   [ Just (named' "mkPoint") :<- lams [named' "_x", named' "_y"] (ann (Core.record
     [ ("x", ann (pure "_x"))
@@ -146,7 +146,7 @@ prog5 = fromBody $ ann (do'
   , Nothing :<- ann (ann (pure "point") Core.... "y") .= ann (ann (pure "point") Core.... "x")
   ])
 
-prog6 :: Has Core sig t => [File (t Name)]
+prog6 :: Syntax.Has Core sig t => [File (t Name)]
 prog6 =
   [ (fromBody (Core.record
     [ ("dep", Core.record [ ("var", Core.bool True) ]) ]))
@@ -158,7 +158,7 @@ prog6 =
     { filePath = Path.absRel "main" }
   ]
 
-ruby :: (Has (Ann Span) sig t, Has Core sig t) => File (t Name)
+ruby :: (Syntax.Has (Ann Span) sig t, Syntax.Has Core sig t) => File (t Name)
 ruby = fromBody $ annWith callStack (rec (named' __semantic_global) (do' statements))
   where statements =
           [ Just "Class" :<- record

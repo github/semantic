@@ -1,4 +1,9 @@
-{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.Carrier.Env.Monovariant
 ( -- * Env carrier
   EnvC(..)
@@ -6,9 +11,9 @@ module Analysis.Carrier.Env.Monovariant
 , module Analysis.Effect.Env
 ) where
 
-import Analysis.Effect.Env
-import Analysis.Name
-import Control.Algebra
+import           Analysis.Effect.Env
+import           Analysis.Name
+import           Control.Algebra
 import qualified Control.Monad.Fail as Fail
 
 newtype EnvC m a = EnvC { runEnv :: m a }
@@ -16,7 +21,8 @@ newtype EnvC m a = EnvC { runEnv :: m a }
 
 instance Algebra sig m
       => Algebra (Env Name :+: sig) (EnvC m) where
-  alg (L (Alloc name k))  = k name
-  alg (L (Bind _ _ m k))  = m >>= k
-  alg (L (Lookup name k)) = k (Just name)
-  alg (R other)           = EnvC (alg (handleCoercible other))
+  alg hdl sig ctx = case sig of
+    L (Alloc name)  -> pure (name <$ ctx)
+    L (Bind _ _ m)  -> hdl (m <$ ctx)
+    L (Lookup name) -> pure (Just name <$ ctx)
+    R other         -> EnvC (alg (runEnv . hdl) other ctx)

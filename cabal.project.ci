@@ -31,7 +31,7 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/antitypical/fused-syntax.git
-  tag: d11e14581217590a5c67f79cbaeee35ac8acee6a
+  tag: 4a383d57c8fd7592f54a33f43eb9666314a6e80e
 
 -- Treat warnings as errors for CI builds
 package semantic

@@ -9,7 +9,7 @@
 -- | A carrier for 'Parse' effects suitable for use in the repl, tests, etc.
 module Control.Carrier.Parse.Simple
 ( -- * Parse carrier
-  ParseC(..)
+  ParseC(ParseC)
 , runParse
   -- * Exceptions
 , ParseFailure(..)
@@ -28,17 +28,18 @@ import           Parsing.Parser
 import           Parsing.TreeSitter
 
 runParse :: Duration -> ParseC m a -> m a
-runParse timeout (ParseC m) = runReader timeout m
+runParse timeout = runReader timeout . runParseC
 
-newtype ParseC m a = ParseC (ReaderC Duration m a)
+newtype ParseC m a = ParseC { runParseC :: ReaderC Duration m a }
   deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance ( Has (Error SomeException) sig m
          , MonadIO m
          )
       => Algebra (Parse :+: sig) (ParseC m) where
-  alg (L (Parse parser blob k)) = ParseC ask >>= \ timeout -> runParser timeout blob parser >>= k
-  alg (R other)                 = ParseC (send (handleCoercible other))
+  alg hdl sig ctx = case sig of
+    L (Parse parser blob) -> ParseC ask >>= \ timeout -> (<$ ctx) <$> runParser timeout blob parser
+    R other               -> ParseC (alg (runParseC . hdl) (R other) ctx)
 
 -- | Parse a 'Blob' in 'IO'.
 runParser

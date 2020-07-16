@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE TypeOperators #-}
 module Analysis.Effect.Domain
 ( -- * Domain effect
@@ -26,81 +26,61 @@ module Analysis.Effect.Domain
 
 import Analysis.Functor.Named
 import Control.Algebra
+import Data.Kind (Type)
 import Data.Text (Text)
-import GHC.Generics (Generic1)
 import Syntax.Scope (Scope)
 
 unit :: Has (UnitDomain value) sig m => m value
-unit = send (Unit pure)
+unit = send Unit
 
-data UnitDomain value m k
-  = Unit (value -> m k)
-  deriving (Functor, Generic1)
-
-instance HFunctor (UnitDomain value)
-instance Effect   (UnitDomain value)
+data UnitDomain value (m :: Type -> Type) k where
+  Unit :: UnitDomain value m value
 
 
 bool :: Has (BoolDomain value) sig m => Bool -> m value
-bool b = send (Bool b pure)
+bool b = send (Bool b)
 
 asBool :: Has (BoolDomain value) sig m => value -> m Bool
-asBool v = send (AsBool v pure)
+asBool v = send (AsBool v)
 
-data BoolDomain value m k
-  = Bool   Bool  (value -> m k)
-  | AsBool value (Bool  -> m k)
-  deriving (Functor, Generic1)
-
-instance HFunctor (BoolDomain value)
-instance Effect   (BoolDomain value)
+data BoolDomain value (m :: Type -> Type) k where
+  Bool   :: Bool  -> BoolDomain value m value
+  AsBool :: value -> BoolDomain value m Bool
 
 
 string :: Has (StringDomain value) sig m => Text -> m value
-string s = send (String s pure)
+string s = send (String s)
 
 asString :: Has (StringDomain value) sig m => value -> m Text
-asString v = send (AsString v pure)
+asString v = send (AsString v)
 
-data StringDomain value m k
-  = String   Text  (value -> m k)
-  | AsString value (Text  -> m k)
-  deriving (Functor, Generic1)
-
-instance HFunctor (StringDomain value)
-instance Effect   (StringDomain value)
+data StringDomain value (m :: Type -> Type) k where
+  String   :: Text  -> StringDomain value m value
+  AsString :: value -> StringDomain value m Text
 
 
 lam :: Has (FunctionDomain term addr value) sig m => Named (Scope () term addr) -> m value
-lam b = send (Lam b pure)
+lam b = send (Lam b)
 
 -- FIXME: Support partial concretization of lambdas.
 asLam :: Has (FunctionDomain term addr value) sig m => value -> m (Named (Scope () term addr))
-asLam v = send (AsLam v pure)
+asLam v = send (AsLam v)
 
-data FunctionDomain term addr value m k
-  = Lam   (Named (Scope () term addr)) (value                      -> m k)
-  | AsLam value                        (Named (Scope () term addr) -> m k)
-  deriving (Functor, Generic1)
-
-instance HFunctor (FunctionDomain term addr value)
-instance Effect   (FunctionDomain term addr value)
+data FunctionDomain term addr value (m :: Type -> Type) k where
+  Lam   :: Named (Scope () term addr) -> FunctionDomain term addr value m value
+  AsLam :: value                      -> FunctionDomain term addr value m (Named (Scope () term addr))
 
 
 record :: Has (RecordDomain term addr value) sig m => [(Name, term addr)] -> m value
-record fs = send (Record fs pure)
+record fs = send (Record fs)
 
 -- FIXME: Support partial concretization of records.
 asRecord :: Has (RecordDomain term addr value) sig m => value -> m [(Name, term addr)]
-asRecord v = send (AsRecord v pure)
+asRecord v = send (AsRecord v)
 
-data RecordDomain term addr value m k
-  = Record   [(Name, term addr)] (value               -> m k)
-  | AsRecord value               ([(Name, term addr)] -> m k)
-  deriving (Functor, Generic1)
-
-instance HFunctor (RecordDomain term addr value)
-instance Effect   (RecordDomain term addr value)
+data RecordDomain term addr value (m :: Type -> Type) k where
+  Record   :: [(Name, term addr)] -> RecordDomain term addr value m value
+  AsRecord :: value               -> RecordDomain term addr value m [(Name, term addr)]
 
 
 type Domain term addr value

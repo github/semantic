@@ -1,4 +1,9 @@
-{-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.Carrier.Env.Precise
 ( -- * Env carrier
   EnvC(..)
@@ -10,10 +15,10 @@ module Analysis.Carrier.Env.Precise
 ) where
 
 import qualified Analysis.Effect.Env as A
-import Analysis.Name
-import Control.Algebra
-import Control.Effect.Fresh
-import Control.Effect.Reader
+import           Analysis.Name
+import           Control.Algebra
+import           Control.Effect.Fresh
+import           Control.Effect.Reader
 import qualified Control.Monad.Fail as Fail
 import qualified Data.Map as Map
 
@@ -27,7 +32,8 @@ instance ( Has Fresh sig m
          , Has (Reader Env) sig m
          )
       => Algebra (A.Env Precise :+: sig) (EnvC m) where
-  alg (L (A.Alloc _ k))          = fresh >>= k
-  alg (L (A.Bind name addr m k)) = local (Map.insert name addr) m >>= k
-  alg (L (A.Lookup name k))      = asks (Map.lookup name) >>= k
-  alg (R other)                  = EnvC (alg (handleCoercible other))
+  alg hdl sig ctx = case sig of
+    L (A.Alloc _)          -> (<$ ctx) <$> fresh
+    L (A.Bind name addr m) -> local (Map.insert name addr) (hdl (m <$ ctx))
+    L (A.Lookup name)      -> (<$ ctx) <$> asks (Map.lookup name)
+    R other                -> EnvC (alg (runEnv . hdl) other ctx)

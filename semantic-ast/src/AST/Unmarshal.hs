@@ -29,8 +29,7 @@ module AST.Unmarshal
 
 import           AST.Token as TS
 import           AST.Parse
-import           Control.Algebra (send)
-import           Control.Carrier.Reader hiding (asks)
+import           Control.Carrier.Reader
 import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.ByteString (ByteString)
@@ -59,10 +58,6 @@ import           TreeSitter.Language as TS
 import           TreeSitter.Node as TS
 import           TreeSitter.Parser as TS
 import           TreeSitter.Tree as TS
-
-asks :: Has (Reader r) sig m => (r -> r') -> m r'
-asks f = send (Ask (pure . f))
-{-# INLINE asks #-}
 
 -- Parse source code and produce AST
 parseByteString :: (Unmarshal t, UnmarshalAnn a) => Ptr TS.Language -> ByteString -> IO (Either String (t a))

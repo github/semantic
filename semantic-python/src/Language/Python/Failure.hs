@@ -1,6 +1,15 @@
-{-# LANGUAGE DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveTraversable, ExistentialQuantification,
-             FlexibleContexts, KindSignatures, MultiParamTypeClasses, QuantifiedConstraints, RankNTypes,
-             StandaloneDeriving, TypeOperators #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Language.Python.Failure
   ( Failure (..)
@@ -11,13 +20,15 @@ module Language.Python.Failure
 
 import Prelude hiding (fail)
 
-import Control.Algebra
 import Control.Monad.Fail
 import Data.Coerce
 import Data.Kind
 import GHC.Generics (Generic1)
+import Syntax.Algebra
 import Syntax.Foldable
+import Syntax.Functor
 import Syntax.Module
+import Syntax.Sum
 import Syntax.Term
 import Syntax.Traversable
 

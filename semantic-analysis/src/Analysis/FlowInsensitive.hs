@@ -24,8 +24,7 @@ type Heap value = Map.Map Name (Set.Set value)
 
 
 convergeTerm :: forall term value m sig
-             .  ( Effect sig
-                , Has Fresh sig m
+             .  ( Has Fresh sig m
                 , Has (State (Heap value)) sig m
                 , Ord term
                 , Ord value
@@ -61,7 +60,7 @@ cacheTerm eval term = do
       result <$ modify (Cache . Map.insertWith (<>) term (Set.singleton (result :: value)) . unCache)
 
 runHeap :: StateC (Heap value) m a -> m (Heap value, a)
-runHeap m = runState Map.empty m
+runHeap = runState Map.empty
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --

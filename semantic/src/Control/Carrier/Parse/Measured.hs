@@ -44,8 +44,9 @@ instance ( Has (Error SomeException) sig m
          , MonadIO m
          )
       => Algebra (Parse :+: sig) (ParseC m) where
-  alg (L (Parse parser blob k)) = runParser blob parser >>= k
-  alg (R other)                 = ParseC (alg (handleCoercible other))
+  alg hdl sig ctx = case sig of
+    L (Parse parser blob) -> (<$ ctx) <$> runParser blob parser
+    R other               -> ParseC (alg (runParse . hdl) other ctx)
 
 -- | Parse a 'Blob' in 'IO'.
 runParser ::
@@ -60,14 +61,14 @@ runParser ::
   -> m term
 runParser blob@Blob{..} parser = case parser of
 
-  UnmarshalParser language -> do
-    (time "parse.tree_sitter_precise_ast_parse" languageTag $ do
+  UnmarshalParser language ->
+    time "parse.tree_sitter_precise_ast_parse" languageTag $ do
       config <- asks config
-      executeParserAction (parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob))
-    `catchError` (\(SomeException e) -> do
+      executeParserAction (parseToPreciseAST (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob)
+    `catchError` \(SomeException e) -> do
       writeStat (increment "parse.precise_ast_parse_failures" languageTag)
       writeLog Error "precise parsing failed" (("task", "parse") : ("exception", "\"" <> displayException e <> "\"") : languageTag)
-      throwError (SomeException e))
+      throwError (SomeException e)
 
   where
     languageTag = [("language" :: String, show (blobLanguage blob))]

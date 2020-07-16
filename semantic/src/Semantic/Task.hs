@@ -19,9 +19,6 @@ module Semantic.Task
 , Files.findFiles
 , Files.write
 , Files.FilesArg(..)
--- * Module Resolution
-, resolutionMap
-, Resolution
 -- * Telemetry
 , writeLog
 , writeStat
@@ -65,22 +62,20 @@ import           Data.ByteString.Builder
 import qualified Data.Flag as Flag
 import           Semantic.Config
 import           Semantic.Distribute
-import           Semantic.Resolution
 import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
 import           Serializing.Format
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskC
-  = ResolutionC
-  ( Files.FilesC
+  = Files.FilesC
   ( ReaderC Config
   ( ReaderC TaskSession
   ( TraceInTelemetryC
   ( TelemetryC
   ( ErrorC SomeException
   ( DistributeC
-  ( LiftC IO))))))))
+  ( LiftC IO)))))))
 
 serialize :: Has (Reader Config) sig m
           => Format input
@@ -113,7 +108,6 @@ runTask taskSession@TaskSession{..} task = do
           . runReader taskSession
           . runReader config
           . Files.runFiles
-          . runResolution
     run task
   queueStat statter stat
   pure result
@@ -129,13 +123,10 @@ withOptions options with = do
   config <- defaultConfig options
   withTelemetry config (\ (TelemetryQueues logger statter _) -> with config logger statter)
 
-runTraceInTelemetry :: TraceInTelemetryC m a
-                    -> m a
-runTraceInTelemetry = runTraceInTelemetryC
-
-newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a }
+newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetry :: m a }
   deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance Has Telemetry sig m => Algebra (Trace :+: sig) (TraceInTelemetryC m) where
-  alg (R other)         = TraceInTelemetryC . alg . handleCoercible $ other
-  alg (L (Trace str k)) = writeLog Debug str [] >> k
+  alg hdl sig ctx = case sig of
+    L (Trace str) -> ctx <$ writeLog Debug str []
+    R other       -> TraceInTelemetryC (alg (runTraceInTelemetry . hdl) other ctx)

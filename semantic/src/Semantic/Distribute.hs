@@ -2,6 +2,7 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE StandaloneDeriving #-}
@@ -31,7 +32,7 @@ import           Data.Foldable (fold)
 --
 --   This is a concurrent analogue of 'sequenceA'.
 distribute :: (Has Distribute sig m, Traversable t) => t (m output) -> m (t output)
-distribute = fmap (withStrategy (parTraversable rseq)) <$> traverse (send . flip Distribute pure)
+distribute = fmap (withStrategy (parTraversable rseq)) <$> traverse (send . Distribute)
 
 -- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), collecting the results.
 --
@@ -47,16 +48,8 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 
 -- | Distribute effects run tasks concurrently.
-data Distribute m k
-  = forall a . Distribute (m a) (a -> m k)
-
-deriving instance Functor m => Functor (Distribute m)
-
-instance HFunctor Distribute where
-  hmap f (Distribute m k) = Distribute (f m) (f . k)
-
-instance Effect Distribute where
-  thread state handler (Distribute task k) = Distribute (handler (task <$ state)) (handler . fmap k)
+data Distribute m k where
+  Distribute :: m a -> Distribute m a
 
 
 -- | Evaluate a 'Distribute' effect concurrently.
@@ -81,7 +74,8 @@ instance (MonadIO m, Algebra sig m) => MonadUnliftIO (DistributeC m) where
   askUnliftIO = DistributeC . ReaderC $ \ u -> pure (UnliftIO (runDistribute u))
 
 instance (Algebra sig m, MonadIO m) => Algebra (Distribute :+: sig) (DistributeC m) where
-  alg (L (Distribute task k)) = do
-    handler <- DistributeC ask
-    liftIO (Async.runConcurrently (Async.Concurrently (runDistribute handler task))) >>= k
-  alg (R other) = DistributeC (alg (R (handleCoercible other)))
+  alg hdl sig ctx = case sig of
+    L (Distribute task) -> do
+      handler <- DistributeC ask
+      liftIO (Async.runConcurrently (Async.Concurrently (runDistribute handler (hdl (task <$ ctx)))))
+    R other -> DistributeC (alg (runDistributeC . hdl) (R other) ctx)
