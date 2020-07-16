@@ -5,7 +5,7 @@ common:ci --color=no
 test:ci --test_output=errors
 
 build --disk_cache=.bazel-cache/bazel-disk
-build --repository_cache=tmp/bazel-repo
+build --repository_cache=.bazel-cache/bazel-repo
 build --color=yes
 build --jobs=8
 build --compilation_mode=fastbuild

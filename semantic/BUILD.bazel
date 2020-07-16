@@ -180,7 +180,6 @@ haskell_test(
 
 haskell_test(
     name = "parse-examples",
-    timeout = "long",
     srcs = [
         "test/Examples.hs",
     ],
