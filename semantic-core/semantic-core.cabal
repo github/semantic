@@ -50,7 +50,7 @@ library
     Core.Eval
     Core.Name
   build-depends:
-      base                         >= 4.13 && < 5
+    , base                         >= 4.13 && < 5
     , fused-effects               ^>= 1.1
     , fused-syntax
     , hashable
