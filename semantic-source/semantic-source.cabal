@@ -82,6 +82,7 @@ test-suite test
   hs-source-dirs: test
   main-is: Test.hs
   other-modules:
+    Range.Test
     Source.Test
   build-depends:
     , base
