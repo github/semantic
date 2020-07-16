@@ -38,10 +38,7 @@ haskell_library(
 
 haskell_test(
     name = "test",
-    srcs = [
-        "test/Source/Test.hs",
-        "test/Test.hs",
-    ],
+    srcs = glob(["test/**/*.hs"]),,
     compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS,
     deps = [
         ":semantic-source",
