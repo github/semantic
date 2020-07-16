@@ -130,7 +130,6 @@ def semantic_language_library(language, name, srcs, ts_package = "", nodetypes =
             "@stackage//:fused-effects",
             "@stackage//:fused-syntax",
             "@stackage//:generic-lens",
-            "@stackage//:generic-monoid",
             "@stackage//:hashable",
             "@stackage//:lens",
             "@stackage//:pathtype",

@@ -29,7 +29,6 @@ haskell_library(
         "//:text",
         "@lingo",
         "@stackage//:aeson",
-        "@stackage//:generic-monoid",
         "@stackage//:hashable",
         "@stackage//:pathtype",
         "@stackage//:semilattices",

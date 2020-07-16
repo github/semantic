@@ -92,7 +92,6 @@ stack_snapshot(
         "fused-syntax",
         "gauge",
         "generic-lens",
-        "generic-monoid",
         "haskeline",
         "hashable",
         "haskeline",

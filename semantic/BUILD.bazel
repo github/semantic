@@ -75,7 +75,6 @@ haskell_library(
         "@stackage//:directory-tree",
         "@stackage//:fused-syntax",
         "@stackage//:generic-lens",
-        "@stackage//:generic-monoid",
         "@stackage//:haskeline",
         "@stackage//:hostname",
         "@stackage//:hscolour",
