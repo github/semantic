@@ -3,7 +3,7 @@
 module Semantic.Stat.Spec (testTree) where
 
 import Control.Exception
-import Network.Socket hiding (recv)
+import Network.Socket
 import Network.Socket.ByteString
 import Semantic.Telemetry.Stat
 import Semantic.Config
