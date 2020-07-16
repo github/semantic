@@ -2,7 +2,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Tagging (benchmarks) where
+module Tagging
+( benchmarks
+, runTagging
+, pythonBenchmarks
+, goBenchmarks
+, rubyBenchmarks
+) where
 
 import           Control.Carrier.Parse.Measured
 import           Control.Exception (throwIO)
