@@ -20,7 +20,7 @@ source r = Gen.frequency [ (1, empty), (20, nonEmpty) ] where
   nonEmpty = Source.fromUTF8 <$> Gen.utf8 r (Gen.frequency [ (1, pure '\r'), (1, pure '\n'), (20, Gen.unicode) ])
 
 testTree :: Tasty.TestTree
-testTree = Tasty.testGroup "Data.Source"
+testTree = Tasty.testGroup "Source.Source"
   [ Tasty.testGroup "lineRanges"
     [ testProperty "produces 1 more range than there are newlines" . property $ do
         source <- forAll (source (Range.linear 0 100))
