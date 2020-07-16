@@ -168,7 +168,6 @@ haskell_test(
         "@stackage//:hspec",
         "@stackage//:hspec-core",
         "@stackage//:hspec-expectations",
-        "@stackage//:leancheck",
         "@stackage//:tasty",
         "@stackage//:tasty-golden",
         "@stackage//:tasty-hedgehog",

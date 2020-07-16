@@ -7,7 +7,7 @@ import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Reader
 import           Data.ByteString.Builder
 import Control.Exception
-import           Data.Language
+import           Source.Language
 import           Semantic.Api hiding (Blob, File)
 import           Semantic.Task
 import           Serializing.Format
@@ -55,10 +55,9 @@ testForParseFixture (format, runParse, files, expected) =
 
 parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], Path.AbsRelFile)]
 parseFixtures =
-  [ ("s-expression", run . parseTermBuilder TermSExpression, path, Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.parseA.txt")
-  , ("symbols", run . parseSymbolsBuilder Serializing.Format.JSON, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.json")
-  , ("protobuf symbols", run . parseSymbolsBuilder Serializing.Format.Proto, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.protobuf.bin")
+  [ ("s-expression", parseTermBuilder TermSExpression, path, Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.parseA.txt")
+  , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.json")
+  , ("protobuf symbols", parseSymbolsBuilder Serializing.Format.Proto, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.protobuf.bin")
   ]
   where path = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby]
         path'' = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
-        run = runReader defaultLanguageModes

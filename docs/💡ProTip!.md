@@ -18,62 +18,20 @@ Space leaks can be detected by running `semantic` with a restricted heap size. N
 
 ## Building
 
-`stack build --fast` is a nice way to speed up local development (builds without optimizations).
-
+Before building with `cabal`, be sure to run `cabal configure --disable-optimizations --enable-tests`. GHC defaults to `-O1`, which can significantly slow recompiles.
 
 ## Testing
 
 `stack build --fast semantic:test` builds and runs the unit tests.
 
-- Find out what all the possible test arguments are with `stack test --help`.
+- Find out what all the possible test arguments are with `cabal run semantic:spec -- --help`.
 - Focus in on a particular test or set of tests with `-m`/`--match`:
 
-        stack test --test-arguments="-m ruby"
-
-- Use `--skip` to run everything but matching tests:
-
-        stack test --test-arguments="--skip ruby"
+        cabal run semantic:spec -- -p ruby
 
 - It can take a while to run them over the whole project. Focus in on a particular module with `--test-arguments`:
 
-        stack test --test-arguments=src/Data/Range.hs
-
-
-## Difftool
-
-`git` can be configured to open diffs in `semantic` using `git-difftool`:
-
-1. Install semantic to the local bin path: `stack install :semantic`
-
-2. Configure `semantic` as a difftool:
-
-        git config difftool.semantic.cmd 'semantic diff --patch "$LOCAL" "$REMOTE"'
-
-3. Optionally, configure `semantic` as the default difftool:
-
-        git config diff.tool semantic
-
-4. Perform git diffs using semantic by invoking `git-difftool`:
-
-        # if configured as default
-        git difftool
-        # otherwise
-        git difftool -t semantic
-
-5. _Bonus round!_ Optionally, configure `git-difftool` to never prompt:
-
-        git config difftool.prompt false
-
-
-## Editing
-
-- 1. Install ghc-mod from the semantic directory by running:
-
-        `stack install ghc-mod`
-
-- 2. You'll need the `ide-haskell` plugins for atom. You can install through apm:
-
-        `apm install haskell-ghc-mod ide-haskell ide-haskell-cabal linter linter-ui-default`
+        cabal run semantic:spec -- -p Data.Language
 
 # Ctags Support
 
@@ -98,12 +56,6 @@ Alternatively, you can replace `symbols-view` with `joshvera/tags-view` in your 
         `git clone https://github.com/joshvera/tags-view ~/.atom/packages/tags-view`
 
 Then disable the `symbols-view` package.
-
-
-## Semantic documentation in Dash
-
-You can generate a `semantic` docset and import it into Dash locally. To do so run the `script/haddock` first to ensure Haddock documentation is generated. Then run `script/docset`. This should generate `.docset/semantic.docset` in the `semantic` repo. The last step is to import the `semantic.docset` into Dash. Open dash, open preferences, select the 'Docsets' tab, click the `+` icon to add a new docset, and direct the file browser to `semantic/.docsets/semantic.docset`.
-
 
 ## Working with grammar datatypes
 

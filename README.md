@@ -58,7 +58,7 @@ Available options:
 
 ## Development
 
-`semantic` requires at least GHC 8.8.1 and Cabal 3.0. We strongly recommend using [`ghcup`][ghcup] to sandbox GHC versions, as GHC packages installed through your OS's package manager may not install statically-linked versions of the GHC boot libraries. `semantic` currently builds only on Unix systems; users of other operating systems may wish to use the [Docker images](https://github.com/github/semantic/packages/11609).
+`semantic` requires at least GHC 8.8.3 and Cabal 3.0. We strongly recommend using [`ghcup`][ghcup] to sandbox GHC versions, as GHC packages installed through your OS's package manager may not install statically-linked versions of the GHC boot libraries. `semantic` currently builds only on Unix systems; users of other operating systems may wish to use the [Docker images](https://github.com/github/semantic/packages/11609).
 
 We use `cabal's` [Nix-style local builds][nix] for development. To get started quickly:
 
@@ -71,7 +71,7 @@ cabal v2-test
 cabal v2-run semantic -- --help
 ```
 
-You can also use the [Bazel](https://bazel.build) build system for development. To learn more about Bazel and why it might give you a better development experience, check the documentation at `docs/build.md`.
+You can also use the [Bazel](https://bazel.build) build system for development. To learn more about Bazel and why it might give you a better development experience, check the [build documentation](docs/build.md).
 
 ``` bash
 git clone git@github.com:github/semantic.git
@@ -89,13 +89,12 @@ bazel build //...
 ## Technology and architecture
 
 Architecturally, `semantic`:
-1. Reads blobs.
-2. Generates parse trees for those blobs with [tree-sitter][tree-sitter] (an incremental parsing system for programming tools).
-3. Assigns those trees into a generalized representation of syntax.
-4. Performs analysis, computes diffs, or just returns parse trees.
-5. Renders output in one of many supported formats.
+1. Generates per-language Haskell syntax types based on [tree-sitter](https://github.com/tree-sitter/tree-sitter) grammar definitions.
+2. Reads blobs from a filesystem or provided via a protocol buffer request.
+3. Returns blobs or performs analysis.
+4. Renders output in one of many supported formats.
 
-Semantic leverages a number of interesting algorithms and techniques:
+Throughout its lifestyle, `semantic` has leveraged a number of interesting algorithms and techniques, including:
 
 - Myers' algorithm (SES) as described in the paper [*An O(ND) Difference Algorithm and Its Variations*][SES]
 - RWS as described in the paper [*RWS-Diff: Flexible and Efficient Change Detection in Hierarchical Data*][RWS].

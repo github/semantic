@@ -15,9 +15,9 @@ import           Analysis.Project
 import           Control.Monad.IO.Class
 import           Data.Blob
 import qualified Data.ByteString as B
-import           Data.Language
 import           Data.Maybe.Exts
 import           Semantic.IO
+import           Source.Language
 import qualified Source.Source as Source
 import           Source.Span
 import qualified System.Path as Path
