@@ -1,9 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE ImplicitParams #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
 {-# OPTIONS_GHC -O1 #-}
@@ -20,7 +18,6 @@ import           Control.Monad
 import           Data.Blob
 import           Data.Foldable
 import           Data.Int
-import           Data.List
 import qualified Data.Text as Text
 import           Data.Traversable
 import           System.FilePath.Glob
@@ -179,7 +176,7 @@ main = withOptions testOptions $ \ config logger statter -> do
 
   let session = TaskSession config "-" False logger statter
 
-  allTests <- forConcurrently examples $ \lang@LanguageExample{..} -> do
+  allTests <- forConcurrently examples $ \lang -> do
     let tsDir = Fixture.absRelDir ".."
     buildExamples session lang tsDir
 
