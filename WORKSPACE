@@ -187,64 +187,64 @@ load(
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-go",
-    sha256 = "364a0ae4e683bda1e348fa85c6828cad72122af155560b680f6052852d98db6c",
-    version = "0.5.0.1",
+    sha256 = "72a1d3bdb2883ace3f2de3a0f754c680908489e984503f1a66243ad74dc2887e",
+    version = "0.5.0.2",
 )
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-python",
-    sha256 = "36aca4989a9f8b52d6af1586e6eecc8c3a8db2b5643f64ef13ab3d284c266522",
-    version = "0.9.0.2",
+    sha256 = "f028c88eabbda9b9bb67895922d753a12ddda83fb917748e0e407e50616b51ae",
+    version = "0.9.0.3",
 )
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-php",
-    sha256 = "d7a050948fcea3b740924520c5d0e00e9b239949eff831527a736c5421c912a3",
-    version = "0.5.0.0",
+    sha256 = "70fd9f5cc429fa2b59adaa86853fb111f733889f0b2996328efd885903d7ce16",
+    version = "0.5.0.1",
 )
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-java",
-    sha256 = "9978b56af40c0c66688c17a193761e9c21f7cbbb7e2e299cb7b99f42bd355dfc",
-    version = "0.7.0.1",
+    sha256 = "569fa1240cdb7db8436201962933c97dd2c502ed65bd4788880238201c67a1c6",
+    version = "0.7.0.2",
 )
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-json",
-    sha256 = "2b16e68afdc8c56bfac81b88dcd495fc8da6ba9df89347249f1785f1077965e5",
-    version = "0.7.0.1",
+    sha256 = "8fbc478268849c16bc7ff85dd6634bb849400bda98575fe26681224a640b9e0a",
+    version = "0.7.0.2",
 )
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-typescript",
     node_types_path = ":vendor/tree-sitter-typescript/typescript/src/node-types.json",
-    sha256 = "19a036ed413c9da66de8fc3826a413c30278d8490603aeb9465caf3707553d19",
-    version = "0.5.0.1",
+    sha256 = "d1cd258e5c83d557ab3481e08c2e8c29ee689e2a9de89b6f72c12080f48c9c62",
+    version = "0.5.0.2",
 )
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-tsx",
     node_types_path = ":vendor/tree-sitter-typescript/tsx/src/node-types.json",
-    sha256 = "56060c8d12acda0218cc3185c041b8bc7e0a13a0863ab4f1ca133a54078630de",
-    version = "0.5.0.1",
-)
-
-tree_sitter_node_types_hackage(
-    name = "tree-sitter-ruby",
-    sha256 = "d7e9cb06d37b5ee3be500a7f19ce09b6e846958195eff465d2b03d3218807690",
+    sha256 = "20115194b7e87d53e8ad42a9d5ef212186040e543ccf295135b1342ec6b12447",
     version = "0.5.0.2",
 )
 
 tree_sitter_node_types_hackage(
+    name = "tree-sitter-ruby",
+    sha256 = "b6bb1fcb23e283f28af2d1ac9444ed63bb7b9f396034d13db62553d998cefc24",
+    version = "0.5.0.3",
+)
+
+tree_sitter_node_types_hackage(
     name = "tree-sitter-ql",
-    sha256 = "fdc3ad5351318fcfeebd7ecb0099a5e3eeac030ec5037f71c1634ab5da94ae6b",
-    version = "0.1.0.3",
+    sha256 = "d15eff87a292ec4559295676afbf0e5a763f5f7e7636411933109880c3fd5c5d",
+    version = "0.1.0.4",
 )
 
 tree_sitter_node_types_hackage(
     name = "tree-sitter-rust",
-    sha256 = "522968fa22ad2e9720012b74487e77c91693572d81b157acdb0e116c535848ad",
-    version = "0.1.0.0",
+    sha256 = "00bc04a31b5c9b0f9b419074238996ee4aadba342e68071ec516077b495e0d41",
+    version = "0.1.0.1",
 )
 
 # Download lingo (which has its own Bazel build instructions).
