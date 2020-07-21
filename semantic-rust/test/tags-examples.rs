@@ -70,3 +70,16 @@ pub enum Node<T: Item> {
     }
 }
 
+// Structs
+
+struct Proton;
+struct Electron {}
+struct Person {pub name: String, pub age: u32}
+struct Point {
+  x: i32,
+
+  #[attribute1]
+  y: i32,
+}
+struct Color(pub i32, i32, i32);
+struct Inches(i32);
