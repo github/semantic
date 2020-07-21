@@ -41,3 +41,32 @@ fn foo(#[attr] x: i32, #[attr] x: i64) {}
 
 fn accumulate(self) -> Machine<{State::Accumulate}> {}
 
+// Attributes and expressions
+
+fn foo() {
+   bar(x,
+       #[cfg(foo = "bar")]
+       y);
+   let z = [#[hello] 2, 7, 8];
+   let t = (#[hello] 2, 7, 8);
+}
+
+// Enums
+
+pub enum Option<T> {
+    None,
+    Some(T),
+}
+
+pub enum Node<T: Item> {
+    Internal {
+        children: Vec<Tree<T>>,
+        height: u16
+    },
+    #[attribute1]
+    #[attribute2]
+    Leaf {
+        value: T
+    }
+}
+
