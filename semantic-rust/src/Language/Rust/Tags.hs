@@ -87,7 +87,7 @@ instance ToTags Rust.ModItem where
         case body of 
           Just (Parse.Success decls) -> gtags decls
           _ -> pure ()
-        where yield name ann = yieldTag name P.FUNCTION P.DEFINITION ann byteRange >> gtags t
+        where yield name ann = yieldTag name P.MODULE P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
 
 
@@ -181,6 +181,7 @@ instance ToTags Rust.GenericFunction where
         where
           yield function ann = yieldTag function P.FUNCTION P.DEFINITION ann byteRange >> gtags t
   tags _ = pure ()
+
 
 instance ToTags Rust.StaticItem where 
   tags 
