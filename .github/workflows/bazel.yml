@@ -1,0 +1,44 @@
+name: Bazel CI
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    name: Bazel
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
+
+    - uses: actions/cache@v2
+      id: caching-stage
+      name: Cache Bazel artifacts
+      with:
+        path: |
+          .bazel-cache
+          bin
+          /home/runner/.cache
+        key: ${{ runner.os }}-bazel-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-bazel-
+
+    - name: Download/cache bazel version
+      if: steps.caching-stage.outputs.cache-hit != 'true'
+      run: |
+        if [ ! -f bin/bazel ]; then
+          curl -LO "https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel-3.1.0-linux-x86_64"
+          mv bazel-3.1.0-linux-x86_64 "bin/bazel"
+          chmod +x "bin/bazel"
+        fi
+
+    - name: Build & test
+      run: |
+        bin/bazel test --config=ci --test_tag_filters=language-test //...
+        bin/bazel test --config=ci //semantic-source //semantic:spec
