@@ -31,6 +31,9 @@ GHC_FLAGS = [
     "-Wno-star-is-type",
     "-Wno-missing-deriving-strategies",
     "-DBAZEL_BUILD=1",
+    "-Wno-unused-packages",
+    "-Wno-prepositive-qualified-module",
+    "-Wno-missing-safe-haskell-mode",
 ] + select(
     {
         "//:release": RELEASE_GHC_FLAGS,
@@ -148,7 +151,7 @@ def semantic_language_parsing_test(language, semantic_package = "", ts_package =
         deps = [
             ":semantic-{}".format(language),
             "//:base",
-            "//:bytestring",
+            "p//:bytestring",
             "//:text",
             "//semantic-ast",
             "@stackage//:bazel-runfiles",

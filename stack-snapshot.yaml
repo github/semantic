@@ -1,11 +1,8 @@
-resolver: lts-15.13
+resolver: nightly-2020-07-23
 packages:
   - github: antitypical/fused-syntax
     commit: "4a383d57c8fd7592f54a33f43eb9666314a6e80e"
     sha256: "aa345f8f04a12beaf8f07620467dee06370b72c763cf2d1c60556878b226fafc"
-  - github: tclem/proto-lens-jsonpb
-    commit: "5d40444be689bef1e12cbe38da0261283775ec64"
-    sha256: "39f783f07aeb64614aadb6ee618d000051c46cc9f511277d87feea6cba8fe955"
   - fused-effects-1.1.0.0
   - fused-effects-exceptions-1.1.0.0
   - fused-effects-readline-0.1.0.0

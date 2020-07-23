@@ -38,7 +38,7 @@ load(
 # Download a GHC binary distribution from haskell.org and register it as a toolchain.
 rules_haskell_toolchains(
     locale = "en_US.UTF-8",
-    version = "8.8.3",
+    version = "8.10.1",
 )
 
 # Enable GHC persistent worker mode, if that's your bag.
@@ -68,6 +68,7 @@ stack_snapshot(
         "async",
         "attoparsec",
         "base",
+        "base64-bytestring",
         "bazel-runfiles",
         "bifunctors",
         "bytestring",
@@ -105,7 +106,6 @@ stack_snapshot(
         "prettyprinter-ansi-terminal",
         "process",
         "proto-lens",
-        "proto-lens-jsonpb",
         "proto-lens-runtime",
         "raw-strings-qq",
         "recursion-schemes",
@@ -237,13 +237,20 @@ tree_sitter_node_types_hackage(
     version = "0.1.0.1",
 )
 
-# Download lingo (which has its own Bazel build instructions).
+# Download lingo and proto-lens-jsonpb (which have their own build files)
 
 http_archive(
     name = "lingo",
     sha256 = "0134c8141443e7e8f49841e29726674d91acf62f1ba007266290157933944278",
     strip_prefix = "lingo-haskell-b3dcb165ebdfc93f894393e607ce601281b59dbb",
     urls = ["https://github.com/tclem/lingo-haskell/archive/b3dcb165ebdfc93f894393e607ce601281b59dbb.tar.gz"],
+)
+
+http_archive(
+    name = "proto-lens-jsonpb",
+    sha256 = "2979fd2dc0730a27882cbd98af655fdfc2b816c43cbf5119396790d3592128f2",
+    strip_prefix = "proto-lens-jsonpb-3a11d23ecdbb1bcc8ef80d02cf0f0b7318ddb4c0",
+    urls = ["https://github.com/tclem/proto-lens-jsonpb/archive/3a11d23ecdbb1bcc8ef80d02cf0f0b7318ddb4c0.tar.gz"],
 )
 
 load("//:build/example_repos.bzl", "declare_example_repos")
