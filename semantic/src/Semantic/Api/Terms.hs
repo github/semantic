@@ -69,38 +69,32 @@ showTermParsers = preciseParsers
 class ShowTerm term where
   showTerm :: (Has (Reader Config) sig m) => term Loc -> m Builder
 
-instance (ShowTermBy term) => ShowTerm term where
-  showTerm = showTermBy @term
+instance ShowTerm Go.Term where
+  showTerm = serialize Show . void . Go.getTerm
 
-class ShowTermBy term where
-  showTermBy :: (Has (Reader Config) sig m) => term Loc -> m Builder
+instance ShowTerm Java.Term where
+  showTerm = serialize Show . void . Java.getTerm
 
-instance ShowTermBy Go.Term where
-  showTermBy = serialize Show . void . Go.getTerm
+instance ShowTerm JSON.Term where
+  showTerm = serialize Show . void . JSON.getTerm
 
-instance ShowTermBy Java.Term where
-  showTermBy = serialize Show . void . Java.getTerm
+instance ShowTerm PHP.Term where
+  showTerm = serialize Show . void . PHP.getTerm
 
-instance ShowTermBy JSON.Term where
-  showTermBy = serialize Show . void . JSON.getTerm
+instance ShowTerm Python.Term where
+  showTerm = serialize Show . void . Python.getTerm
 
-instance ShowTermBy PHP.Term where
-  showTermBy = serialize Show . void . PHP.getTerm
+instance ShowTerm CodeQL.Term where
+  showTerm = serialize Show . void . CodeQL.getTerm
 
-instance ShowTermBy Python.Term where
-  showTermBy = serialize Show . void . Python.getTerm
+instance ShowTerm Ruby.Term where
+  showTerm = serialize Show . void . Ruby.getTerm
 
-instance ShowTermBy CodeQL.Term where
-  showTermBy = serialize Show . void . CodeQL.getTerm
+instance ShowTerm TSX.Term where
+  showTerm = serialize Show . void . TSX.getTerm
 
-instance ShowTermBy Ruby.Term where
-  showTermBy = serialize Show . void . Ruby.getTerm
-
-instance ShowTermBy TSX.Term where
-  showTermBy = serialize Show . void . TSX.getTerm
-
-instance ShowTermBy TypeScript.Term where
-  showTermBy = serialize Show . void . TypeScript.getTerm
+instance ShowTerm TypeScript.Term where
+  showTerm = serialize Show . void . TypeScript.getTerm
 
 sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)
 sexprTermParsers = preciseParsers
@@ -108,35 +102,29 @@ sexprTermParsers = preciseParsers
 class SExprTerm term where
   sexprTerm :: term Loc -> Builder
 
-instance (SExprTermBy term) => SExprTerm term where
-  sexprTerm = sexprTermBy @term
+instance SExprTerm Go.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . Go.getTerm
 
-class SExprTermBy term where
-  sexprTermBy :: term Loc -> Builder
+instance SExprTerm Java.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . Java.getTerm
 
-instance SExprTermBy Go.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . Go.getTerm
+instance SExprTerm JSON.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . JSON.getTerm
 
-instance SExprTermBy Java.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . Java.getTerm
+instance SExprTerm PHP.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . PHP.getTerm
 
-instance SExprTermBy JSON.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . JSON.getTerm
+instance SExprTerm Python.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . Python.getTerm
 
-instance SExprTermBy PHP.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . PHP.getTerm
+instance SExprTerm CodeQL.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . CodeQL.getTerm
 
-instance SExprTermBy Python.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . Python.getTerm
+instance SExprTerm Ruby.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . Ruby.getTerm
 
-instance SExprTermBy CodeQL.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . CodeQL.getTerm
+instance SExprTerm TSX.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . TSX.getTerm
 
-instance SExprTermBy Ruby.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . Ruby.getTerm
-
-instance SExprTermBy TSX.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . TSX.getTerm
-
-instance SExprTermBy TypeScript.Term where
-  sexprTermBy = SExpr.Precise.serializeSExpression . TypeScript.getTerm
+instance SExprTerm TypeScript.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . TypeScript.getTerm
