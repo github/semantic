@@ -15,13 +15,6 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # an updated version.
 #
 # [1] https://github.com/tweag/rules_haskell/issues/1349
-#
-# http_archive(
-#     name = "rules_haskell",
-#     sha256 = "56a8e6337df8802f1e0e7d2b3d12d12d5d96c929c8daecccc5738a0f41d9c1e4",
-#     strip_prefix = "rules_haskell-0.12",
-#     urls = ["https://github.com/tweag/rules_haskell/archive/v0.12.tar.gz"],
-# )
 http_archive(
     name = "rules_haskell",
     sha256 = "78d017aa732b430c0681fff4514503af78a8d8c44df165e603a9433745b16e5e",
@@ -47,6 +40,11 @@ rules_haskell_toolchains(
     locale = "en_US.UTF-8",
     version = "8.8.3",
 )
+
+# Enable GHC persistent worker mode, if that's your bag.
+load("@rules_haskell//tools:repositories.bzl", "rules_haskell_worker_dependencies")
+
+rules_haskell_worker_dependencies()
 
 load(
     "@rules_haskell//haskell:cabal.bzl",
@@ -86,7 +84,6 @@ stack_snapshot(
         "fused-syntax",
         "gauge",
         "generic-lens",
-        "haskeline",
         "hashable",
         "haskeline",
         "hedgehog",
@@ -244,9 +241,9 @@ tree_sitter_node_types_hackage(
 
 http_archive(
     name = "lingo",
-    sha256 = "32a5e2d66e4620ff7004acab4802dc948b852ce26725012283a85d41af97275f",
-    strip_prefix = "lingo-haskell-6614b9afe1a519364491c170d6b06ff5cd96153a",
-    urls = ["https://github.com/tclem/lingo-haskell/archive/6614b9afe1a519364491c170d6b06ff5cd96153a.tar.gz"],
+    sha256 = "0134c8141443e7e8f49841e29726674d91acf62f1ba007266290157933944278",
+    strip_prefix = "lingo-haskell-b3dcb165ebdfc93f894393e607ce601281b59dbb",
+    urls = ["https://github.com/tclem/lingo-haskell/archive/b3dcb165ebdfc93f894393e607ce601281b59dbb.tar.gz"],
 )
 
 load("//:build/example_repos.bzl", "declare_example_repos")
