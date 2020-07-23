@@ -151,7 +151,7 @@ def semantic_language_parsing_test(language, semantic_package = "", ts_package =
         deps = [
             ":semantic-{}".format(language),
             "//:base",
-            "p//:bytestring",
+            "//:bytestring",
             "//:text",
             "//semantic-ast",
             "@stackage//:bazel-runfiles",
