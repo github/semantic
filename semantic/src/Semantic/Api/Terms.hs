@@ -45,6 +45,7 @@ import           Source.Loc
 data TermOutputFormat
   = TermSExpression
   | TermShow
+  | TermJSON
   | TermQuiet
   deriving (Eq, Show)
 
@@ -52,6 +53,7 @@ parseTermBuilder :: (Traversable t, Has Distribute sig m, Has (Error SomeExcepti
   => TermOutputFormat -> t Blob -> m Builder
 parseTermBuilder TermSExpression = distributeFoldMap (parseWith sexprTermParsers (pure . sexprTerm))
 parseTermBuilder TermShow        = distributeFoldMap (parseWith showTermParsers showTerm)
+parseTermBuilder TermJSON        = distributeFoldMap (parseWith jsonTermParsers jsonTerm)
 parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
 
 quietTerm :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, MonadIO m) => Blob -> m Builder
@@ -95,6 +97,39 @@ instance ShowTerm TSX.Term where
 
 instance ShowTerm TypeScript.Term where
   showTerm = serialize Show . void . TypeScript.getTerm
+
+jsonTermParsers :: Map Language (SomeParser JSONTerm Loc)
+jsonTermParsers = preciseParsers
+
+class JSONTerm term where
+  jsonTerm :: (Has (Reader Config) sig m) => term Loc -> m Builder
+
+instance JSONTerm Go.Term where
+  jsonTerm = serialize Marshal . Go.getTerm
+
+instance JSONTerm Java.Term where
+  jsonTerm = serialize Marshal . Java.getTerm
+
+instance JSONTerm JSON.Term where
+  jsonTerm = serialize Marshal . JSON.getTerm
+
+instance JSONTerm PHP.Term where
+  jsonTerm = serialize Marshal . PHP.getTerm
+
+instance JSONTerm Python.Term where
+  jsonTerm = serialize Marshal . Python.getTerm
+
+instance JSONTerm CodeQL.Term where
+  jsonTerm = serialize Marshal . CodeQL.getTerm
+
+instance JSONTerm Ruby.Term where
+  jsonTerm = serialize Marshal . Ruby.getTerm
+
+instance JSONTerm TSX.Term where
+  jsonTerm = serialize Marshal . TSX.getTerm
+
+instance JSONTerm TypeScript.Term where
+  jsonTerm = serialize Marshal . TypeScript.getTerm
 
 sexprTermParsers :: Map Language (SomeParser SExprTerm Loc)
 sexprTermParsers = preciseParsers

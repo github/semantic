@@ -1,9 +1,12 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# OPTIONS_GHC -freduction-depth=0 #-}
 -- | Semantic functionality for CodeQL programs.
 module Language.CodeQL
 ( Term(..)
 , TreeSitter.QL.tree_sitter_ql
 ) where
 
+import           AST.Marshal.JSON
 import qualified AST.Unmarshal as TS
 import           Data.Proxy
 import qualified Language.CodeQL.AST as CodeQL
@@ -12,6 +15,7 @@ import qualified Tags.Tagging.Precise as Tags
 import qualified TreeSitter.QL (tree_sitter_ql)
 
 newtype Term a = Term { getTerm :: CodeQL.Ql a }
+  deriving MarshalJSON
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy CodeQL.Ql)
