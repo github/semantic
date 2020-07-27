@@ -112,7 +112,6 @@ library
                      , Semantic.Api.Terms
                      , Semantic.CLI
                      , Semantic.Config
-                     , Semantic.Distribute
                      , Semantic.Env
                      , Semantic.IO
                      , Semantic.Task
@@ -147,7 +146,6 @@ library
                      , lens >= 4.17 && < 4.19
                      , network-uri ^>= 2.6.1.0
                      , optparse-applicative >= 0.14.3 && < 0.16
-                     , parallel ^>= 3.2.2.0
                      , parsers ^>= 0.12.9
                      , prettyprinter >= 1.2 && < 2
                      , pretty-show ^>= 1.9.5
@@ -171,7 +169,6 @@ library
                      , template-haskell >= 2.14 && < 2.16
                      , time >= 1.8.0.2 && < 1.10
                      , utf8-string ^>= 1.0.1.1
-                     , unliftio-core ^>= 0.1.2.0
                      , unordered-containers ^>= 0.2.9.0
                      , vector ^>= 0.12.0.2
                      , tree-sitter-go ^>= 0.5.0.0

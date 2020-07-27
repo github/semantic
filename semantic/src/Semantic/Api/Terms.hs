@@ -23,6 +23,7 @@ import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.ByteString.Builder
 import           Data.Either
+import           Data.Foldable (fold)
 import           Data.Map.Strict (Map)
 import qualified Language.CodeQL as CodeQL
 import qualified Language.Go as Go
@@ -49,12 +50,15 @@ data TermOutputFormat
   | TermQuiet
   deriving (Eq, Show)
 
-parseTermBuilder :: (Traversable t, Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, MonadIO m)
+parseTermBuilder :: (Traversable t, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, MonadIO m)
   => TermOutputFormat -> t Blob -> m Builder
-parseTermBuilder TermSExpression = distributeFoldMap (parseWith sexprTermParsers (pure . sexprTerm))
-parseTermBuilder TermShow        = distributeFoldMap (parseWith showTermParsers showTerm)
-parseTermBuilder TermJSON        = distributeFoldMap (parseWith jsonTermParsers jsonTerm)
-parseTermBuilder TermQuiet       = distributeFoldMap quietTerm
+parseTermBuilder TermSExpression = foldMapM (parseWith sexprTermParsers (pure . sexprTerm))
+parseTermBuilder TermShow        = foldMapM (parseWith showTermParsers showTerm)
+parseTermBuilder TermJSON        = foldMapM (parseWith jsonTermParsers jsonTerm)
+parseTermBuilder TermQuiet       = foldMapM quietTerm
+
+foldMapM :: (Traversable t, Monoid out, Applicative m) => (a -> m out) -> t a -> m out
+foldMapM f = fmap fold . traverse f
 
 quietTerm :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, MonadIO m) => Blob -> m Builder
 quietTerm blob = showTiming blob <$> time' (parseWith showTermParsers (fmap (const (Right ())) . showTerm) blob `catchError` timingError)
