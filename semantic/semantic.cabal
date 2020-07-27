@@ -67,9 +67,6 @@ common dependencies
                      , network ^>= 2.8.0.0
                      , pathtype ^>= 0.8.1
                      , process ^>= 1.6.3.0
-                     , recursion-schemes ^>= 5.1
-                     , scientific ^>= 0.3.6.2
-                     , safe-exceptions ^>= 0.1.7.0
                      , semantic-analysis ^>= 0
                      , semantic-ast
                      , semantic-source ^>= 0.1.0
@@ -133,26 +130,20 @@ library
   other-modules:       Paths_semantic
   build-depends:       base >= 4.13 && < 5
                      , ansi-terminal >= 0.8.2 && <1
-                     , array ^>= 0.5.3.0
-                     , attoparsec ^>= 0.13.2.2
                      , deepseq ^>= 1.4.4.0
                      , directory-tree ^>= 0.12.1
                      , filepath ^>= 1.4.2.1
-                     , generic-monoid ^>= 0.1.0.0
                      , ghc-prim ^>= 0.5.3
                      , gitrev ^>= 1.3.1
-                     , haskeline ^>= 0.7.5.0
                      , hostname ^>= 1.0
                      , hscolour ^>= 1.24.4
                      , lens >= 4.17 && < 4.19
                      , network-uri ^>= 2.6.1.0
                      , optparse-applicative >= 0.14.3 && < 0.16
                      , parallel ^>= 3.2.2.0
-                     , parsers ^>= 0.12.9
                      , prettyprinter >= 1.2 && < 2
                      , pretty-show ^>= 1.9.5
                      , proto-lens >= 0.5 && < 0.7
-                     , reducers ^>= 3.12.3
                      , semantic-go ^>= 0
                      , semantic-java ^>= 0
                      , semantic-json ^>= 0
@@ -225,7 +216,6 @@ test-suite test
                      , tasty-hspec ^>= 1.1.5.1
                      , tasty-hunit ^>= 0.10.0.2
                      , HUnit ^>= 1.6.0.0
-                     , temporary ^>= 1.3
 
 test-suite parse-examples
   import:              haskell, dependencies, executable-flags
@@ -234,7 +224,6 @@ test-suite parse-examples
   main-is:             Examples.hs
   build-depends:       semantic
                      , Glob
-                     , foldl ^>= 1.4.5
                      , lens >= 4.17 && < 4.19
                      , resourcet ^>= 1.2
                      , semantic-proto ^>= 0

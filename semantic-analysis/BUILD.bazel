@@ -37,6 +37,5 @@ haskell_library(
         "@stackage//:prettyprinter",
         "@stackage//:prettyprinter-ansi-terminal",
         "@stackage//:semilattices",
-        "@stackage//:terminal-size",
     ],
 )
