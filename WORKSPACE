@@ -48,6 +48,10 @@ rules_haskell_toolchains(
     version = "8.8.3",
 )
 
+# Enable GHC persistent worker mode, if that's your bag.
+load("@rules_haskell//tools:repositories.bzl", "rules_haskell_worker_dependencies")
+
+rules_haskell_worker_dependencies()
 load(
     "@rules_haskell//haskell:cabal.bzl",
     "stack_snapshot",
