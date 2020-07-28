@@ -21,6 +21,7 @@ module Control.Effect.StackGraph
     currentScope,
     rootScope,
     putCurrentScope,
+    pushSymbol,
     popSymbol,
     newScope,
     selfScope,
@@ -135,6 +136,9 @@ topScope = taggedM . Stack.BottomScope
 
 scope :: StackGraphEff sig m => Name -> m (Tagged Stack.Node)
 scope = taggedM . Stack.Scope
+
+pushSymbol :: StackGraphEff sig m => Name -> m (Tagged Stack.Node)
+pushSymbol = taggedM . Stack.PushSymbol
 
 popSymbol :: StackGraphEff sig m => Name -> m (Tagged Stack.Node)
 popSymbol = taggedM . Stack.PopSymbol

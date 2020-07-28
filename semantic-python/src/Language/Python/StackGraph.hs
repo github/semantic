@@ -96,6 +96,38 @@ type ClassBodyBinder =
 
 type BodyStruct a b = ([(Tagged Stack.Node, ClassBodyBinder a)], b)
 
+
+
+--
+--  The Nascent DSL
+--
+
+
+parentScopeNode name = do
+  Py.Identifier _ann1 name0 <- ensureAST name
+  parentScopeName <- pure $ Name.name (Text.pack "ParentScope " <> name0)
+  internalScope parentScopeName
+
+declarationNode :: (StackGraphEff sig m) => P.SyntaxType -> Loc -> Parse.Err (Py.Identifier a) -> m (Tagged Stack.Node)
+declarationNode syntax ann name = do
+  Py.Identifier _ann1 name' <- ensureAST name
+  declare (Name.name name') syntax ann
+
+formalParametersScopeNode :: (StackGraphEff sig m) => m (Tagged Stack.Node)
+formalParametersScopeNode = scope (Name.name "FormalParameters")
+
+--parameterNodes ::
+parameterNodes parameters = do
+  Py.Parameters _ann2 parameters0 <- ensureAST parameters
+  parameters' <- mapM ensureAST parameters0
+  parameterMs <- pure $ fmap param parameters'
+  forM (zip [0 ..] parameterMs) $ \(ix, (pos, parameter)) ->
+    declareParameter parameter ix P.UNKNOWN_SYNTAX pos
+  where
+      param (Py.Parameter (Prj (Py.Identifier pann pname))) = (pann, Name.name pname)
+      param _ = error "Plz implement ScopeGraph.hs l223"
+
+
 noBindings :: b -> BodyStruct a b
 noBindings x = ([], x)
 
@@ -104,10 +136,14 @@ onlyBindings m =
   do (bindings, _) <- m
      pure (bindings, [])
 
-onlyNodes :: (StackGraphEff sig m) => m (BodyStruct Loc [Tagged Stack.Node]) -> m (BodyStruct Loc [Tagged Stack.Node])
-onlyNodes m =
-  do (_, nodes) <- m
-     pure ([], nodes)
+-- These next two are python specific which I don't like.
+popNames :: (StackGraphEff sig m) => NonEmpty (Parse.Err (Py.Identifier Loc)) -> m (NonEmpty (Tagged Stack.Node))
+popNames =
+  mapM ((\(Py.Identifier _ name) -> popSymbol (Name.name name)) <=< ensureAST)
+
+pushNames :: (StackGraphEff sig m) => NonEmpty (Parse.Err (Py.Identifier Loc)) -> m (NonEmpty (Tagged Stack.Node))
+pushNames =
+  mapM ((\(Py.Identifier _ name) -> pushSymbol (Name.name name)) <=< ensureAST)
 
 childScopeGraph :: (ToScopeGraph t, StackGraphEff sig m) => Parse.Err (t Loc) -> m (BodyStruct Loc [Tagged Stack.Node])
 childScopeGraph = scopeGraph <=< ensureAST
@@ -129,14 +165,33 @@ optionalChildScopeGraph' :: (ToScopeGraph t, StackGraphEff sig m) => Maybe (Pars
 optionalChildScopeGraph' Nothing = pure ([], [])
 optionalChildScopeGraph' (Just val) = childScopeGraph val
 
-
+(~>>) :: (StackGraphEff sig m) => Tagged Stack.Node -> Tagged Stack.Node -> m ()
 x ~>> y = modify (Stack.addEdge x y)
 
-x ~>>* ys = forM ys $ \y -> x ~>> y
+(~>>*) :: (StackGraphEff sig m) => Tagged Stack.Node -> [Tagged Stack.Node] -> m ()
+x ~>>* ys = forM_ ys $ \y -> x ~>> y
 
-xs *~>> y = forM xs $ \x -> x ~>> y
+(*~>>) :: (StackGraphEff sig m) => [Tagged Stack.Node] -> Tagged Stack.Node -> m ()
+xs *~>> y = forM_ xs $ \x -> x ~>> y
 
-xs *~>>* ys = forM xs $ \x -> forM ys $ \y -> x ~>> y
+(*~>>*) :: (StackGraphEff sig m) => [Tagged Stack.Node] -> [Tagged Stack.Node] -> m ()
+xs *~>>* ys = forM_ xs $ \x -> forM_ ys $ \y -> x ~>> y
+
+forwardPopMemberChain :: (StackGraphEff sig m) => NonEmpty (Tagged Stack.Node) -> m ()
+forwardPopMemberChain (a :| []) = pure ()
+forwardPopMemberChain (a :| (b : cs)) = do
+  memberSymbol <- popSymbol "."
+  a            ~>> memberSymbol
+  memberSymbol ~>> b
+  forwardPopMemberChain (b :| cs)
+
+backwardPushMemberChain :: (StackGraphEff sig m) => NonEmpty (Tagged Stack.Node) -> m ()
+backwardPushMemberChain (a :| []) = pure ()
+backwardPushMemberChain (a :| (b : cs)) = do
+  memberSymbol <- pushSymbol "."
+  b            ~>> memberSymbol
+  memberSymbol ~>> a
+  backwardPushMemberChain (b :| cs)
 
 returnScopeGraph :: (ToScopeGraph t, StackGraphEff sig m) => Maybe (Parse.Err (t Loc)) -> m (BodyStruct Loc [Tagged Stack.Node])
 returnScopeGraph maybeVals = do
