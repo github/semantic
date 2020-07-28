@@ -207,6 +207,10 @@ returnScopeGraph maybeVals = do
     
     pure ([], [returnNode])
 
+
+
+
+
 scopeGraphModule :: StackGraphEff sig m => Py.Module Loc -> m ()
 scopeGraphModule x = scopeGraph x >> pure ()
 
@@ -267,8 +271,7 @@ instance ToScopeGraph Py.ClassDefinition where
   scopeGraph def@Py.ClassDefinition { ann, name,
         body } = do
       
-      Py.Identifier _ann1 name' <- ensureAST name
-      declaration <- declare (Name.name name') P.CLASS ann
+      declaration <- declarationNode P.CLASS ann name
       CurrentScope currentScope' <- currentScope
       callPopSymbol <- popSymbol "()"
       selfScope' <- selfScope "self"
@@ -386,41 +389,29 @@ instance ToScopeGraph Py.FunctionDefinition where
   scopeGraph
     Py.FunctionDefinition
       { ann,
-        name = Parse.Success (Py.Identifier _ann1 name),
-        parameters = Parse.Success (Py.Parameters _ann2 parameters),
-        body = Parse.Success body
+        name,
+        parameters,
+        body
       } = do
       
 
-      parameters' <- mapM ensureAST parameters
-      name' <- pure $ Name.name name
-      parentScopeName <- pure $ Name.name (Text.pack "ParentScope " <> name)
-      parameterMs <- pure $ fmap param parameters'
+      parentScope <- parentScopeNode name
+      formalParametersScope <- formalParametersScopeNode
+      paramNodes <- parameterNodes parameters
       CurrentScope currentScope' <- currentScope
-      declaration <- declare name' P.FUNCTION ann
-      callPopSymbol <- popSymbol "()"
-      formalParametersScope <- scope (Name.name "FormalParameters")
-      parentScope <- internalScope parentScopeName
-      (_, nodes) <- withScope parentScope $ scopeGraph body
+      declaration <- declarationNode P.FUNCTION ann name
       callNode <- popSymbol "()"
-      (functionNameNode, _associatedScope) <- declareFunction (Just name') P.FUNCTION ann
-      paramNodes <- forM (zip [0 ..] parameterMs) $ \(ix, (pos, parameter)) ->
-        declareParameter parameter ix P.UNKNOWN_SYNTAX pos
+      (_, returnNodes) <- withScope parentScope $ childScopeGraph body
       
-      
-      
-      currentScope'          ~>>   declaration
-      declaration            ~>>   callPopSymbol
-      formalParametersScope  ~>>*  paramNodes
       parentScope            ~>>   formalParametersScope
-      callNode               ~>>*  nodes
-      functionNameNode       ~>>   callNode
-
+      formalParametersScope  ~>>*  paramNodes
+      currentScope'          ~>>   declaration
+      declaration            ~>>   callNode
+      callNode               ~>>*  returnNodes
+      
+      
+      
       pure ([], [])
-    
-    where
-      param (Py.Parameter (Prj (Py.Identifier pann pname))) = (pann, Name.name pname)
-      param _ = error "Plz implement ScopeGraph.hs l223"
 
 instance ToScopeGraph Py.FutureImportStatement where
   scopeGraph = todo
@@ -444,64 +435,71 @@ instance ToScopeGraph Py.Integer where
   scopeGraph = todo
 
 instance ToScopeGraph Py.ImportStatement where
-  scopeGraph (Py.ImportStatement _ (Parse.Success (R1 (Py.DottedName _ eNames@(Parse.Success (Py.Identifier ann definition) :| _))) :| [])) = do
-    rootScope' <- rootScope
-    ScopeGraph.CurrentScope previousScope <- currentScope
-
+  scopeGraph (Py.ImportStatement _ (Parse.Success (R1 (Py.DottedName _ eNames)) :| [])) = do
+    CurrentScope previousScope <- currentScope
     importScope <- newScope previousScope
-
-    names <- mapM ensureAST eNames
-    let names' = (\(Py.Identifier ann name) -> (Name.name name, P.UNKNOWN_SYNTAX, ann)) <$> names
-    (childGraph, initialReference) <- addDeclarations names'
-
-    definitionScope <- declare (Name.name definition) P.UNKNOWN_SYNTAX ann
-    let childGraph' = Stack.addEdge importScope definitionScope childGraph
-
-    let childGraph'' = Stack.addEdge initialReference rootScope' childGraph'
-
+    pops <- popNames eNames
+    pushes <- pushNames eNames
+    root <- rootScope
+    
+    forwardPopMemberChain pops
+    backwardPushMemberChain pushes
+    importScope          ~>> NonEmpty.head pops
+    NonEmpty.last pops   ~>> NonEmpty.head pushes
+    NonEmpty.last pushes ~>> root
+    
     putCurrentScope importScope
 
     pure ([], [])
+
   scopeGraph term = todo (show term)
 
 instance ToScopeGraph Py.ImportFromStatement where  
-  scopeGraph term@(Py.ImportFromStatement _ [] (Parse.Success (L1 (Py.DottedName _ eNames))) (Just (Parse.Success (Py.WildcardImport _ _)))) = do
-    todo term
-  -- let toName (Py.Identifier _ name) = Name.name name
-  -- names <- mapM ensureAST eNames
-  -- complete <* newEdge ScopeGraph.Import (toName <$> names)
-  scopeGraph (Py.ImportFromStatement _ _imports (Parse.Success (L1 (Py.DottedName _ _names@(Parse.Success (Py.Identifier _ann _scopeName) :| _)))) Nothing) = do
-    -- let toName (Py.Identifier _ name) = Name.name name
-    -- newEdge ScopeGraph.Import (toName <$> names)
+  scopeGraph (Py.ImportFromStatement _ [] (Parse.Success (L1 (Py.DottedName _ eNames))) (Just (Parse.Success (Py.WildcardImport _ _)))) = do
+    CurrentScope previousScope <- currentScope
+    importScope <- newScope previousScope
+    pushMember <- pushSymbol "."
+    pushes <- pushNames eNames
+    root <- rootScope
+    
+    backwardPushMemberChain pushes
+    importScope          ~>> pushMember
+    pushMember           ~>> NonEmpty.head pushes
+    NonEmpty.last pushes ~>> root
+    
+    putCurrentScope importScope
 
-    -- let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
-    -- newReference (Name.name scopeName) referenceProps
+    pure ([], [])
 
-    -- let pairs = zip (toList names) (tail $ toList names)
-    -- for_ pairs $ \pair -> do
-    --   case pair of
-    --     (scopeIdentifier, referenceIdentifier@(Py.Identifier ann2 _)) -> do
-    --       withScope (toName scopeIdentifier) $ do
-    --         let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2 ^. span_ :: Span)
-    --         newReference (toName referenceIdentifier) referenceProps
+  scopeGraph (Py.ImportFromStatement _ imports (Parse.Success (L1 (Py.DottedName _ eNames))) Nothing) = do
+    CurrentScope previousScope <- currentScope
+    importScope <- newScope previousScope
+    pushMember <- pushSymbol "."
+    pushes <- pushNames eNames
+    root <- rootScope
 
-    -- completions <- for imports $ \identifier -> do
-    --   case identifier of
-    --     (R1 (Py.DottedName _ (Py.Identifier ann name :| []))) -> do
-    --       let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann ^. span_ :: Span)
-    --       complete <* newReference (Name.name name) referenceProps
-    --     (L1 (Py.AliasedImport _ (Py.Identifier ann name) (Py.DottedName _ (Py.Identifier ann2 ref :| _)))) -> do
-    --       let declProps = Props.Declaration ScopeGraph.UnqualifiedImport ScopeGraph.Default Nothing (ann ^. span_ :: Span)
-    --       declare (Name.name name) declProps
+    backwardPushMemberChain pushes
+    pushMember           ~>> NonEmpty.head pushes
+    NonEmpty.last pushes ~>> root
 
-    --       let referenceProps = Props.Reference ScopeGraph.Identifier ScopeGraph.Default (ann2 ^. span_ :: Span)
-    --       newReference (Name.name ref) referenceProps
+    forM_ imports $ \importErr -> do
+      imp <- ensureAST importErr
+      case imp of
+        R1 (Py.DottedName _ eNames) -> do
+          
+          pops <- popNames eNames
+          pushes <- pushNames eNames
+          forwardPopMemberChain pops
+          backwardPushMemberChain pushes
 
-    --       complete
-    --     (R1 (Py.DottedName _ ((Py.Identifier _ _) :| (_ : _)))) -> undefined
+          importScope          ~>> NonEmpty.head pops
+          NonEmpty.last pops   ~>> NonEmpty.head pushes
+          NonEmpty.last pushes ~>> pushMember
+    
+    putCurrentScope importScope
 
-    -- pure (mconcat completions)
-    todo ("Plz implement: ScopeGraph.hs l321" :: String)
+    pure ([], [])
+
   scopeGraph term = todo term
 
 instance ToScopeGraph Py.Lambda where
