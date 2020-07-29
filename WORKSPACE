@@ -52,6 +52,7 @@ rules_haskell_toolchains(
 load("@rules_haskell//tools:repositories.bzl", "rules_haskell_worker_dependencies")
 
 rules_haskell_worker_dependencies()
+
 load(
     "@rules_haskell//haskell:cabal.bzl",
     "stack_snapshot",
@@ -91,7 +92,6 @@ stack_snapshot(
         "gauge",
         "generic-lens",
         "generic-monoid",
-        "haskeline",
         "hashable",
         "haskeline",
         "hedgehog",
@@ -104,7 +104,6 @@ stack_snapshot(
         "network",
         "network-uri",
         "optparse-applicative",
-        "parallel",
         "parsers",
         "pathtype",
         "pretty-show",
@@ -140,7 +139,6 @@ stack_snapshot(
         "tree-sitter",
         "trifecta",
         "unix",
-        "unliftio-core",
         "unordered-containers",
         "vector",
         "yaml",

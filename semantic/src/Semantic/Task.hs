@@ -26,10 +26,6 @@ module Semantic.Task
 , time'
 -- * High-level flow
 , serialize
--- * Concurrency
-, distribute
-, distributeFor
-, distributeFoldMap
 -- * Configuration
 , debugOptions
 , defaultOptions
@@ -42,8 +38,6 @@ module Semantic.Task
 , withOptions
 , TaskSession(..)
 , runTraceInTelemetry
--- * Re-exports
-, Distribute
 , Error
 , Lift
 , throwError
@@ -61,12 +55,11 @@ import           Control.Monad.IO.Class
 import           Data.ByteString.Builder
 import qualified Data.Flag as Flag
 import           Semantic.Config
-import           Semantic.Distribute
 import qualified Semantic.Task.Files as Files
 import           Semantic.Telemetry
 import           Serializing.Format
 
--- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
+-- | A high-level task producing some result, e.g. parsing, diffing, rendering.
 type TaskC
   = Files.FilesC
   ( ReaderC Config
@@ -74,8 +67,7 @@ type TaskC
   ( TraceInTelemetryC
   ( TelemetryC
   ( ErrorC SomeException
-  ( DistributeC
-  ( LiftC IO)))))))
+  ( LiftC IO))))))
 
 serialize :: Has (Reader Config) sig m
           => Format input
@@ -101,7 +93,6 @@ runTask taskSession@TaskSession{..} task = do
     let run :: TaskC a -> IO (Either SomeException a)
         run
           = runM
-          . withDistribute
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry
