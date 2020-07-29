@@ -52,7 +52,7 @@ runParser
   -> m term
 runParser timeout blob@Blob{..} parser = case parser of
   UnmarshalParser language ->
-    parseToPreciseAST timeout timeout language blob
+    liftIO (parseToPreciseAST timeout timeout language blob)
       >>= either (throwError . SomeException) pure
 
 newtype ParseFailure = ParseFailure String

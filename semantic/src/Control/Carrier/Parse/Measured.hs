@@ -76,7 +76,7 @@ runParser blob@Blob{..} parser = case parser of
       -- Test harnesses can specify that parsing must fail, for testing purposes.
       shouldFailFlag <- asks (Flag.toBool FailTestParsing . configFailParsingForTesting . config)
       when shouldFailFlag (throwError (SomeException ParsingTimedOut))
-      act >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
+      liftIO act >>= either (\e -> trace (displayException e) *> throwError (SomeException e)) pure
 
 data ParsingTimedOut = ParsingTimedOut deriving (Eq, Show)
 instance Exception ParsingTimedOut

@@ -40,14 +40,13 @@ data TSParseException
     deriving (Eq, Show, Generic)
 
 parseToPreciseAST
-  :: ( MonadIO m
-     , TS.Unmarshal t
+  :: ( TS.Unmarshal t
      )
   => Duration
   -> Duration
   -> Ptr TS.Language
   -> Blob
-  -> m (Either TSParseException (t Loc))
+  -> IO (Either TSParseException (t Loc))
 parseToPreciseAST parseTimeout unmarshalTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
   withTimeout $
     TS.withCursor (castPtr rootPtr) $ \ cursor ->
