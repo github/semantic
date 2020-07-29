@@ -7,6 +7,7 @@ module Control.Effect.Parse
 ( -- * Parse effect
   Parse(..)
 , parse
+, parseMany
 , parserForLanguage
 , parserForBlob
 , parseWith
@@ -28,9 +29,10 @@ import qualified Data.Map as Map
 import           Parsing.Parser
 import           Source.Language (Language (..))
 
+type ParserMap c ann = Map.Map Language (SomeParser c ann)
+
 data Parse (m :: Type -> Type) k where
   Parse :: Parser term -> Blob -> Parse m term
-
 
 -- | Parse a 'Blob' with the given 'Parser'.
 parse :: Has Parse sig m
@@ -39,20 +41,27 @@ parse :: Has Parse sig m
       -> m term
 parse parser blob = send (Parse parser blob)
 
+parseMany ::
+  (Has Parse sig m, Traversable t)
+  => ParserMap c ann
+  -> t Blob
+  -> m (t (Either SomeException term))
+parseMany pmap blobs = send (ParseMany pmap blobs)
+
 
 -- | Select a parser for the given 'Language'.
-parserForLanguage :: Map.Map Language (SomeParser c ann) -> Language -> Maybe (SomeParser c ann)
+parserForLanguage :: ParserMap c ann -> Language -> Maybe (SomeParser c ann)
 parserForLanguage = flip Map.lookup
 
 -- | Select a parser for the given 'Blob'.
-parserForBlob :: Map.Map Language (SomeParser c ann) -> Blob -> Maybe (SomeParser c ann)
+parserForBlob :: ParserMap c ann -> Blob -> Maybe (SomeParser c ann)
 parserForBlob parsers = parserForLanguage parsers . blobLanguage
 
 
 -- | Parse a 'Blob' with one of the provided parsers, and run an action on the abstracted term.
 parseWith
   :: (Has (Error SomeException) sig m, Has Parse sig m)
-  => Map.Map Language (SomeParser c ann)       -- ^ The set of parsers to select from.
+  => ParserMap c ann       -- ^ The set of parsers to select from.
   -> (forall term . c term => term ann -> m a) -- ^ A function to run on the parsed term. Note that the term is abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> Blob                                      -- ^ The blob to parse.
   -> m a
@@ -63,7 +72,7 @@ parseWith parsers with blob = case parserForBlob parsers blob of
 -- | Parse a 'BlobPair' with one of the provided parsers, and run an action on the abstracted term pair.
 parsePairWith
   :: (Has (Error SomeException) sig m, Has Parse sig m)
-  => Map.Map Language (SomeParser c ann)                                     -- ^ The set of parsers to select from.
+  => ParserMap c ann                                     -- ^ The set of parsers to select from.
   -> (forall term . c term => Edit (Blob, term ann) (Blob, term ann) -> m a) -- ^ A function to run on the parsed terms. Note that the terms are abstract, but constrained by @c@, allowing you to do anything @c@ allows, and requiring that all the input parsers produce terms supporting @c@.
   -> BlobPair                                                                -- ^ The blob pair to parse.
   -> m a
