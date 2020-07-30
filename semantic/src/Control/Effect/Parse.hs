@@ -6,8 +6,8 @@
 module Control.Effect.Parse
 ( -- * Parse effect
   Parse(..)
+, ParserMap
 , parse
-, parseMany
 , parserForLanguage
 , parserForBlob
 , parseWith
@@ -40,14 +40,6 @@ parse :: Has Parse sig m
       -> Blob
       -> m term
 parse parser blob = send (Parse parser blob)
-
-parseMany ::
-  (Has Parse sig m, Traversable t)
-  => ParserMap c ann
-  -> t Blob
-  -> m (t (Either SomeException term))
-parseMany pmap blobs = send (ParseMany pmap blobs)
-
 
 -- | Select a parser for the given 'Language'.
 parserForLanguage :: ParserMap c ann -> Language -> Maybe (SomeParser c ann)
