@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -15,6 +16,8 @@
 module Control.Carrier.Parse.Parallel.Measured
   ( -- * Parse carrier
     ParseC (..),
+    ParseError (..),
+    errorBlob
   )
 where
 
@@ -43,8 +46,7 @@ newtype ParseC m a = ParseC {runParse :: m a}
   deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
 instance
-  ( Has (Error SomeException) sig m,
-    Has (Reader TaskSession) sig m,
+  ( Has (Reader TaskSession) sig m,
     Has Telemetry sig m,
     Has Trace sig m,
     Has (Lift IO) sig m,
@@ -57,17 +59,16 @@ instance
     R other -> ParseC (alg (runParse . hdl) other ctx)
 -- | Parse a 'Blob' in 'IO'.
 runParser ::
-  ( Has (Error SomeException) sig m,
-    Has (Reader TaskSession) sig m,
+  ( Has (Reader TaskSession) sig m,
     Has Telemetry sig m,
     Has Trace sig m,
     MonadIO m,
     Traversable t
   ) =>
   ParserMap c ann ->
-  (forall term . c term => term ann -> IO a) ->
+  (forall term . c term => Blob -> term ann -> IO a) ->
   t Blob ->
-  m (t (Either SomeException a))
+  m (t (Either ParseError a))
 runParser pmap fn blobs = do
   config <- asks config
   liftIO . forConcurrently blobs $ \blob -> do
@@ -75,8 +76,7 @@ runParser pmap fn blobs = do
       Just (SomeParser ((UnmarshalParser language) :: Parser (term ann))) -> do
         res <- parseToPreciseAST @term (configTreeSitterParseTimeout config) (configTreeSitterUnmarshalTimeout config) language blob
         case res of
-          Left err -> pure (Left (SomeException err))
-          Right val -> Right <$> fn val
-
+          Left err -> pure (Left (TSError err blob))
+          Right val -> Right <$> fn blob val
       _ -> do
-        pure (Left (SomeException (NoLanguageForBlob (blobPath blob))))
+        pure (Left (NoLanguage blob))
