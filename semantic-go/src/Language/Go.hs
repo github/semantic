@@ -1,10 +1,11 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- | Semantic functionality for Go programs.
 module Language.Go
 ( Term(..)
 , Language.Go.Grammar.tree_sitter_go
 ) where
 
-
+import           AST.Marshal.JSON
 import           Data.Proxy
 import qualified Language.Go.AST as Go
 import qualified Language.Go.Tags as GoTags
@@ -13,6 +14,7 @@ import qualified Language.Go.Grammar (tree_sitter_go)
 import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: Go.SourceFile a }
+  deriving MarshalJSON
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy Go.SourceFile)

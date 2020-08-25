@@ -36,12 +36,12 @@ import           Source.Language
 import           Source.Loc as Loc
 import           Tags.Tagging.Precise
 
-parseSymbolsBuilder :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
+parseSymbolsBuilder :: (Has (Error SomeException) sig m, Has Parse sig m, Has (Reader Config) sig m, Traversable t) => Format ParseTreeSymbolResponse -> t Blob -> m Builder
 parseSymbolsBuilder format blobs = parseSymbols blobs >>= serialize format
 
-parseSymbols :: (Has Distribute sig m, Has (Error SomeException) sig m, Has Parse sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
+parseSymbols :: (Has (Error SomeException) sig m, Has Parse sig m, Traversable t) => t Blob -> m ParseTreeSymbolResponse
 parseSymbols blobs = do
-  terms <- distributeFor blobs go
+  terms <- traverse go blobs
   pure $ defMessage & P.files .~ toList terms
   where
     go :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m File

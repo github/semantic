@@ -1,3 +1,4 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# OPTIONS_GHC -freduction-depth=0 #-}
 -- | Semantic functionality for TSX programs.
 module Language.TSX
@@ -5,6 +6,7 @@ module Language.TSX
 , Language.TSX.Grammar.tree_sitter_tsx
 ) where
 
+import           AST.Marshal.JSON
 import           Data.Proxy
 import qualified Language.TSX.AST as TSX
 import qualified Language.TSX.Tags as TsxTags
@@ -13,6 +15,7 @@ import qualified Language.TSX.Grammar (tree_sitter_tsx)
 import qualified AST.Unmarshal as TS
 
 newtype Term a = Term { getTerm :: TSX.Program a }
+  deriving MarshalJSON
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy TSX.Program)

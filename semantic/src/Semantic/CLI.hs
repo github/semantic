@@ -96,6 +96,9 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
         <|> flag' (parseSymbolsBuilder Proto)
                   (  long "proto-symbols"
                   <> help "Output protobufs symbol list")
+        <|> flag' (parseTermBuilder TermJSON)
+                  (  long "json"
+                  <> help "Output JSON AST dump")
         <|> flag' (parseTermBuilder TermShow)
                   (  long "show"
                   <> help "Output using the Show instance (debug only, format subject to change without notice)")

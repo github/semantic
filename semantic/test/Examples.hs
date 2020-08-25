@@ -185,7 +185,6 @@ main = withOptions testOptions $ \ config logger statter -> do
 
 parseSymbolsFilePath ::
   ( Has (Error SomeException) sig m
-  , Has Distribute sig m
   , Has Parse sig m
   , Has Files sig m
   )

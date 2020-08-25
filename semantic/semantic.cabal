@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic
-version:             0.11.0.0
+version:             0.11.0.1
 synopsis:            Framework and executable for analyzing and diffing untrusted code.
 description:         Semantic is a library for parsing, analyzing, and comparing source code across many languages.
 homepage:            http://github.com/github/semantic#readme
@@ -10,13 +10,13 @@ license:             MIT
 license-file:        LICENSE
 author:              The Semantic authors
 maintainer:          opensource+semantic@github.com
-copyright:           (c) 2015-2019 GitHub, Inc.
+copyright:           (c) 2015-2020 GitHub, Inc.
 category:            Language
 build-type:          Simple
 stability:           alpha
 extra-source-files:  README.md
 
-tested-with:         GHC == 8.8.3
+tested-with:         GHC == 8.10.1
 
 flag release
   description: Build with optimizations on (for CI or deployment builds)
@@ -81,7 +81,6 @@ library
                      , Semantic.Api.Terms
                      , Semantic.CLI
                      , Semantic.Config
-                     , Semantic.Distribute
                      , Semantic.Env
                      , Semantic.IO
                      , Semantic.Task
@@ -143,7 +142,7 @@ library
     , semilattices ^>= 0.0.0.3
     , split ^>= 0.2.3.3
     , stm-chans ^>= 3.0.0.4
-    , text ^>= 1.2
+    , text ^>= 1.2.3.2
     , time >= 1.8.0.2 && < 1.10
     , tree-sitter ^>= 0.9.0.1
     , tree-sitter-go ^>= 0.5.0.0
@@ -226,7 +225,7 @@ test-suite parse-examples
     , semantic-proto ^>= 0
     , tasty
     , tasty-hunit
-    , text ^>= 1.2
+    , text ^>= 1.2.3.2
 
 benchmark benchmarks
   import:              haskell, executable-flags

@@ -70,7 +70,6 @@ runTagging dir glob = nfIO . withOptions testOptions $ \ config logger statter -
 
 parseSymbolsFilePath ::
   ( Has (Error SomeException) sig m
-  , Has Distribute sig m
   , Has Parse sig m
   , Has Files sig m
   )

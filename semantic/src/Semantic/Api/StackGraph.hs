@@ -24,19 +24,17 @@ import           Proto.Semantic as P hiding (Blob)
 import           Proto.Semantic_Fields as P
 import           Proto.Semantic_JSON ()
 import           Semantic.Api.Bridge
-import           Semantic.Task
 import           Source.Language
 import           Source.Loc as Loc
 
 parseStackGraph :: ( Has (Error SomeException) sig m
-                   , Has Distribute sig m
                    , Has Parse sig m
                    , Traversable t
                    )
   => t Blob
   -> m StackGraphResponse
 parseStackGraph blobs = do
-  terms <- distributeFor blobs go
+  terms <- traverse go blobs
   pure $ defMessage & P.files .~ toList terms
   where
     go :: ( Has (Error SomeException) sig m
