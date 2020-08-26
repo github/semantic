@@ -59,7 +59,7 @@ library
     , deepseq        ^>= 1.4.4.0
     , containers     ^>= 0.6.2
     , hashable        >= 1.2.7 && < 1.4
-    , lingo          ^>= 0.4.0.0
+    , lingo          ^>= 0.3.2.0
     , pathtype       ^>= 0.8.1
     , semilattices   ^>= 0.0.0.3
     , text           ^>= 1.2.3.2
