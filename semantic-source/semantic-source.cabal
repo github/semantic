@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic-source
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            Types and functionality for working with source code
 description:         Types and functionality for working with source code (program text).
 homepage:            https://github.com/github/semantic/tree/master/semantic-source#readme
@@ -10,7 +10,7 @@ license:             MIT
 license-file:        LICENSE
 author:              The Semantic authors
 maintainer:          opensource+semantic@github.com
-copyright:           (c) 2019 GitHub, Inc.
+copyright:           (c) 2020 GitHub, Inc.
 category:            Data
 build-type:          Simple
 stability:           alpha
@@ -21,6 +21,7 @@ extra-source-files:
 tested-with:
   GHC == 8.6.5
   GHC == 8.8.1
+  GHC == 8.10.1
 
 common haskell
   default-language: Haskell2010
@@ -58,10 +59,10 @@ library
     , deepseq        ^>= 1.4.4.0
     , containers     ^>= 0.6.2
     , hashable        >= 1.2.7 && < 1.4
-    , lingo          ^>= 0.3.2.0
+    , lingo          ^>= 0.4.0.0
     , pathtype       ^>= 0.8.1
     , semilattices   ^>= 0.0.0.3
-    , text           ^>= 1.2.3.1
+    , text           ^>= 1.2.3.2
   hs-source-dirs: src
 
 test-suite test
