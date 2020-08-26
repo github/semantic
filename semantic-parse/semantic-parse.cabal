@@ -53,7 +53,7 @@ executable semantic-parse
     , pretty-simple
     , semantic-ast
     , semantic-python
-    , semantic-source ^>= 0.1.0
+    , semantic-source ^>= 0.1.0.1
     , tree-sitter-python ^>= 0.9.0.1
   hs-source-dirs:      app
   default-language:    Haskell2010
