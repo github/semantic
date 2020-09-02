@@ -27,7 +27,7 @@ haskell_library(
         "//:deepseq",
         "//:filepath",
         "//:text",
-        "@lingo",
+        "@stackage//:lingo",
         "@stackage//:aeson",
         "@stackage//:hashable",
         "@stackage//:pathtype",

@@ -50,7 +50,7 @@ haskell_library(
     name = "semantic",
     srcs = glob(["src/**/*.hs"]),
     compiler_flags = GHC_FLAGS + ["-XStrictData"],
-    version = "0.11.0.0",
+    version = "0.11.0.1",
     deps = semantic_common_dependencies + [
         "//:base",
         "//:deepseq",

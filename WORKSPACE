@@ -96,6 +96,7 @@ stack_snapshot(
         "hspec-expectations",
         "proto-lens-jsonpb",
         "lens",
+        "lingo",
         "network",
         "network-uri",
         "optparse-applicative",
@@ -237,14 +238,6 @@ tree_sitter_node_types_hackage(
     version = "0.1.0.1",
 )
 
-# Download lingo and proto-lens-jsonpb (which have their own build files)
-
-http_archive(
-    name = "lingo",
-    sha256 = "0134c8141443e7e8f49841e29726674d91acf62f1ba007266290157933944278",
-    strip_prefix = "lingo-haskell-b3dcb165ebdfc93f894393e607ce601281b59dbb",
-    urls = ["https://github.com/tclem/lingo-haskell/archive/b3dcb165ebdfc93f894393e607ce601281b59dbb.tar.gz"],
-)
 load("//:build/example_repos.bzl", "declare_example_repos")
 
 declare_example_repos()
