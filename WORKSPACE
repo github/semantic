@@ -94,6 +94,7 @@ stack_snapshot(
         "hspec",
         "hspec-core",
         "hspec-expectations",
+        "proto-lens-jsonpb",
         "lens",
         "network",
         "network-uri",
@@ -244,14 +245,6 @@ http_archive(
     strip_prefix = "lingo-haskell-b3dcb165ebdfc93f894393e607ce601281b59dbb",
     urls = ["https://github.com/tclem/lingo-haskell/archive/b3dcb165ebdfc93f894393e607ce601281b59dbb.tar.gz"],
 )
-
-http_archive(
-    name = "proto-lens-jsonpb",
-    sha256 = "2979fd2dc0730a27882cbd98af655fdfc2b816c43cbf5119396790d3592128f2",
-    strip_prefix = "proto-lens-jsonpb-3a11d23ecdbb1bcc8ef80d02cf0f0b7318ddb4c0",
-    urls = ["https://github.com/tclem/proto-lens-jsonpb/archive/3a11d23ecdbb1bcc8ef80d02cf0f0b7318ddb4c0.tar.gz"],
-)
-
 load("//:build/example_repos.bzl", "declare_example_repos")
 
 declare_example_repos()
