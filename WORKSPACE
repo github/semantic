@@ -38,7 +38,7 @@ load(
 # Download a GHC binary distribution from haskell.org and register it as a toolchain.
 rules_haskell_toolchains(
     locale = "en_US.UTF-8",
-    version = "8.8.3",
+    version = "8.10.2",
 )
 
 # Enable GHC persistent worker mode, if that's your bag.
