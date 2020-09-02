@@ -38,7 +38,7 @@ load(
 # Download a GHC binary distribution from haskell.org and register it as a toolchain.
 rules_haskell_toolchains(
     locale = "en_US.UTF-8",
-    version = "8.10.1",
+    version = "8.10.2",
 )
 
 # Enable GHC persistent worker mode, if that's your bag.
@@ -94,7 +94,6 @@ stack_snapshot(
         "hspec",
         "hspec-core",
         "hspec-expectations",
-        "proto-lens-jsonpb",
         "lens",
         "lingo",
         "network",
@@ -108,6 +107,7 @@ stack_snapshot(
         "prettyprinter-ansi-terminal",
         "process",
         "proto-lens",
+        "proto-lens-jsonpb",
         "proto-lens-runtime",
         "raw-strings-qq",
         "recursion-schemes",
