@@ -109,6 +109,7 @@ stack_snapshot(
         "process",
         "proto-lens",
         "proto-lens-runtime",
+        "raw-strings-qq",
         "recursion-schemes",
         "reducers",
         "resourcet",

@@ -1,4 +1,4 @@
-resolver: nightly-2020-07-23
+resolver: nightly-2020-08-16
 packages:
   - github: antitypical/fused-syntax
     commit: "4a383d57c8fd7592f54a33f43eb9666314a6e80e"
