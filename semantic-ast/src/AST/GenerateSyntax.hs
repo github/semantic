@@ -18,7 +18,7 @@ import           AST.Traversable1.Class
 import qualified AST.Unmarshal as TS
 import           Data.Aeson hiding (String)
 import           Data.Foldable
-import           Data.List
+import           Data.List (elemIndices, genericIndex, intercalate)
 import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Text (Text)
 import           Foreign.C.String

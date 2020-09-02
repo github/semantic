@@ -2,12 +2,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
@@ -50,7 +45,7 @@ parseSymbols blobs = do
   pure $ defMessage & P.files .~ toList terms
   where
     go :: (Has (Error SomeException) sig m, Has Parse sig m) => Blob -> m File
-    go blob@Blob {..} = catching $ tagsToFile <$> tagsForBlob blob
+    go blob = catching $ tagsToFile <$> tagsForBlob blob
       where
         catching m = m `catchError` (\(SomeException e) -> pure $ errorFile (show e))
         blobLanguage' = blobLanguage blob

@@ -17,9 +17,9 @@ haskell_library(
     deps = [
         "//:base",
         "//:text",
+        "@stackage//:proto-lens-jsonpb",
         "@stackage//:aeson",
         "@stackage//:proto-lens",
-        "@stackage//:proto-lens-jsonpb",
         "@stackage//:proto-lens-runtime",
     ],
 )

@@ -94,7 +94,7 @@ knownLanguage :: Language -> Bool
 knownLanguage = (/= Unknown)
 
 extensionsForLanguage :: Language -> [String]
-extensionsForLanguage language = T.unpack <$> maybe mempty Lingo.languageExtensions (Map.lookup (languageToText language) Lingo.languages)
+extensionsForLanguage language = fmap T.unpack (maybe mempty Lingo.languageExtensions (Map.lookup (languageToText language) Lingo.languages))
 
 forPath :: Path.PartClass.AbsRel ar => Path.File ar -> Language
 forPath path =

@@ -52,7 +52,7 @@ makeError s e a = withFrozenCallStack (Error s e a callStack)
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
 formatError :: Flag LogPrintSource -> Flag Colourize -> Blob -> Error String -> String
-formatError includeSource colourize blob@Blob{..} Error{..}
+formatError includeSource colourize blob Error{..}
   = ($ "")
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan path errorSpan . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation colourize errorExpected errorActual . showChar '\n'

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DerivingVia, RankNTypes, NamedFieldPuns, OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric, RankNTypes, NamedFieldPuns, OverloadedStrings #-}
 module Source.Loc
 ( Loc(..)
 , byteRange_
@@ -9,7 +9,6 @@ module Source.Loc
 import Control.DeepSeq (NFData)
 import Data.Aeson (ToJSON(..), object, (.=))
 import Data.Hashable (Hashable)
-import Data.Monoid.Generic
 import GHC.Generics (Generic)
 import Prelude hiding (span)
 import Source.Range
@@ -20,7 +19,9 @@ data Loc = Loc
   , span      :: {-# UNPACK #-} !Span
   }
   deriving (Eq, Ord, Show, Generic)
-  deriving Semigroup via GenericSemigroup Loc
+
+instance Semigroup Loc where
+  Loc b1 s1 <> Loc b2 s2 = Loc (b1 <> b2) (s1 <> s2)
 
 instance Hashable Loc
 instance NFData   Loc
@@ -42,4 +43,3 @@ type Lens' s a = forall f . Functor f => (a -> f a) -> (s -> f s)
 lens :: (s -> a) -> (s -> a -> s) -> Lens' s a
 lens get put afa s = fmap (put s) (afa (get s))
 {-# INLINE lens #-}
-

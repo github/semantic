@@ -29,7 +29,6 @@ haskell_library(
         "@stackage//:algebraic-graphs",
         "@stackage//:fused-effects",
         "@stackage//:generic-lens",
-        "@stackage//:generic-monoid",
         "@stackage//:hashable",
         "@stackage//:lens",
         "@stackage//:pathtype",

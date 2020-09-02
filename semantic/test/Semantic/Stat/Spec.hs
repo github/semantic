@@ -1,12 +1,13 @@
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Semantic.Stat.Spec (testTree) where
 
 import Control.Exception
-import Network.Socket hiding (recv)
+import Network.Socket (Family (..), Socket, SocketType (..), close, defaultProtocol, socketPair)
 import Network.Socket.ByteString
-import Semantic.Telemetry.Stat
 import Semantic.Config
+import Semantic.Telemetry.Stat
 import System.Environment
 
 import Test.Tasty
@@ -18,7 +19,7 @@ withSocketPair = bracket create release
         release (client, server) = close client >> close server
 
 withEnvironment :: String -> String -> IO () -> IO ()
-withEnvironment key value = bracket (setEnv key value) (const (unsetEnv key)) . const
+withEnvironment key value = bracket_ (setEnv key value) (unsetEnv key)
 
 -- NOTE: These cannot easily run in parallel because we test things like
 -- setting/unsetting the environment.
@@ -92,7 +93,7 @@ case_render_tags = do
 
 case_sendstat_delivers_datagram :: Assertion
 case_sendstat_delivers_datagram = do
-  client@StatsClient{..} <- defaultStatsClient
+  client <- defaultStatsClient
   withSocketPair $ \(clientSoc, serverSoc) -> do
     sendStat client { statsClientUDPSocket = clientSoc } (increment "app.metric" [])
     info <- recv serverSoc 1024
