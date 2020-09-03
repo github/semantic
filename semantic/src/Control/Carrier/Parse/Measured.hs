@@ -3,7 +3,6 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 -- | A carrier for 'Parse' effects suitable for use in production.
@@ -59,7 +58,7 @@ runParser ::
   => Blob
   -> Parser term
   -> m term
-runParser blob@Blob{..} parser = case parser of
+runParser blob parser = case parser of
 
   UnmarshalParser language ->
     time "parse.tree_sitter_precise_ast_parse" languageTag $ do

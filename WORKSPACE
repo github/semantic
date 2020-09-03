@@ -15,18 +15,11 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # an updated version.
 #
 # [1] https://github.com/tweag/rules_haskell/issues/1349
-#
-# http_archive(
-#     name = "rules_haskell",
-#     sha256 = "56a8e6337df8802f1e0e7d2b3d12d12d5d96c929c8daecccc5738a0f41d9c1e4",
-#     strip_prefix = "rules_haskell-0.12",
-#     urls = ["https://github.com/tweag/rules_haskell/archive/v0.12.tar.gz"],
-# )
 http_archive(
     name = "rules_haskell",
-    sha256 = "78d017aa732b430c0681fff4514503af78a8d8c44df165e603a9433745b16e5e",
-    strip_prefix = "rules_haskell-abaec6502a4474f10b3c367fb5e90173ee0e349c",
-    urls = ["https://github.com/tweag/rules_haskell/archive/abaec6502a4474f10b3c367fb5e90173ee0e349c.tar.gz"],
+    sha256 = "5e8077ae243b4bcf7bb913dfd9b4335c3b4bd2554658c62db7b3eb5351c80d8e",
+    strip_prefix = "rules_haskell-aabeedc18f5e5db030ca1aa0c10a7dc14e4a4a55",
+    urls = ["https://github.com/tweag/rules_haskell/archive/aabeedc18f5e5db030ca1aa0c10a7dc14e4a4a55.tar.gz"],
 )
 
 load(
@@ -45,7 +38,7 @@ load(
 # Download a GHC binary distribution from haskell.org and register it as a toolchain.
 rules_haskell_toolchains(
     locale = "en_US.UTF-8",
-    version = "8.8.3",
+    version = "8.10.1",
 )
 
 # Enable GHC persistent worker mode, if that's your bag.
@@ -75,6 +68,7 @@ stack_snapshot(
         "async",
         "attoparsec",
         "base",
+        "base64-bytestring",
         "bazel-runfiles",
         "bifunctors",
         "bytestring",
@@ -100,7 +94,9 @@ stack_snapshot(
         "hspec",
         "hspec-core",
         "hspec-expectations",
+        "proto-lens-jsonpb",
         "lens",
+        "lingo",
         "network",
         "network-uri",
         "optparse-applicative",
@@ -112,7 +108,6 @@ stack_snapshot(
         "prettyprinter-ansi-terminal",
         "process",
         "proto-lens",
-        "proto-lens-jsonpb",
         "proto-lens-runtime",
         "raw-strings-qq",
         "recursion-schemes",
@@ -241,15 +236,6 @@ tree_sitter_node_types_hackage(
     name = "tree-sitter-rust",
     sha256 = "00bc04a31b5c9b0f9b419074238996ee4aadba342e68071ec516077b495e0d41",
     version = "0.1.0.1",
-)
-
-# Download lingo (which has its own Bazel build instructions).
-
-http_archive(
-    name = "lingo",
-    sha256 = "32a5e2d66e4620ff7004acab4802dc948b852ce26725012283a85d41af97275f",
-    strip_prefix = "lingo-haskell-6614b9afe1a519364491c170d6b06ff5cd96153a",
-    urls = ["https://github.com/tclem/lingo-haskell/archive/6614b9afe1a519364491c170d6b06ff5cd96153a.tar.gz"],
 )
 
 load("//:build/example_repos.bzl", "declare_example_repos")

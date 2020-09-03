@@ -46,6 +46,8 @@ function flags {
 
   echo "-optP-Wno-macro-redefined"
 
+  echo "-DBAZEL_BUILD=0"
+
   # .hs source dirs
   # TODO: would be nice to figure this out from cabal.project & the .cabal files
   echo "-isemantic/app"
@@ -98,8 +100,9 @@ function flags {
   echo "-Wno-name-shadowing"
   echo "-Wno-safe"
   echo "-Wno-unsafe"
-  [[ "$ghc_version" = 8.6.* ]] || [[ "$ghc_version" = 8.8.* ]] && echo "-Wno-star-is-type" || true
-  [[ "$ghc_version" = 8.8.* ]] && echo "-Wno-missing-deriving-strategies" || true
+  [[ "$ghc_version" = 8.6.* ]] || [[ "$ghc_version" = 8.8.* ]] || [[ "$ghc_version" = 8.10.* ]] && echo "-Wno-star-is-type" || true
+  [[ "$ghc_version" = 8.8.* ]] || [[ "$ghc_version" = 8.10.* ]] && echo "-Wno-missing-deriving-strategies" || true
+  [[ "$ghc_version" = 8.10.* ]] && echo "-Wno-missing-safe-haskell-mode" && echo "-Wno-prepositive-qualified-module" && echo "-Wno-unused-packages"
 }
 
 flags > "$output_file"

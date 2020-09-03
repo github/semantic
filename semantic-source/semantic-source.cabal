@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic-source
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Types and functionality for working with source code
 description:         Types and functionality for working with source code (program text).
 homepage:            https://github.com/github/semantic/tree/master/semantic-source#readme
@@ -10,7 +10,7 @@ license:             MIT
 license-file:        LICENSE
 author:              The Semantic authors
 maintainer:          opensource+semantic@github.com
-copyright:           (c) 2019 GitHub, Inc.
+copyright:           (c) 2020 GitHub, Inc.
 category:            Data
 build-type:          Simple
 stability:           alpha
@@ -21,6 +21,7 @@ extra-source-files:
 tested-with:
   GHC == 8.6.5
   GHC == 8.8.1
+  GHC == 8.10.1
 
 common haskell
   default-language: Haskell2010
@@ -38,6 +39,10 @@ common haskell
     -Wno-star-is-type
   if (impl(ghc >= 8.8))
     ghc-options: -Wno-missing-deriving-strategies
+  if (impl(ghc >= 8.10))
+    ghc-options:
+      -Wno-missing-safe-haskell-mode
+      -Wno-prepositive-qualified-module
 
 library
   import: haskell
@@ -48,29 +53,17 @@ library
     Source.Source
     Source.Span
   build-depends:
-      aeson          ^>= 1.4.2.0
+    , aeson          ^>= 1.4.2.0
     , base            >= 4.12 && < 5
     , bytestring     ^>= 0.10.8.2
     , deepseq        ^>= 1.4.4.0
     , containers     ^>= 0.6.2
-    , generic-monoid ^>= 0.1.0.0
     , hashable        >= 1.2.7 && < 1.4
-    , lingo          ^>= 0.3.2.0
+    , lingo          ^>= 0.5.0.1
     , pathtype       ^>= 0.8.1
     , semilattices   ^>= 0.0.0.3
-    , text           ^>= 1.2.3.1
+    , text           ^>= 1.2.3.2
   hs-source-dirs: src
-
-test-suite doctest
-  import: haskell
-  type: exitcode-stdio-1.0
-  main-is: Doctest.hs
-  build-depends:
-      base
-    , doctest          >= 0.7 && <1.0
-    , QuickCheck
-    , semantic-source
-  hs-source-dirs: test
 
 test-suite test
   import: haskell
@@ -78,9 +71,10 @@ test-suite test
   hs-source-dirs: test
   main-is: Test.hs
   other-modules:
+    Range.Test
     Source.Test
   build-depends:
-      base
+    , base
     , hedgehog        ^>= 1
     , semantic-source
     , tasty            >= 1.2 && <2

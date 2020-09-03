@@ -24,7 +24,11 @@
 :seti -Wno-safe
 :seti -Wno-unsafe
 :seti -Wno-star-is-type
+-- 8.8+
 :seti -Wno-missing-deriving-strategies
+-- 8.10+
+:seti -Wno-missing-safe-haskell-mode
+:seti -Wno-prepositive-qualified-module
 
 -- Turn on some language extensions you use a lot
 :seti -XFlexibleContexts -XOverloadedStrings -XTypeApplications
@@ -44,5 +48,6 @@
 -- Better typed holes
 :set -funclutter-valid-hole-fits -fabstract-refinement-hole-fits -frefinement-level-hole-fits=2
 
--- This usually impairs understanding
+-- We have this one on in the project but not in the REPL to reduce noise
 :seti -Wno-type-defaults
+:set -Wno-unused-packages

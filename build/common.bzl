@@ -31,6 +31,9 @@ GHC_FLAGS = [
     "-Wno-star-is-type",
     "-Wno-missing-deriving-strategies",
     "-DBAZEL_BUILD=1",
+    "-Wno-unused-packages",
+    "-Wno-prepositive-qualified-module",
+    "-Wno-missing-safe-haskell-mode",
 ] + select(
     {
         "//:release": RELEASE_GHC_FLAGS,
@@ -126,7 +129,6 @@ def semantic_language_library(language, name, srcs, ts_package = "", nodetypes =
             "@stackage//:fused-effects",
             "@stackage//:fused-syntax",
             "@stackage//:generic-lens",
-            "@stackage//:generic-monoid",
             "@stackage//:hashable",
             "@stackage//:lens",
             "@stackage//:pathtype",

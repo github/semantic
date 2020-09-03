@@ -2,10 +2,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Tagging (benchmarks) where
+module Tagging
+( benchmarks
+, runTagging
+, pythonBenchmarks
+, goBenchmarks
+, rubyBenchmarks
+) where
 
 import           Control.Carrier.Parse.Measured
-import           Control.Carrier.Reader
 import           Control.Exception (throwIO)
 import           Control.Monad
 import           Data.Foldable
@@ -15,7 +20,6 @@ import qualified System.Path as Path
 
 import qualified Analysis.File as File
 import           Data.Flag
-import           Data.Either (fromRight)
 import           Proto.Semantic as P hiding (Blob)
 import           Semantic.Api.Symbols (parseSymbols)
 import           Semantic.Config as Config

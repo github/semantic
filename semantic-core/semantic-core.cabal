@@ -35,6 +35,10 @@ common common
     -Wno-star-is-type
   if (impl(ghc >= 8.8))
     ghc-options: -Wno-missing-deriving-strategies
+  if (impl(ghc >= 8.10))
+    ghc-options:
+      -Wno-missing-safe-haskell-mode
+      -Wno-prepositive-qualified-module
 
 library
   import: common
@@ -46,7 +50,7 @@ library
     Core.Eval
     Core.Name
   build-depends:
-      base                         >= 4.13 && < 5
+    , base                         >= 4.13 && < 5
     , fused-effects               ^>= 1.1
     , fused-syntax
     , hashable
@@ -55,7 +59,7 @@ library
     , prettyprinter                >= 1.2.1 && < 2
     , prettyprinter-ansi-terminal ^>= 1.1.1
     , semantic-analysis           ^>= 0
-    , semantic-source             ^>= 0.1.0
+    , semantic-source             ^>= 0.1.0.1
     , text                        ^>= 1.2.3.1
     , trifecta                     >= 2 && < 2.2
     , unordered-containers        ^>= 0.2.10
@@ -67,11 +71,10 @@ test-suite test
   main-is:        Test.hs
   other-modules:  Generators
   build-depends:
-      base
+    , base
     , semantic-analysis
     , semantic-core
     , semantic-source
-    , fused-effects
     , fused-syntax
     , hedgehog ^>= 1
     , tasty >= 1.2 && <2
