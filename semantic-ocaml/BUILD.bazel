@@ -1,0 +1,16 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "//:build/common.bzl",
+    "semantic_language_library",
+    "semantic_language_parsing_test",
+)
+
+semantic_language_library(
+    name = "semantic-ocaml",
+    srcs = glob(["src/**/*.hs"]),
+    language = "ocaml",
+    nodetypes = "@tree-sitter-ocaml//:vendor/tree-sitter-ocaml/ocaml/src/node-types.json",
+)
+
+semantic_language_parsing_test(language = "ocaml")
