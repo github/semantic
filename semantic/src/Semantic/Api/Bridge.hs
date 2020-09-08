@@ -1,22 +1,25 @@
+{-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE RecordWildCards #-}
-module Semantic.Api.Bridge
-  ( APIBridge (..)
-  , APIConvert (..)
-  , (#?)
-  ) where
 
-import           Analysis.File
-import           Control.Lens
+module Semantic.Api.Bridge
+  ( APIBridge (..),
+    APIConvert (..),
+    (#?),
+  )
+where
+
+import Analysis.File
+import Control.Lens
 import qualified Data.Blob as Data
-import           Data.Either
-import           Data.ProtoLens (defMessage)
+import Data.Either
+import Data.ProtoLens (defMessage)
 import qualified Data.Text as T
-import           Data.Text.Lens
+import Data.Text.Lens
 import qualified Proto.Semantic as API
-import           Proto.Semantic_Fields as P hiding (to)
+import Proto.Semantic_Fields as P hiding (to)
 import qualified Source.Language as Data
 import qualified Source.Range as Source
 import qualified Source.Source as Source (fromText, toText, totalSpan)
@@ -50,37 +53,77 @@ class APIConvert api native | api -> native where
 -- extracting 'Just' values from it.
 (#?) :: AReview t s -> s -> Maybe t
 rev #? item = item ^? re rev
+
 infixr 8 #?
 
+-- instance APIBridge Legacy.Position Source.Pos where
+--   bridging = iso fromAPI toAPI   where
+--     toAPI Source.Pos {..} = Legacy.Position line column
+--     fromAPI Legacy.Position {..} = Source.Pos line column
+
 instance APIBridge API.Position Source.Pos where
-  bridging = iso fromAPI toAPI where
-    toAPI Source.Pos{..}     = defMessage & P.line .~ fromIntegral line & P.column .~ fromIntegral column
-    fromAPI position = Source.Pos (fromIntegral (position^.line)) (fromIntegral (position^.column))
+  bridging = iso fromAPI toAPI
+    where
+      toAPI Source.Pos {..} =
+        defMessage & P.line .~ fromIntegral line & P.column .~ fromIntegral column
+      fromAPI position =
+        Source.Pos
+          (fromIntegral (position ^. P.line))
+          (fromIntegral (position ^. P.column))
 
 instance APIConvert API.Span Source.Span where
-  converting = prism' toAPI fromAPI where
-    toAPI Source.Span{..} = defMessage & P.maybe'start .~ (bridging #? start) & P.maybe'end .~ (bridging #? end)
-    fromAPI span = Source.Span <$> (span^.maybe'start >>= preview bridging) <*> (span^.maybe'end >>= preview bridging)
+  converting = prism' toAPI fromAPI
+    where
+      toAPI Source.Span {..} =
+        defMessage
+          & P.maybe'start
+          .~ (bridging #? start)
+          & P.maybe'end
+          .~ (bridging #? end)
+      fromAPI span =
+        Source.Span
+          <$> (span ^. P.maybe'start >>= preview bridging)
+          <*> (span ^. P.maybe'end >>= preview bridging)
+
+-- instance APIConvert Legacy.Span Source.Span where
+--   converting = prism' toAPI fromAPI   where
+--     toAPI Source.Span {..} = Legacy.Span (bridging #? start) (bridging #? end)
+--     fromAPI Legacy.Span {..} =
+--       Source.Span
+--         <$> (start >>= preview bridging)
+--         <*> (end >>= preview bridging)
 
 instance APIBridge API.ByteRange Source.Range where
-  bridging = iso fromAPI toAPI where
-    toAPI Source.Range{..} = defMessage & P.start .~ fromIntegral start & P.end .~ fromIntegral end
-    fromAPI range = Source.Range (fromIntegral (range^.start)) (fromIntegral (range^.end))
+  bridging = iso fromAPI toAPI
+    where
+      toAPI Source.Range {..} = defMessage & P.start .~ fromIntegral start & P.end .~ fromIntegral end
+      fromAPI range = Source.Range (fromIntegral (range ^. start)) (fromIntegral (range ^. end))
 
 instance APIBridge T.Text Data.Language where
   bridging = iso Data.textToLanguage Data.languageToText
 
 instance APIBridge API.Blob Data.Blob where
-  bridging = iso apiBlobToBlob blobToApiBlob where
-    blobToApiBlob b
-      = defMessage
-      & P.content .~ Source.toText (Data.blobSource b)
-      & P.path .~ T.pack (Data.blobFilePath b)
-      & P.language .~ (bridging # Data.blobLanguage b)
-    apiBlobToBlob blob =
-      let src = blob^.content.to Source.fromText
-          pth = fromRight (Path.toAbsRel Path.emptyFile) (blob^.path._Text.to Path.parse)
-      in Data.Blob
-      { blobSource = src
-      , blobFile = File pth (Source.totalSpan src) (blob^.language.bridging)
-      }
+  bridging = iso apiBlobToBlob blobToApiBlob
+    where
+      blobToApiBlob b =
+        defMessage
+          & P.content
+          .~ Source.toText (Data.blobSource b)
+          & P.path
+          .~ T.pack (Data.blobFilePath b)
+          & P.language
+          .~ (bridging # Data.blobLanguage b)
+      apiBlobToBlob blob =
+        let src = blob ^. P.content . to Source.fromText
+            pth =
+              fromRight
+                (Path.toAbsRel Path.emptyFile)
+                (blob ^. P.path . _Text . to Path.parse)
+         in Data.Blob
+              { blobSource = src,
+                blobFile =
+                  File
+                    pth
+                    (Source.totalSpan src)
+                    (blob ^. P.language . bridging)
+              }

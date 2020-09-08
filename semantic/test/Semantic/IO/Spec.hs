@@ -1,17 +1,15 @@
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ImplicitParams #-}
-{-# OPTIONS_GHC -Wno-unused-imports #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module Semantic.IO.Spec (spec) where
 
-import Prelude hiding (readFile)
-
-import           Analysis.File as File
-import           Data.Blob as Blob
-import           Data.Handle
-import           SpecHelpers
+import Analysis.File as File
+import Data.Blob as Blob
+import Data.Handle
+import SpecHelpers
 import qualified System.Path as Path
 import qualified System.Path.Fixture as Fixture
 
@@ -27,7 +25,6 @@ spec = do
         blobs <- readBlobPairsFromHandle h
         pure blobs
   describe "readFile" $ do
-
     it "returns a blob for extant files" $ do
       let path = Fixture.absRelFile "test/fixtures/cli/diff.json"
       Just blob <- readBlobFromFile (File path lowerBound Unknown)
@@ -58,7 +55,6 @@ spec = do
     it "returns blobs when there's null after" $ do
       blobs <- blobsFromFilePath "test/fixtures/cli/diff-null-after.json"
       blobs `shouldBe` [Delete a]
-
 
     it "returns blobs for unsupported language" $ do
       h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/diff-unsupported-language.json")

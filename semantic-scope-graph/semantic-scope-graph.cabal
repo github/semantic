@@ -20,11 +20,12 @@ tested-with:         GHC == 8.6.5
 
 library
   exposed-modules:
-    Control.Carrier.Sketch.ScopeGraph
-    Control.Effect.ScopeGraph
-    Control.Effect.ScopeGraph.Properties.Declaration
-    Control.Effect.ScopeGraph.Properties.Function
-    Control.Effect.ScopeGraph.Properties.Reference
+    Control.Carrier.StackGraph
+    Control.Effect.StackGraph
+    Control.Effect.StackGraph.Properties.Declaration
+    Control.Effect.StackGraph.Properties.Function
+    Control.Effect.StackGraph.Properties.Reference
+    Data.Functor.Tagged
     Scope.Graph.AdjacencyList
     Scope.Graph.Convert
     Scope.Info
@@ -32,6 +33,9 @@ library
     Scope.Reference
     Scope.Scope
     Scope.Types
+    Stack.Path
+    Stack.Graph
+    Stack.Graph.Export
     Data.Hole
     Data.Module
     Data.ScopeGraph
@@ -44,10 +48,17 @@ library
     , hashable
     , lens
     , pathtype
+    , process
     , semantic-analysis
     , semantic-source    ^>= 0.1.0.1
     , semilattices
+    , streaming
+    , streaming-bytestring
+    , streaming-process
     , text               ^>= 1.2.3.1
+    , temporary
+    , comonad
+    , monoid-subclasses
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:

@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Analysis.Name
-( Name
+( Name(..)
 -- * Constructors
 , gensym
 , name

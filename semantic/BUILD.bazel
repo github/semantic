@@ -79,6 +79,7 @@ haskell_library(
         "@stackage//:hostname",
         "@stackage//:hscolour",
         "@stackage//:lens",
+        "@stackage//:lingo",
         "@stackage//:network-uri",
         "@stackage//:optparse-applicative",
         "@stackage//:parsers",

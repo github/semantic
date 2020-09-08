@@ -62,6 +62,7 @@ library
     Analysis.Project
     Analysis.Typecheck
     Control.Carrier.Fail.WithLoc
+    Data.Maybe.Exts
   build-depends:
     , aeson                       ^>= 1.4
     , algebraic-graphs            ^>= 0.3

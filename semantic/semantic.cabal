@@ -62,6 +62,7 @@ library
                      -- General datatype definitions & generic algorithms
                      , Data.Blob
                      , Data.Blob.IO
+                     , Data.Maybe.Exts
                      , Data.Duration
                      , Data.Edit
                      , Data.Error

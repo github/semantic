@@ -1,10 +1,9 @@
 module Data.Maybe.Exts
-  ( module Data.Maybe,
-    maybeLast,
-    fromMaybeLast,
-    maybeM,
-  )
-where
+( module Data.Maybe
+, maybeLast
+, fromMaybeLast
+, maybeM
+) where
 
 import Data.Maybe
 import Data.Monoid

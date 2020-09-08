@@ -51,7 +51,7 @@ library
     Language.Python.Grammar
     Language.Python.Failure
     Language.Python.Patterns
-    -- Language.Python.ScopeGraph
+    Language.Python.StackGraph
     Language.Python.Tags
   hs-source-dirs: src
   build-depends:
@@ -114,6 +114,20 @@ library
   --              , tasty
   --              , tasty-hunit
 
+test-suite stack-graph
+  import: haskell
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test-stack-graph
+  main-is: StackTest.hs
+  ghc-options: -threaded
+
+  -- build-depends: base
+  --              , semantic-python
+  --             --  , semantic-scope-graph
+  --              , bytestring
+  --              , pathtype
+  --              , tasty
+  --              , tasty-hunit
 
 test-suite test
   import: haskell
