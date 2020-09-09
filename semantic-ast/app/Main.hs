@@ -13,14 +13,14 @@
 module Main (main) where
 
 import AST.GenerateSyntax
+import Control.Lens (Traversal', mapped, (%~))
+import Data.Generics.Product.Typed (typed)
 import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import Data.Generics.Product.Typed
 import GHC.Generics (Generic)
 import Language.Haskell.TH
-import Control.Lens
 import Language.Haskell.TH.Lens
 import NeatInterpolation
 import qualified Options.Generic as Opt
@@ -39,7 +39,7 @@ data Config = Config {language :: Text, path :: FilePath}
 -- doesn't like at all. I haven't figured out quite why we get this qualified
 -- name, but for now the simplest thing to do is some neste dupdates
 adjust :: Dec -> Dec
-adjust =  _InstanceD._4.mapped %~ (values %~ truncate) . (functions %~ truncate)
+adjust = _InstanceD.typed.mapped %~ (values %~ truncate) . (functions %~ truncate)
   where
     -- Need to handle functions with no arguments, which are parsed as ValD entities,
     -- as well as those with arguments, which are FunD.
