@@ -17,6 +17,7 @@ import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Data.Generics.Product.Typed
 import GHC.Generics (Generic)
 import Language.Haskell.TH
 import Control.Lens
@@ -40,9 +41,11 @@ data Config = Config {language :: Text, path :: FilePath}
 adjust :: Dec -> Dec
 adjust =  _InstanceD._4.mapped %~ (values %~ truncate) . (functions %~ truncate)
   where
+    -- Need to handle functions with no arguments, which are parsed as ValD entities,
+    -- as well as those with arguments, which are FunD.
     values, functions :: Traversal' Dec Name
-    values = _ValD._1._VarP
-    functions = _FunD._1
+    values = _ValD.typed._VarP
+    functions = _FunD.typed
 
     truncate :: Name -> Name
     truncate = mkName . nameBase

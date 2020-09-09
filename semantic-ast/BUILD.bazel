@@ -60,6 +60,7 @@ haskell_binary(
         "//:template-haskell",
         "//:text",
         "@stackage//:directory",
+        "@stackage//:generic-lens",
         "@stackage//:lens",
         "@stackage//:neat-interpolation",
         "@stackage//:optparse-generic",
