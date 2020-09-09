@@ -30,21 +30,28 @@ data Config = Config {language :: Text, path :: FilePath}
   deriving stock (Show, Generic)
   deriving anyclass (Opt.ParseRecord)
 
-adjusto :: Dec -> Dec
-adjusto = \case
-  InstanceD ol cxt typ bindings -> InstanceD ol cxt typ (fmap adjust bindings)
-  other -> other
-
+-- There are a few cases where the output emitted by TH's 'pprint' doesn't
+-- create entirely valid Haskell syntax, because sometimes we get
+-- a qualified name on the LHS of a typeclass declaration, which Haskell
+-- doesn't like at all. I haven't figured out quite why we get this qualified
+-- name, but for now the simplest thing to do is some neste dupdates
 adjust :: Dec -> Dec
 adjust = \case
-  ValD (VarP lhs) bod decs -> ValD (VarP (mkName . nameBase $ lhs)) bod decs
-  FunD n cs -> FunD (mkName . nameBase $ n) cs
-  y -> y
+  InstanceD ol cxt typ bindings ->
+    let go = \case
+          -- zero-argument functions
+          ValD (VarP lhs) bod decs -> ValD (VarP (mkName . nameBase $ lhs)) bod decs
+          -- n-argument functions
+          FunD n cs -> FunD (mkName . nameBase $ n) cs
+          -- otherwise
+          y -> y
+     in InstanceD ol cxt typ (go <$> bindings)
+  other -> other
 
 main :: IO ()
 main = do
   Config language path <- Opt.getRecord "generate-ast"
-  decls <- T.pack . pprint . fmap adjusto <$> runQ (astDeclarationsRelative JSON.tree_sitter_json path)
+  decls <- T.pack . pprint . fmap adjust <$> runQ (astDeclarationsRelative JSON.tree_sitter_json path)
 
   let programText =
         [trimming|
