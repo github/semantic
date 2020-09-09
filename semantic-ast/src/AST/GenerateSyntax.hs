@@ -51,7 +51,6 @@ astDeclarationsRelative :: Ptr TS.Language -> FilePath -> Q [Dec]
 astDeclarationsRelative language invocationRelativePath = do
   input <- runIO (eitherDecodeFileStrict' invocationRelativePath) >>= either fail pure
   allSymbols <- runIO (getAllSymbols language)
-  let dsn = varE (mkName "debugSymbolNames")
   debugSymbolNames <- [d|
     debugSymbolNames :: [String]
     debugSymbolNames = $(listE (map (litE . stringL . debugPrefix) allSymbols))
@@ -106,9 +105,10 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
-    skipDefined m = m
-      -- isLocal <- lookupTypeName nameStr >>= maybe (pure False) isLocalName
-      -- if isLocal then pure [] else m
+    skipDefined m = do
+      let query = lookupTypeName nameStr `recover` pure Nothing
+      isLocal <- query >>= maybe (pure False) isLocalName
+      if isLocal then pure [] else m
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
 
 makeStandaloneDerivings :: TypeQ -> Q [Dec]
