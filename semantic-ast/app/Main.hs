@@ -19,6 +19,8 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import GHC.Generics (Generic)
 import Language.Haskell.TH
+import Control.Lens
+import Language.Haskell.TH.Lens
 import NeatInterpolation
 import qualified Options.Generic as Opt
 import System.Directory
@@ -36,17 +38,14 @@ data Config = Config {language :: Text, path :: FilePath}
 -- doesn't like at all. I haven't figured out quite why we get this qualified
 -- name, but for now the simplest thing to do is some neste dupdates
 adjust :: Dec -> Dec
-adjust = \case
-  InstanceD ol cxt typ bindings ->
-    let go = \case
-          -- zero-argument functions
-          ValD (VarP lhs) bod decs -> ValD (VarP (mkName . nameBase $ lhs)) bod decs
-          -- n-argument functions
-          FunD n cs -> FunD (mkName . nameBase $ n) cs
-          -- otherwise
-          y -> y
-     in InstanceD ol cxt typ (go <$> bindings)
-  other -> other
+adjust =  _InstanceD._4.mapped %~ (values %~ truncate) . (functions %~ truncate)
+  where
+    values, functions :: Traversal' Dec Name
+    values = _ValD._1._VarP
+    functions = _FunD._1
+
+    truncate :: Name -> Name
+    truncate = mkName . nameBase
 
 main :: IO ()
 main = do

@@ -60,6 +60,7 @@ haskell_binary(
         "//:template-haskell",
         "//:text",
         "@stackage//:directory",
+        "@stackage//:lens",
         "@stackage//:neat-interpolation",
         "@stackage//:optparse-generic",
         "@tree-sitter-json//:tree-sitter-json",
