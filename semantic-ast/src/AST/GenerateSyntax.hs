@@ -9,6 +9,7 @@
 module AST.GenerateSyntax
 ( syntaxDatatype
 , astDeclarationsForLanguage
+, astDeclarationsRelative
 ) where
 
 import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
@@ -44,6 +45,10 @@ astDeclarationsForLanguage language filePath = do
   currentFilename <- loc_filename <$> location
   pwd             <- runIO getCurrentDirectory
   let invocationRelativePath = takeDirectory (pwd </> currentFilename) </> filePath
+  astDeclarationsRelative language invocationRelativePath
+
+astDeclarationsRelative :: Ptr TS.Language -> FilePath -> Q [Dec]
+astDeclarationsRelative language invocationRelativePath = do
   input <- runIO (eitherDecodeFileStrict' invocationRelativePath) >>= either fail pure
   allSymbols <- runIO (getAllSymbols language)
   debugSymbolNames <- [d|
@@ -100,9 +105,9 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       in glue <$> generatedDatatype [con] <*> symbols <*> traversalInstances
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
-    skipDefined m = do
-      isLocal <- lookupTypeName nameStr >>= maybe (pure False) isLocalName
-      if isLocal then pure [] else m
+    skipDefined m = m
+      -- isLocal <- lookupTypeName nameStr >>= maybe (pure False) isLocalName
+      -- if isLocal then pure [] else m
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
 
 makeStandaloneDerivings :: TypeQ -> Q [Dec]

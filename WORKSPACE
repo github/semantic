@@ -100,6 +100,7 @@ stack_snapshot(
         "network",
         "network-uri",
         "optparse-applicative",
+        "optparse-generic",
         "parsers",
         "pathtype",
         "pretty-show",

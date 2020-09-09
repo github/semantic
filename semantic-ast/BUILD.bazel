@@ -12,6 +12,7 @@ load(
 )
 load(
     "//:build/common.bzl",
+    "EXECUTABLE_FLAGS",
     "GHC_FLAGS",
 )
 
@@ -44,5 +45,20 @@ haskell_library(
         "@stackage//:tree-sitter",
         "@stackage//:tree-sitter-python",
         "@stackage//:unordered-containers",
+    ],
+)
+
+haskell_binary(
+    name = "generate-ast",
+    srcs = glob(["app/**/*.hs"]),
+    compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS + ["-XStrictData"],
+    deps = [
+        ":semantic-ast",
+        "//:base",
+        "//:filepath",
+        "//:template-haskell",
+        "@stackage//:directory",
+        "@stackage//:optparse-generic",
+        "@tree-sitter-json//:tree-sitter-json",
     ],
 )
