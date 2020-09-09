@@ -188,10 +188,8 @@ parseSymbolsFilePath path = readBlob (File.fromPath path) >>= parseSymbols . pur
 
 parseStackGraphFilePath ::
   ( Has (Error SomeException) sig m,
-    Has Distribute sig m,
     Has Parse sig m,
-    Has Files sig m,
-    Effect sig
+    Has Files sig m
   ) =>
   Path.RelFile ->
   m StackGraphResponse

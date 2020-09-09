@@ -15,7 +15,7 @@ SED_ARGS="-i"
 if [[ "$(uname -s)" = "Darwin" ]]; then
   SED_ARGS="$SED_ARGS .bak"
 fi
-sed $SED_ARGS "s/buildSHA =.*/buildSHA = \"$BUILD_SHA\"/" src/Semantic/Version.hs
+sed $SED_ARGS "s/buildSHA =.*/buildSHA = \"$BUILD_SHA\"/" semantic/src/Semantic/Version.hs
 
 # Build
 docker build -t $DOCKER_IMAGE .
@@ -28,10 +28,10 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
   # Requires that you've logged in to the GPR (e.g. `docker login docker.pkg.github.com`)
   # https://help.github.com/en/articles/configuring-docker-for-use-with-github-package-registry
-  docker tag $DOCKER_IMAGE $DOCKER_IMAGE:latest
-  docker tag $DOCKER_IMAGE $DOCKER_IMAGE:$VERSION
+  # docker tag $DOCKER_IMAGE $DOCKER_IMAGE:latest
+  # docker tag $DOCKER_IMAGE $DOCKER_IMAGE:$VERSION
   docker tag $DOCKER_IMAGE $DOCKER_IMAGE:sha_$BUILD_SHA
   docker push $DOCKER_IMAGE:sha_$BUILD_SHA
-  docker push $DOCKER_IMAGE:$VERSION
-  docker push $DOCKER_IMAGE:latest
+  # docker push $DOCKER_IMAGE:$VERSION
+  # docker push $DOCKER_IMAGE:latest
 fi

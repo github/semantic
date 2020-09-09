@@ -2,15 +2,20 @@
 
 module Semantic.CLI.Spec (testTree) where
 
+import Analysis.Blob
 import Analysis.File
 import Control.Carrier.Parse.Simple
 import Control.Carrier.Reader
 import Control.Exception
+import Control.Monad
 import Data.ByteString.Builder
+import Data.Maybe
+import Data.Semilattice.Lower
 import Semantic.Api hiding (Blob, File)
 import Semantic.Task
 import Serializing.Format
 import Source.Language
+import SpecHelpers (runTaskOrDie)
 import System.IO.Unsafe
 import qualified System.Path as Path
 import qualified System.Path.Directory as Path

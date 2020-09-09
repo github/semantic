@@ -72,22 +72,22 @@ spec = do
 
     it "throws if language field not given" $ do
       h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/diff-no-language.json")
-      readBlobsFromHandle h `shouldThrow` jsonException
+      readBlobsFromJSON h `shouldThrow` jsonException
 
     it "throws if null on before and after" $ do
       h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/diff-null-both-sides.json")
       readBlobPairsFromHandle h `shouldThrow` jsonException
 
-  describe "readBlobsFromHandle" $ do
+  describe "readBlobsFromJSON" $ do
     it "returns blobs for valid JSON encoded parse input" $ do
       h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/parse.json")
-      blobs <- readBlobsFromHandle h
+      blobs <- readBlobsFromJSON h
       let a = Blob.fromSource (Path.relFile "method.rb") Ruby "def foo; end"
       blobs `shouldBe` [a]
 
     it "throws on blank input" $ do
       h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/blank.json")
-      readBlobsFromHandle h `shouldThrow` jsonException
+      readBlobsFromJSON h `shouldThrow` jsonException
 
 jsonException :: Selector InvalidJSONException
 jsonException = const True

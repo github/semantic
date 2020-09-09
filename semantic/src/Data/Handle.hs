@@ -87,12 +87,8 @@ readPathsFromHandle (ReadHandle h) =
   liftIO $ fmap BLC.unpack . BLC.lines <$> BLZ.hGetContents h
 
 -- | Read JSON encoded blob pairs from a handle.
-readBlobPairsFromHandle :: Handle 'IO.ReadMode -> m [BlobPair]
-readBlobPairsFromHandle = undefined
-
--- do
--- request <- readFromHandle @Proto.DiffTreeRequest @m
--- pure (fromProto <$> request^.blobs)
+readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [BlobPair]
+readBlobPairsFromHandle = fmap Blob.blobs <$> readFromJSON
 
 newtype InvalidProtoException = InvalidProtoException String
   deriving (Eq, Show, Exception)
