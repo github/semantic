@@ -82,7 +82,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       name = mkName nameStr
       generatedDatatype cons = dataD (cxt []) name [plainTV annParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
       deriveStockClause = derivClause (Just StockStrategy) [conT ''Generic, conT ''Generic1]
-      deriveAnyClassClause = derivClause (Just AnyclassStrategy) [parensT (conT ''Traversable1 `appT` varT (mkName "someConstraint"))]
+      deriveAnyClassClause = derivClause (Just AnyclassStrategy) [ [t| (forall a. Traversable1 a) |] ]
       deriveGN = derivClause (Just NewtypeStrategy) [conT ''TS.SymbolMatching]
   case datatype of
     SumType (DatatypeName _) _ subtypes ->

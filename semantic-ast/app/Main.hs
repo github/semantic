@@ -1,11 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Main (main) where
 
@@ -14,16 +15,16 @@ import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Debug.Trace
 import GHC.Generics (Generic)
 import Language.Haskell.TH
+import Language.Haskell.TH.PprLib (Doc)
+import qualified Language.Haskell.TH.PprLib as Doc
 import NeatInterpolation
 import qualified Options.Generic as Opt
 import System.Directory
-import Debug.Trace
 import System.IO
 import System.Process
-import qualified Language.Haskell.TH.PprLib as Doc
-import Language.Haskell.TH.PprLib (Doc)
 import qualified TreeSitter.JSON as JSON (tree_sitter_json)
 
 data Config = Config
@@ -89,15 +90,16 @@ class Ppr a => Pretty a where
 instance Pretty a => Pretty [a] where
   pretty = Doc.vcat . fmap pretty
 
+adjust :: Dec -> Dec
+adjust = \case
+  ValD (VarP lhs) bod decs -> ValD (VarP (mkName . nameBase $ lhs)) bod decs
+  FunD n cs -> FunD (mkName . nameBase $ n) cs
+  y -> y
+
 instance Pretty Dec where
   pretty x = case x of
-    InstanceD ol cxt typ bindings ->
-      let adjust = \case
-            ValD (VarP lhs) bod decs -> traceShow x (ValD (VarP (mkName . nameBase $ lhs)) bod decs)
-            FunD n cs -> FunD (mkName . nameBase $ n) cs
-            y -> traceShowId y
-          in ppr (InstanceD ol cxt typ (fmap adjust bindings))
-    other -> traceShow other (ppr other)
+    InstanceD ol cxt typ bindings -> ppr (InstanceD ol cxt typ (fmap adjust bindings))
+    other -> ppr other
 
 main :: IO ()
 main = do
@@ -118,6 +120,5 @@ main = do
       (path, tf) <- openTempFile "/tmp" "generated.hs"
       T.hPutStrLn tf programText
       hClose tf
-      callProcess "sed" ["-i", "-e", "s/AST.Traversable1.Class.Traversable1 someConstraint/(AST.Traversable1.Class.Traversable1 someConstraint)/g", path]
       callProcess "ormolu" ["--mode", "inplace", path]
       readFile path >>= putStrLn

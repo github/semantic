@@ -70,16 +70,19 @@ debugSymbolNames_0 =
 newtype Value a = Value {getValue :: ((Array GHC.Generics.:+: False GHC.Generics.:+: Null GHC.Generics.:+: Number GHC.Generics.:+: Object GHC.Generics.:+: String GHC.Generics.:+: True) a)}
   deriving newtype (AST.Unmarshal.SymbolMatching)
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_1.
+      AST.Traversable1.Class.Traversable1 a_1
+    )
 
-instance GHC.Records.HasField "ann" (Value a_1) a_1 where
+instance GHC.Records.HasField "ann" (Value a_2) a_2 where
   getField = AST.Unmarshal.gann GHC.Base.. getValue
 
-deriving instance GHC.Classes.Eq a_2 => GHC.Classes.Eq (Value a_2)
+deriving instance GHC.Classes.Eq a_3 => GHC.Classes.Eq (Value a_3)
 
-deriving instance GHC.Classes.Ord a_3 => GHC.Classes.Ord (Value a_3)
+deriving instance GHC.Classes.Ord a_4 => GHC.Classes.Ord (Value a_4)
 
-deriving instance GHC.Show.Show a_4 => GHC.Show.Show (Value a_4)
+deriving instance GHC.Show.Show a_5 => GHC.Show.Show (Value a_5)
 
 instance AST.Unmarshal.Unmarshal Value
 
@@ -94,33 +97,36 @@ instance Data.Traversable.Traversable Value where
 
 data Array a = Array {ann :: a, extraChildren :: ([AST.Parse.Err (Value a)])}
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_6.
+      AST.Traversable1.Class.Traversable1 a_6
+    )
 
 instance AST.Unmarshal.SymbolMatching Array where
   matchedSymbols _ = [18]
-  showFailure _ node_5 =
+  showFailure _ node_7 =
     "expected "
       GHC.Base.<> ( "array"
                       GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_5 GHC.Classes.== 65535
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_7 GHC.Classes.== 65535
                                                       then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_5) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_6 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_7 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_8 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_9 GHC.Base.<> "]")))))))))
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_7) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_8 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_9 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_10 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_11 GHC.Base.<> "]")))))))))
                                                   )
                                   )
                   )
     where
       TreeSitter.Node.TSPoint
-        r1_6
-        c1_7 = TreeSitter.Node.nodeStartPoint node_5
+        r1_8
+        c1_9 = TreeSitter.Node.nodeStartPoint node_7
       TreeSitter.Node.TSPoint
-        r2_8
-        c2_9 = TreeSitter.Node.nodeEndPoint node_5
+        r2_10
+        c2_11 = TreeSitter.Node.nodeEndPoint node_7
 
-deriving instance GHC.Classes.Eq a_10 => GHC.Classes.Eq (Array a_10)
+deriving instance GHC.Classes.Eq a_12 => GHC.Classes.Eq (Array a_12)
 
-deriving instance GHC.Classes.Ord a_11 => GHC.Classes.Ord (Array a_11)
+deriving instance GHC.Classes.Ord a_13 => GHC.Classes.Ord (Array a_13)
 
-deriving instance GHC.Show.Show a_12 => GHC.Show.Show (Array a_12)
+deriving instance GHC.Show.Show a_14 => GHC.Show.Show (Array a_14)
 
 instance AST.Unmarshal.Unmarshal Array
 
@@ -135,33 +141,36 @@ instance Data.Traversable.Traversable Array where
 
 data Document a = Document {ann :: a, extraChildren :: (AST.Parse.Err (Value a))}
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_15.
+      AST.Traversable1.Class.Traversable1 a_15
+    )
 
 instance AST.Unmarshal.SymbolMatching Document where
   matchedSymbols _ = [14]
-  showFailure _ node_13 =
+  showFailure _ node_16 =
     "expected "
       GHC.Base.<> ( "document"
                       GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_13 GHC.Classes.== 65535
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_16 GHC.Classes.== 65535
                                                       then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_13) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_14 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_15 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_16 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_17 GHC.Base.<> "]")))))))))
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_16) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_17 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_18 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_19 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_20 GHC.Base.<> "]")))))))))
                                                   )
                                   )
                   )
     where
       TreeSitter.Node.TSPoint
-        r1_14
-        c1_15 = TreeSitter.Node.nodeStartPoint node_13
+        r1_17
+        c1_18 = TreeSitter.Node.nodeStartPoint node_16
       TreeSitter.Node.TSPoint
-        r2_16
-        c2_17 = TreeSitter.Node.nodeEndPoint node_13
+        r2_19
+        c2_20 = TreeSitter.Node.nodeEndPoint node_16
 
-deriving instance GHC.Classes.Eq a_18 => GHC.Classes.Eq (Document a_18)
+deriving instance GHC.Classes.Eq a_21 => GHC.Classes.Eq (Document a_21)
 
-deriving instance GHC.Classes.Ord a_19 => GHC.Classes.Ord (Document a_19)
+deriving instance GHC.Classes.Ord a_22 => GHC.Classes.Ord (Document a_22)
 
-deriving instance GHC.Show.Show a_20 => GHC.Show.Show (Document a_20)
+deriving instance GHC.Show.Show a_23 => GHC.Show.Show (Document a_23)
 
 instance AST.Unmarshal.Unmarshal Document
 
@@ -176,33 +185,36 @@ instance Data.Traversable.Traversable Document where
 
 data Object a = Object {ann :: a, extraChildren :: ([AST.Parse.Err (Pair a)])}
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_24.
+      AST.Traversable1.Class.Traversable1 a_24
+    )
 
 instance AST.Unmarshal.SymbolMatching Object where
   matchedSymbols _ = [16]
-  showFailure _ node_21 =
+  showFailure _ node_25 =
     "expected "
       GHC.Base.<> ( "object"
                       GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_21 GHC.Classes.== 65535
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_25 GHC.Classes.== 65535
                                                       then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_21) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_22 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_23 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_24 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_25 GHC.Base.<> "]")))))))))
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_25) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_26 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_27 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_28 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_29 GHC.Base.<> "]")))))))))
                                                   )
                                   )
                   )
     where
       TreeSitter.Node.TSPoint
-        r1_22
-        c1_23 = TreeSitter.Node.nodeStartPoint node_21
+        r1_26
+        c1_27 = TreeSitter.Node.nodeStartPoint node_25
       TreeSitter.Node.TSPoint
-        r2_24
-        c2_25 = TreeSitter.Node.nodeEndPoint node_21
+        r2_28
+        c2_29 = TreeSitter.Node.nodeEndPoint node_25
 
-deriving instance GHC.Classes.Eq a_26 => GHC.Classes.Eq (Object a_26)
+deriving instance GHC.Classes.Eq a_30 => GHC.Classes.Eq (Object a_30)
 
-deriving instance GHC.Classes.Ord a_27 => GHC.Classes.Ord (Object a_27)
+deriving instance GHC.Classes.Ord a_31 => GHC.Classes.Ord (Object a_31)
 
-deriving instance GHC.Show.Show a_28 => GHC.Show.Show (Object a_28)
+deriving instance GHC.Show.Show a_32 => GHC.Show.Show (Object a_32)
 
 instance AST.Unmarshal.Unmarshal Object
 
@@ -221,33 +233,36 @@ data Pair a = Pair
     key :: (AST.Parse.Err ((Number GHC.Generics.:+: String) a))
   }
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_33.
+      AST.Traversable1.Class.Traversable1 a_33
+    )
 
 instance AST.Unmarshal.SymbolMatching Pair where
   matchedSymbols _ = [17]
-  showFailure _ node_29 =
+  showFailure _ node_34 =
     "expected "
       GHC.Base.<> ( "pair"
                       GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_29 GHC.Classes.== 65535
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_34 GHC.Classes.== 65535
                                                       then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_29) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_30 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_31 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_32 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_33 GHC.Base.<> "]")))))))))
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_34) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_35 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_36 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_37 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_38 GHC.Base.<> "]")))))))))
                                                   )
                                   )
                   )
     where
       TreeSitter.Node.TSPoint
-        r1_30
-        c1_31 = TreeSitter.Node.nodeStartPoint node_29
+        r1_35
+        c1_36 = TreeSitter.Node.nodeStartPoint node_34
       TreeSitter.Node.TSPoint
-        r2_32
-        c2_33 = TreeSitter.Node.nodeEndPoint node_29
+        r2_37
+        c2_38 = TreeSitter.Node.nodeEndPoint node_34
 
-deriving instance GHC.Classes.Eq a_34 => GHC.Classes.Eq (Pair a_34)
+deriving instance GHC.Classes.Eq a_39 => GHC.Classes.Eq (Pair a_39)
 
-deriving instance GHC.Classes.Ord a_35 => GHC.Classes.Ord (Pair a_35)
+deriving instance GHC.Classes.Ord a_40 => GHC.Classes.Ord (Pair a_40)
 
-deriving instance GHC.Show.Show a_36 => GHC.Show.Show (Pair a_36)
+deriving instance GHC.Show.Show a_41 => GHC.Show.Show (Pair a_41)
 
 instance AST.Unmarshal.Unmarshal Pair
 
@@ -265,33 +280,36 @@ data String a = String
     extraChildren :: (GHC.Maybe.Maybe (AST.Parse.Err (StringContent a)))
   }
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_42.
+      AST.Traversable1.Class.Traversable1 a_42
+    )
 
 instance AST.Unmarshal.SymbolMatching String where
   matchedSymbols _ = [19]
-  showFailure _ node_37 =
+  showFailure _ node_43 =
     "expected "
       GHC.Base.<> ( "string"
                       GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_37 GHC.Classes.== 65535
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_43 GHC.Classes.== 65535
                                                       then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_37) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_38 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_39 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_40 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_41 GHC.Base.<> "]")))))))))
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_43) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_44 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_45 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_46 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_47 GHC.Base.<> "]")))))))))
                                                   )
                                   )
                   )
     where
       TreeSitter.Node.TSPoint
-        r1_38
-        c1_39 = TreeSitter.Node.nodeStartPoint node_37
+        r1_44
+        c1_45 = TreeSitter.Node.nodeStartPoint node_43
       TreeSitter.Node.TSPoint
-        r2_40
-        c2_41 = TreeSitter.Node.nodeEndPoint node_37
+        r2_46
+        c2_47 = TreeSitter.Node.nodeEndPoint node_43
 
-deriving instance GHC.Classes.Eq a_42 => GHC.Classes.Eq (String a_42)
+deriving instance GHC.Classes.Eq a_48 => GHC.Classes.Eq (String a_48)
 
-deriving instance GHC.Classes.Ord a_43 => GHC.Classes.Ord (String a_43)
+deriving instance GHC.Classes.Ord a_49 => GHC.Classes.Ord (String a_49)
 
-deriving instance GHC.Show.Show a_44 => GHC.Show.Show (String a_44)
+deriving instance GHC.Show.Show a_50 => GHC.Show.Show (String a_50)
 
 instance AST.Unmarshal.Unmarshal String
 
@@ -309,33 +327,36 @@ data StringContent a = StringContent
     extraChildren :: ([AST.Parse.Err (EscapeSequence a)])
   }
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_51.
+      AST.Traversable1.Class.Traversable1 a_51
+    )
 
 instance AST.Unmarshal.SymbolMatching StringContent where
   matchedSymbols _ = [20]
-  showFailure _ node_45 =
+  showFailure _ node_52 =
     "expected "
       GHC.Base.<> ( "string_content"
                       GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_45 GHC.Classes.== 65535
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_52 GHC.Classes.== 65535
                                                       then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_45) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_46 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_47 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_48 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_49 GHC.Base.<> "]")))))))))
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_52) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_53 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_54 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_55 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_56 GHC.Base.<> "]")))))))))
                                                   )
                                   )
                   )
     where
       TreeSitter.Node.TSPoint
-        r1_46
-        c1_47 = TreeSitter.Node.nodeStartPoint node_45
+        r1_53
+        c1_54 = TreeSitter.Node.nodeStartPoint node_52
       TreeSitter.Node.TSPoint
-        r2_48
-        c2_49 = TreeSitter.Node.nodeEndPoint node_45
+        r2_55
+        c2_56 = TreeSitter.Node.nodeEndPoint node_52
 
-deriving instance GHC.Classes.Eq a_50 => GHC.Classes.Eq (StringContent a_50)
+deriving instance GHC.Classes.Eq a_57 => GHC.Classes.Eq (StringContent a_57)
 
-deriving instance GHC.Classes.Ord a_51 => GHC.Classes.Ord (StringContent a_51)
+deriving instance GHC.Classes.Ord a_58 => GHC.Classes.Ord (StringContent a_58)
 
-deriving instance GHC.Show.Show a_52 => GHC.Show.Show (StringContent a_52)
+deriving instance GHC.Show.Show a_59 => GHC.Show.Show (StringContent a_59)
 
 instance AST.Unmarshal.Unmarshal StringContent
 
@@ -360,54 +381,16 @@ type AnonymousRBracket = AST.Token.Token "]" 6
 
 data EscapeSequence a = EscapeSequence {ann :: a, text :: Data.Text.Internal.Text}
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_60.
+      AST.Traversable1.Class.Traversable1 a_60
+    )
 
 instance AST.Unmarshal.SymbolMatching EscapeSequence where
   matchedSymbols _ = [9]
-  showFailure _ node_53 =
-    "expected "
-      GHC.Base.<> ( "escape_sequence"
-                      GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_53 GHC.Classes.== 65535
-                                                      then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_53) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_54 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_55 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_56 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_57 GHC.Base.<> "]")))))))))
-                                                  )
-                                  )
-                  )
-    where
-      TreeSitter.Node.TSPoint
-        r1_54
-        c1_55 = TreeSitter.Node.nodeStartPoint node_53
-      TreeSitter.Node.TSPoint
-        r2_56
-        c2_57 = TreeSitter.Node.nodeEndPoint node_53
-
-deriving instance GHC.Classes.Eq a_58 => GHC.Classes.Eq (EscapeSequence a_58)
-
-deriving instance GHC.Classes.Ord a_59 => GHC.Classes.Ord (EscapeSequence a_59)
-
-deriving instance GHC.Show.Show a_60 => GHC.Show.Show (EscapeSequence a_60)
-
-instance AST.Unmarshal.Unmarshal EscapeSequence
-
-instance Data.Foldable.Foldable EscapeSequence where
-  foldMap = AST.Traversable1.Class.foldMapDefault1
-
-instance GHC.Base.Functor EscapeSequence where
-  fmap = AST.Traversable1.Class.fmapDefault1
-
-instance Data.Traversable.Traversable EscapeSequence where
-  traverse = AST.Traversable1.Class.traverseDefault1
-
-data False a = False {ann :: a, text :: Data.Text.Internal.Text}
-  deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
-
-instance AST.Unmarshal.SymbolMatching False where
-  matchedSymbols _ = [12]
   showFailure _ node_61 =
     "expected "
-      GHC.Base.<> ( "false"
+      GHC.Base.<> ( "escape_sequence"
                       GHC.Base.<> ( " but got "
                                       GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_61 GHC.Classes.== 65535
                                                       then "ERROR"
@@ -423,11 +406,55 @@ instance AST.Unmarshal.SymbolMatching False where
         r2_64
         c2_65 = TreeSitter.Node.nodeEndPoint node_61
 
-deriving instance GHC.Classes.Eq a_66 => GHC.Classes.Eq (False a_66)
+deriving instance GHC.Classes.Eq a_66 => GHC.Classes.Eq (EscapeSequence a_66)
 
-deriving instance GHC.Classes.Ord a_67 => GHC.Classes.Ord (False a_67)
+deriving instance GHC.Classes.Ord a_67 => GHC.Classes.Ord (EscapeSequence a_67)
 
-deriving instance GHC.Show.Show a_68 => GHC.Show.Show (False a_68)
+deriving instance GHC.Show.Show a_68 => GHC.Show.Show (EscapeSequence a_68)
+
+instance AST.Unmarshal.Unmarshal EscapeSequence
+
+instance Data.Foldable.Foldable EscapeSequence where
+  foldMap = AST.Traversable1.Class.foldMapDefault1
+
+instance GHC.Base.Functor EscapeSequence where
+  fmap = AST.Traversable1.Class.fmapDefault1
+
+instance Data.Traversable.Traversable EscapeSequence where
+  traverse = AST.Traversable1.Class.traverseDefault1
+
+data False a = False {ann :: a, text :: Data.Text.Internal.Text}
+  deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
+  deriving anyclass
+    ( forall a_69.
+      AST.Traversable1.Class.Traversable1 a_69
+    )
+
+instance AST.Unmarshal.SymbolMatching False where
+  matchedSymbols _ = [12]
+  showFailure _ node_70 =
+    "expected "
+      GHC.Base.<> ( "false"
+                      GHC.Base.<> ( " but got "
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_70 GHC.Classes.== 65535
+                                                      then "ERROR"
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_70) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_71 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_72 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_73 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_74 GHC.Base.<> "]")))))))))
+                                                  )
+                                  )
+                  )
+    where
+      TreeSitter.Node.TSPoint
+        r1_71
+        c1_72 = TreeSitter.Node.nodeStartPoint node_70
+      TreeSitter.Node.TSPoint
+        r2_73
+        c2_74 = TreeSitter.Node.nodeEndPoint node_70
+
+deriving instance GHC.Classes.Eq a_75 => GHC.Classes.Eq (False a_75)
+
+deriving instance GHC.Classes.Ord a_76 => GHC.Classes.Ord (False a_76)
+
+deriving instance GHC.Show.Show a_77 => GHC.Show.Show (False a_77)
 
 instance AST.Unmarshal.Unmarshal False
 
@@ -442,33 +469,36 @@ instance Data.Traversable.Traversable False where
 
 data Null a = Null {ann :: a, text :: Data.Text.Internal.Text}
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_78.
+      AST.Traversable1.Class.Traversable1 a_78
+    )
 
 instance AST.Unmarshal.SymbolMatching Null where
   matchedSymbols _ = [13]
-  showFailure _ node_69 =
+  showFailure _ node_79 =
     "expected "
       GHC.Base.<> ( "null"
                       GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_69 GHC.Classes.== 65535
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_79 GHC.Classes.== 65535
                                                       then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_69) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_70 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_71 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_72 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_73 GHC.Base.<> "]")))))))))
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_79) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_80 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_81 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_82 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_83 GHC.Base.<> "]")))))))))
                                                   )
                                   )
                   )
     where
       TreeSitter.Node.TSPoint
-        r1_70
-        c1_71 = TreeSitter.Node.nodeStartPoint node_69
+        r1_80
+        c1_81 = TreeSitter.Node.nodeStartPoint node_79
       TreeSitter.Node.TSPoint
-        r2_72
-        c2_73 = TreeSitter.Node.nodeEndPoint node_69
+        r2_82
+        c2_83 = TreeSitter.Node.nodeEndPoint node_79
 
-deriving instance GHC.Classes.Eq a_74 => GHC.Classes.Eq (Null a_74)
+deriving instance GHC.Classes.Eq a_84 => GHC.Classes.Eq (Null a_84)
 
-deriving instance GHC.Classes.Ord a_75 => GHC.Classes.Ord (Null a_75)
+deriving instance GHC.Classes.Ord a_85 => GHC.Classes.Ord (Null a_85)
 
-deriving instance GHC.Show.Show a_76 => GHC.Show.Show (Null a_76)
+deriving instance GHC.Show.Show a_86 => GHC.Show.Show (Null a_86)
 
 instance AST.Unmarshal.Unmarshal Null
 
@@ -483,33 +513,36 @@ instance Data.Traversable.Traversable Null where
 
 data Number a = Number {ann :: a, text :: Data.Text.Internal.Text}
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_87.
+      AST.Traversable1.Class.Traversable1 a_87
+    )
 
 instance AST.Unmarshal.SymbolMatching Number where
   matchedSymbols _ = [10]
-  showFailure _ node_77 =
+  showFailure _ node_88 =
     "expected "
       GHC.Base.<> ( "number"
                       GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_77 GHC.Classes.== 65535
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_88 GHC.Classes.== 65535
                                                       then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_77) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_78 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_79 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_80 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_81 GHC.Base.<> "]")))))))))
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_88) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_89 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_90 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_91 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_92 GHC.Base.<> "]")))))))))
                                                   )
                                   )
                   )
     where
       TreeSitter.Node.TSPoint
-        r1_78
-        c1_79 = TreeSitter.Node.nodeStartPoint node_77
+        r1_89
+        c1_90 = TreeSitter.Node.nodeStartPoint node_88
       TreeSitter.Node.TSPoint
-        r2_80
-        c2_81 = TreeSitter.Node.nodeEndPoint node_77
+        r2_91
+        c2_92 = TreeSitter.Node.nodeEndPoint node_88
 
-deriving instance GHC.Classes.Eq a_82 => GHC.Classes.Eq (Number a_82)
+deriving instance GHC.Classes.Eq a_93 => GHC.Classes.Eq (Number a_93)
 
-deriving instance GHC.Classes.Ord a_83 => GHC.Classes.Ord (Number a_83)
+deriving instance GHC.Classes.Ord a_94 => GHC.Classes.Ord (Number a_94)
 
-deriving instance GHC.Show.Show a_84 => GHC.Show.Show (Number a_84)
+deriving instance GHC.Show.Show a_95 => GHC.Show.Show (Number a_95)
 
 instance AST.Unmarshal.Unmarshal Number
 
@@ -524,33 +557,36 @@ instance Data.Traversable.Traversable Number where
 
 data True a = True {ann :: a, text :: Data.Text.Internal.Text}
   deriving stock (GHC.Generics.Generic, GHC.Generics.Generic1)
-  deriving anyclass (AST.Traversable1.Class.Traversable1 someConstraint)
+  deriving anyclass
+    ( forall a_96.
+      AST.Traversable1.Class.Traversable1 a_96
+    )
 
 instance AST.Unmarshal.SymbolMatching True where
   matchedSymbols _ = [11]
-  showFailure _ node_85 =
+  showFailure _ node_97 =
     "expected "
       GHC.Base.<> ( "true"
                       GHC.Base.<> ( " but got "
-                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_85 GHC.Classes.== 65535
+                                      GHC.Base.<> ( if TreeSitter.Node.nodeSymbol node_97 GHC.Classes.== 65535
                                                       then "ERROR"
-                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_85) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_86 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_87 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_88 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_89 GHC.Base.<> "]")))))))))
+                                                      else Data.OldList.genericIndex debugSymbolNames (TreeSitter.Node.nodeSymbol node_97) GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r1_98 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c1_99 GHC.Base.<> ("] -" GHC.Base.<> (" [" GHC.Base.<> (GHC.Show.show r2_100 GHC.Base.<> (", " GHC.Base.<> (GHC.Show.show c2_101 GHC.Base.<> "]")))))))))
                                                   )
                                   )
                   )
     where
       TreeSitter.Node.TSPoint
-        r1_86
-        c1_87 = TreeSitter.Node.nodeStartPoint node_85
+        r1_98
+        c1_99 = TreeSitter.Node.nodeStartPoint node_97
       TreeSitter.Node.TSPoint
-        r2_88
-        c2_89 = TreeSitter.Node.nodeEndPoint node_85
+        r2_100
+        c2_101 = TreeSitter.Node.nodeEndPoint node_97
 
-deriving instance GHC.Classes.Eq a_90 => GHC.Classes.Eq (True a_90)
+deriving instance GHC.Classes.Eq a_102 => GHC.Classes.Eq (True a_102)
 
-deriving instance GHC.Classes.Ord a_91 => GHC.Classes.Ord (True a_91)
+deriving instance GHC.Classes.Ord a_103 => GHC.Classes.Ord (True a_103)
 
-deriving instance GHC.Show.Show a_92 => GHC.Show.Show (True a_92)
+deriving instance GHC.Show.Show a_104 => GHC.Show.Show (True a_104)
 
 instance AST.Unmarshal.Unmarshal True
 
