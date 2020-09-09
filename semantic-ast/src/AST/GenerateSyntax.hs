@@ -51,6 +51,7 @@ astDeclarationsRelative :: Ptr TS.Language -> FilePath -> Q [Dec]
 astDeclarationsRelative language invocationRelativePath = do
   input <- runIO (eitherDecodeFileStrict' invocationRelativePath) >>= either fail pure
   allSymbols <- runIO (getAllSymbols language)
+  let dsn = varE (mkName "debugSymbolNames")
   debugSymbolNames <- [d|
     debugSymbolNames :: [String]
     debugSymbolNames = $(listE (map (litE . stringL . debugPrefix) allSymbols))
@@ -81,7 +82,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
       name = mkName nameStr
       generatedDatatype cons = dataD (cxt []) name [plainTV annParameterName] Nothing cons [deriveStockClause, deriveAnyClassClause]
       deriveStockClause = derivClause (Just StockStrategy) [conT ''Generic, conT ''Generic1]
-      deriveAnyClassClause = derivClause (Just AnyclassStrategy) [conT ''Traversable1 `appT` varT (mkName "someConstraint")]
+      deriveAnyClassClause = derivClause (Just AnyclassStrategy) [parensT (conT ''Traversable1 `appT` varT (mkName "someConstraint"))]
       deriveGN = derivClause (Just NewtypeStrategy) [conT ''TS.SymbolMatching]
   case datatype of
     SumType (DatatypeName _) _ subtypes ->
