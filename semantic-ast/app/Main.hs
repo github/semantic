@@ -109,7 +109,7 @@ main = do
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
-module Language.$language.AST (module Language.$language.AST) where
+module Language.$language.AST (module Language.$language.AST, getTestCorpusDir) where
 
 import qualified AST.Parse
 import qualified AST.Token
@@ -126,6 +126,8 @@ import qualified GHC.Records
 import qualified GHC.Show
 import qualified Prelude as GHC.Classes
 import qualified TreeSitter.Node
+
+import TreeSitter.$language (getTestCorpusDir)
 
 debugSymbolNames :: [GHC.Base.String]
 debugSymbolNames = debugSymbolNames_0
