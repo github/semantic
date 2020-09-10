@@ -32,6 +32,7 @@ library
     , proto-lens-runtime  >= 0.5 && <0.8
   hs-source-dirs:      src
   default-language:    Haskell2010
+  default-extensions:  OverloadedStrings
   ghc-options:
     -Weverything
     -Wno-missing-local-signatures
@@ -41,6 +42,7 @@ library
     -Wno-unsafe
     -Wno-name-shadowing
     -Wno-monomorphism-restriction
+    -Wno-missing-export-lists
     -Wno-missed-specialisations
     -Wno-all-missed-specialisations
     -Wno-star-is-type
