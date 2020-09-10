@@ -80,9 +80,3 @@ library
     , unordered-containers ^>= 0.2.10
 
   hs-source-dirs:      src
-
-executable generate-ast
-  import: haskell
-  hs-source-dirs: app
-  main-is: Main.hs
-  build-depends: optparse-generic
