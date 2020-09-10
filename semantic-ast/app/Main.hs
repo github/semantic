@@ -38,8 +38,8 @@ data Config = Config {language :: Text, path :: FilePath}
 -- a qualified name on the LHS of a typeclass declaration, which Haskell
 -- doesn't like at all. I haven't figured out quite why we get this qualified
 -- name, but for now the easiest thing to do is some nested updates with lens.
-adjust :: [Dec] -> [Dec]
-adjust = mapped._InstanceD.typed.mapped %~ (values %~ truncate) . (functions %~ truncate)
+adjust :: Dec -> Dec
+adjust = _InstanceD.typed.mapped %~ (values %~ truncate) . (functions %~ truncate)
   where
     -- Need to handle functions with no arguments, which are parsed as ValD entities,
     -- as well as those with arguments, which are FunD.
@@ -53,7 +53,7 @@ adjust = mapped._InstanceD.typed.mapped %~ (values %~ truncate) . (functions %~ 
 main :: IO ()
 main = do
   Config language path <- Opt.getRecord "generate-ast"
-  decls <- T.pack . pprint . adjust <$> astDeclarationsIO JSON.tree_sitter_json path
+  decls <- T.pack . pprint . fmap adjust <$> astDeclarationsIO JSON.tree_sitter_json path
 
   let programText =
         [trimming|

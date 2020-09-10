@@ -48,6 +48,19 @@ haskell_library(
     ],
 )
 
+all_ts_deps = ["@tree-sitter-{name}//:tree-sitter-{name}".format(name = name) for name in [
+    "go",
+    "java",
+    "json",
+    "php",
+    "python",
+    "ql",
+    "ruby",
+    "rust",
+    "tsx",
+    "typescript",
+]]
+
 haskell_binary(
     name = "generate-ast",
     srcs = glob(["app/**/*.hs"]),
@@ -64,6 +77,5 @@ haskell_binary(
         "@stackage//:lens",
         "@stackage//:neat-interpolation",
         "@stackage//:optparse-generic",
-        "@tree-sitter-json//:tree-sitter-json",
-    ],
+    ] + all_ts_deps,
 )
