@@ -14,20 +14,33 @@ module Main (main) where
 
 import AST.GenerateSyntax
 import Control.Lens (Traversal', mapped, (%~))
+import Control.Monad
 import Data.Generics.Product.Typed (typed)
 import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Foreign
 import GHC.Generics (Generic)
-import Language.Haskell.TH
+import Language.Haskell.TH hiding (JavaScript)
 import Language.Haskell.TH.Lens
 import NeatInterpolation
 import qualified Options.Generic as Opt
+import Source.Language
 import System.Directory
+import System.Exit
+import qualified TreeSitter.Language
 import System.IO
 import System.Process
+import qualified TreeSitter.Go as Go (tree_sitter_go)
 import qualified TreeSitter.JSON as JSON (tree_sitter_json)
+import qualified TreeSitter.Java as Java (tree_sitter_java)
+import qualified TreeSitter.PHP as PHP (tree_sitter_php)
+import qualified TreeSitter.Python as Python (tree_sitter_python)
+import qualified TreeSitter.QL as CodeQL (tree_sitter_ql)
+import qualified TreeSitter.Ruby as Ruby (tree_sitter_ruby)
+import qualified TreeSitter.TSX as TSX (tree_sitter_tsx)
+import qualified TreeSitter.TypeScript as TypeScript (tree_sitter_typescript)
 
 data Config = Config {language :: Text, path :: FilePath}
   deriving stock (Show, Generic)
@@ -39,21 +52,40 @@ data Config = Config {language :: Text, path :: FilePath}
 -- doesn't like at all. I haven't figured out quite why we get this qualified
 -- name, but for now the easiest thing to do is some nested updates with lens.
 adjust :: Dec -> Dec
-adjust = _InstanceD.typed.mapped %~ (values %~ truncate) . (functions %~ truncate)
+adjust = _InstanceD . typed . mapped %~ (values %~ truncate) . (functions %~ truncate)
   where
     -- Need to handle functions with no arguments, which are parsed as ValD entities,
     -- as well as those with arguments, which are FunD.
     values, functions :: Traversal' Dec Name
-    values = _ValD.typed._VarP
-    functions = _FunD.typed
+    values = _ValD . typed . _VarP
+    functions = _FunD . typed
 
     truncate :: Name -> Name
     truncate = mkName . nameBase
 
+parserForLanguage :: Language -> Ptr TreeSitter.Language.Language
+parserForLanguage = \case
+  Unknown -> error "Unknown language encountered"
+  CodeQL -> CodeQL.tree_sitter_ql
+  Go -> Go.tree_sitter_go
+  Haskell -> error "Haskell backend not implemented yet"
+  Java -> Java.tree_sitter_java
+  JavaScript -> TypeScript.tree_sitter_typescript
+  JSON -> JSON.tree_sitter_json
+  JSX -> TSX.tree_sitter_tsx
+  Markdown -> error "Markdown backend deprecated"
+  PHP -> PHP.tree_sitter_php
+  Python -> Python.tree_sitter_python
+  Ruby -> Ruby.tree_sitter_ruby
+  TypeScript -> TypeScript.tree_sitter_typescript
+  TSX -> TSX.tree_sitter_tsx
+
 main :: IO ()
 main = do
   Config language path <- Opt.getRecord "generate-ast"
-  decls <- T.pack . pprint . fmap adjust <$> astDeclarationsIO JSON.tree_sitter_json path
+  let lang = textToLanguage language
+  decls <- T.pack . pprint . fmap adjust <$> astDeclarationsIO (parserForLanguage lang) path
+  when (lang == Unknown) (die ("Couldn't determine language for " <> T.unpack language))
 
   let programText =
         [trimming|

@@ -67,6 +67,7 @@ haskell_binary(
     compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS + ["-XStrictData"],
     deps = [
         ":semantic-ast",
+        "//semantic-source",
         "//:base",
         "//:filepath",
         "//:process",
@@ -75,6 +76,7 @@ haskell_binary(
         "@stackage//:directory",
         "@stackage//:generic-lens",
         "@stackage//:lens",
+        "@stackage//:tree-sitter",
         "@stackage//:neat-interpolation",
         "@stackage//:optparse-generic",
     ] + all_ts_deps,
