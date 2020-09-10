@@ -3,13 +3,13 @@ packages:
   - github: antitypical/fused-syntax
     commit: "4a383d57c8fd7592f54a33f43eb9666314a6e80e"
     sha256: "aa345f8f04a12beaf8f07620467dee06370b72c763cf2d1c60556878b226fafc"
+  - Interpolation-0.3.0
   - fused-effects-1.1.0.0
   - fused-effects-exceptions-1.1.0.0
   - fused-effects-readline-0.1.0.0
-  - semilattices-0.0.0.4
   - haskeline-0.8.0.0
-  - Interpolation-0.3.0
-  - tree-sitter-0.9.0.2
-  - unliftio-core-0.2.0.1
   - lingo-0.5.0.1
   - proto-lens-jsonpb-0.2.0.2
+  - semilattices-0.0.0.4
+  - tree-sitter-0.9.0.2
+  - unliftio-core-0.2.0.1

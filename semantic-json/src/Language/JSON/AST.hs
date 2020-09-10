@@ -18,7 +18,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
-module Language.JSON.AST (module Language.JSON.AST) where
+module Language.JSON.AST (module Language.JSON.AST, getTestCorpusDir) where
 
 import qualified AST.Parse
 import qualified AST.Token
@@ -33,6 +33,7 @@ import qualified GHC.Base
 import qualified GHC.Generics
 import qualified GHC.Records
 import qualified GHC.Show
+import TreeSitter.JSON (getTestCorpusDir)
 import qualified TreeSitter.Node
 import qualified Prelude as GHC.Classes
 
