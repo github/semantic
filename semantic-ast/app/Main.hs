@@ -53,7 +53,7 @@ adjust = _InstanceD.typed.mapped %~ (values %~ truncate) . (functions %~ truncat
 main :: IO ()
 main = do
   Config language path <- Opt.getRecord "generate-ast"
-  decls <- T.pack . pprint . fmap adjust <$> runQ (astDeclarationsRelative JSON.tree_sitter_json path)
+  decls <- T.pack . pprint . fmap adjust <$> astDeclarationsIO JSON.tree_sitter_json path
 
   let programText =
         [trimming|

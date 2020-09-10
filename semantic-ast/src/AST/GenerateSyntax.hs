@@ -9,7 +9,7 @@
 module AST.GenerateSyntax
 ( syntaxDatatype
 , astDeclarationsForLanguage
-, astDeclarationsRelative
+, astDeclarationsIO
 ) where
 
 import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
@@ -45,17 +45,20 @@ astDeclarationsForLanguage language filePath = do
   currentFilename <- loc_filename <$> location
   pwd             <- runIO getCurrentDirectory
   let invocationRelativePath = takeDirectory (pwd </> currentFilename) </> filePath
-  astDeclarationsRelative language invocationRelativePath
+  astDeclarationsRelative lookupTypeName language invocationRelativePath
 
-astDeclarationsRelative :: Ptr TS.Language -> FilePath -> Q [Dec]
-astDeclarationsRelative language invocationRelativePath = do
+astDeclarationsIO :: Ptr TS.Language -> FilePath -> IO [Dec]
+astDeclarationsIO lang p = runQ (astDeclarationsRelative (const (pure Nothing)) lang p)
+
+astDeclarationsRelative :: (String -> Q (Maybe Name)) -> Ptr TS.Language -> FilePath -> Q [Dec]
+astDeclarationsRelative lookupName language invocationRelativePath = do
   input <- runIO (eitherDecodeFileStrict' invocationRelativePath) >>= either fail pure
   allSymbols <- runIO (getAllSymbols language)
   debugSymbolNames <- [d|
     debugSymbolNames :: [String]
     debugSymbolNames = $(listE (map (litE . stringL . debugPrefix) allSymbols))
     |]
-  mappend debugSymbolNames . concat @[] <$> traverse (syntaxDatatype language allSymbols) input
+  mappend debugSymbolNames . concat @[] <$> traverse (syntaxDatatype lookupName language allSymbols) input
 
 -- Build a list of all symbols
 getAllSymbols :: Ptr TS.Language -> IO [(String, Named)]
@@ -74,8 +77,8 @@ annParameterName :: Name
 annParameterName = mkName "a"
 
 -- Auto-generate Haskell datatypes for sums, products and leaf types
-syntaxDatatype :: Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
-syntaxDatatype language allSymbols datatype = skipDefined $ do
+syntaxDatatype :: (String -> Q (Maybe Name)) -> Ptr TS.Language -> [(String, Named)] -> Datatype -> Q [Dec]
+syntaxDatatype lookupType language allSymbols datatype = skipDefined $ do
   let traversalInstances = mappend <$> makeStandaloneDerivings (conT name) <*> makeTraversalInstances (conT name)
       glue a b c = a : b <> c
       name = mkName nameStr
@@ -106,8 +109,7 @@ syntaxDatatype language allSymbols datatype = skipDefined $ do
   where
     -- Skip generating datatypes that have already been defined (overridden) in the module where the splice is running.
     skipDefined m = do
-      let query = lookupTypeName nameStr `recover` pure Nothing
-      isLocal <- query >>= maybe (pure False) isLocalName
+      isLocal <- lookupType nameStr >>= maybe (pure False) isLocalName
       if isLocal then pure [] else m
     nameStr = toNameString (datatypeNameStatus datatype) (getDatatypeName (AST.Deserialize.datatypeName datatype))
 
