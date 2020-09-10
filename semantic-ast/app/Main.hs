@@ -37,7 +37,7 @@ data Config = Config {language :: Text, path :: FilePath}
 -- create entirely valid Haskell syntax, because sometimes we get
 -- a qualified name on the LHS of a typeclass declaration, which Haskell
 -- doesn't like at all. I haven't figured out quite why we get this qualified
--- name, but for now the simplest thing to do is some neste dupdates
+-- name, but for now the easiest thing to do is some nested updates with lens.
 adjust :: [Dec] -> [Dec]
 adjust = mapped._InstanceD.typed.mapped %~ (values %~ truncate) . (functions %~ truncate)
   where
