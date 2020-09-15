@@ -15,6 +15,7 @@ module Main (main) where
 import AST.GenerateSyntax
 import Control.Lens (Traversal', mapped, (%~))
 import Control.Monad
+import Data.Foldable
 import Data.Generics.Product.Typed (typed)
 import Data.Maybe
 import Data.Text (Text)
@@ -29,12 +30,12 @@ import qualified Options.Generic as Opt
 import Source.Language
 import System.Directory
 import System.Exit
-import qualified TreeSitter.Language
 import System.IO
 import System.Process
 import qualified TreeSitter.Go as Go (tree_sitter_go)
 import qualified TreeSitter.JSON as JSON (tree_sitter_json)
 import qualified TreeSitter.Java as Java (tree_sitter_java)
+import qualified TreeSitter.Language
 import qualified TreeSitter.PHP as PHP (tree_sitter_php)
 import qualified TreeSitter.Python as Python (tree_sitter_python)
 import qualified TreeSitter.QL as CodeQL (tree_sitter_ql)
@@ -42,7 +43,8 @@ import qualified TreeSitter.Ruby as Ruby (tree_sitter_ruby)
 import qualified TreeSitter.TSX as TSX (tree_sitter_tsx)
 import qualified TreeSitter.TypeScript as TypeScript (tree_sitter_typescript)
 
-data Config = Config {language :: Text, path :: FilePath}
+-- As a special case, you can pass
+data Config = Config {language :: Text, path :: FilePath, rootdir :: Maybe FilePath}
   deriving stock (Show, Generic)
   deriving anyclass (Opt.ParseRecord)
 
@@ -66,7 +68,7 @@ adjust = _InstanceD . typed . mapped %~ (values %~ truncate) . (functions %~ tru
 parserForLanguage :: Language -> Ptr TreeSitter.Language.Language
 parserForLanguage = \case
   Unknown -> error "Unknown language encountered"
-  CodeQL -> CodeQL.tree_sitter_ql
+  CodeQL -> (CodeQL.tree_sitter_ql)
   Go -> Go.tree_sitter_go
   Haskell -> error "Haskell backend not implemented yet"
   Java -> Java.tree_sitter_java
@@ -80,12 +82,17 @@ parserForLanguage = \case
   TypeScript -> TypeScript.tree_sitter_typescript
   TSX -> TSX.tree_sitter_tsx
 
-main :: IO ()
-main = do
-  Config language path <- Opt.getRecord "generate-ast"
-  let lang = textToLanguage language
+-- nodeTypesPathForLanguage :: Bazel.Runfiles -> Language -> FilePath
+-- nodeTypesPathForLanguage rf = \case
+--   CodeQL -> r
+
+validLanguages :: [Language]
+validLanguages = [CodeQL, Go, Java, JavaScript, JSON, JSX, PHP, Python, Ruby, TypeScript, TSX]
+
+emit :: FilePath -> Language -> IO ()
+emit path lang = do
+  let language = languageToText lang
   decls <- T.pack . pprint . fmap adjust <$> astDeclarationsIO (parserForLanguage lang) path
-  when (lang == Unknown) (die ("Couldn't determine language for " <> T.unpack language))
 
   let programText =
         [trimming|
@@ -145,3 +152,13 @@ $decls
       hClose tf
       callProcess "ormolu" ["--mode", "inplace", path]
       T.readFile path >>= T.putStrLn
+
+main :: IO ()
+main = do
+  Config language path _root <- Opt.getRecord "generate-ast"
+  if language == "all"
+    then traverse_ (emit path) validLanguages
+    else do
+      let lang = textToLanguage language
+      when (lang == Unknown) (die ("Couldn't determine language for " <> T.unpack language))
+      emit path lang

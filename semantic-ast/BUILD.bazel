@@ -77,6 +77,7 @@ haskell_binary(
         "@stackage//:generic-lens",
         "@stackage//:lens",
         "@stackage//:tree-sitter",
+        "@stackage//:bazel-runfiles",
         "@stackage//:neat-interpolation",
         "@stackage//:optparse-generic",
     ] + all_ts_deps,
