@@ -29,7 +29,6 @@ instance FromJSON Blob where
     let lang' = if knownLanguage lang then lang else Language.forPath pth
     pure (fromSource (pth :: Path.AbsRelFile) lang' src)
 
-
 -- | Create a Blob from a provided path, language, and UTF-8 source.
 -- The resulting Blob's span is taken from the 'totalSpan' of the source.
 fromSource :: Path.PartClass.AbsRel ar => Path.File ar -> Language -> Source -> Blob

@@ -57,7 +57,7 @@ spec = do
     it "produces tags for classes" $
       parseTestFile [] (Fixture.absRelFile "test/fixtures/python/tags/class.py")
         `shouldReturn` [ Tag "Foo" P.CLASS P.DEFINITION (Range 6 9) (OneIndexedSpan (Span (Pos 1 7) (Pos 1 10))) "class Foo:" (UTF16CodeUnitSpan (Span (Pos 0 6) (Pos 0 9))),
-                         Tag "f" P.FUNCTION P.DEFINITION (Range 43 44 ) (OneIndexedSpan (Span (Pos 3 9) (Pos 3 10))) "def f(self):" (UTF16CodeUnitSpan (Span (Pos 2 8) (Pos 2 9)))
+                         Tag "f" P.FUNCTION P.DEFINITION (Range 43 44) (OneIndexedSpan (Span (Pos 3 9) (Pos 3 10))) "def f(self):" (UTF16CodeUnitSpan (Span (Pos 2 8) (Pos 2 9)))
                        ]
     it "produces tags for multi-line functions" $
       parseTestFile [P.FUNCTION] (Fixture.absRelFile "test/fixtures/python/tags/multiline.py")

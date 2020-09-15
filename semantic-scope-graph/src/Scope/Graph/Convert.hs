@@ -5,41 +5,56 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
-module Scope.Graph.Convert
-  ( ToScopeGraph (..)
-  , Result (..)
-  , todo
-  , complete
-  ) where
 
-import Control.Effect.ScopeGraph
+module Scope.Graph.Convert
+  ( ToScopeGraph (..),
+    Result (..),
+    todo,
+    complete,
+  )
+where
+
+import Control.Effect.StackGraph
 import Data.List.NonEmpty
 import Data.Typeable
 import Source.Loc
 
 class Typeable t => ToScopeGraph t where
+  type FocalPoint (t :: * -> *) (a :: *)
   scopeGraph ::
-    ( ScopeGraphEff sig m
-    )
-    => t Loc
-    -> m Result
+    ( StackGraphEff sig m
+    ) =>
+    t Loc ->
+    m (Result (FocalPoint t Loc))
 
-data Result
-  = Complete
+data Result a
+  = Complete a
   | Todo (NonEmpty String)
-    deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord)
 
-instance Semigroup Result where
-  Complete <> Complete = Complete
-  Todo a <> Todo b     = Todo (a <> b)
-  a <> Complete        = a
-  Complete <> a        = a
+instance Functor Result where
+  fmap f (Complete x) = Complete (f x)
+  fmap _ (Todo msg) = Todo msg
 
-instance Monoid Result where mempty = Complete
+instance Semigroup a => Semigroup (Result a) where
+  Complete a <> Complete b = Complete (a <> b)
+  Todo a <> Todo b = Todo (a <> b)
+  a <> Complete _ = a
+  Complete _ <> b = b
 
-todo :: (Show a, Applicative m) => a -> m Result
+instance Monoid a => Monoid (Result a) where mempty = Complete mempty
+
+instance Applicative Result where
+  Complete a <*> Complete b = Complete (a b)
+  Todo a <*> Todo b = Todo (a <> b)
+  (Todo a) <*> _ = Todo a
+  _ <*> (Todo b) = Todo b
+  pure = Complete
+
+todo :: (Show a, Applicative m) => a -> m (Result b)
 todo = pure . Todo . pure . show
 
-complete :: Applicative m => m Result
-complete = pure Complete
+complete :: (Monoid b, Applicative m) => m (Result b)
+complete = pure (Complete mempty)

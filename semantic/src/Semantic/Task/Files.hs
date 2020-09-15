@@ -9,42 +9,45 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Semantic.Task.Files
-  ( Files
-  , Destination (..)
-  , Source (..)
-  , readBlob
-  , readBlobs
-  , readBlobPairs
-  , readProject
-  , findFiles
-  , write
-  , Handle (..)
-  , FilesC(..)
-  , FilesArg(..)
-  ) where
+  ( Files,
+    Destination (..),
+    Source (..),
+    readBlob,
+    readBlobs,
+    readBlobPairs,
+    readProject,
+    findFiles,
+    write,
+    Handle (..),
+    FilesC (..),
+    FilesArg (..),
+  )
+where
 
-import           Analysis.File
-import           Analysis.Project
-import           Control.Algebra
-import           Control.Effect.Error
-import           Control.Exception
-import           Control.Monad.IO.Class
-import           Data.Blob
-import           Data.Blob.IO
+import Analysis.File
+import Analysis.Project
+import Control.Algebra
+import Control.Effect.Error
+import Control.Exception
+import Control.Monad.IO.Class
+import Data.Blob
+import Data.Blob.IO
 import qualified Data.ByteString.Builder as B
-import           Data.Handle
-import           Prelude hiding (readFile)
-import           Semantic.IO
-import           Source.Language (Language)
+import Data.Handle
+import Semantic.IO
+import Source.Language (Language)
 import qualified System.IO as IO hiding (withBinaryFile)
 import qualified System.Path as Path
 import qualified System.Path.IO as IO (withBinaryFile)
+import Prelude hiding (readFile)
+import Prelude hiding (readFile)
 
 data Source blob where
-  FromPath       :: File Language                   -> Source Blob
-  FromHandle     :: Handle 'IO.ReadMode             -> Source [Blob]
-  FromPathPair   :: File Language -> File Language  -> Source BlobPair
-  FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
+  FromPath :: File Language -> Source Blob
+  FromHandle :: Handle 'IO.ReadMode -> Source [Blob]
+  FromJSON :: Handle 'IO.ReadMode -> Source [Blob]
+  FromPathPair :: File Language -> File Language -> Source BlobPair
+  FromPairHandle :: Handle 'IO.ReadMode -> Source [BlobPair]
 
 data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
 
@@ -55,7 +58,6 @@ data Files (m :: * -> *) k where
   FindFiles :: Path.AbsRelDir -> [String] -> [Path.AbsRelDir] -> Files m [Path.AbsRelFile]
   Write :: Destination -> B.Builder -> Files m ()
 
-
 newtype FilesC m a = FilesC
   { -- | Run a 'Files' effect in 'IO'
     runFiles :: m a
@@ -65,14 +67,15 @@ newtype FilesC m a = FilesC
 instance (Has (Error SomeException) sig m, MonadFail m, MonadIO m) => Algebra (Files :+: sig) (FilesC m) where
   alg hdl sig ctx = case sig of
     L op -> (<$ ctx) <$> case op of
-      Read (FromPath path)                                    -> readBlobFromFile' path
-      Read (FromHandle handle)                                -> readBlobsFromHandle handle
-      Read (FromPathPair p1 p2)                               -> readFilePair p1 p2
-      Read (FromPairHandle handle)                            -> readBlobPairsFromHandle handle
-      ReadProject rootDir dir language excludeDirs            -> readProjectFromPaths rootDir dir language excludeDirs
-      FindFiles dir exts excludeDirs                          -> findFilesInDir dir exts excludeDirs
-      Write (ToPath path) builder                             -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
-      Write (ToHandle (WriteHandle handle)) builder           -> liftIO (B.hPutBuilder handle builder)
+      Read (FromPath path) -> readBlobFromFile' path
+      Read (FromHandle handle) -> readBlobsFromHandle handle
+      Read (FromJSON handle) -> readBlobsFromJSON handle
+      Read (FromPathPair p1 p2) -> readFilePair p1 p2
+      Read (FromPairHandle handle) -> readBlobPairsFromHandle handle
+      ReadProject rootDir dir language excludeDirs -> readProjectFromPaths rootDir dir language excludeDirs
+      FindFiles dir exts excludeDirs -> findFilesInDir dir exts excludeDirs
+      Write (ToPath path) builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
+      Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
     R other -> FilesC (alg (runFiles . hdl) other ctx)
 
 readBlob :: Has Files sig m => File Language -> m Blob
@@ -81,12 +84,14 @@ readBlob file = send (Read (FromPath file))
 -- Various ways to read in files
 data FilesArg
   = FilesFromHandle (Handle 'IO.ReadMode)
+  | FilesFromJSON (Handle 'IO.ReadMode)
   | FilesFromPaths [File Language]
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: Has Files sig m => FilesArg -> m [Blob]
 readBlobs (FilesFromHandle handle) = send (Read (FromHandle handle))
-readBlobs (FilesFromPaths paths)   = traverse (send . Read . FromPath) paths
+readBlobs (FilesFromPaths paths) = traverse (send . Read . FromPath) paths
+readBlobs (FilesFromJSON handle) = send (Read (FromJSON handle))
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
 readBlobPairs :: Has Files sig m => Either (Handle 'IO.ReadMode) [(File Language, File Language)] -> m [BlobPair]

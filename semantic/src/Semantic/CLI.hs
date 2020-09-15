@@ -1,49 +1,63 @@
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE FlexibleContexts #-}
+
 module Semantic.CLI (main) where
 
 import qualified Analysis.File as File
 import qualified Control.Carrier.Parse.Measured as Parse
-import           Control.Exception
+import Control.Concurrent
+import Control.Exception
 import qualified Data.Flag as Flag
-import           Data.Foldable
-import           Data.Handle
-import           Data.List (intercalate)
-import           Options.Applicative hiding (style)
-import           Semantic.Api hiding (File)
-import           Semantic.Config
+import Data.Foldable
+import Data.Handle
+import Data.List (intercalate)
+import Options.Applicative hiding (style)
+import Semantic.Api hiding (File)
+import Semantic.Config
 import qualified Semantic.Task as Task
-import           Semantic.Task.Files
-import           Semantic.Telemetry
+import Semantic.Task.Files
+import Semantic.Telemetry
 import qualified Semantic.Telemetry.Log as Log
-import           Semantic.Version
-import           Serializing.Format
+import Semantic.Version
+import Serializing.Format
 import qualified Source.Language as Language
-import           System.Exit (die)
+import System.Exit (die)
 import qualified System.Path as Path
 import qualified System.Path.PartClass as Path.PartClass
-
-import Control.Concurrent (mkWeakThreadId, myThreadId)
-import Proto.Semantic_JSON ()
-import System.Mem.Weak (deRefWeak)
 import System.Posix.Signals
+import qualified GHC.Weak as Weak
+
 
 newtype SignalException = SignalException Signal
   deriving (Show)
+
 instance Exception SignalException
 
 installSignalHandlers :: IO ()
 installSignalHandlers = do
   mainThreadId <- myThreadId
   weakTid <- mkWeakThreadId mainThreadId
-  for_ [ sigABRT, sigBUS, sigHUP, sigILL, sigQUIT, sigSEGV,
-          sigSYS, sigTERM, sigUSR1, sigUSR2, sigXCPU, sigXFSZ ] $ \sig ->
-    installHandler sig (Catch $ sendException weakTid sig) Nothing
+  for_
+    [ sigABRT,
+      sigBUS,
+      sigHUP,
+      sigILL,
+      sigQUIT,
+      sigSEGV,
+      sigSYS,
+      sigTERM,
+      sigUSR1,
+      sigUSR2,
+      sigXCPU,
+      sigXFSZ
+    ]
+    $ \sig ->
+      installHandler sig (Catch $ sendException weakTid sig) Nothing
   where
     sendException weakTid sig = do
-      m <- deRefWeak weakTid
+      m <- Weak.deRefWeak weakTid
       case m of
-        Nothing  -> pure ()
+        Nothing -> pure ()
         Just tid -> throwTo tid (toException $ SignalException sig)
 
 main :: IO ()
@@ -51,7 +65,7 @@ main = do
   installSignalHandlers
   (options, task) <- customExecParser (prefs showHelpOnEmpty) arguments
   config <- defaultConfig options
-  res <- withTelemetry config $ \ (TelemetryQueues logger statter _) ->
+  res <- withTelemetry config $ \(TelemetryQueues logger statter _) ->
     Task.runTask (Task.TaskSession config "-" (optionsLogPathsOnError options) logger statter) (Parse.runParse task)
   either (die . displayException) pure res
 
@@ -67,8 +81,10 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
 optionsParser :: Parser Options
 optionsParser = do
-  logLevel <- options [ ("error", Just Log.Error) , ("warning", Just Log.Warning) , ("info", Just Log.Info) , ("debug", Just Log.Debug) , ("none", Nothing)]
-                      (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
+  logLevel <-
+    options
+      [("error", Just Log.Error), ("warning", Just Log.Warning), ("info", Just Log.Info), ("debug", Just Log.Debug), ("none", Nothing)]
+      (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
   failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
   failOnParseError <- switch (long "fail-on-parse-error" <> help "Fail on tree-sitter parse errors.")
   logPathsOnError <- switch (long "log-paths" <> help "Log source paths on parse and assignment error.")
@@ -84,29 +100,53 @@ parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
 parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
   where
     parseArgumentsParser = do
-      renderer
-        <-  flag  (parseTermBuilder TermSExpression)
-                  (parseTermBuilder TermSExpression)
-                  (  long "sexpression"
-                  <> help "Output s-expression parse trees (default)")
-        <|> flag' (parseSymbolsBuilder JSON)
-                  (  long "symbols"
-                  <> long "json-symbols"
-                  <> help "Output JSON symbol list")
-        <|> flag' (parseSymbolsBuilder Proto)
-                  (  long "proto-symbols"
-                  <> help "Output protobufs symbol list")
-        <|> flag' (parseTermBuilder TermJSON)
-                  (  long "json"
-                  <> help "Output JSON AST dump")
-        <|> flag' (parseTermBuilder TermShow)
-                  (  long "show"
-                  <> help "Output using the Show instance (debug only, format subject to change without notice)")
-        <|> flag' (parseTermBuilder TermQuiet)
-                  (  long "quiet"
-                  <> help "Don't produce output, but show timing stats")
-      filesOrStdin <- FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
-                  <|> pure (FilesFromHandle stdin)
+      renderer <-
+        flag
+          (parseTermBuilder TermSExpression)
+          (parseTermBuilder TermSExpression)
+          ( long "sexpression"
+              <> help "Output s-expression parse trees (default)"
+          )
+          <|> flag'
+            (parseSymbolsBuilder JSON)
+            ( long "symbols"
+                <> long "json-symbols"
+                <> help "Output JSON symbol list"
+            )
+          <|> flag'
+            (parseSymbolsBuilder Proto)
+            ( long "proto-symbols"
+                <> help "Output protobufs symbol list"
+            )
+          <|> flag'
+            (parseTermBuilder TermJSON)
+            ( long "json"
+                <> help "Output JSON AST dump"
+            )
+          <|> flag'
+            (parseStackGraphBuilder Proto)
+            ( long "proto-stack-graph"
+                <> help "Output protobufs stack graph"
+            )
+          <|> flag'
+            (parseStackGraphBuilder JSON)
+            ( long "stack-graph"
+                <> help "Output JSON stack graph"
+            )
+          <|> flag'
+            (parseTermBuilder TermShow)
+            ( long "show"
+                <> help "Output using the Show instance (debug only, format subject to change without notice)"
+            )
+          <|> flag'
+            (parseTermBuilder TermQuiet)
+            ( long "quiet"
+                <> help "Don't produce output, but show timing stats"
+            )
+      filesOrStdin <-
+        FilesFromPaths <$> some (argument filePathReader (metavar "FILES..."))
+          <|> pure (FilesFromHandle stdin)
+          <|> pure (FilesFromJSON stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
 filePathReader :: ReadM (File.File Language.Language)
@@ -121,5 +161,5 @@ pathOption = option path
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
 options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
   where
-    optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
+    optionsReader options = eitherReader $ \str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
     findOption options value = maybe "" fst (find ((== value) . snd) options)

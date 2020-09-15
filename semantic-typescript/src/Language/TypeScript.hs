@@ -1,21 +1,25 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -freduction-depth=0 #-}
+
 -- | Semantic functionality for TypeScript programs.
 module Language.TypeScript
-( Term(..)
-, Language.TypeScript.Grammar.tree_sitter_typescript
-) where
+  ( Term (..),
+    Language.TypeScript.Grammar.tree_sitter_typescript,
+  )
+where
 
-import           AST.Marshal.JSON
-import           Data.Proxy
-import qualified Language.TypeScript.AST as TypeScript
-import qualified Language.TypeScript.Tags as TsTags
-import qualified Tags.Tagging.Precise as Tags
-import qualified Language.TypeScript.Grammar (tree_sitter_typescript)
+import AST.Marshal.JSON
 import qualified AST.Unmarshal as TS
+import Data.Proxy
+import qualified Language.TypeScript.AST as TypeScript
+import qualified Language.TypeScript.Grammar (tree_sitter_typescript)
+import qualified Language.TypeScript.Tags as TsTags
+import Scope.Graph.Convert
+import qualified Tags.Tagging.Precise as Tags
 
-newtype Term a = Term { getTerm :: TypeScript.Program a }
-  deriving MarshalJSON
+newtype Term a = Term {getTerm :: TypeScript.Program a}
+  deriving (MarshalJSON)
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy TypeScript.Program)
@@ -26,3 +30,7 @@ instance TS.Unmarshal Term where
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . TsTags.tags . getTerm
+
+instance ToScopeGraph Term where
+  type FocalPoint Term _ = ()
+  scopeGraph _ = todo "Implement scope graphs for TypeScript"

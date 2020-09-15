@@ -1,21 +1,25 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -freduction-depth=0 #-}
+
 -- | Semantic functionality for TSX programs.
 module Language.TSX
-( Term(..)
-, Language.TSX.Grammar.tree_sitter_tsx
-) where
+  ( Term (..),
+    Language.TSX.Grammar.tree_sitter_tsx,
+  )
+where
 
-import           AST.Marshal.JSON
-import           Data.Proxy
-import qualified Language.TSX.AST as TSX
-import qualified Language.TSX.Tags as TsxTags
-import qualified Tags.Tagging.Precise as Tags
-import qualified Language.TSX.Grammar (tree_sitter_tsx)
+import AST.Marshal.JSON
 import qualified AST.Unmarshal as TS
+import Data.Proxy
+import qualified Language.TSX.AST as TSX
+import qualified Language.TSX.Grammar (tree_sitter_tsx)
+import qualified Language.TSX.Tags as TsxTags
+import Scope.Graph.Convert
+import qualified Tags.Tagging.Precise as Tags
 
-newtype Term a = Term { getTerm :: TSX.Program a }
-  deriving MarshalJSON
+newtype Term a = Term {getTerm :: TSX.Program a}
+  deriving (MarshalJSON)
 
 instance TS.SymbolMatching Term where
   matchedSymbols _ = TS.matchedSymbols (Proxy :: Proxy TSX.Program)
@@ -26,3 +30,7 @@ instance TS.Unmarshal Term where
 
 instance Tags.ToTags Term where
   tags src = Tags.runTagging src . TsxTags.tags . getTerm
+
+instance ToScopeGraph Term where
+  type FocalPoint Term _ = ()
+  scopeGraph _ = todo "Implement scope graph for TSX"

@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic-proto
-version:             0.0.0.0
+version:             0.1.0.0
 synopsis:            Datatypes generated from protobuf schema
 description:         Datatypes generated from protobuf schema
 homepage:            https://github.com/github/semantic/tree/master/semantic-proto#readme
