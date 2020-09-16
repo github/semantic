@@ -140,6 +140,7 @@ stack_snapshot(
         "vector",
         "yaml",
     ],
+    stack_snapshot_json = "//:stackage_snapshot.json",
     tools = ["@happy"],
     vendored_packages = {
         "tree-sitter-{}".format(name): "@tree-sitter-{name}//:tree-sitter-{name}".format(name = name)
