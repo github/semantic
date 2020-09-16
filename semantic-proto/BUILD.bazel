@@ -14,12 +14,13 @@ load(
 haskell_library(
     name = "semantic-proto",
     srcs = glob(["src/**/*.hs"]),
+    compiler_flags = ["-XOverloadedStrings"],
     deps = [
         "//:base",
         "//:text",
-        "@stackage//:proto-lens-jsonpb",
         "@stackage//:aeson",
         "@stackage//:proto-lens",
+        "@stackage//:proto-lens-jsonpb",
         "@stackage//:proto-lens-runtime",
     ],
 )
