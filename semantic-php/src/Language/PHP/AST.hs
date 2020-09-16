@@ -18,7 +18,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
-module Language.PHP.AST (module Language.PHP.AST, getTestCorpusDir) where
+module Language.PHP.AST (module Language.PHP.AST) where
 
 import qualified AST.Parse
 import qualified AST.Token
@@ -34,7 +34,6 @@ import qualified GHC.Generics
 import qualified GHC.Records
 import qualified GHC.Show
 import qualified TreeSitter.Node
-import TreeSitter.PHP (getTestCorpusDir)
 import qualified Prelude as GHC.Classes
 
 debugSymbolNames :: [GHC.Base.String]
