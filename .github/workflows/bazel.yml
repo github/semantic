@@ -3,10 +3,10 @@ name: Bazel CI
 on:
   # Trigger the workflow on push or pull request,
   # but only for the master branch
-  # push:
-  #   branches:
-  #     - master
-  # pull_request: {}
+  push:
+    branches:
+      - master
+  pull_request: {}
 
 jobs:
   build:
@@ -41,5 +41,5 @@ jobs:
     - name: Build & test
       run: |
         bin/bazel clean
-        bin/bazel test --sandbox_debug --config=ci --test_tag_filters=language-test //...
-        bin/bazel test --sandbox_debug --config=ci //semantic-source //semantic:spec
+        bin/bazel test --config=ci --test_tag_filters=language-test //...
+        bin/bazel test --config=ci //semantic-source //semantic:spec
