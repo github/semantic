@@ -127,6 +127,9 @@ emit :: FilePath -> Language -> IO ()
 emit root lang = do
   rf <- Bazel.create
   let language = languageToText lang
+  let languageHack = case lang of
+        CodeQL -> "QL"
+        _ -> language
   let path = pathForLanguage rf lang
   decls <- T.pack . pprint . fmap adjust <$> astDeclarationsIO (parserForLanguage lang) path
 
@@ -170,7 +173,7 @@ import qualified GHC.Show
 import qualified Prelude as GHC.Classes
 import qualified TreeSitter.Node
 
-import TreeSitter.$language (getTestCorpusDir)
+import TreeSitter.$languageHack (getTestCorpusDir)
 
 debugSymbolNames :: [GHC.Base.String]
 debugSymbolNames = debugSymbolNames_0

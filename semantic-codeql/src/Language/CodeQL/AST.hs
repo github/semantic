@@ -33,8 +33,8 @@ import qualified GHC.Base
 import qualified GHC.Generics
 import qualified GHC.Records
 import qualified GHC.Show
-import TreeSitter.CodeQL (getTestCorpusDir)
 import qualified TreeSitter.Node
+import TreeSitter.QL (getTestCorpusDir)
 import qualified Prelude as GHC.Classes
 
 debugSymbolNames :: [GHC.Base.String]
