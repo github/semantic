@@ -1,5 +1,5 @@
 {- This file was auto-generated from semantic.proto by the proto-lens-protoc program. -}
-{-# LANGUAGE ScopedTypeVariables, DataKinds, TypeFamilies, UndecidableInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleContexts, FlexibleInstances, PatternSynonyms, MagicHash, NoImplicitPrelude, DataKinds, BangPatterns, TypeApplications#-}
+{-# LANGUAGE ScopedTypeVariables, DataKinds, TypeFamilies, UndecidableInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleContexts, FlexibleInstances, PatternSynonyms, MagicHash, NoImplicitPrelude, DataKinds, BangPatterns, TypeApplications, OverloadedStrings, DerivingStrategies#-}
 {-# OPTIONS_GHC -Wno-unused-imports#-}
 {-# OPTIONS_GHC -Wno-duplicate-exports#-}
 {-# OPTIONS_GHC -Wno-dodgy-exports#-}
@@ -47,7 +47,7 @@ data Blob
                        _Blob'path :: !Data.Text.Text,
                        _Blob'language :: !Data.Text.Text,
                        _Blob'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Blob where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -74,6 +74,13 @@ instance Data.ProtoLens.Field.HasField Blob "language" Data.Text.Text where
         Prelude.id
 instance Data.ProtoLens.Message Blob where
   messageName _ = Data.Text.pack "github.semantic.Blob"
+  packedMessageDescriptor _
+    = "\n\
+      \\EOTBlob\DC2\CAN\n\
+      \\acontent\CAN\SOH \SOH(\tR\acontent\DC2\DC2\n\
+      \\EOTpath\CAN\STX \SOH(\tR\EOTpath\DC2\SUB\n\
+      \\blanguage\CAN\ETX \SOH(\tR\blanguage"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         content__field_descriptor
@@ -255,7 +262,7 @@ data ByteRange
   = ByteRange'_constructor {_ByteRange'start :: !Data.Int.Int32,
                             _ByteRange'end :: !Data.Int.Int32,
                             _ByteRange'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ByteRange where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -276,6 +283,12 @@ instance Data.ProtoLens.Field.HasField ByteRange "end" Data.Int.Int32 where
         Prelude.id
 instance Data.ProtoLens.Message ByteRange where
   messageName _ = Data.Text.pack "github.semantic.ByteRange"
+  packedMessageDescriptor _
+    = "\n\
+      \\tByteRange\DC2\DC4\n\
+      \\ENQstart\CAN\SOH \SOH(\ENQR\ENQstart\DC2\DLE\n\
+      \\ETXend\CAN\STX \SOH(\ENQR\ETXend"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         start__field_descriptor
@@ -389,7 +402,7 @@ instance Control.DeepSeq.NFData ByteRange where
 data Docstring
   = Docstring'_constructor {_Docstring'docstring :: !Data.Text.Text,
                             _Docstring'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Docstring where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -405,6 +418,11 @@ instance Data.ProtoLens.Field.HasField Docstring "docstring" Data.Text.Text wher
         Prelude.id
 instance Data.ProtoLens.Message Docstring where
   messageName _ = Data.Text.pack "github.semantic.Docstring"
+  packedMessageDescriptor _
+    = "\n\
+      \\tDocstring\DC2\FS\n\
+      \\tdocstring\CAN\SOH \SOH(\tR\tdocstring"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         docstring__field_descriptor
@@ -513,7 +531,7 @@ data File
                        _File'errors :: !(Data.Vector.Vector ParseError),
                        _File'blobOid :: !Data.Text.Text,
                        _File'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show File where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -568,6 +586,15 @@ instance Data.ProtoLens.Field.HasField File "blobOid" Data.Text.Text where
         Prelude.id
 instance Data.ProtoLens.Message File where
   messageName _ = Data.Text.pack "github.semantic.File"
+  packedMessageDescriptor _
+    = "\n\
+      \\EOTFile\DC2\DC2\n\
+      \\EOTpath\CAN\SOH \SOH(\tR\EOTpath\DC2\SUB\n\
+      \\blanguage\CAN\STX \SOH(\tR\blanguage\DC21\n\
+      \\asymbols\CAN\ETX \ETX(\v2\ETB.github.semantic.SymbolR\asymbols\DC23\n\
+      \\ACKerrors\CAN\EOT \ETX(\v2\ESC.github.semantic.ParseErrorR\ACKerrors\DC2\EM\n\
+      \\bblob_oid\CAN\ENQ \SOH(\tR\ablobOid"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         path__field_descriptor
@@ -846,7 +873,7 @@ instance Control.DeepSeq.NFData File where
                          (Control.DeepSeq.deepseq (_File'blobOid x__) ())))))
 newtype NodeType'UnrecognizedValue
   = NodeType'UnrecognizedValue Data.Int.Int32
-  deriving (Prelude.Eq, Prelude.Ord, Prelude.Show)
+  deriving stock (Prelude.Eq, Prelude.Ord, Prelude.Show)
 data NodeType
   = ROOT_SCOPE |
     JUMP_TO_SCOPE |
@@ -854,7 +881,7 @@ data NodeType
     DEFINITION |
     REFERENCE |
     NodeType'Unrecognized !NodeType'UnrecognizedValue
-  deriving (Prelude.Show, Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Show, Prelude.Eq, Prelude.Ord)
 instance Data.ProtoLens.MessageEnum NodeType where
   maybeToEnum 0 = Prelude.Just ROOT_SCOPE
   maybeToEnum 1 = Prelude.Just JUMP_TO_SCOPE
@@ -930,7 +957,7 @@ instance Control.DeepSeq.NFData NodeType where
 data ParseError
   = ParseError'_constructor {_ParseError'error :: !Data.Text.Text,
                              _ParseError'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ParseError where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -945,6 +972,12 @@ instance Data.ProtoLens.Field.HasField ParseError "error" Data.Text.Text where
         Prelude.id
 instance Data.ProtoLens.Message ParseError where
   messageName _ = Data.Text.pack "github.semantic.ParseError"
+  packedMessageDescriptor _
+    = "\n\
+      \\n\
+      \ParseError\DC2\DC4\n\
+      \\ENQerror\CAN\SOH \SOH(\tR\ENQerror"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         error__field_descriptor
@@ -1042,7 +1075,7 @@ instance Control.DeepSeq.NFData ParseError where
 data ParseTreeRequest
   = ParseTreeRequest'_constructor {_ParseTreeRequest'blobs :: !(Data.Vector.Vector Blob),
                                    _ParseTreeRequest'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ParseTreeRequest where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1067,6 +1100,11 @@ instance Data.ProtoLens.Field.HasField ParseTreeRequest "vec'blobs" (Data.Vector
         Prelude.id
 instance Data.ProtoLens.Message ParseTreeRequest where
   messageName _ = Data.Text.pack "github.semantic.ParseTreeRequest"
+  packedMessageDescriptor _
+    = "\n\
+      \\DLEParseTreeRequest\DC2+\n\
+      \\ENQblobs\CAN\SOH \ETX(\v2\NAK.github.semantic.BlobR\ENQblobs"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         blobs__field_descriptor
@@ -1170,7 +1208,7 @@ instance Control.DeepSeq.NFData ParseTreeRequest where
 data ParseTreeSymbolResponse
   = ParseTreeSymbolResponse'_constructor {_ParseTreeSymbolResponse'files :: !(Data.Vector.Vector File),
                                           _ParseTreeSymbolResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show ParseTreeSymbolResponse where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1196,6 +1234,11 @@ instance Data.ProtoLens.Field.HasField ParseTreeSymbolResponse "vec'files" (Data
 instance Data.ProtoLens.Message ParseTreeSymbolResponse where
   messageName _
     = Data.Text.pack "github.semantic.ParseTreeSymbolResponse"
+  packedMessageDescriptor _
+    = "\n\
+      \\ETBParseTreeSymbolResponse\DC2+\n\
+      \\ENQfiles\CAN\SOH \ETX(\v2\NAK.github.semantic.FileR\ENQfiles"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         files__field_descriptor
@@ -1298,7 +1341,7 @@ instance Control.DeepSeq.NFData ParseTreeSymbolResponse where
 data PingRequest
   = PingRequest'_constructor {_PingRequest'service :: !Data.Text.Text,
                               _PingRequest'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show PingRequest where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1314,6 +1357,11 @@ instance Data.ProtoLens.Field.HasField PingRequest "service" Data.Text.Text wher
         Prelude.id
 instance Data.ProtoLens.Message PingRequest where
   messageName _ = Data.Text.pack "github.semantic.PingRequest"
+  packedMessageDescriptor _
+    = "\n\
+      \\vPingRequest\DC2\CAN\n\
+      \\aservice\CAN\SOH \SOH(\tR\aservice"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         service__field_descriptor
@@ -1417,7 +1465,7 @@ data PingResponse
                                _PingResponse'timestamp :: !Data.Text.Text,
                                _PingResponse'sha :: !Data.Text.Text,
                                _PingResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show PingResponse where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1453,6 +1501,14 @@ instance Data.ProtoLens.Field.HasField PingResponse "sha" Data.Text.Text where
         Prelude.id
 instance Data.ProtoLens.Message PingResponse where
   messageName _ = Data.Text.pack "github.semantic.PingResponse"
+  packedMessageDescriptor _
+    = "\n\
+      \\fPingResponse\DC2\SYN\n\
+      \\ACKstatus\CAN\SOH \SOH(\tR\ACKstatus\DC2\SUB\n\
+      \\bhostname\CAN\STX \SOH(\tR\bhostname\DC2\FS\n\
+      \\ttimestamp\CAN\ETX \SOH(\tR\ttimestamp\DC2\DLE\n\
+      \\ETXsha\CAN\EOT \SOH(\tR\ETXsha"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         status__field_descriptor
@@ -1678,7 +1734,7 @@ data Position
   = Position'_constructor {_Position'line :: !Data.Int.Int32,
                            _Position'column :: !Data.Int.Int32,
                            _Position'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Position where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1699,6 +1755,12 @@ instance Data.ProtoLens.Field.HasField Position "column" Data.Int.Int32 where
         Prelude.id
 instance Data.ProtoLens.Message Position where
   messageName _ = Data.Text.pack "github.semantic.Position"
+  packedMessageDescriptor _
+    = "\n\
+      \\bPosition\DC2\DC2\n\
+      \\EOTline\CAN\SOH \SOH(\ENQR\EOTline\DC2\SYN\n\
+      \\ACKcolumn\CAN\STX \SOH(\ENQR\ACKcolumn"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         line__field_descriptor
@@ -1816,7 +1878,7 @@ data Span
   = Span'_constructor {_Span'start :: !(Prelude.Maybe Position),
                        _Span'end :: !(Prelude.Maybe Position),
                        _Span'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Span where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -1849,6 +1911,12 @@ instance Data.ProtoLens.Field.HasField Span "maybe'end" (Prelude.Maybe Position)
         Prelude.id
 instance Data.ProtoLens.Message Span where
   messageName _ = Data.Text.pack "github.semantic.Span"
+  packedMessageDescriptor _
+    = "\n\
+      \\EOTSpan\DC2/\n\
+      \\ENQstart\CAN\SOH \SOH(\v2\EM.github.semantic.PositionR\ENQstart\DC2+\n\
+      \\ETXend\CAN\STX \SOH(\v2\EM.github.semantic.PositionR\ETXend"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         start__field_descriptor
@@ -1983,7 +2051,7 @@ data StackGraphFile
                                  _StackGraphFile'paths :: !(Data.Vector.Vector StackGraphPath),
                                  _StackGraphFile'errors :: !(Data.Vector.Vector ParseError),
                                  _StackGraphFile'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphFile where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -2054,6 +2122,15 @@ instance Data.ProtoLens.Field.HasField StackGraphFile "vec'errors" (Data.Vector.
         Prelude.id
 instance Data.ProtoLens.Message StackGraphFile where
   messageName _ = Data.Text.pack "github.semantic.StackGraphFile"
+  packedMessageDescriptor _
+    = "\n\
+      \\SOStackGraphFile\DC2\DC2\n\
+      \\EOTpath\CAN\SOH \SOH(\tR\EOTpath\DC2\SUB\n\
+      \\blanguage\CAN\STX \SOH(\tR\blanguage\DC25\n\
+      \\ENQnodes\CAN\ETX \ETX(\v2\US.github.semantic.StackGraphNodeR\ENQnodes\DC25\n\
+      \\ENQpaths\CAN\EOT \ETX(\v2\US.github.semantic.StackGraphPathR\ENQpaths\DC23\n\
+      \\ACKerrors\CAN\ENQ \ETX(\v2\ESC.github.semantic.ParseErrorR\ACKerrors"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         path__field_descriptor
@@ -2354,7 +2431,7 @@ data StackGraphNode
                                  _StackGraphNode'syntaxType :: !SyntaxType,
                                  _StackGraphNode'nodeType :: !NodeType,
                                  _StackGraphNode'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphNode where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -2411,6 +2488,17 @@ instance Data.ProtoLens.Field.HasField StackGraphNode "nodeType" NodeType where
         Prelude.id
 instance Data.ProtoLens.Message StackGraphNode where
   messageName _ = Data.Text.pack "github.semantic.StackGraphNode"
+  packedMessageDescriptor _
+    = "\n\
+      \\SOStackGraphNode\DC2\SO\n\
+      \\STXid\CAN\SOH \SOH(\ETXR\STXid\DC2\DC2\n\
+      \\EOTname\CAN\STX \SOH(\tR\EOTname\DC2\DC2\n\
+      \\EOTline\CAN\ETX \SOH(\tR\EOTline\DC2)\n\
+      \\EOTspan\CAN\EOT \SOH(\v2\NAK.github.semantic.SpanR\EOTspan\DC2<\n\
+      \\vsyntax_type\CAN\ENQ \SOH(\SO2\ESC.github.semantic.SyntaxTypeR\n\
+      \syntaxType\DC26\n\
+      \\tnode_type\CAN\ACK \SOH(\SO2\EM.github.semantic.NodeTypeR\bnodeType"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         id__field_descriptor
@@ -2703,7 +2791,7 @@ data StackGraphPath
                                  _StackGraphPath'endingScopeStack :: !(Data.Vector.Unboxed.Vector Data.Int.Int64),
                                  _StackGraphPath'endingSymbolStack :: !(Data.Vector.Vector Data.Text.Text),
                                  _StackGraphPath'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphPath where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -2787,6 +2875,17 @@ instance Data.ProtoLens.Field.HasField StackGraphPath "vec'endingSymbolStack" (D
         Prelude.id
 instance Data.ProtoLens.Message StackGraphPath where
   messageName _ = Data.Text.pack "github.semantic.StackGraphPath"
+  packedMessageDescriptor _
+    = "\n\
+      \\SOStackGraphPath\DC22\n\
+      \\NAKstarting_symbol_stack\CAN\SOH \ETX(\tR\DC3startingSymbolStack\DC29\n\
+      \\EMstarting_scope_stack_size\CAN\STX \SOH(\ETXR\SYNstartingScopeStackSize\DC2\DC2\n\
+      \\EOTfrom\CAN\ETX \SOH(\ETXR\EOTfrom\DC2\DC4\n\
+      \\ENQedges\CAN\EOT \SOH(\tR\ENQedges\DC2\SO\n\
+      \\STXto\CAN\ENQ \SOH(\ETXR\STXto\DC2,\n\
+      \\DC2ending_scope_stack\CAN\ACK \ETX(\ETXR\DLEendingScopeStack\DC2.\n\
+      \\DC3ending_symbol_stack\CAN\a \ETX(\tR\DC1endingSymbolStack"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         startingSymbolStack__field_descriptor
@@ -3191,7 +3290,7 @@ instance Control.DeepSeq.NFData StackGraphPath where
 data StackGraphRequest
   = StackGraphRequest'_constructor {_StackGraphRequest'blobs :: !(Data.Vector.Vector Blob),
                                     _StackGraphRequest'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphRequest where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -3216,6 +3315,11 @@ instance Data.ProtoLens.Field.HasField StackGraphRequest "vec'blobs" (Data.Vecto
         Prelude.id
 instance Data.ProtoLens.Message StackGraphRequest where
   messageName _ = Data.Text.pack "github.semantic.StackGraphRequest"
+  packedMessageDescriptor _
+    = "\n\
+      \\DC1StackGraphRequest\DC2+\n\
+      \\ENQblobs\CAN\SOH \ETX(\v2\NAK.github.semantic.BlobR\ENQblobs"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         blobs__field_descriptor
@@ -3319,7 +3423,7 @@ instance Control.DeepSeq.NFData StackGraphRequest where
 data StackGraphResponse
   = StackGraphResponse'_constructor {_StackGraphResponse'files :: !(Data.Vector.Vector StackGraphFile),
                                      _StackGraphResponse'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show StackGraphResponse where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -3344,6 +3448,11 @@ instance Data.ProtoLens.Field.HasField StackGraphResponse "vec'files" (Data.Vect
         Prelude.id
 instance Data.ProtoLens.Message StackGraphResponse where
   messageName _ = Data.Text.pack "github.semantic.StackGraphResponse"
+  packedMessageDescriptor _
+    = "\n\
+      \\DC2StackGraphResponse\DC25\n\
+      \\ENQfiles\CAN\SOH \ETX(\v2\US.github.semantic.StackGraphFileR\ENQfiles"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         files__field_descriptor
@@ -3466,7 +3575,7 @@ data Symbol
                          _Symbol'utf16CodeUnitSpan :: !(Prelude.Maybe Span),
                          _Symbol'byteRange :: !(Prelude.Maybe ByteRange),
                          _Symbol'_unknownFields :: !Data.ProtoLens.FieldSet}
-  deriving (Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Eq, Prelude.Ord)
 instance Prelude.Show Symbol where
   showsPrec _ __x __s
     = Prelude.showChar
@@ -3555,6 +3664,21 @@ instance Data.ProtoLens.Field.HasField Symbol "maybe'byteRange" (Prelude.Maybe B
         Prelude.id
 instance Data.ProtoLens.Message Symbol where
   messageName _ = Data.Text.pack "github.semantic.Symbol"
+  packedMessageDescriptor _
+    = "\n\
+      \\ACKSymbol\DC2\SYN\n\
+      \\ACKsymbol\CAN\SOH \SOH(\tR\ACKsymbol\DC2\DC2\n\
+      \\EOTkind\CAN\STX \SOH(\tR\EOTkind\DC2\DC2\n\
+      \\EOTline\CAN\ETX \SOH(\tR\EOTline\DC2)\n\
+      \\EOTspan\CAN\EOT \SOH(\v2\NAK.github.semantic.SpanR\EOTspan\DC2.\n\
+      \\EOTdocs\CAN\ENQ \SOH(\v2\SUB.github.semantic.DocstringR\EOTdocs\DC26\n\
+      \\tnode_type\CAN\ACK \SOH(\SO2\EM.github.semantic.NodeTypeR\bnodeType\DC2<\n\
+      \\vsyntax_type\CAN\a \SOH(\SO2\ESC.github.semantic.SyntaxTypeR\n\
+      \syntaxType\DC2F\n\
+      \\DC4utf16_code_unit_span\CAN\b \SOH(\v2\NAK.github.semantic.SpanR\DC1utf16CodeUnitSpan\DC29\n\
+      \\n\
+      \byte_range\CAN\t \SOH(\v2\SUB.github.semantic.ByteRangeR\tbyteRange"
+  packedFileDescriptor _ = packedFileDescriptor
   fieldsByTag
     = let
         symbol__field_descriptor
@@ -3951,7 +4075,7 @@ instance Control.DeepSeq.NFData Symbol where
                                      (Control.DeepSeq.deepseq (_Symbol'byteRange x__) ())))))))))
 newtype SyntaxType'UnrecognizedValue
   = SyntaxType'UnrecognizedValue Data.Int.Int32
-  deriving (Prelude.Eq, Prelude.Ord, Prelude.Show)
+  deriving stock (Prelude.Eq, Prelude.Ord, Prelude.Show)
 data SyntaxType
   = FUNCTION |
     METHOD |
@@ -3962,7 +4086,7 @@ data SyntaxType
     INTERFACE |
     IMPLEMENTATION |
     SyntaxType'Unrecognized !SyntaxType'UnrecognizedValue
-  deriving (Prelude.Show, Prelude.Eq, Prelude.Ord)
+  deriving stock (Prelude.Show, Prelude.Eq, Prelude.Ord)
 instance Data.ProtoLens.MessageEnum SyntaxType where
   maybeToEnum 0 = Prelude.Just FUNCTION
   maybeToEnum 1 = Prelude.Just METHOD
@@ -4050,3 +4174,853 @@ instance Data.ProtoLens.FieldDefault SyntaxType where
   fieldDefault = FUNCTION
 instance Control.DeepSeq.NFData SyntaxType where
   rnf x__ = Prelude.seq x__ ()
+packedFileDescriptor :: Data.ByteString.ByteString
+packedFileDescriptor
+  = "\n\
+    \\SOsemantic.proto\DC2\SIgithub.semantic\"'\n\
+    \\vPingRequest\DC2\CAN\n\
+    \\aservice\CAN\SOH \SOH(\tR\aservice\"r\n\
+    \\fPingResponse\DC2\SYN\n\
+    \\ACKstatus\CAN\SOH \SOH(\tR\ACKstatus\DC2\SUB\n\
+    \\bhostname\CAN\STX \SOH(\tR\bhostname\DC2\FS\n\
+    \\ttimestamp\CAN\ETX \SOH(\tR\ttimestamp\DC2\DLE\n\
+    \\ETXsha\CAN\EOT \SOH(\tR\ETXsha\"?\n\
+    \\DLEParseTreeRequest\DC2+\n\
+    \\ENQblobs\CAN\SOH \ETX(\v2\NAK.github.semantic.BlobR\ENQblobs\"F\n\
+    \\ETBParseTreeSymbolResponse\DC2+\n\
+    \\ENQfiles\CAN\SOH \ETX(\v2\NAK.github.semantic.FileR\ENQfiles\"@\n\
+    \\DC1StackGraphRequest\DC2+\n\
+    \\ENQblobs\CAN\SOH \ETX(\v2\NAK.github.semantic.BlobR\ENQblobs\"K\n\
+    \\DC2StackGraphResponse\DC25\n\
+    \\ENQfiles\CAN\SOH \ETX(\v2\US.github.semantic.StackGraphFileR\ENQfiles\"\"\n\
+    \\n\
+    \ParseError\DC2\DC4\n\
+    \\ENQerror\CAN\SOH \SOH(\tR\ENQerror\"P\n\
+    \\EOTBlob\DC2\CAN\n\
+    \\acontent\CAN\SOH \SOH(\tR\acontent\DC2\DC2\n\
+    \\EOTpath\CAN\STX \SOH(\tR\EOTpath\DC2\SUB\n\
+    \\blanguage\CAN\ETX \SOH(\tR\blanguage\"\185\SOH\n\
+    \\EOTFile\DC2\DC2\n\
+    \\EOTpath\CAN\SOH \SOH(\tR\EOTpath\DC2\SUB\n\
+    \\blanguage\CAN\STX \SOH(\tR\blanguage\DC21\n\
+    \\asymbols\CAN\ETX \ETX(\v2\ETB.github.semantic.SymbolR\asymbols\DC23\n\
+    \\ACKerrors\CAN\EOT \ETX(\v2\ESC.github.semantic.ParseErrorR\ACKerrors\DC2\EM\n\
+    \\bblob_oid\CAN\ENQ \SOH(\tR\ablobOid\"\156\ETX\n\
+    \\ACKSymbol\DC2\SYN\n\
+    \\ACKsymbol\CAN\SOH \SOH(\tR\ACKsymbol\DC2\DC2\n\
+    \\EOTkind\CAN\STX \SOH(\tR\EOTkind\DC2\DC2\n\
+    \\EOTline\CAN\ETX \SOH(\tR\EOTline\DC2)\n\
+    \\EOTspan\CAN\EOT \SOH(\v2\NAK.github.semantic.SpanR\EOTspan\DC2.\n\
+    \\EOTdocs\CAN\ENQ \SOH(\v2\SUB.github.semantic.DocstringR\EOTdocs\DC26\n\
+    \\tnode_type\CAN\ACK \SOH(\SO2\EM.github.semantic.NodeTypeR\bnodeType\DC2<\n\
+    \\vsyntax_type\CAN\a \SOH(\SO2\ESC.github.semantic.SyntaxTypeR\n\
+    \syntaxType\DC2F\n\
+    \\DC4utf16_code_unit_span\CAN\b \SOH(\v2\NAK.github.semantic.SpanR\DC1utf16CodeUnitSpan\DC29\n\
+    \\n\
+    \byte_range\CAN\t \SOH(\v2\SUB.github.semantic.ByteRangeR\tbyteRange\")\n\
+    \\tDocstring\DC2\FS\n\
+    \\tdocstring\CAN\SOH \SOH(\tR\tdocstring\"6\n\
+    \\bPosition\DC2\DC2\n\
+    \\EOTline\CAN\SOH \SOH(\ENQR\EOTline\DC2\SYN\n\
+    \\ACKcolumn\CAN\STX \SOH(\ENQR\ACKcolumn\"d\n\
+    \\EOTSpan\DC2/\n\
+    \\ENQstart\CAN\SOH \SOH(\v2\EM.github.semantic.PositionR\ENQstart\DC2+\n\
+    \\ETXend\CAN\STX \SOH(\v2\EM.github.semantic.PositionR\ETXend\"3\n\
+    \\tByteRange\DC2\DC4\n\
+    \\ENQstart\CAN\SOH \SOH(\ENQR\ENQstart\DC2\DLE\n\
+    \\ETXend\CAN\STX \SOH(\ENQR\ETXend\"\227\SOH\n\
+    \\SOStackGraphFile\DC2\DC2\n\
+    \\EOTpath\CAN\SOH \SOH(\tR\EOTpath\DC2\SUB\n\
+    \\blanguage\CAN\STX \SOH(\tR\blanguage\DC25\n\
+    \\ENQnodes\CAN\ETX \ETX(\v2\US.github.semantic.StackGraphNodeR\ENQnodes\DC25\n\
+    \\ENQpaths\CAN\EOT \ETX(\v2\US.github.semantic.StackGraphPathR\ENQpaths\DC23\n\
+    \\ACKerrors\CAN\ENQ \ETX(\v2\ESC.github.semantic.ParseErrorR\ACKerrors\"\233\SOH\n\
+    \\SOStackGraphNode\DC2\SO\n\
+    \\STXid\CAN\SOH \SOH(\ETXR\STXid\DC2\DC2\n\
+    \\EOTname\CAN\STX \SOH(\tR\EOTname\DC2\DC2\n\
+    \\EOTline\CAN\ETX \SOH(\tR\EOTline\DC2)\n\
+    \\EOTspan\CAN\EOT \SOH(\v2\NAK.github.semantic.SpanR\EOTspan\DC2<\n\
+    \\vsyntax_type\CAN\ENQ \SOH(\SO2\ESC.github.semantic.SyntaxTypeR\n\
+    \syntaxType\DC26\n\
+    \\tnode_type\CAN\ACK \SOH(\SO2\EM.github.semantic.NodeTypeR\bnodeType\"\151\STX\n\
+    \\SOStackGraphPath\DC22\n\
+    \\NAKstarting_symbol_stack\CAN\SOH \ETX(\tR\DC3startingSymbolStack\DC29\n\
+    \\EMstarting_scope_stack_size\CAN\STX \SOH(\ETXR\SYNstartingScopeStackSize\DC2\DC2\n\
+    \\EOTfrom\CAN\ETX \SOH(\ETXR\EOTfrom\DC2\DC4\n\
+    \\ENQedges\CAN\EOT \SOH(\tR\ENQedges\DC2\SO\n\
+    \\STXto\CAN\ENQ \SOH(\ETXR\STXto\DC2,\n\
+    \\DC2ending_scope_stack\CAN\ACK \ETX(\ETXR\DLEendingScopeStack\DC2.\n\
+    \\DC3ending_symbol_stack\CAN\a \ETX(\tR\DC1endingSymbolStack*`\n\
+    \\bNodeType\DC2\SO\n\
+    \\n\
+    \ROOT_SCOPE\DLE\NUL\DC2\DC1\n\
+    \\rJUMP_TO_SCOPE\DLE\SOH\DC2\DC2\n\
+    \\SOEXPORTED_SCOPE\DLE\STX\DC2\SO\n\
+    \\n\
+    \DEFINITION\DLE\ETX\DC2\r\n\
+    \\tREFERENCE\DLE\EOT*t\n\
+    \\n\
+    \SyntaxType\DC2\f\n\
+    \\bFUNCTION\DLE\NUL\DC2\n\
+    \\n\
+    \\ACKMETHOD\DLE\SOH\DC2\t\n\
+    \\ENQCLASS\DLE\STX\DC2\n\
+    \\n\
+    \\ACKMODULE\DLE\ETX\DC2\b\n\
+    \\EOTCALL\DLE\EOT\DC2\b\n\
+    \\EOTTYPE\DLE\ENQ\DC2\r\n\
+    \\tINTERFACE\DLE\ACK\DC2\DC2\n\
+    \\SOIMPLEMENTATION\DLE\aB\DC2\234\STX\SISemantic::ProtoJ\186$\n\
+    \\ACK\DC2\EOT\NUL\NUL~\SOH\n\
+    \\b\n\
+    \\SOH\f\DC2\ETX\NUL\NUL\DC2\n\
+    \\b\n\
+    \\SOH\STX\DC2\ETX\STX\NUL\CAN\n\
+    \\b\n\
+    \\SOH\b\DC2\ETX\EOT\NUL(\n\
+    \\t\n\
+    \\STX\b-\DC2\ETX\EOT\NUL(\n\
+    \\n\
+    \\n\
+    \\STX\EOT\NUL\DC2\EOT\ACK\NUL\b\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\NUL\SOH\DC2\ETX\ACK\b\DC3\n\
+    \\v\n\
+    \\EOT\EOT\NUL\STX\NUL\DC2\ETX\a\STX\NAK\n\
+    \\r\n\
+    \\ENQ\EOT\NUL\STX\NUL\EOT\DC2\EOT\a\STX\ACK\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\NUL\STX\NUL\ENQ\DC2\ETX\a\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\NUL\STX\NUL\SOH\DC2\ETX\a\t\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\NUL\STX\NUL\ETX\DC2\ETX\a\DC3\DC4\n\
+    \\n\
+    \\n\
+    \\STX\EOT\SOH\DC2\EOT\n\
+    \\NUL\SI\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\SOH\SOH\DC2\ETX\n\
+    \\b\DC4\n\
+    \\v\n\
+    \\EOT\EOT\SOH\STX\NUL\DC2\ETX\v\STX\DC4\n\
+    \\r\n\
+    \\ENQ\EOT\SOH\STX\NUL\EOT\DC2\EOT\v\STX\n\
+    \\SYN\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\NUL\ENQ\DC2\ETX\v\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\NUL\SOH\DC2\ETX\v\t\SI\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\NUL\ETX\DC2\ETX\v\DC2\DC3\n\
+    \\v\n\
+    \\EOT\EOT\SOH\STX\SOH\DC2\ETX\f\STX\SYN\n\
+    \\r\n\
+    \\ENQ\EOT\SOH\STX\SOH\EOT\DC2\EOT\f\STX\v\DC4\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\SOH\ENQ\DC2\ETX\f\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\SOH\SOH\DC2\ETX\f\t\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\SOH\ETX\DC2\ETX\f\DC4\NAK\n\
+    \\v\n\
+    \\EOT\EOT\SOH\STX\STX\DC2\ETX\r\STX\ETB\n\
+    \\r\n\
+    \\ENQ\EOT\SOH\STX\STX\EOT\DC2\EOT\r\STX\f\SYN\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\STX\ENQ\DC2\ETX\r\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\STX\SOH\DC2\ETX\r\t\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\STX\ETX\DC2\ETX\r\NAK\SYN\n\
+    \\v\n\
+    \\EOT\EOT\SOH\STX\ETX\DC2\ETX\SO\STX\DC1\n\
+    \\r\n\
+    \\ENQ\EOT\SOH\STX\ETX\EOT\DC2\EOT\SO\STX\r\ETB\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\ETX\ENQ\DC2\ETX\SO\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\ETX\SOH\DC2\ETX\SO\t\f\n\
+    \\f\n\
+    \\ENQ\EOT\SOH\STX\ETX\ETX\DC2\ETX\SO\SI\DLE\n\
+    \\n\
+    \\n\
+    \\STX\EOT\STX\DC2\EOT\DC1\NUL\DC3\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\STX\SOH\DC2\ETX\DC1\b\CAN\n\
+    \\v\n\
+    \\EOT\EOT\STX\STX\NUL\DC2\ETX\DC2\STX\SUB\n\
+    \\f\n\
+    \\ENQ\EOT\STX\STX\NUL\EOT\DC2\ETX\DC2\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\STX\STX\NUL\ACK\DC2\ETX\DC2\v\SI\n\
+    \\f\n\
+    \\ENQ\EOT\STX\STX\NUL\SOH\DC2\ETX\DC2\DLE\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\STX\STX\NUL\ETX\DC2\ETX\DC2\CAN\EM\n\
+    \\n\
+    \\n\
+    \\STX\EOT\ETX\DC2\EOT\NAK\NUL\ETB\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\ETX\SOH\DC2\ETX\NAK\b\US\n\
+    \\v\n\
+    \\EOT\EOT\ETX\STX\NUL\DC2\ETX\SYN\STX\SUB\n\
+    \\f\n\
+    \\ENQ\EOT\ETX\STX\NUL\EOT\DC2\ETX\SYN\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\ETX\STX\NUL\ACK\DC2\ETX\SYN\v\SI\n\
+    \\f\n\
+    \\ENQ\EOT\ETX\STX\NUL\SOH\DC2\ETX\SYN\DLE\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\ETX\STX\NUL\ETX\DC2\ETX\SYN\CAN\EM\n\
+    \\n\
+    \\n\
+    \\STX\EOT\EOT\DC2\EOT\EM\NUL\ESC\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\EOT\SOH\DC2\ETX\EM\b\EM\n\
+    \\v\n\
+    \\EOT\EOT\EOT\STX\NUL\DC2\ETX\SUB\STX\SUB\n\
+    \\f\n\
+    \\ENQ\EOT\EOT\STX\NUL\EOT\DC2\ETX\SUB\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\EOT\STX\NUL\ACK\DC2\ETX\SUB\v\SI\n\
+    \\f\n\
+    \\ENQ\EOT\EOT\STX\NUL\SOH\DC2\ETX\SUB\DLE\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\EOT\STX\NUL\ETX\DC2\ETX\SUB\CAN\EM\n\
+    \\n\
+    \\n\
+    \\STX\EOT\ENQ\DC2\EOT\GS\NUL\US\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\ENQ\SOH\DC2\ETX\GS\b\SUB\n\
+    \\v\n\
+    \\EOT\EOT\ENQ\STX\NUL\DC2\ETX\RS\STX$\n\
+    \\f\n\
+    \\ENQ\EOT\ENQ\STX\NUL\EOT\DC2\ETX\RS\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\ENQ\STX\NUL\ACK\DC2\ETX\RS\v\EM\n\
+    \\f\n\
+    \\ENQ\EOT\ENQ\STX\NUL\SOH\DC2\ETX\RS\SUB\US\n\
+    \\f\n\
+    \\ENQ\EOT\ENQ\STX\NUL\ETX\DC2\ETX\RS\"#\n\
+    \\n\
+    \\n\
+    \\STX\EOT\ACK\DC2\EOT!\NUL#\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\ACK\SOH\DC2\ETX!\b\DC2\n\
+    \\v\n\
+    \\EOT\EOT\ACK\STX\NUL\DC2\ETX\"\STX\DC3\n\
+    \\r\n\
+    \\ENQ\EOT\ACK\STX\NUL\EOT\DC2\EOT\"\STX!\DC4\n\
+    \\f\n\
+    \\ENQ\EOT\ACK\STX\NUL\ENQ\DC2\ETX\"\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\ACK\STX\NUL\SOH\DC2\ETX\"\t\SO\n\
+    \\f\n\
+    \\ENQ\EOT\ACK\STX\NUL\ETX\DC2\ETX\"\DC1\DC2\n\
+    \\n\
+    \\n\
+    \\STX\EOT\a\DC2\EOT%\NUL)\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\a\SOH\DC2\ETX%\b\f\n\
+    \\v\n\
+    \\EOT\EOT\a\STX\NUL\DC2\ETX&\STX\NAK\n\
+    \\r\n\
+    \\ENQ\EOT\a\STX\NUL\EOT\DC2\EOT&\STX%\SO\n\
+    \\f\n\
+    \\ENQ\EOT\a\STX\NUL\ENQ\DC2\ETX&\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\a\STX\NUL\SOH\DC2\ETX&\t\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\a\STX\NUL\ETX\DC2\ETX&\DC3\DC4\n\
+    \\v\n\
+    \\EOT\EOT\a\STX\SOH\DC2\ETX'\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\a\STX\SOH\EOT\DC2\EOT'\STX&\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\a\STX\SOH\ENQ\DC2\ETX'\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\a\STX\SOH\SOH\DC2\ETX'\t\r\n\
+    \\f\n\
+    \\ENQ\EOT\a\STX\SOH\ETX\DC2\ETX'\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\a\STX\STX\DC2\ETX(\STX\SYN\n\
+    \\r\n\
+    \\ENQ\EOT\a\STX\STX\EOT\DC2\EOT(\STX'\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\a\STX\STX\ENQ\DC2\ETX(\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\a\STX\STX\SOH\DC2\ETX(\t\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\a\STX\STX\ETX\DC2\ETX(\DC4\NAK\n\
+    \\n\
+    \\n\
+    \\STX\EOT\b\DC2\EOT+\NUL1\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\b\SOH\DC2\ETX+\b\f\n\
+    \\v\n\
+    \\EOT\EOT\b\STX\NUL\DC2\ETX,\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\b\STX\NUL\EOT\DC2\EOT,\STX+\SO\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\NUL\ENQ\DC2\ETX,\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\NUL\SOH\DC2\ETX,\t\r\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\NUL\ETX\DC2\ETX,\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\b\STX\SOH\DC2\ETX-\STX\SYN\n\
+    \\r\n\
+    \\ENQ\EOT\b\STX\SOH\EOT\DC2\EOT-\STX,\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\SOH\ENQ\DC2\ETX-\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\SOH\SOH\DC2\ETX-\t\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\SOH\ETX\DC2\ETX-\DC4\NAK\n\
+    \\v\n\
+    \\EOT\EOT\b\STX\STX\DC2\ETX.\STX\RS\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\STX\EOT\DC2\ETX.\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\STX\ACK\DC2\ETX.\v\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\STX\SOH\DC2\ETX.\DC2\EM\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\STX\ETX\DC2\ETX.\FS\GS\n\
+    \\v\n\
+    \\EOT\EOT\b\STX\ETX\DC2\ETX/\STX!\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\ETX\EOT\DC2\ETX/\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\ETX\ACK\DC2\ETX/\v\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\ETX\SOH\DC2\ETX/\SYN\FS\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\ETX\ETX\DC2\ETX/\US \n\
+    \\v\n\
+    \\EOT\EOT\b\STX\EOT\DC2\ETX0\STX\SYN\n\
+    \\r\n\
+    \\ENQ\EOT\b\STX\EOT\EOT\DC2\EOT0\STX/!\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\EOT\ENQ\DC2\ETX0\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\EOT\SOH\DC2\ETX0\t\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\b\STX\EOT\ETX\DC2\ETX0\DC4\NAK\n\
+    \\n\
+    \\n\
+    \\STX\EOT\t\DC2\EOT3\NUL=\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\t\SOH\DC2\ETX3\b\SO\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\NUL\DC2\ETX4\STX\DC4\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\NUL\EOT\DC2\EOT4\STX3\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\NUL\ENQ\DC2\ETX4\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\NUL\SOH\DC2\ETX4\t\SI\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\NUL\ETX\DC2\ETX4\DC2\DC3\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\SOH\DC2\ETX5\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\SOH\EOT\DC2\EOT5\STX4\DC4\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\SOH\ENQ\DC2\ETX5\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\SOH\SOH\DC2\ETX5\t\r\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\SOH\ETX\DC2\ETX5\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\STX\DC2\ETX6\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\STX\EOT\DC2\EOT6\STX5\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\STX\ENQ\DC2\ETX6\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\STX\SOH\DC2\ETX6\t\r\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\STX\ETX\DC2\ETX6\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\ETX\DC2\ETX7\STX\DLE\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\ETX\EOT\DC2\EOT7\STX6\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ETX\ACK\DC2\ETX7\STX\ACK\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ETX\SOH\DC2\ETX7\a\v\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ETX\ETX\DC2\ETX7\SO\SI\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\EOT\DC2\ETX8\STX\NAK\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\EOT\EOT\DC2\EOT8\STX7\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\EOT\ACK\DC2\ETX8\STX\v\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\EOT\SOH\DC2\ETX8\f\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\EOT\ETX\DC2\ETX8\DC3\DC4\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\ENQ\DC2\ETX9\STX\EM\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\ENQ\EOT\DC2\EOT9\STX8\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ENQ\ACK\DC2\ETX9\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ENQ\SOH\DC2\ETX9\v\DC4\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ENQ\ETX\DC2\ETX9\ETB\CAN\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\ACK\DC2\ETX:\STX\GS\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\ACK\EOT\DC2\EOT:\STX9\EM\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ACK\ACK\DC2\ETX:\STX\f\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ACK\SOH\DC2\ETX:\r\CAN\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\ACK\ETX\DC2\ETX:\ESC\FS\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\a\DC2\ETX;\STX \n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\a\EOT\DC2\EOT;\STX:\GS\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\a\ACK\DC2\ETX;\STX\ACK\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\a\SOH\DC2\ETX;\a\ESC\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\a\ETX\DC2\ETX;\RS\US\n\
+    \\v\n\
+    \\EOT\EOT\t\STX\b\DC2\ETX<\STX\ESC\n\
+    \\r\n\
+    \\ENQ\EOT\t\STX\b\EOT\DC2\EOT<\STX; \n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\b\ACK\DC2\ETX<\STX\v\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\b\SOH\DC2\ETX<\f\SYN\n\
+    \\f\n\
+    \\ENQ\EOT\t\STX\b\ETX\DC2\ETX<\EM\SUB\n\
+    \\n\
+    \\n\
+    \\STX\EOT\n\
+    \\DC2\EOT?\NULA\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\n\
+    \\SOH\DC2\ETX?\b\DC1\n\
+    \\v\n\
+    \\EOT\EOT\n\
+    \\STX\NUL\DC2\ETX@\STX\ETB\n\
+    \\r\n\
+    \\ENQ\EOT\n\
+    \\STX\NUL\EOT\DC2\EOT@\STX?\DC3\n\
+    \\f\n\
+    \\ENQ\EOT\n\
+    \\STX\NUL\ENQ\DC2\ETX@\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\n\
+    \\STX\NUL\SOH\DC2\ETX@\t\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\n\
+    \\STX\NUL\ETX\DC2\ETX@\NAK\SYN\n\
+    \\n\
+    \\n\
+    \\STX\EOT\v\DC2\EOTC\NULF\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\v\SOH\DC2\ETXC\b\DLE\n\
+    \\v\n\
+    \\EOT\EOT\v\STX\NUL\DC2\ETXD\STX\DC1\n\
+    \\r\n\
+    \\ENQ\EOT\v\STX\NUL\EOT\DC2\EOTD\STXC\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\v\STX\NUL\ENQ\DC2\ETXD\STX\a\n\
+    \\f\n\
+    \\ENQ\EOT\v\STX\NUL\SOH\DC2\ETXD\b\f\n\
+    \\f\n\
+    \\ENQ\EOT\v\STX\NUL\ETX\DC2\ETXD\SI\DLE\n\
+    \\v\n\
+    \\EOT\EOT\v\STX\SOH\DC2\ETXE\STX\DC3\n\
+    \\r\n\
+    \\ENQ\EOT\v\STX\SOH\EOT\DC2\EOTE\STXD\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\v\STX\SOH\ENQ\DC2\ETXE\STX\a\n\
+    \\f\n\
+    \\ENQ\EOT\v\STX\SOH\SOH\DC2\ETXE\b\SO\n\
+    \\f\n\
+    \\ENQ\EOT\v\STX\SOH\ETX\DC2\ETXE\DC1\DC2\n\
+    \\n\
+    \\n\
+    \\STX\EOT\f\DC2\EOTH\NULK\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\f\SOH\DC2\ETXH\b\f\n\
+    \\v\n\
+    \\EOT\EOT\f\STX\NUL\DC2\ETXI\STX\NAK\n\
+    \\r\n\
+    \\ENQ\EOT\f\STX\NUL\EOT\DC2\EOTI\STXH\SO\n\
+    \\f\n\
+    \\ENQ\EOT\f\STX\NUL\ACK\DC2\ETXI\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\f\STX\NUL\SOH\DC2\ETXI\v\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\f\STX\NUL\ETX\DC2\ETXI\DC3\DC4\n\
+    \\v\n\
+    \\EOT\EOT\f\STX\SOH\DC2\ETXJ\STX\DC3\n\
+    \\r\n\
+    \\ENQ\EOT\f\STX\SOH\EOT\DC2\EOTJ\STXI\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\f\STX\SOH\ACK\DC2\ETXJ\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\f\STX\SOH\SOH\DC2\ETXJ\v\SO\n\
+    \\f\n\
+    \\ENQ\EOT\f\STX\SOH\ETX\DC2\ETXJ\DC1\DC2\n\
+    \\n\
+    \\n\
+    \\STX\EOT\r\DC2\EOTM\NULP\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\r\SOH\DC2\ETXM\b\DC1\n\
+    \\v\n\
+    \\EOT\EOT\r\STX\NUL\DC2\ETXN\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\r\STX\NUL\EOT\DC2\EOTN\STXM\DC3\n\
+    \\f\n\
+    \\ENQ\EOT\r\STX\NUL\ENQ\DC2\ETXN\STX\a\n\
+    \\f\n\
+    \\ENQ\EOT\r\STX\NUL\SOH\DC2\ETXN\b\r\n\
+    \\f\n\
+    \\ENQ\EOT\r\STX\NUL\ETX\DC2\ETXN\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\r\STX\SOH\DC2\ETXO\STX\DLE\n\
+    \\r\n\
+    \\ENQ\EOT\r\STX\SOH\EOT\DC2\EOTO\STXN\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\r\STX\SOH\ENQ\DC2\ETXO\STX\a\n\
+    \\f\n\
+    \\ENQ\EOT\r\STX\SOH\SOH\DC2\ETXO\b\v\n\
+    \\f\n\
+    \\ENQ\EOT\r\STX\SOH\ETX\DC2\ETXO\SO\SI\n\
+    \\n\
+    \\n\
+    \\STX\EOT\SO\DC2\EOTR\NULX\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\SO\SOH\DC2\ETXR\b\SYN\n\
+    \\v\n\
+    \\EOT\EOT\SO\STX\NUL\DC2\ETXS\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\SO\STX\NUL\EOT\DC2\EOTS\STXR\CAN\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\NUL\ENQ\DC2\ETXS\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\NUL\SOH\DC2\ETXS\t\r\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\NUL\ETX\DC2\ETXS\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\SO\STX\SOH\DC2\ETXT\STX\SYN\n\
+    \\r\n\
+    \\ENQ\EOT\SO\STX\SOH\EOT\DC2\EOTT\STXS\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\SOH\ENQ\DC2\ETXT\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\SOH\SOH\DC2\ETXT\t\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\SOH\ETX\DC2\ETXT\DC4\NAK\n\
+    \\v\n\
+    \\EOT\EOT\SO\STX\STX\DC2\ETXU\STX$\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\STX\EOT\DC2\ETXU\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\STX\ACK\DC2\ETXU\v\EM\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\STX\SOH\DC2\ETXU\SUB\US\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\STX\ETX\DC2\ETXU\"#\n\
+    \\v\n\
+    \\EOT\EOT\SO\STX\ETX\DC2\ETXV\STX$\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\ETX\EOT\DC2\ETXV\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\ETX\ACK\DC2\ETXV\v\EM\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\ETX\SOH\DC2\ETXV\SUB\US\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\ETX\ETX\DC2\ETXV\"#\n\
+    \\v\n\
+    \\EOT\EOT\SO\STX\EOT\DC2\ETXW\STX!\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\EOT\EOT\DC2\ETXW\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\EOT\ACK\DC2\ETXW\v\NAK\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\EOT\SOH\DC2\ETXW\SYN\FS\n\
+    \\f\n\
+    \\ENQ\EOT\SO\STX\EOT\ETX\DC2\ETXW\US \n\
+    \\n\
+    \\n\
+    \\STX\ENQ\NUL\DC2\EOTZ\NUL`\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\ENQ\NUL\SOH\DC2\ETXZ\ENQ\r\n\
+    \\v\n\
+    \\EOT\ENQ\NUL\STX\NUL\DC2\ETX[\STX\DC1\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\NUL\SOH\DC2\ETX[\STX\f\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\NUL\STX\DC2\ETX[\SI\DLE\n\
+    \\v\n\
+    \\EOT\ENQ\NUL\STX\SOH\DC2\ETX\\\STX\DC4\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\SOH\SOH\DC2\ETX\\\STX\SI\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\SOH\STX\DC2\ETX\\\DC2\DC3\n\
+    \\v\n\
+    \\EOT\ENQ\NUL\STX\STX\DC2\ETX]\STX\NAK\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\STX\SOH\DC2\ETX]\STX\DLE\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\STX\STX\DC2\ETX]\DC3\DC4\n\
+    \\v\n\
+    \\EOT\ENQ\NUL\STX\ETX\DC2\ETX^\STX\DC1\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\ETX\SOH\DC2\ETX^\STX\f\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\ETX\STX\DC2\ETX^\SI\DLE\n\
+    \\v\n\
+    \\EOT\ENQ\NUL\STX\EOT\DC2\ETX_\STX\DLE\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\EOT\SOH\DC2\ETX_\STX\v\n\
+    \\f\n\
+    \\ENQ\ENQ\NUL\STX\EOT\STX\DC2\ETX_\SO\SI\n\
+    \\n\
+    \\n\
+    \\STX\ENQ\SOH\DC2\EOTb\NULk\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\ENQ\SOH\SOH\DC2\ETXb\ENQ\SI\n\
+    \\v\n\
+    \\EOT\ENQ\SOH\STX\NUL\DC2\ETXc\STX\SI\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\NUL\SOH\DC2\ETXc\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\NUL\STX\DC2\ETXc\r\SO\n\
+    \\v\n\
+    \\EOT\ENQ\SOH\STX\SOH\DC2\ETXd\STX\r\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\SOH\SOH\DC2\ETXd\STX\b\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\SOH\STX\DC2\ETXd\v\f\n\
+    \\v\n\
+    \\EOT\ENQ\SOH\STX\STX\DC2\ETXe\STX\f\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\STX\SOH\DC2\ETXe\STX\a\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\STX\STX\DC2\ETXe\n\
+    \\v\n\
+    \\v\n\
+    \\EOT\ENQ\SOH\STX\ETX\DC2\ETXf\STX\r\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\ETX\SOH\DC2\ETXf\STX\b\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\ETX\STX\DC2\ETXf\v\f\n\
+    \\v\n\
+    \\EOT\ENQ\SOH\STX\EOT\DC2\ETXg\STX\v\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\EOT\SOH\DC2\ETXg\STX\ACK\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\EOT\STX\DC2\ETXg\t\n\
+    \\n\
+    \\v\n\
+    \\EOT\ENQ\SOH\STX\ENQ\DC2\ETXh\STX\v\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\ENQ\SOH\DC2\ETXh\STX\ACK\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\ENQ\STX\DC2\ETXh\t\n\
+    \\n\
+    \\v\n\
+    \\EOT\ENQ\SOH\STX\ACK\DC2\ETXi\STX\DLE\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\ACK\SOH\DC2\ETXi\STX\v\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\ACK\STX\DC2\ETXi\SO\SI\n\
+    \\v\n\
+    \\EOT\ENQ\SOH\STX\a\DC2\ETXj\STX\NAK\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\a\SOH\DC2\ETXj\STX\DLE\n\
+    \\f\n\
+    \\ENQ\ENQ\SOH\STX\a\STX\DC2\ETXj\DC3\DC4\n\
+    \\n\
+    \\n\
+    \\STX\EOT\SI\DC2\EOTm\NULt\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\SI\SOH\DC2\ETXm\b\SYN\n\
+    \\v\n\
+    \\EOT\EOT\SI\STX\NUL\DC2\ETXn\STX\SI\n\
+    \\r\n\
+    \\ENQ\EOT\SI\STX\NUL\EOT\DC2\EOTn\STXm\CAN\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\NUL\ENQ\DC2\ETXn\STX\a\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\NUL\SOH\DC2\ETXn\b\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\NUL\ETX\DC2\ETXn\r\SO\n\
+    \\v\n\
+    \\EOT\EOT\SI\STX\SOH\DC2\ETXo\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\SI\STX\SOH\EOT\DC2\EOTo\STXn\SI\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\SOH\ENQ\DC2\ETXo\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\SOH\SOH\DC2\ETXo\t\r\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\SOH\ETX\DC2\ETXo\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\SI\STX\STX\DC2\ETXp\STX\DC2\n\
+    \\r\n\
+    \\ENQ\EOT\SI\STX\STX\EOT\DC2\EOTp\STXo\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\STX\ENQ\DC2\ETXp\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\STX\SOH\DC2\ETXp\t\r\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\STX\ETX\DC2\ETXp\DLE\DC1\n\
+    \\v\n\
+    \\EOT\EOT\SI\STX\ETX\DC2\ETXq\STX\DLE\n\
+    \\r\n\
+    \\ENQ\EOT\SI\STX\ETX\EOT\DC2\EOTq\STXp\DC2\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\ETX\ACK\DC2\ETXq\STX\ACK\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\ETX\SOH\DC2\ETXq\a\v\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\ETX\ETX\DC2\ETXq\SO\SI\n\
+    \\v\n\
+    \\EOT\EOT\SI\STX\EOT\DC2\ETXr\STX\GS\n\
+    \\r\n\
+    \\ENQ\EOT\SI\STX\EOT\EOT\DC2\EOTr\STXq\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\EOT\ACK\DC2\ETXr\STX\f\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\EOT\SOH\DC2\ETXr\r\CAN\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\EOT\ETX\DC2\ETXr\ESC\FS\n\
+    \\v\n\
+    \\EOT\EOT\SI\STX\ENQ\DC2\ETXs\STX\EM\n\
+    \\r\n\
+    \\ENQ\EOT\SI\STX\ENQ\EOT\DC2\EOTs\STXr\GS\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\ENQ\ACK\DC2\ETXs\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\ENQ\SOH\DC2\ETXs\v\DC4\n\
+    \\f\n\
+    \\ENQ\EOT\SI\STX\ENQ\ETX\DC2\ETXs\ETB\CAN\n\
+    \\n\
+    \\n\
+    \\STX\EOT\DLE\DC2\EOTv\NUL~\SOH\n\
+    \\n\
+    \\n\
+    \\ETX\EOT\DLE\SOH\DC2\ETXv\b\SYN\n\
+    \\v\n\
+    \\EOT\EOT\DLE\STX\NUL\DC2\ETXw\STX,\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\NUL\EOT\DC2\ETXw\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\NUL\ENQ\DC2\ETXw\v\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\NUL\SOH\DC2\ETXw\DC2'\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\NUL\ETX\DC2\ETXw*+\n\
+    \\v\n\
+    \\EOT\EOT\DLE\STX\SOH\DC2\ETXx\STX&\n\
+    \\r\n\
+    \\ENQ\EOT\DLE\STX\SOH\EOT\DC2\EOTx\STXw,\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\SOH\ENQ\DC2\ETXx\STX\a\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\SOH\SOH\DC2\ETXx\b!\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\SOH\ETX\DC2\ETXx$%\n\
+    \\v\n\
+    \\EOT\EOT\DLE\STX\STX\DC2\ETXy\STX\DC1\n\
+    \\r\n\
+    \\ENQ\EOT\DLE\STX\STX\EOT\DC2\EOTy\STXx&\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\STX\ENQ\DC2\ETXy\STX\a\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\STX\SOH\DC2\ETXy\b\f\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\STX\ETX\DC2\ETXy\SI\DLE\n\
+    \\v\n\
+    \\EOT\EOT\DLE\STX\ETX\DC2\ETXz\STX\DC3\n\
+    \\r\n\
+    \\ENQ\EOT\DLE\STX\ETX\EOT\DC2\EOTz\STXy\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ETX\ENQ\DC2\ETXz\STX\b\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ETX\SOH\DC2\ETXz\t\SO\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ETX\ETX\DC2\ETXz\DC1\DC2\n\
+    \\v\n\
+    \\EOT\EOT\DLE\STX\EOT\DC2\ETX{\STX\SI\n\
+    \\r\n\
+    \\ENQ\EOT\DLE\STX\EOT\EOT\DC2\EOT{\STXz\DC3\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\EOT\ENQ\DC2\ETX{\STX\a\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\EOT\SOH\DC2\ETX{\b\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\EOT\ETX\DC2\ETX{\r\SO\n\
+    \\v\n\
+    \\EOT\EOT\DLE\STX\ENQ\DC2\ETX|\STX(\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ENQ\EOT\DC2\ETX|\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ENQ\ENQ\DC2\ETX|\v\DLE\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ENQ\SOH\DC2\ETX|\DC1#\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ENQ\ETX\DC2\ETX|&'\n\
+    \\v\n\
+    \\EOT\EOT\DLE\STX\ACK\DC2\ETX}\STX*\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ACK\EOT\DC2\ETX}\STX\n\
+    \\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ACK\ENQ\DC2\ETX}\v\DC1\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ACK\SOH\DC2\ETX}\DC2%\n\
+    \\f\n\
+    \\ENQ\EOT\DLE\STX\ACK\ETX\DC2\ETX}()b\ACKproto3"
