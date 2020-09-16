@@ -13,6 +13,7 @@
 module Main (main) where
 
 import AST.GenerateSyntax
+import qualified Bazel.Runfiles as Bazel
 import Control.Lens (Traversal', mapped, (%~))
 import Control.Monad
 import Data.Foldable
@@ -28,10 +29,12 @@ import Language.Haskell.TH.Lens
 import NeatInterpolation
 import qualified Options.Generic as Opt
 import Source.Language
+import System.FilePath
 import System.Directory
 import System.Exit
 import System.IO
 import System.Process
+import Text.Printf
 import qualified TreeSitter.Go as Go (tree_sitter_go)
 import qualified TreeSitter.JSON as JSON (tree_sitter_json)
 import qualified TreeSitter.Java as Java (tree_sitter_java)
@@ -44,7 +47,7 @@ import qualified TreeSitter.TSX as TSX (tree_sitter_tsx)
 import qualified TreeSitter.TypeScript as TypeScript (tree_sitter_typescript)
 
 -- As a special case, you can pass
-data Config = Config {language :: Text, path :: FilePath, rootdir :: Maybe FilePath}
+data Config = Config {language :: Text, rootdir :: FilePath}
   deriving stock (Show, Generic)
   deriving anyclass (Opt.ParseRecord)
 
@@ -64,6 +67,37 @@ adjust = _InstanceD . typed . mapped %~ (values %~ truncate) . (functions %~ tru
 
     truncate :: Name -> Name
     truncate = mkName . nameBase
+
+pathForLanguage :: Bazel.Runfiles -> Language -> FilePath
+pathForLanguage rf =
+  let loc = Bazel.rlocation rf
+   in \case
+        CodeQL -> loc "tree-sitter-ql/vendor/tree-sitter-ql/src/node-types.json"
+        Go -> loc "tree-sitter-go/vendor/tree-sitter-go/src/node-types.json"
+        PHP -> loc "tree-sitter-php/vendor/tree-sitter-php/src/node-types.json"
+        Python -> loc "tree-sitter-python/vendor/tree-sitter-python/src/node-types.json"
+        Ruby -> loc "tree-sitter-ruby/vendor/tree-sitter-ruby/src/node-types.json"
+        TypeScript -> loc "tree-sitter-typescript/vendor/tree-sitter-typescript/typescript/src/node-types.json"
+        TSX -> loc "tree-sitter-tsx/vendor/tree-sitter-typescript/tsx/src/node-types.json"
+        JavaScript -> loc "tree-sitter-typescript/vendor/tree-sitter-typescript/typescript/src/node-types.json"
+        JSX -> loc "tree-sitter-typescript/vendor/tree-sitter-typescript/src/tsx/node-types.json"
+        Java -> loc "tree-sitter-java/vendor/tree-sitter-java/src/node-types.json"
+        other -> error ("Couldn't find path for " <> show other)
+
+targetForLanguage :: Language -> FilePath
+targetForLanguage x =
+  let go lc = printf "semantic-%s/src/Language/%s/AST.hs" (lc :: String) (show x)
+   in case x of
+        CodeQL -> go "codeql"
+        Go -> go "go"
+        PHP -> go "php"
+        Python -> go "python"
+        Ruby -> go "ruby"
+        TypeScript -> go "typescript"
+        TSX -> go "tsx"
+        JavaScript -> go "javascript"
+        Java -> go "java"
+        other -> error ("Couldn't find path for " <> show other)
 
 parserForLanguage :: Language -> Ptr TreeSitter.Language.Language
 parserForLanguage = \case
@@ -87,11 +121,13 @@ parserForLanguage = \case
 --   CodeQL -> r
 
 validLanguages :: [Language]
-validLanguages = [CodeQL, Go, Java, JavaScript, JSON, JSX, PHP, Python, Ruby, TypeScript, TSX]
+validLanguages = [CodeQL, Go, Java, PHP, Python, Ruby, TypeScript, TSX]
 
 emit :: FilePath -> Language -> IO ()
-emit path lang = do
+emit root lang = do
+  rf <- Bazel.create
   let language = languageToText lang
+  let path = pathForLanguage rf lang
   decls <- T.pack . pprint . fmap adjust <$> astDeclarationsIO (parserForLanguage lang) path
 
   let programText =
@@ -151,14 +187,14 @@ $decls
       T.hPutStrLn tf programText
       hClose tf
       callProcess "ormolu" ["--mode", "inplace", path]
-      T.readFile path >>= T.putStrLn
+      callProcess "cp" [path, root </> targetForLanguage lang]
 
 main :: IO ()
 main = do
-  Config language path _root <- Opt.getRecord "generate-ast"
+  Config language root <- Opt.getRecord "generate-ast"
   if language == "all"
-    then traverse_ (emit path) validLanguages
+    then traverse_ (emit root) validLanguages
     else do
       let lang = textToLanguage language
       when (lang == Unknown) (die ("Couldn't determine language for " <> T.unpack language))
-      emit path lang
+      emit root lang

@@ -48,7 +48,20 @@ haskell_library(
     ],
 )
 
-all_ts_deps = ["@tree-sitter-{name}//:tree-sitter-{name}".format(name = name) for name in [
+all_ts_deps = ["@tree-sitter-{name}".format(name = name) for name in [
+    "go",
+    "java",
+    "json",
+    "php",
+    "python",
+    "ql",
+    "ruby",
+    "rust",
+    "tsx",
+    "typescript",
+]]
+
+all_file_deps = ["@tree-sitter-{name}//:src/node-types.json".format(name = name) for name in [
     "go",
     "java",
     "json",
@@ -65,20 +78,21 @@ haskell_binary(
     name = "generate-ast",
     srcs = glob(["app/**/*.hs"]),
     compiler_flags = GHC_FLAGS + EXECUTABLE_FLAGS + ["-XStrictData"],
+    data = all_file_deps,
     deps = [
         ":semantic-ast",
-        "//semantic-source",
         "//:base",
         "//:filepath",
         "//:process",
         "//:template-haskell",
         "//:text",
+        "//semantic-source",
+        "@stackage//:bazel-runfiles",
         "@stackage//:directory",
         "@stackage//:generic-lens",
         "@stackage//:lens",
-        "@stackage//:tree-sitter",
-        "@stackage//:bazel-runfiles",
         "@stackage//:neat-interpolation",
         "@stackage//:optparse-generic",
+        "@stackage//:tree-sitter",
     ] + all_ts_deps,
 )
