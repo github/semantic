@@ -17,9 +17,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # [1] https://github.com/tweag/rules_haskell/issues/1349
 http_archive(
     name = "rules_haskell",
-    sha256 = "5e8077ae243b4bcf7bb913dfd9b4335c3b4bd2554658c62db7b3eb5351c80d8e",
-    strip_prefix = "rules_haskell-aabeedc18f5e5db030ca1aa0c10a7dc14e4a4a55",
-    urls = ["https://github.com/tweag/rules_haskell/archive/aabeedc18f5e5db030ca1aa0c10a7dc14e4a4a55.tar.gz"],
+    sha256 = "cd07e421281c3ad286574ae235f39165e294c850fa4cdf03b5683547d8822c34",
+    strip_prefix = "rules_haskell-1254b1d9bee9e82cd70c4f7941cb64b8ec048bac",
+    urls = ["https://github.com/tweag/rules_haskell/archive/1254b1d9bee9e82cd70c4f7941cb64b8ec048bac.tar.gz"],
 )
 
 load(
@@ -94,7 +94,6 @@ stack_snapshot(
         "hspec",
         "hspec-core",
         "hspec-expectations",
-        "proto-lens-jsonpb",
         "lens",
         "lingo",
         "network",
@@ -108,6 +107,7 @@ stack_snapshot(
         "prettyprinter-ansi-terminal",
         "process",
         "proto-lens",
+        "proto-lens-jsonpb",
         "proto-lens-runtime",
         "raw-strings-qq",
         "recursion-schemes",
