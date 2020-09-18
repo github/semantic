@@ -1,0 +1,2 @@
+#!/bin/bash
+bazel run //semantic-ast:generate-ast -- --language=all --rootdir=$PWD

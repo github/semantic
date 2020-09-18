@@ -24,7 +24,6 @@ jobs:
         path: |
           .bazel-cache
           bin
-          /home/runner/.cache
         key: ${{ runner.os }}-bazel-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-bazel-
