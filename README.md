@@ -83,7 +83,7 @@ bazel build //...
 
  `stack` as a build tool is not officially supported; there is [unofficial `stack.yaml` support](https://github.com/jkachmar/semantic-stack-yaml) available, though we cannot make guarantees as to its stability.
 
-[nix]: https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html
+[nix]: https://cabal.readthedocs.io/en/3.4/nix-local-build-overview.html
 [ghcup]: https://www.haskell.org/ghcup/
 
 ## Technology and architecture
