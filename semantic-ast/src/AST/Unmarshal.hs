@@ -10,6 +10,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module AST.Unmarshal
 ( parseByteString
@@ -33,6 +34,7 @@ import           AST.Parse
 import           Control.Carrier.State.Strict
 import           Control.Exception
 import           Control.Monad.IO.Class
+import           Data.Attoparsec.Text as Attoparsec (Parser, char, takeWhile1, string, many', endOfInput, decimal, choice, parseOnly)
 import           Data.ByteString (ByteString)
 import qualified Data.ByteString as B
 import           Data.Coerce
@@ -45,7 +47,7 @@ import qualified Data.Text as Text
 import           Data.Text.Encoding
 import           Data.Text.Encoding.Error (lenientDecode)
 import           Foreign.C.String
-import           Foreign.Marshal.Alloc (alloca)
+import           Foreign.Marshal.Alloc (alloca, free)
 import           Foreign.Marshal.Array
 import           Foreign.Marshal.Utils
 import           Foreign.Ptr
@@ -60,6 +62,7 @@ import           TreeSitter.Language as TS
 import           TreeSitter.Node as TS
 import           TreeSitter.Parser as TS
 import           TreeSitter.Tree as TS
+import Control.Monad (void)
 
 -- Parse source code and produce AST
 parseByteString :: (Unmarshal t, UnmarshalAnn a) => Ptr TS.Language -> ByteString -> IO (Either String (UnmarshalDiagnostics, (t a)))
@@ -82,8 +85,9 @@ newtype UnmarshalError = UnmarshalError { getUnmarshalError :: String }
 
 instance Exception UnmarshalError
 
-newtype UnmarshalDiagnostics = UnmarshalDiagnostics [(Loc, String)]
-  deriving (Show)
+-- newtype UnmarshalDiagnostics = UnmarshalDiagnostics [(Loc, String)]
+newtype UnmarshalDiagnostics = UnmarshalDiagnostics [(Range, [((Int,Int), TSDiagnostic)])]
+  deriving (Show, Eq)
 
 instance Semigroup UnmarshalDiagnostics where
   UnmarshalDiagnostics a <> UnmarshalDiagnostics b = UnmarshalDiagnostics (a <> b)
@@ -173,14 +177,19 @@ class SymbolMatching t => Unmarshal t where
             fmap to1 (gunmarshalNode node)
 
 -- | Check if the Node has any tree-sitter problems, such as being an
--- ERROR or MISSING node
+-- ERROR or MISSING or UNEXPECTED node
 checkDiagnostics :: Node -> MatchM ()
 checkDiagnostics node = do
-  missing <- liftIO . alloca $ (\p -> poke p (nodeTSNode node) >> ts_node_has_error_p p)
-  err     <- liftIO . alloca $ (\p -> poke p (nodeTSNode node) >> ts_node_is_missing_p p)
-  loc <- unmarshalAnn @Loc node
-  let newDiags = UnmarshalDiagnostics ([(loc, "MISSING") | missing] <> [(loc, "ERROR") | err])
-  modify (\s -> s { diagnostics = diagnostics s <> newDiags })
+  (Loc loc _, _txt) <- unmarshalAnn @(Loc, Text.Text) node
+  dds     <- liftIO . alloca $ (\p -> poke p (nodeTSNode node) >> ts_node_string_diagnostics_p p)
+  str <- liftIO $ peekCString dds
+  liftIO $ free dds
+  let dd = if null str
+             then []
+             else [(loc, parseDiagnostics (Text.pack str))]
+
+  modify (\s -> s { diagnostics = diagnostics s <> UnmarshalDiagnostics dd })
+
 
 instance (Unmarshal f, Unmarshal g) => Unmarshal (f :+: g) where
   matchers = fmap (fmap (hoist L1)) matchers <> fmap (fmap (hoist R1)) matchers
@@ -457,3 +466,80 @@ instance (GHasAnn ann l, GHasAnn ann r) => GHasAnn ann (l :+: r) where
 
 instance {-# OVERLAPPABLE #-} HasField "ann" (t ann) ann => GHasAnn ann t where
   gann = getField @"ann"
+
+-- ---------------------------------------------------------------------
+-- Perhaps this belongs in its own module
+
+
+-- [(Range {start = 11, end = 23},"((16,19) (ERROR)),((24,24) (MISSING \".\")),")]
+
+data TSDiagnostic = TSDError
+                  | TSDMissing Text.Text
+                  | TSDUnexpected Text.Text
+                  deriving (Eq,Show)
+
+parseDiagnostics :: Text.Text -> [((Int,Int), TSDiagnostic)]
+parseDiagnostics str = r
+  where
+    r = case parseOnly posdiagnostics str of
+      -- TODO: proper handling
+      Left err -> error err
+      Right ds -> ds
+
+
+posdiagnostics :: Attoparsec.Parser [((Int,Int), TSDiagnostic)]
+posdiagnostics = do
+  xs <- many' posdiagnostic
+  void endOfInput
+  pure xs
+
+-- "((16,19) (ERROR)),((24,24) (MISSING \".\")),")]
+posdiagnostic :: Attoparsec.Parser ((Int,Int), TSDiagnostic)
+posdiagnostic = do
+  void $ char '('
+  pos <- pos
+  void $ char ' '
+  d <- diag
+  void $ char ')'
+  void $ char ','
+  pure (pos,d)
+
+pos :: Attoparsec.Parser (Int,Int)
+pos = do
+  void $ char '('
+  l <- decimal
+  void $ char ','
+  c <- decimal
+  void $ char ')'
+  pure (l,c)
+
+diag :: Attoparsec.Parser TSDiagnostic
+diag = do
+  void $ char '('
+  d <- choice [perror,punexpected,pmissing]
+  void $ char ')'
+  pure d
+
+perror :: Attoparsec.Parser TSDiagnostic
+perror = do
+  void $ string "ERROR"
+  pure TSDError
+
+pmissing :: Attoparsec.Parser TSDiagnostic
+pmissing = do
+  void $ string "MISSING"
+  void $ char ' '
+  void $ char '"'
+  s <- takeWhile1 (/= '"')
+  void $ char '"'
+  pure (TSDMissing s)
+
+punexpected :: Attoparsec.Parser TSDiagnostic
+punexpected = do
+  void $ string "UNEXPECTED"
+  void $ char ' '
+  void $ char '"'
+  s <- takeWhile1 (/= '"')
+  void $ char '"'
+  pure (TSDUnexpected s)
+

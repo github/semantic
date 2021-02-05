@@ -20,7 +20,7 @@ packages: semantic
           semantic-tags
           semantic-tsx
           semantic-typescript
-          -- ../../alanz/haskell-tree-sitter/tree-sitter
+          -- ../../tree-sitter/haskell-tree-sitter/tree-sitter
 
 source-repository-package
   type: git
@@ -30,5 +30,5 @@ source-repository-package
 source-repository-package
     type: git
     location: https://github.com/alanz/haskell-tree-sitter.git
-    tag: 8f6d94e6bbb7035851492160fa6e642c8612d2b
+    tag: ec8a82021017f644c77156c33a249073d013f73b
     subdir: tree-sitter
