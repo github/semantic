@@ -16,6 +16,8 @@ module AST.Unmarshal
 ( parseByteString
 , UnmarshalState(..)
 , UnmarshalDiagnostics(..)
+, TSDiagnostic(..)
+, parseDiagnostics
 , UnmarshalError(..)
 , FieldName(..)
 , Unmarshal(..)
@@ -33,6 +35,7 @@ import           AST.Token as TS
 import           AST.Parse
 import           Control.Carrier.State.Strict
 import           Control.Exception
+import           Control.Monad (void)
 import           Control.Monad.IO.Class
 import           Data.Attoparsec.Text as Attoparsec (Parser, char, takeWhile1, string, many', endOfInput, decimal, choice, parseOnly)
 import           Data.ByteString (ByteString)
@@ -62,7 +65,6 @@ import           TreeSitter.Language as TS
 import           TreeSitter.Node as TS
 import           TreeSitter.Parser as TS
 import           TreeSitter.Tree as TS
-import Control.Monad (void)
 
 -- Parse source code and produce AST
 parseByteString :: (Unmarshal t, UnmarshalAnn a) => Ptr TS.Language -> ByteString -> IO (Either String (UnmarshalDiagnostics, (t a)))
