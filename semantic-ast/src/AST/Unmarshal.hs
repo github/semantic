@@ -175,6 +175,8 @@ class SymbolMatching t => Unmarshal t where
     where match = Match $ \ node -> do
             cursor <- gets cursor
             goto cursor (nodeTSNode node)
+            -- Note: checkDiagnostics could be made optional, for
+            -- batch usage
             checkDiagnostics node
             fmap to1 (gunmarshalNode node)
 
@@ -182,13 +184,11 @@ class SymbolMatching t => Unmarshal t where
 -- ERROR or MISSING or UNEXPECTED node
 checkDiagnostics :: Node -> MatchM ()
 checkDiagnostics node = do
-  (Loc loc _, _txt) <- unmarshalAnn @(Loc, Text.Text) node
-  dds     <- liftIO . alloca $ (\p -> poke p (nodeTSNode node) >> ts_node_string_diagnostics_p p)
+  (Loc loc _) <- unmarshalAnn @Loc node
+  dds <- liftIO . alloca $ (\p -> poke p (nodeTSNode node) >> ts_node_string_diagnostics_p p)
   str <- liftIO $ peekCString dds
   liftIO $ free dds
-  let dd = if null str
-             then []
-             else [(loc, parseDiagnostics (Text.pack str))]
+  let dd = [(loc, parseDiagnostics (Text.pack str)) | not (null str)]
 
   modify (\s -> s { diagnostics = diagnostics s <> UnmarshalDiagnostics dd })
 
@@ -485,9 +485,8 @@ parseDiagnostics str = r
   where
     r = case parseOnly posdiagnostics str of
       -- TODO: proper handling
-      Left err -> error err
+      Left err -> [((1,0), TSDUnexpected ("parseDiagnostics:" <> Text.pack err <> "parsing [" <> str <> "]"))]
       Right ds -> ds
-
 
 posdiagnostics :: Attoparsec.Parser [((Int,Int), TSDiagnostic)]
 posdiagnostics = do
