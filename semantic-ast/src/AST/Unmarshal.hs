@@ -65,6 +65,7 @@ import           TreeSitter.Language as TS
 import           TreeSitter.Node as TS
 import           TreeSitter.Parser as TS
 import           TreeSitter.Tree as TS
+import Control.Applicative ((<|>))
 
 -- Parse source code and produce AST
 parseByteString :: (Unmarshal t, UnmarshalAnn a) => Ptr TS.Language -> ByteString -> IO (Either String (UnmarshalDiagnostics, (t a)))
@@ -495,6 +496,7 @@ posdiagnostics = do
   pure xs
 
 -- "((16,19) (ERROR)),((24,24) (MISSING \".\")),")]
+-- ((15,15) (MISSING {_raw_atom}))
 posdiagnostic :: Attoparsec.Parser ((Int,Int), TSDiagnostic)
 posdiagnostic = do
   void $ char '('
@@ -530,17 +532,34 @@ pmissing :: Attoparsec.Parser TSDiagnostic
 pmissing = do
   void $ string "MISSING"
   void $ char ' '
-  void $ char '"'
-  s <- takeWhile1 (/= '"')
-  void $ char '"'
+  s <- pquoted
   pure (TSDMissing s)
 
 punexpected :: Attoparsec.Parser TSDiagnostic
 punexpected = do
   void $ string "UNEXPECTED"
   void $ char ' '
+  s <- pquoted
+  pure (TSDUnexpected s)
+
+pquoted :: Attoparsec.Parser Text.Text
+pquoted =
+  pquotedString
+    <|> pbracedString
+
+pquotedString :: Attoparsec.Parser Text.Text
+pquotedString = do
   void $ char '"'
   s <- takeWhile1 (/= '"')
   void $ char '"'
-  pure (TSDUnexpected s)
+  pure s
 
+-- TODO: this should probably be an SEXP parser. But we wrap the
+-- missng part in braces in the tree-sitter C part, so should work
+-- unless there is a '}' in the quoted fragment.
+pbracedString :: Attoparsec.Parser Text.Text
+pbracedString = do
+  void $ char '{'
+  s <- takeWhile1 (/= '}')
+  void $ char '}'
+  pure s
