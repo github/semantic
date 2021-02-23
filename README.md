@@ -67,7 +67,7 @@ git clone git@github.com:github/semantic.git
 cd semantic
 script/bootstrap
 cabal v2-build all
-cabal v2-test semantic
+cabal v2-run semantic:test
 cabal v2-run semantic:semantic -- --help
 ```
 
