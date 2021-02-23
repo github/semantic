@@ -35,7 +35,7 @@ allTests :: (?session :: TaskSession, Fixture.HasFixture) => IO TestTree
 allTests = do
   asTastySpecs <- Tasty.testSpecs legacySpecs
   let allSpecs = tests <> asTastySpecs
-  pure . Tasty.localOption Tasty.Success $ testGroup "semantic" allSpecs
+  pure (testGroup "semantic" allSpecs)
 
 -- If you're writing new test modules, please don't add to this
 -- stanza: it is only there to prevent massive rewrites, and is
