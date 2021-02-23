@@ -67,8 +67,8 @@ git clone git@github.com:github/semantic.git
 cd semantic
 script/bootstrap
 cabal v2-build all
-cabal v2-test
-cabal v2-run semantic -- --help
+cabal v2-test semantic
+cabal v2-run semantic:semantic -- --help
 ```
 
 You can also use the [Bazel](https://bazel.build) build system for development. To learn more about Bazel and why it might give you a better development experience, check the [build documentation](docs/build.md).
