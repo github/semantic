@@ -12,7 +12,8 @@ module Parsing.TreeSitter
 , parseToPreciseAST
 ) where
 
-import Control.Carrier.Reader
+import Control.Carrier.State.Strict
+-- import Control.Carrier.Reader
 import Control.Exception as Exc
 import Control.Monad.IO.Class
 import Foreign
@@ -51,7 +52,7 @@ parseToPreciseAST
 parseToPreciseAST parseTimeout unmarshalTimeout language blob = runParse parseTimeout language blob $ \ rootPtr ->
   withTimeout $
     TS.withCursor (castPtr rootPtr) $ \ cursor ->
-      runReader (TS.UnmarshalState (Source.bytes (blobSource blob)) cursor) (liftIO (peek rootPtr) >>= TS.unmarshalNode)
+      runState (TS.UnmarshalState (Source.bytes (blobSource blob)) cursor mempty) (liftIO (peek rootPtr) >>= TS.unmarshalNode)
         `Exc.catch` (Exc.throw . UnmarshalFailure . TS.getUnmarshalError)
   where
     withTimeout :: IO a -> IO a
