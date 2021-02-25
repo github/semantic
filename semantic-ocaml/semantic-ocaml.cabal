@@ -1,0 +1,75 @@
+cabal-version:       2.4
+
+name:                semantic-ocaml
+version:             0.0.0.0
+synopsis:            Semantic support for OCaml.
+description:         Semantic support for OCaml using the semantic-core intermediate language.
+homepage:            https://github.com/github/semantic/tree/master/semantic-ocaml#readme
+bug-reports:         https://github.com/github/semantic/issues
+license:             MIT
+license-file:        LICENSE
+author:              The Semantic authors
+maintainer:          opensource+semantic@github.com
+copyright:           (c) 2019 GitHub, Inc.
+category:            Language
+build-type:          Simple
+stability:           alpha
+extra-source-files:  README.md
+
+tested-with:         GHC == 8.6.5
+
+common haskell
+  default-language:    Haskell2010
+  ghc-options:
+    -Weverything
+    -Wno-missing-local-signatures
+    -Wno-missing-import-lists
+    -Wno-implicit-prelude
+    -Wno-safe
+    -Wno-unsafe
+    -Wno-name-shadowing
+    -Wno-monomorphism-restriction
+    -Wno-missed-specialisations
+    -Wno-all-missed-specialisations
+    -Wno-star-is-type
+  if (impl(ghc >= 8.8))
+    ghc-options: -Wno-missing-deriving-strategies
+  if (impl(ghc >= 8.10))
+    ghc-options:
+      -Wno-missing-safe-haskell-mode
+      -Wno-prepositive-qualified-module
+  cpp-options:
+    -DBAZEL_BUILD=0
+
+library
+  import: haskell
+  exposed-modules:
+    Language.OCaml
+    Language.OCaml.AST
+    Language.OCaml.Grammar
+    Language.OCaml.Tags
+  hs-source-dirs: src
+  build-depends:
+    , base  >= 4.13 && < 5
+    , fused-effects ^>= 1.1
+    , semantic-ast
+    , semantic-proto ^>= 0
+    , semantic-source ^>= 0.1.0.1
+    , semantic-tags ^>= 0.0
+    , template-haskell  >= 2.15 && < 2.17
+    , text ^>= 1.2.3
+    , tree-sitter ^>= 0.9.0.0
+    , tree-sitter-ocaml ^>= 0.1
+
+test-suite test
+  import: haskell
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          PreciseTest.hs
+  build-depends:
+    , base
+    , pathtype ^>= 0.8.1
+    , semantic-ast
+    , semantic-ocaml
+    , tasty
+    , tree-sitter-ocaml ^>= 0.1

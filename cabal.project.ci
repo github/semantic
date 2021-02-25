@@ -9,6 +9,7 @@ packages: semantic
           semantic-go
           semantic-java
           semantic-json
+          semantic-ocaml
           semantic-parse
           semantic-php
           semantic-proto
@@ -50,6 +51,9 @@ package semantic-java
 
 package semantic-json
   ghc-options: -Werror
+
+package semantic-ocaml
+  ghc-options: -Werror -freduction-depth=300
 
 package semantic-parse
   ghc-options: -Werror
