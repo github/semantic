@@ -29,7 +29,7 @@ To serve these goals, the following options were considered alongside `tree-sitt
 8. **Open source.** By using tree-sitter we can lean on open source contributors to do grammar development work.
 9. **Low learning curve.** Writing grammars in JavaScript (as opposed to some custom notation/language) is quite powerful.
 10. **Multiple algorithms for handling ambiguity.** Precedence annotations at compile time, GLR at runtime.
-11. **External scanner support.** In case you need to parse a context free grammar. An example of an external scanner is in [Ruby's language support](https://github.com/tree-sitter/tree-sitter-ruby/blob/master/src/scanner.cc).
+11. **External scanner support.** In case you need to parse a context-sensitive grammar. An example of an external scanner is in [Ruby's language support](https://github.com/tree-sitter/tree-sitter-ruby/blob/master/src/scanner.cc).
 12. **Solid tooling for development and debugging.** Tree-sitter makes it easy to get up and running fairly quickly. It also provides detailed error messages to guide grammar development.
 13. **Built in performance tooling.**
 14. **Parsing is very fast.**
