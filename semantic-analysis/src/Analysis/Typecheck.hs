@@ -46,8 +46,6 @@ import qualified Data.Set as Set
 import           Data.Void
 import           GHC.Generics (Generic1)
 import           Prelude hiding (fail)
-import           Source.Span
-import qualified System.Path as Path
 
 data Monotype a
   = Var a
@@ -115,7 +113,7 @@ generalize ty = fromJust (closed (forAlls (IS.toList (mvs ty)) (PType ty)))
 typecheckingFlowInsensitive
   :: Ord (term Addr)
   => (forall sig m
-     .  (Has (Dom Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     .  (Has (Dom Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Reference) sig m, MonadFail m)
      => (term Addr -> m Type)
      -> (term Addr -> m Type)
      )
@@ -136,7 +134,7 @@ runFile
      , Ord (term Addr)
      )
   => (forall sig m
-     .  (Has (A.Dom Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     .  (Has (A.Dom Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Reference) sig m, MonadFail m)
      => (term Addr -> m Type)
      -> (term Addr -> m Type)
      )
@@ -149,8 +147,7 @@ runFile eval file = traverse run file
               modify @(Heap Type) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
           . runState @Substitution mempty
-          . runReader (filePath file)
-          . runReader (fileSpan file)
+          . runReader (Reference (filePath file) (fileSpan file))
           . runEnv
           . runFail
           . (\ m -> do

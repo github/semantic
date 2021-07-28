@@ -30,12 +30,12 @@ runFail = runError . runFailC
 newtype FailC m a = FailC { runFailC :: ErrorC (Reference, String) m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
-instance (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => MonadFail (FailC m) where
+instance Has (Reader Reference) sig m => MonadFail (FailC m) where
   fail s = do
-    ref <- Reference <$> ask <*> ask
-    FailC (throwError (ref, s))
+    ref <- ask
+    FailC (throwError (ref :: Reference, s))
 
-instance (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => Algebra (Fail :+: sig) (FailC m) where
+instance Has (Reader Reference) sig m => Algebra (Fail :+: sig) (FailC m) where
   alg _   (L (Fail s)) _   = fail s
   alg hdl (R other)    ctx = FailC (alg (runFailC . hdl) (R other) ctx)
 

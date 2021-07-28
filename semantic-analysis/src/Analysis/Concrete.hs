@@ -125,7 +125,7 @@ type Eval term m value = (term -> m value) -> (term -> m value)
 
 concrete
   :: (forall sig m
-     .  (Has (A.Dom Concrete :+: A.Env Addr :+: A.Heap Addr Concrete :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     .  (Has (A.Dom Concrete :+: A.Env Addr :+: A.Heap Addr Concrete :+: Reader Reference) sig m, MonadFail m)
      => Eval term m Concrete
      )
   -> [File term]
@@ -141,14 +141,13 @@ runFile
      , Has (A.Heap Addr Concrete) sig m
      )
   => (forall sig m
-     .  (Has (A.Dom Concrete :+: A.Env Addr :+: A.Heap Addr Concrete :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
+     .  (Has (A.Dom Concrete :+: A.Env Addr :+: A.Heap Addr Concrete :+: Reader Reference) sig m, MonadFail m)
      => Eval term m Concrete
      )
   -> File term
   -> m (File (Either (Reference, String) Concrete))
 runFile eval file = traverse run file
-  where run = runReader (filePath file)
-            . runReader (fileSpan file)
+  where run = runReader (Reference (filePath file) (fileSpan file))
             . runFail
             . runReader @Env mempty
             . A.runEnv
@@ -164,8 +163,7 @@ instance MonadTrans DomainC where
 
 instance ( Has (A.Env Addr) sig m
          , Has (A.Heap Addr Concrete) sig m
-         , Has (Reader Path.AbsRelFile) sig m
-         , Has (Reader Span) sig m
+         , Has (Reader Reference) sig m
          , MonadFail m
          )
       => Algebra (A.Dom Concrete :+: sig) (DomainC m) where
@@ -173,9 +171,8 @@ instance ( Has (A.Env Addr) sig m
     L (DVar n)    -> pure (vvar n <$ ctx)
     L (DAbs n b)  -> do
       b' <- hdl (b (vvar n) <$ ctx)
-      path <- ask
-      span <- ask
-      pure $ Closure path span . named n . flip (vsubst n) <$> b'
+      ref <- ask
+      pure $ Closure (refPath ref) (refSpan ref) . named n . flip (vsubst n) <$> b'
     L (DApp f a)  -> pure $ velim f (EApp a) <$ ctx
     L (DInt i)    -> pure (Int i <$ ctx)
     L DUnit       -> pure (Unit <$ ctx)
