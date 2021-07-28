@@ -148,7 +148,7 @@ runFile eval file = traverse run file
               modify @(Heap Type) (fmap (Set.map (substAll subst)))
               pure (substAll subst <$> t))
           . runState @Substitution mempty
-          . runReader (Reference (filePath file) (fileSpan file))
+          . runReader (fileRef file)
           . runEnv
           . runFail
           . (\ m -> do

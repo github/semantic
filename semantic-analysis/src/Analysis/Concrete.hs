@@ -148,7 +148,7 @@ runFile
   -> File term
   -> m (File (Either (Reference, String) Concrete))
 runFile eval file = traverse run file
-  where run = runReader (Reference (filePath file) (fileSpan file))
+  where run = runReader (fileRef file)
             . runFail
             . runReader @Env mempty
             . A.runEnv
