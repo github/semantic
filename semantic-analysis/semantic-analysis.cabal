@@ -58,6 +58,7 @@ library
     Analysis.Functor.Named
     Analysis.Name
     Analysis.Project
+    Analysis.Reference
     Analysis.Typecheck
     Control.Carrier.Fail.WithLoc
   build-depends:
