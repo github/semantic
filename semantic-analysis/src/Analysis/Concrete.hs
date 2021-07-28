@@ -21,13 +21,13 @@ module Analysis.Concrete
 ) where
 
 import qualified Analysis.Carrier.Env.Precise as A
+import           Analysis.Carrier.Fail.WithLoc
 import qualified Analysis.Carrier.Heap.Precise as A
 import           Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.Functor.Named
 import           Analysis.Reference
 import           Control.Algebra
-import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader hiding (Local)
 import           Control.Monad.Trans.Class (MonadTrans(..))

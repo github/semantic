@@ -23,6 +23,7 @@ module Analysis.Typecheck
 ) where
 
 import           Analysis.Carrier.Env.Monovariant
+import           Analysis.Carrier.Fail.WithLoc
 import qualified Analysis.Carrier.Heap.Monovariant as A
 import           Analysis.Effect.Domain as A
 import           Analysis.File
@@ -31,7 +32,6 @@ import           Analysis.Functor.Named
 import           Analysis.Reference
 import           Control.Algebra
 import           Control.Applicative (Alternative(..))
-import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict as Fresh
 import           Control.Carrier.Reader hiding (Local)
 import           Control.Carrier.State.Strict

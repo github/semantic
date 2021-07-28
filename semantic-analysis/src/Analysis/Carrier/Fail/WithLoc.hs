@@ -3,7 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Control.Carrier.Fail.WithLoc
+module Analysis.Carrier.Fail.WithLoc
 ( -- * Fail carrier
   runFail
 , FailC(..)

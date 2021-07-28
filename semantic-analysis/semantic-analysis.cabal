@@ -47,6 +47,7 @@ library
     Analysis.Blob
     Analysis.Carrier.Env.Monovariant
     Analysis.Carrier.Env.Precise
+    Analysis.Carrier.Fail.WithLoc
     Analysis.Carrier.Heap.Monovariant
     Analysis.Carrier.Heap.Precise
     Analysis.Concrete
@@ -60,7 +61,6 @@ library
     Analysis.Project
     Analysis.Reference
     Analysis.Typecheck
-    Control.Carrier.Fail.WithLoc
   build-depends:
     , aeson                       ^>= 1.4
     , base                         >= 4.13 && < 5
