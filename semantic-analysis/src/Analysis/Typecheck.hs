@@ -28,6 +28,7 @@ import           Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
 import           Analysis.Functor.Named
+import           Analysis.Reference
 import           Control.Algebra
 import           Control.Applicative (Alternative(..))
 import           Control.Carrier.Fail.WithLoc

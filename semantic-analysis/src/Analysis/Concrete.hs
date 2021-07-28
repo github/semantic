@@ -25,6 +25,7 @@ import qualified Analysis.Carrier.Heap.Precise as A
 import           Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.Functor.Named
+import           Analysis.Reference
 import           Control.Algebra
 import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
