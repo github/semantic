@@ -79,7 +79,7 @@ importGraph
      )
   -> [File (term Addr)]
   -> ( Heap (Value (Semi term))
-     , [File (Either (Path.AbsRelFile, Span, String) (Value (Semi term)))]
+     , [File (Either (Reference, String) (Value (Semi term)))]
      )
 importGraph eval
   = run
@@ -101,7 +101,7 @@ runFile
      -> (term Addr -> m (Value (Semi term)))
      )
   -> File (term Addr)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Value (Semi term))))
+  -> m (File (Either (Reference, String) (Value (Semi term))))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)

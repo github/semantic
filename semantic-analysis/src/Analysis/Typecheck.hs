@@ -121,7 +121,7 @@ typecheckingFlowInsensitive
      )
   -> [File (term Addr)]
   -> ( Heap Type
-     , [File (Either (Path.AbsRelFile, Span, String) (Term (Polytype Syntax.:+: Monotype) Void))]
+     , [File (Either (Reference, String) (Term (Polytype Syntax.:+: Monotype) Void))]
      )
 typecheckingFlowInsensitive eval
   = run
@@ -142,7 +142,7 @@ runFile
      -> (term Addr -> m Type)
      )
   -> File (term Addr)
-  -> m (File (Either (Path.AbsRelFile, Span, String) Type))
+  -> m (File (Either (Reference, String) Type))
 runFile eval file = traverse run file
   where run
           = (\ m -> do

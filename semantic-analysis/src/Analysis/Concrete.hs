@@ -75,7 +75,7 @@ concrete
      -> (term Addr -> m (Concrete term))
      )
   -> [File (term Addr)]
-  -> (Heap (Concrete term), [File (Either (Path.AbsRelFile, Span, String) (Concrete term))])
+  -> (Heap (Concrete term), [File (Either (Reference, String) (Concrete term))])
 concrete eval
   = run
   . evalFresh 0
@@ -94,7 +94,7 @@ runFile
      -> (term Addr -> m (Concrete term))
      )
   -> File (term Addr)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete term)))
+  -> m (File (Either (Reference, String) (Concrete term)))
 runFile eval file = traverse run file
   where run = runReader (filePath file)
             . runReader (fileSpan file)

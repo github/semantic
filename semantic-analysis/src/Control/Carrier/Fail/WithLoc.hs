@@ -24,17 +24,16 @@ import qualified System.Path as Path
 
 -- Fail carrier
 
-runFail :: FailC m a -> m (Either (Path.AbsRelFile, Span, String) a)
+runFail :: FailC m a -> m (Either (Reference, String) a)
 runFail = runError . runFailC
 
-newtype FailC m a = FailC { runFailC :: ErrorC (Path.AbsRelFile, Span, String) m a }
+newtype FailC m a = FailC { runFailC :: ErrorC (Reference, String) m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
 instance (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => MonadFail (FailC m) where
   fail s = do
-    path <- ask
-    span <- ask
-    FailC (throwError (path :: Path.AbsRelFile, span :: Span, s))
+    ref <- Reference <$> ask <*> ask
+    FailC (throwError (ref, s))
 
 instance (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => Algebra (Fail :+: sig) (FailC m) where
   alg _   (L (Fail s)) _   = fail s
