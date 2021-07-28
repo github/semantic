@@ -11,6 +11,9 @@ module Analysis.Name
   -- * De Bruijn indices & levels
 , Level(..)
 , Index(..)
+  -- ** Conversions
+, levelToIndex
+, indexToLevel
 ) where
 
 import           Control.Effect.Fresh
@@ -80,3 +83,12 @@ newtype Level = Level { getLevel :: Int }
 -- | De Bruijn indicex.
 newtype Index = Index { getIndex :: Int }
   deriving (Eq, Ord, Show)
+
+
+-- Conversions
+
+levelToIndex :: Level -> Level -> Index
+levelToIndex (Level d) (Level level) = Index (d - level - 1)
+
+indexToLevel :: Level -> Index -> Level
+indexToLevel (Level d) (Index index) = Level (d - index - 1)
