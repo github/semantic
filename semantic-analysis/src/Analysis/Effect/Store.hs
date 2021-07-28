@@ -26,6 +26,8 @@ alloc = sendLabelled @Store . Alloc
 (.=) :: HasLabelled Store (Store addr val) sig m => addr -> val -> m ()
 addr .= val = sendLabelled @Store $ Assign addr val
 
+infix 2 .=
+
 fetch :: HasLabelled Store (Store addr val) sig m => addr -> m val
 fetch = sendLabelled @Store . Fetch
 
