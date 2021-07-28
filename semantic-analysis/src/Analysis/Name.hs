@@ -10,6 +10,7 @@ module Analysis.Name
 , isGenerated
   -- * De Bruijn indices & levels
 , Level(..)
+, Index(..)
 ) where
 
 import           Control.Effect.Fresh
@@ -74,4 +75,8 @@ instance ToJSON Name where
 
 -- | De Bruijn levels.
 newtype Level = Level { getLevel :: Int }
+  deriving (Eq, Ord, Show)
+
+-- | De Bruijn indicex.
+newtype Index = Index { getIndex :: Int }
   deriving (Eq, Ord, Show)
