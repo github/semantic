@@ -44,7 +44,7 @@ instance (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => Algebr
 
 data Reference = Reference
   { refPath :: Path.AbsRelFile
-  , relSpan :: Span
+  , refSpan :: Span
   }
   deriving (Eq, Ord, Show)
 -- FIXME: find this a better home
