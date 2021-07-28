@@ -46,3 +46,4 @@ data Reference = Reference
   { refPath :: Path.AbsRelFile
   , relSpan :: Span
   }
+  deriving (Eq, Ord, Show)
