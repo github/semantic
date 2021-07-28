@@ -7,6 +7,8 @@ module Control.Carrier.Fail.WithLoc
 ( -- * Fail carrier
   runFail
 , FailC(..)
+  -- * Reference
+, Reference(..)
   -- * Fail effect
 , module Control.Effect.Fail
 ) where
@@ -19,6 +21,8 @@ import           Control.Effect.Reader
 import           Prelude hiding (fail)
 import           Source.Span
 import qualified System.Path as Path
+
+-- Fail carrier
 
 runFail :: FailC m a -> m (Either (Path.AbsRelFile, Span, String) a)
 runFail = runError . runFailC
@@ -35,3 +39,11 @@ instance (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => MonadF
 instance (Has (Reader Path.AbsRelFile) sig m, Has (Reader Span) sig m) => Algebra (Fail :+: sig) (FailC m) where
   alg _   (L (Fail s)) _   = fail s
   alg hdl (R other)    ctx = FailC (alg (runFailC . hdl) (R other) ctx)
+
+
+-- Reference
+
+data Reference = Reference
+  { refPath :: Path.AbsRelFile
+  , relSpan :: Span
+  }
