@@ -20,9 +20,8 @@ module Analysis.Concrete
 , concrete
 ) where
 
-import qualified Analysis.Carrier.Env.Precise as A
 import           Analysis.Carrier.Fail.WithLoc
-import qualified Analysis.Carrier.Heap.Precise as A
+import qualified Analysis.Carrier.Store.Precise as A
 import           Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.Functor.Named
@@ -30,19 +29,15 @@ import           Analysis.Reference
 import           Control.Algebra
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader hiding (Local)
+import           Control.Effect.Labelled
 import           Control.Monad.Trans.Class (MonadTrans(..))
 import           Data.Foldable (foldl')
 import           Data.Function (fix, on)
-import qualified Data.IntMap as IntMap
-import qualified Data.Map as Map
 import           Data.Semigroup (Last(..))
 import           Data.Text as Text (Text, pack)
 import           Prelude hiding (fail)
 import           Source.Span
 import qualified System.Path as Path
-
-type Addr = Int
-type Env = Map.Map Name Addr
 
 data Concrete
   = Closure Path.AbsRelFile Span (Named (Concrete -> Concrete))
@@ -119,30 +114,26 @@ quote = \case
   Neutral n sp           -> foldl' (\ f (EApp a) -> FOApp f (quote a)) (FOVar n) sp
 
 
-type Heap = IntMap.IntMap
-
 type Eval term m value = (term -> m value) -> (term -> m value)
 
 
 concrete
   :: (forall sig m
-     .  (Has (A.Dom Concrete :+: A.Env Addr :+: A.Heap Addr Concrete :+: Reader Reference) sig m, MonadFail m)
+     .  (Has (A.Dom Concrete :+: A.Env A.PAddr :+: Reader Reference) sig m, HasLabelled A.Store (A.Store A.PAddr Concrete) sig m, MonadFail m)
      => Eval term m Concrete
      )
   -> [File term]
-  -> (Heap Concrete, [File (Either (Reference, String) Concrete)])
+  -> (A.PStore Concrete, [File (Either (Reference, String) Concrete)])
 concrete eval
   = run
   . evalFresh 0
-  . A.runHeap
+  . A.runStore
   . traverse (runFile eval)
 
 runFile
-  :: ( Has Fresh sig m
-     , Has (A.Heap Addr Concrete) sig m
-     )
+  :: HasLabelled A.Store (A.Store A.PAddr Concrete) sig m
   => (forall sig m
-     .  (Has (A.Dom Concrete :+: A.Env Addr :+: A.Heap Addr Concrete :+: Reader Reference) sig m, MonadFail m)
+     .  (Has (A.Dom Concrete :+: A.Env A.PAddr :+: Reader Reference) sig m, HasLabelled A.Store (A.Store A.PAddr Concrete) sig m, MonadFail m)
      => Eval term m Concrete
      )
   -> File term
@@ -150,7 +141,6 @@ runFile
 runFile eval file = traverse run file
   where run = runReader (fileRef file)
             . runFail
-            . runReader @Env mempty
             . A.runEnv
             . runDomain
             . fix eval
@@ -162,8 +152,8 @@ newtype DomainC m a = DomainC { runDomain :: m a }
 instance MonadTrans DomainC where
   lift = DomainC
 
-instance ( Has (A.Env Addr) sig m
-         , Has (A.Heap Addr Concrete) sig m
+instance ( Has (A.Env A.PAddr) sig m
+         , HasLabelled A.Store (A.Store A.PAddr Concrete) sig m
          , Has (Reader Reference) sig m
          , MonadFail m
          )

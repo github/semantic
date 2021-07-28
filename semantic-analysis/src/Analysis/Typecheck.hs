@@ -22,9 +22,8 @@ module Analysis.Typecheck
 , typecheckingFlowInsensitive
 ) where
 
-import           Analysis.Carrier.Env.Monovariant
 import           Analysis.Carrier.Fail.WithLoc
-import qualified Analysis.Carrier.Heap.Monovariant as A
+import qualified Analysis.Carrier.Store.Monovariant as A
 import           Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.FlowInsensitive
@@ -35,6 +34,7 @@ import           Control.Applicative (Alternative(..))
 import           Control.Carrier.Fresh.Strict as Fresh
 import           Control.Carrier.Reader hiding (Local)
 import           Control.Carrier.State.Strict
+import           Control.Effect.Labelled
 import           Control.Monad (ap, guard, unless)
 import           Control.Monad.Trans.Class
 import           Data.Foldable (for_)
@@ -83,7 +83,6 @@ instance Monad Monotype where
 
 type Type = Monotype Meta
 
-type Addr = Name
 
 type Meta = Int
 
@@ -112,44 +111,44 @@ generalize ty = fromJust (closed (forAlls (IS.toList (mvs ty)) (PType ty)))
 
 
 typecheckingFlowInsensitive
-  :: Ord (term Addr)
+  :: Ord term
   => (forall sig m
-     .  (Has (Dom Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Reference) sig m, MonadFail m)
-     => (term Addr -> m Type)
-     -> (term Addr -> m Type)
+     .  (Has (A.Dom Type :+: A.Env A.MAddr :+: Reader Reference) sig m, HasLabelled A.Store (A.Store A.MAddr Type) sig m, MonadFail m)
+     => (term -> m Type)
+     -> (term -> m Type)
      )
-  -> [File (term Addr)]
-  -> ( Heap Type
+  -> [File term]
+  -> ( A.MStore Type
      , [File (Either (Reference, String) (Polytype Void))]
      )
 typecheckingFlowInsensitive eval
   = run
   . evalFresh 0
-  . runHeap
+  . A.runStoreState
   . fmap (fmap (fmap (fmap generalize)))
   . traverse (runFile eval)
 
 runFile
   :: ( Has Fresh sig m
-     , Has (State (Heap Type)) sig m
-     , Ord (term Addr)
+     , Has (State (A.MStore Type)) sig m
+     , Ord term
      )
   => (forall sig m
-     .  (Has (A.Dom Type :+: Env Addr :+: A.Heap Addr Type :+: Reader Reference) sig m, MonadFail m)
-     => (term Addr -> m Type)
-     -> (term Addr -> m Type)
+     .  (Has (A.Dom Type :+: A.Env A.MAddr :+: Reader Reference) sig m, HasLabelled A.Store (A.Store A.MAddr Type) sig m, MonadFail m)
+     => (term -> m Type)
+     -> (term -> m Type)
      )
-  -> File (term Addr)
+  -> File term
   -> m (File (Either (Reference, String) Type))
 runFile eval file = traverse run file
   where run
           = (\ m -> do
               (subst, t) <- m
-              modify @(Heap Type) (fmap (Set.map (substAll subst)))
+              modify @(A.MStore Type) (A.MStore . fmap (Set.map (substAll subst)) . A.getMStore)
               pure (substAll subst <$> t))
           . runState @Substitution mempty
           . runReader (fileRef file)
-          . runEnv
+          . A.runEnv @Type
           . runFail
           . (\ m -> do
             (cs, t) <- m
@@ -159,7 +158,7 @@ runFile eval file = traverse run file
               v <- meta
               bs <- m
               v <$ for_ bs (unify v))
-          . convergeTerm 1 (A.runHeap @Addr @Type . runDomain . fix (cacheTerm . eval))
+          . convergeTerm (A.runStore @Type . runDomain . fix (cacheTerm . eval))
 
 
 data Solution
@@ -209,9 +208,9 @@ instance MonadTrans DomainC where
   lift = DomainC
 
 instance ( Alternative m
-         , Has (Env Addr) sig m
+         , Has (A.Env A.MAddr) sig m
          , Has Fresh sig m
-         , Has (A.Heap Addr Type) sig m
+         , HasLabelled A.Store (A.Store A.MAddr Type) sig m
          , Has (State (Set.Set (Type, Type))) sig m
          , MonadFail m
          )
@@ -231,9 +230,9 @@ instance ( Alternative m
     L (DString _) -> pure (String <$ ctx)
 
     L (DAbs n b) -> do
-      addr <- alloc @Name n
+      addr <- A.alloc n
       arg <- meta
-      A.assign addr arg
+      addr A..= arg
       ty <- hdl (b arg <$ ctx)
       pure ((arg :->) <$> ty)
     L (DApp f a) -> do

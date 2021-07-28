@@ -45,11 +45,9 @@ library
   hs-source-dirs: src
   exposed-modules:
     Analysis.Blob
-    Analysis.Carrier.Env.Monovariant
-    Analysis.Carrier.Env.Precise
     Analysis.Carrier.Fail.WithLoc
-    Analysis.Carrier.Heap.Monovariant
-    Analysis.Carrier.Heap.Precise
+    Analysis.Carrier.Store.Monovariant
+    Analysis.Carrier.Store.Precise
     Analysis.Concrete
     Analysis.Effect.Domain
     Analysis.Effect.Env
