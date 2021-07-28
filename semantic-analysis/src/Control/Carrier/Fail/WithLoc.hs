@@ -47,3 +47,5 @@ data Reference = Reference
   , relSpan :: Span
   }
   deriving (Eq, Ord, Show)
+-- FIXME: find this a better home
+-- FIXME: add this to some sort of static context carried in analyses
