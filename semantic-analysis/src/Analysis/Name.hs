@@ -2,12 +2,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Analysis.Name
 ( Name
--- * Constructors
+  -- * Constructors
 , gensym
 , name
 , nameI
 , formatName
 , isGenerated
+  -- * De Bruijn indices & levels
+, Level(..)
 ) where
 
 import           Control.Effect.Fresh
@@ -66,3 +68,10 @@ instance Hashable Name where
 instance ToJSON Name where
   toJSON = toJSON . formatName
   toEncoding = toEncoding . formatName
+
+
+-- De Bruijn indices & levels
+
+-- | De Bruijn levels.
+newtype Level = Level { getLevel :: Int }
+  deriving (Eq, Ord, Show)
