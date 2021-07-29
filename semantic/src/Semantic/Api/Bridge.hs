@@ -9,6 +9,7 @@ module Semantic.Api.Bridge
   ) where
 
 import           Analysis.File
+import           Analysis.Reference
 import           Control.Lens
 import qualified Data.Blob as Data
 import           Data.Either
@@ -82,5 +83,5 @@ instance APIBridge API.Blob Data.Blob where
           pth = fromRight (Path.toAbsRel Path.emptyFile) (blob^.path._Text.to Path.parse)
       in Data.Blob
       { blobSource = src
-      , blobFile = File pth (Source.totalSpan src) (blob^.language.bridging)
+      , blobFile = File (Reference pth (Source.totalSpan src)) (blob^.language.bridging)
       }
