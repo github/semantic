@@ -34,7 +34,7 @@ import           Control.Monad.Trans.Class (MonadTrans(..))
 import           Data.Foldable (foldl')
 import           Data.Function (fix, on)
 import           Data.Semigroup (Last(..))
-import           Data.Text as Text (Text, pack)
+import           Data.Text as Text (Text)
 import           Prelude hiding (fail)
 import           Source.Span
 import qualified System.Path as Path
@@ -173,7 +173,7 @@ instance ( Has (A.Env A.PAddr) sig m
         | b         -> hdl (t <$ ctx)
         | otherwise -> hdl (e <$ ctx)
       _             -> fail "expected Bool"
-    L (DString s) -> pure (String (Text.pack s) <$ ctx)
+    L (DString s) -> pure (String s <$ ctx)
     L (DDie msg)  -> fail msg
 
     R other       -> DomainC (alg (runDomain . hdl) other ctx)

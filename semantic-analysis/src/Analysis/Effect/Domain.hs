@@ -28,6 +28,7 @@ module Analysis.Effect.Domain
 
 import Analysis.Functor.Named
 import Control.Algebra
+import Data.Text (Text)
 
 -- Variables
 
@@ -73,7 +74,7 @@ dif c t e = send $ DIf c t e
 
 -- Strings
 
-dstring :: Has (Dom val) sig m => String -> m val
+dstring :: Has (Dom val) sig m => Text -> m val
 dstring = send . DString
 
 
@@ -90,6 +91,5 @@ data Dom val m k where
   DUnit :: Dom val m val
   DBool :: Bool -> Dom val m val
   DIf :: val -> m val -> m val -> Dom val m val
--- FIXME: Text
-  DString :: String -> Dom val m val
+  DString :: Text -> Dom val m val
   DDie :: String -> Dom val m val
