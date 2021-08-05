@@ -68,7 +68,7 @@ dfalse = dbool False
 dbool :: Has (Dom val) sig m => Bool -> m val
 dbool = send . DBool
 
-dif :: Has (Dom val) sig m => val -> m val -> m val -> m val
+dif :: Has (Dom val) sig m => val -> m a -> m a -> m a
 dif c t e = send $ DIf c t e
 
 
@@ -90,6 +90,6 @@ data Dom val m k where
   DInt :: Int -> Dom val m val
   DUnit :: Dom val m val
   DBool :: Bool -> Dom val m val
-  DIf :: val -> m val -> m val -> Dom val m val
+  DIf :: val -> m a -> m a -> Dom val m a
   DString :: Text -> Dom val m val
   DDie :: String -> Dom val m val
