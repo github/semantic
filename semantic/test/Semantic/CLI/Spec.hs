@@ -3,6 +3,7 @@
 module Semantic.CLI.Spec (testTree) where
 
 import           Analysis.File
+import           Analysis.Reference
 import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Reader
 import           Data.ByteString.Builder
@@ -59,5 +60,5 @@ parseFixtures =
   , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.json")
   , ("protobuf symbols", parseSymbolsBuilder Serializing.Format.Proto, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.protobuf.bin")
   ]
-  where path = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.A.rb") lowerBound Ruby]
-        path'' = [File (Path.absRel "semantic/test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound Ruby]
+  where path = [File (Reference (Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.A.rb") lowerBound) Ruby]
+        path'' = [File (Reference (Path.absRel "semantic/test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound) Ruby]
