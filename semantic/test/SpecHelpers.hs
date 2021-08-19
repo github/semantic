@@ -17,7 +17,7 @@ module SpecHelpers
 ) where
 
 import qualified Analysis.File as File
-import           Analysis.Name as X
+import           Analysis.Name as X hiding (Level)
 import           Analysis.Project as X
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Lift
