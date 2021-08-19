@@ -45,6 +45,7 @@ library
   hs-source-dirs: src
   exposed-modules:
     Core.Core
+    Core.Expr
     Core.Parser
     Core.Pretty
     Core.Eval
