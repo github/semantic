@@ -12,6 +12,7 @@ module Data.Blob.IO
 import           Analysis.Blob
 import           Analysis.File as File
 import           Analysis.Project
+import           Analysis.Reference
 import           Control.Monad.IO.Class
 import           Data.Blob
 import qualified Data.ByteString as B
@@ -44,14 +45,14 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
   pure $ Project rootDir blobs lang excludeDirs
   where
-    toFile path = File path (point (Pos 1 1)) lang
+    toFile path = File (Reference path (point (Pos 1 1))) lang
     exts = extensionsForLanguage lang
 
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readBlobFromFile :: MonadIO m => File Language -> m (Maybe Blob)
-readBlobFromFile (File (Path.toString -> "/dev/null") _ _) = pure Nothing
-readBlobFromFile file@(File path _ _language) = do
+readBlobFromFile (File (Reference (Path.toString -> "/dev/null") _) _) = pure Nothing
+readBlobFromFile file@(File (Reference path _) _language) = do
   raw <- liftIO $ B.readFile (Path.toString path)
   let newblob = Blob (Source.fromUTF8 raw) file
   pure . Just $ newblob
