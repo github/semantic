@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Core.Expr
 ( Expr(..)
 , id'
@@ -8,9 +9,10 @@ module Core.Expr
 , and'
 , or'
 , ($$)
+, Name
 ) where
 
-import Membrane.Syntax
+import Analysis.Name
 
 -- | A lambda calculus with integers, conditionals, and exceptions.
 data Expr
@@ -19,8 +21,7 @@ data Expr
   | App Expr Expr
   | Let Name Expr Expr
   | Lit Int
-  | Op1 Op1 Expr
-  | If0 Expr Expr Expr
+  | If Expr Expr Expr
   | Die String
   deriving (Eq, Ord, Show)
 
