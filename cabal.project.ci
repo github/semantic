@@ -21,11 +21,6 @@ packages: semantic
           semantic-tsx
           semantic-typescript
 
-source-repository-package
-  type: git
-  location: https://github.com/antitypical/fused-syntax.git
-  tag: 4a383d57c8fd7592f54a33f43eb9666314a6e80e
-
 -- Treat warnings as errors for CI builds
 package semantic
   ghc-options: -Werror

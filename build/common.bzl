@@ -127,7 +127,6 @@ def semantic_language_library(language, name, srcs, ts_package = "", nodetypes =
             "@stackage//:aeson",
             "@stackage//:algebraic-graphs",
             "@stackage//:fused-effects",
-            "@stackage//:fused-syntax",
             "@stackage//:generic-lens",
             "@stackage//:hashable",
             "@stackage//:lens",

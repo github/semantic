@@ -82,7 +82,6 @@ stack_snapshot(
         "fused-effects",
         "fused-effects-exceptions",
         "fused-effects-readline",
-        "fused-syntax",
         "gauge",
         "generic-lens",
         "generic-monoid",
