@@ -9,6 +9,7 @@ packages: semantic
           semantic-go
           semantic-java
           semantic-json
+          semantic-ocaml
           semantic-parse
           semantic-php
           semantic-proto
@@ -20,6 +21,9 @@ packages: semantic
           semantic-tags
           semantic-tsx
           semantic-typescript
+
+package semantic-ocaml
+  ghc-options: -freduction-depth=300
 
 source-repository-package
   type: git

@@ -63,6 +63,8 @@ function flags {
   echo "-isemantic-java/src"
   echo "-isemantic-json/src"
   echo "-isemantic-json/test"
+  echo "-isemantic-ocaml/src"
+  echo "-isemantic-ocaml/test"
   echo "-isemantic-parse/src"
   echo "-isemantic-php/src"
   echo "-isemantic-proto/src"
@@ -103,6 +105,7 @@ function flags {
   [[ "$ghc_version" = 8.6.* ]] || [[ "$ghc_version" = 8.8.* ]] || [[ "$ghc_version" = 8.10.* ]] && echo "-Wno-star-is-type" || true
   [[ "$ghc_version" = 8.8.* ]] || [[ "$ghc_version" = 8.10.* ]] && echo "-Wno-missing-deriving-strategies" || true
   [[ "$ghc_version" = 8.10.* ]] && echo "-Wno-missing-safe-haskell-mode" && echo "-Wno-prepositive-qualified-module" && echo "-Wno-unused-packages"
+  echo "-freduction-depth=300"
 }
 
 flags > "$output_file"

@@ -129,6 +129,7 @@ library
     , semantic-go ^>= 0
     , semantic-java ^>= 0
     , semantic-json ^>= 0
+    , semantic-ocaml ^>= 0
     , semantic-php ^>= 0
     , semantic-proto ^>= 0
     , semantic-python ^>= 0
