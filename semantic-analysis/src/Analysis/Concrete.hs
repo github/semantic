@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -17,183 +18,167 @@
 module Analysis.Concrete
 ( Concrete(..)
 , concrete
-, heapGraph
-, heapValueGraph
-, heapAddressGraph
-, addressStyle
 ) where
 
-import qualified Algebra.Graph as G
-import qualified Algebra.Graph.Export.Dot as G
-import qualified Analysis.Carrier.Env.Precise as A
-import qualified Analysis.Carrier.Heap.Precise as A
-import qualified Analysis.Effect.Domain as A
+import           Analysis.Carrier.Fail.WithLoc
+import qualified Analysis.Carrier.Store.Precise as A
+import           Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.Functor.Named
+import           Analysis.Reference
 import           Control.Algebra
-import           Control.Carrier.Fail.WithLoc
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader hiding (Local)
-import           Control.Monad.Trans.Class (MonadTrans (..))
-import           Data.Function (fix)
-import qualified Data.IntMap as IntMap
-import qualified Data.Map as Map
-import           Data.Semigroup (Last (..))
-import           Data.Text (Text, pack)
-import           Data.Traversable (for)
+import           Control.Effect.Labelled
+import           Control.Monad.Trans.Class (MonadTrans(..))
+import           Data.Foldable (foldl')
+import           Data.Function (fix, on)
+import           Data.Semigroup (Last(..))
+import           Data.Text as Text (Text)
 import           Prelude hiding (fail)
 import           Source.Span
-import           Syntax.Scope
 import qualified System.Path as Path
 
-type Addr = Int
-type Env = Map.Map Name Addr
-
-data Concrete term
-  = Closure Path.AbsRelFile Span (Named (Scope () term Addr))
+data Concrete
+  = Closure Path.AbsRelFile Span (Named (Concrete -> Concrete))
   | Unit
   | Bool Bool
+  | Int Int
   | String Text
-  | Record Env
+  -- | A neutral value, consisting of a variable at the head, followed by a “spine” of eliminations.
+  --
+  -- This constructor is key to hereditary substitution, whereby a value in 'Concrete' is a normal form by virtue of either being a value (i.e. one of the other constructors) or 'Neutral', somewhere inside a 'Closure'. In the latter case, when the surrounding closure is eliminated, if it substitutes out the variable at the head, the eliminations are applied, immediately reducing it. Since eliminations can’t be applied to any of the other constructors, there’s no way to represent redexes, so we’re left with a new term which is itself either already a value, or else is a neutral term underneath a closure.
+  --
+  -- This is essential for parametric modular analysis, as it allows us to obtain the same benefits not just for variables inside closures, but also variables which aren’t known from the surrounding (local) context (e.g. as-yet-unresolved imports). That in turn allows analysis to be performed 1. before we’ve computed an import graph, which is particularly difficult in some languages, 2. completely in parallel, and 3. incrementally.
+  | Neutral Name (Snoc (Elim Concrete))
   -- NB: We derive the 'Semigroup' instance for 'Concrete' to take the second argument. This is equivalent to stating that the return value of an imperative sequence of statements is the value of its final statement.
-  deriving Semigroup via Last (Concrete term)
+  deriving Semigroup via Last Concrete
 
-deriving instance ( forall a . Eq   a => Eq   (f a), Monad f) => Eq   (Concrete f)
-deriving instance ( forall a . Eq   a => Eq   (f a)
-                  , forall a . Ord  a => Ord  (f a), Monad f) => Ord  (Concrete f)
-deriving instance ( forall a . Show a => Show (f a))          => Show (Concrete f)
+instance Eq Concrete where
+  (==) = (==) `on` quote
+
+instance Ord Concrete where
+  compare = compare `on` quote
+
+instance Show Concrete where
+  showsPrec p = showsPrec p . quote
 
 
-type Heap = IntMap.IntMap
+data Snoc a = Nil | Snoc a :> a
+  deriving (Foldable, Functor, Traversable)
+
+
+newtype Elim a = EApp a
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+
+vvar :: Name -> Concrete
+vvar n = Neutral n Nil
+
+velim :: Concrete -> Elim Concrete -> Concrete
+velim (Closure _ _ f) (EApp a) = namedValue f a
+velim (Neutral h as)  a        = Neutral h (as :> a)
+velim _               _        = error "velim: cannot eliminate" -- FIXME: fail in the monad instead
+
+-- FIXME: so why use HOAS at all then?
+-- FIXME: construct in de Bruijn-indexed rep & simple eval instead of substituting.
+vsubst :: Name -> Concrete -> Concrete -> Concrete
+vsubst n v = go
+  where
+  go = \case
+    Neutral n' as
+      | n == n'   -> foldl' velim v as'
+      | otherwise -> Neutral n'     as'
+      where
+      as' = fmap go <$> as
+    Closure p s b -> Closure p s ((go .) <$> b) -- NB: Shadowing can’t happen because n' can’t occur inside b
+    Unit          -> Unit
+    Bool b        -> Bool b
+    Int i         -> Int i
+    String s      -> String s
+
+
+data FO
+  = FOVar Name
+  | FOClosure Path.AbsRelFile Span (Named FO)
+  | FOUnit
+  | FOBool Bool
+  | FOInt Int
+  | FOString Text
+  | FOApp FO FO
+  deriving (Eq, Ord, Show)
+
+
+quote :: Concrete -> FO
+quote = \case
+-- FIXME: should quote take a Level incremented under binders?
+  Closure path span body -> FOClosure path span ((\ f -> quote (f (vvar (namedName body)))) <$> body)
+  Unit                   -> FOUnit
+  Bool b                 -> FOBool b
+  Int i                  -> FOInt i
+  String s               -> FOString s
+  Neutral n sp           -> foldl' (\ f (EApp a) -> FOApp f (quote a)) (FOVar n) sp
+
+
+type Eval term m value = (term -> m value) -> (term -> m value)
 
 
 concrete
-  :: Applicative term
-  => (forall sig m
-     .  (Has (A.Domain term Addr (Concrete term) :+: A.Env Addr :+: A.Heap Addr (Concrete term) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
-     => (term Addr -> m (Concrete term))
-     -> (term Addr -> m (Concrete term))
+  :: (forall sig m
+     .  (Has (A.Dom Concrete :+: A.Env A.PAddr :+: Reader Reference) sig m, HasLabelled A.Store (A.Store A.PAddr Concrete) sig m, MonadFail m)
+     => Eval term m Concrete
      )
-  -> [File (term Addr)]
-  -> (Heap (Concrete term), [File (Either (Path.AbsRelFile, Span, String) (Concrete term))])
+  -> [File term]
+  -> (A.PStore Concrete, [File (Either (Reference, String) Concrete)])
 concrete eval
   = run
   . evalFresh 0
-  . A.runHeap
+  . A.runStore
   . traverse (runFile eval)
 
 runFile
-  :: forall term m sig
-  .  ( Applicative term
-     , Has Fresh sig m
-     , Has (A.Heap Addr (Concrete term)) sig m
-     )
+  :: HasLabelled A.Store (A.Store A.PAddr Concrete) sig m
   => (forall sig m
-     .  (Has (A.Domain term Addr (Concrete term) :+: A.Env Addr :+: A.Heap Addr (Concrete term) :+: Reader Path.AbsRelFile :+: Reader Span) sig m, MonadFail m)
-     => (term Addr -> m (Concrete term))
-     -> (term Addr -> m (Concrete term))
+     .  (Has (A.Dom Concrete :+: A.Env A.PAddr :+: Reader Reference) sig m, HasLabelled A.Store (A.Store A.PAddr Concrete) sig m, MonadFail m)
+     => Eval term m Concrete
      )
-  -> File (term Addr)
-  -> m (File (Either (Path.AbsRelFile, Span, String) (Concrete term)))
+  -> File term
+  -> m (File (Either (Reference, String) Concrete))
 runFile eval file = traverse run file
-  where run = runReader (filePath file)
-            . runReader (fileSpan file)
+  where run = runReader (fileRef file)
             . runFail
-            . runReader @Env mempty
             . A.runEnv
-            . fix (\ eval' -> runDomain eval' . fix eval)
+            . runDomain
+            . fix eval
 
 
-runDomain :: (term Addr -> m (Concrete term)) -> DomainC term m a -> m a
-runDomain eval = runReader eval . runDomainC
-
-newtype DomainC term m a = DomainC { runDomainC :: ReaderC (term Addr -> m (Concrete term)) m a }
+newtype DomainC m a = DomainC { runDomain :: m a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
-instance MonadTrans (DomainC term) where
-  lift = DomainC . lift
+instance MonadTrans DomainC where
+  lift = DomainC
 
-instance ( Applicative term
-         , Has (A.Env Addr) sig m
-         , Has (A.Heap Addr (Concrete term)) sig m
-         , Has (Reader Path.AbsRelFile) sig m
-         , Has (Reader Span) sig m
+instance ( Has (A.Env A.PAddr) sig m
+         , HasLabelled A.Store (A.Store A.PAddr Concrete) sig m
+         , Has (Reader Reference) sig m
          , MonadFail m
          )
-      => Algebra (A.Domain term Addr (Concrete term) :+: sig) (DomainC term m) where
+      => Algebra (A.Dom Concrete :+: sig) (DomainC m) where
   alg hdl sig ctx = case sig of
-    L (L A.Unit) -> pure (Unit <$ ctx)
-    L (R (L (A.Bool     b))) -> pure (Bool b <$ ctx)
-    L (R (L (A.AsBool   c))) -> case c of
-      Bool   b -> pure (b <$ ctx)
-      _        -> fail "expected Bool"
-    L (R (R (L (A.String   s)))) -> pure (String s <$ ctx)
-    L (R (R (L (A.AsString c)))) -> case c of
-      String s -> pure (s <$ ctx)
-      _        -> fail "expected String"
-    L (R (R (R (L (A.Lam      b))))) -> do
-      path <- ask
-      span <- ask
-      pure (Closure path span b <$ ctx)
-    L (R (R (R (L (A.AsLam    c))))) -> case c of
-      Closure _ _ b -> pure (b <$ ctx)
-      _             -> fail "expected Closure"
-    L (R (R (R (R (A.Record fields))))) -> do
-      eval <- DomainC ask
-      fields' <- for fields $ \ (name, t) -> do
-        addr <- A.alloc name
-        v <- lift (eval t)
-        A.assign @Addr @(Concrete term) addr v
-        pure (name, addr)
-      pure (Record (Map.fromList fields') <$ ctx)
-    L (R (R (R (R (A.AsRecord c))))) -> case c of
-      Record fields -> pure (map (fmap pure) (Map.toList fields) <$ ctx)
-      _             -> fail "expected Record"
-    R other -> DomainC (alg (runDomainC . hdl) (R other) ctx)
+    L (DVar n)    -> pure (vvar n <$ ctx)
+    L (DAbs n b)  -> do
+      b' <- hdl (b (vvar n) <$ ctx)
+      ref <- ask
+      pure $ Closure (refPath ref) (refSpan ref) . named n . flip (vsubst n) <$> b'
+    L (DApp f a)  -> pure $ velim f (EApp a) <$ ctx
+    L (DInt i)    -> pure (Int i <$ ctx)
+    L DUnit       -> pure (Unit <$ ctx)
+    L (DBool b)   -> pure (Bool b <$ ctx)
+    L (DIf c t e) -> case c of
+      Bool b
+        | b         -> hdl (t <$ ctx)
+        | otherwise -> hdl (e <$ ctx)
+      _             -> fail "expected Bool"
+    L (DString s) -> pure (String s <$ ctx)
+    L (DDie msg)  -> fail msg
 
-
--- | 'heapGraph', 'heapValueGraph', and 'heapAddressGraph' allow us to conveniently export SVGs of the heap:
---
---   > λ let (heap, res) = concrete [ruby]
---   > λ writeFile "/Users/rob/Desktop/heap.dot" (export (addressStyle heap) (heapAddressGraph heap))
---   > λ :!dot -Tsvg < ~/Desktop/heap.dot > ~/Desktop/heap.svg
-heapGraph :: Foldable term => (Addr -> Concrete term -> a) -> (Either Edge Name -> Addr -> G.Graph a) -> Heap (Concrete term) -> G.Graph a
-heapGraph vertex edge h = foldr (uncurry graph) G.empty (IntMap.toList h)
-  where graph k v rest = (G.vertex (vertex k v) `G.connect` outgoing v) `G.overlay` rest
-        outgoing = \case
-          Unit -> G.empty
-          Bool _ -> G.empty
-          String _ -> G.empty
-          Closure _ _ (Named _ b) -> foldr (G.overlay . edge (Left Lexical)) G.empty b
-          Record frame -> Map.foldrWithKey (\ k -> G.overlay . edge (Right k)) G.empty frame
-
-heapValueGraph :: Foldable term => Heap (Concrete term) -> G.Graph (Concrete term)
-heapValueGraph h = heapGraph (const id) (const fromAddr) h
-  where fromAddr addr = maybe G.empty G.vertex (IntMap.lookup addr h)
-
-heapAddressGraph :: Foldable term => Heap (Concrete term) -> G.Graph (EdgeType (Concrete term), Addr)
-heapAddressGraph = heapGraph (\ addr v -> (Value v, addr)) (fmap G.vertex . (,) . either Edge Slot)
-
-addressStyle :: Heap (Concrete term) -> G.Style (EdgeType (Concrete term), Addr) Text
-addressStyle heap = (G.defaultStyle vertex) { G.edgeAttributes }
-  where vertex (_, addr) = pack (show addr) <> " = " <> maybe "?" fromConcrete (IntMap.lookup addr heap)
-        edgeAttributes _ (Slot name,    _) = ["label" G.:= formatName name]
-        edgeAttributes _ (Edge Import,  _) = ["color" G.:= "blue"]
-        edgeAttributes _ (Edge Lexical, _) = ["color" G.:= "green"]
-        edgeAttributes _ _                 = []
-        fromConcrete = \case
-          Unit ->  "()"
-          Bool b -> pack $ show b
-          String s -> pack $ show s
-          Closure p (Span s e) (Named n _) -> "\\\\ " <> formatName n <> " [" <> pack (Path.toString p) <> ":" <> showPos s <> "-" <> showPos e <> "]"
-          Record _ -> "{}"
-        showPos (Pos l c) = pack (show l) <> ":" <> pack (show c)
-
-data EdgeType value
-  = Edge Edge
-  | Slot Name
-  | Value value
-  deriving (Eq, Ord, Show)
-
-data Edge = Lexical | Import
-  deriving (Eq, Ord, Show)
+    R other       -> DomainC (alg (runDomain . hdl) other ctx)

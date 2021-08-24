@@ -9,6 +9,7 @@ module Semantic.IO.Spec (spec) where
 import Prelude hiding (readFile)
 
 import           Analysis.File as File
+import           Analysis.Reference as Ref
 import           Data.Blob as Blob
 import           Data.Handle
 import           SpecHelpers
@@ -30,11 +31,11 @@ spec = do
 
     it "returns a blob for extant files" $ do
       let path = Fixture.absRelFile "test/fixtures/cli/diff.json"
-      Just blob <- readBlobFromFile (File path lowerBound Unknown)
+      Just blob <- readBlobFromFile (File (Reference path lowerBound) Unknown)
       blobFilePath blob `shouldBe` Path.toString path
 
     it "throws for absent files" $ do
-      readBlobFromFile (File (Path.absRel "/dev/doesnotexist") lowerBound Unknown) `shouldThrow` anyIOException
+      readBlobFromFile (File (Reference (Path.absRel "/dev/doesnotexist") lowerBound) Unknown) `shouldThrow` anyIOException
 
   describe "readBlobPairsFromHandle" $ do
     let a = Blob.fromSource (Path.relFile "method.rb") Ruby "def foo; end"

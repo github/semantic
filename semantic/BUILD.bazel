@@ -73,7 +73,6 @@ haskell_library(
         "@stackage//:attoparsec",
         "@stackage//:bifunctors",
         "@stackage//:directory-tree",
-        "@stackage//:fused-syntax",
         "@stackage//:generic-lens",
         "@stackage//:haskeline",
         "@stackage//:hostname",

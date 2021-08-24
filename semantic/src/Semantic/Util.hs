@@ -14,6 +14,7 @@ module Semantic.Util
 import Prelude hiding (readFile)
 
 import           Analysis.File
+import           Analysis.Reference
 import           Control.Carrier.Parse.Simple
 import           Control.Effect.Reader
 import           Control.Exception hiding (evaluate)
@@ -31,7 +32,7 @@ parseFile      parser = runTask'     . (parse parser <=< readBlob . fileForPath)
 parseFileQuiet parser = runTaskQuiet . (parse parser <=< readBlob . fileForPath)
 
 fileForPath :: FilePath -> File Language.Language
-fileForPath (Path.absRel -> p) = File p (point (Pos 1 1)) (Language.forPath p)
+fileForPath (Path.absRel -> p) = File (Reference p (point (Pos 1 1))) (Language.forPath p)
 
 runTask', runTaskQuiet :: ParseC TaskC a -> IO a
 runTask'     task = runTaskWithOptions debugOptions   (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure

@@ -45,30 +45,25 @@ library
   hs-source-dirs: src
   exposed-modules:
     Analysis.Blob
-    Analysis.Carrier.Env.Monovariant
-    Analysis.Carrier.Env.Precise
-    Analysis.Carrier.Heap.Monovariant
-    Analysis.Carrier.Heap.Precise
+    Analysis.Carrier.Fail.WithLoc
+    Analysis.Carrier.Store.Monovariant
+    Analysis.Carrier.Store.Precise
     Analysis.Concrete
     Analysis.Effect.Domain
     Analysis.Effect.Env
-    Analysis.Effect.Heap
+    Analysis.Effect.Store
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.Functor.Named
-    Analysis.ImportGraph
-    Analysis.Intro
     Analysis.Name
     Analysis.Project
+    Analysis.Reference
     Analysis.Typecheck
-    Control.Carrier.Fail.WithLoc
   build-depends:
     , aeson                       ^>= 1.4
-    , algebraic-graphs            ^>= 0.3
     , base                         >= 4.13 && < 5
     , containers                  ^>= 0.6
     , fused-effects               ^>= 1.1
-    , fused-syntax
     , hashable
     , pathtype                    ^>= 0.8.1
     , semantic-source             ^>= 0.1.0.1

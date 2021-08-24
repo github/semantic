@@ -49,7 +49,7 @@ library
     Language.Python.AST
     -- Language.Python.Core
     Language.Python.Grammar
-    Language.Python.Failure
+    -- Language.Python.Failure
     Language.Python.Patterns
     -- Language.Python.ScopeGraph
     Language.Python.Tags
@@ -57,7 +57,6 @@ library
   build-depends:
     , base  >= 4.13 && < 5
     , fused-effects ^>= 1.1
-    , fused-syntax
     , semantic-analysis ^>= 0
     , semantic-ast
     , semantic-proto ^>= 0

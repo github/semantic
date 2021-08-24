@@ -1,91 +1,95 @@
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE TypeOperators #-}
+{-
+TODO
+
+- machine integer sizes
+-}
 module Analysis.Effect.Domain
-( -- * Domain effect
-  unit
-, UnitDomain(..)
-, bool
-, asBool
-, BoolDomain(..)
-, string
-, asString
-, StringDomain(..)
-, lam
-, asLam
-, FunctionDomain(..)
-, record
-, asRecord
-, RecordDomain(..)
-, Domain
-  -- * Re-exports
-, Algebra
-, Has
-, run
+( -- * Variables
+  dvar
+  -- * Functions
+, dabs
+, dapp
+  -- * Integers
+, dint
+  -- * Unit
+, dunit
+  -- * Booleans
+, dtrue
+, dfalse
+, dbool
+, dif
+  -- * Strings
+, dstring
+  -- * Exceptions
+, ddie
+, Dom(..)
 ) where
 
 import Analysis.Functor.Named
 import Control.Algebra
-import Data.Kind (Type)
 import Data.Text (Text)
-import Syntax.Scope (Scope)
 
-unit :: Has (UnitDomain value) sig m => m value
-unit = send Unit
+-- Variables
 
-data UnitDomain value (m :: Type -> Type) k where
-  Unit :: UnitDomain value m value
+dvar :: Has (Dom val) sig m => Name -> m val
+dvar = send . DVar
 
 
-bool :: Has (BoolDomain value) sig m => Bool -> m value
-bool b = send (Bool b)
+-- Functions
 
-asBool :: Has (BoolDomain value) sig m => value -> m Bool
-asBool v = send (AsBool v)
+dabs :: Has (Dom val) sig m => Name -> (val -> m val) -> m val
+dabs n = send . DAbs n
 
-data BoolDomain value (m :: Type -> Type) k where
-  Bool   :: Bool  -> BoolDomain value m value
-  AsBool :: value -> BoolDomain value m Bool
+dapp :: Has (Dom val) sig m => val -> val -> m val
+dapp f a = send $ DApp f a
 
 
-string :: Has (StringDomain value) sig m => Text -> m value
-string s = send (String s)
+-- Integers
 
-asString :: Has (StringDomain value) sig m => value -> m Text
-asString v = send (AsString v)
-
-data StringDomain value (m :: Type -> Type) k where
-  String   :: Text  -> StringDomain value m value
-  AsString :: value -> StringDomain value m Text
+dint :: Has (Dom val) sig m => Int -> m val
+dint = send . DInt
 
 
-lam :: Has (FunctionDomain term addr value) sig m => Named (Scope () term addr) -> m value
-lam b = send (Lam b)
+-- Unit
 
--- FIXME: Support partial concretization of lambdas.
-asLam :: Has (FunctionDomain term addr value) sig m => value -> m (Named (Scope () term addr))
-asLam v = send (AsLam v)
-
-data FunctionDomain term addr value (m :: Type -> Type) k where
-  Lam   :: Named (Scope () term addr) -> FunctionDomain term addr value m value
-  AsLam :: value                      -> FunctionDomain term addr value m (Named (Scope () term addr))
+dunit :: Has (Dom val) sig m => m val
+dunit = send DUnit
 
 
-record :: Has (RecordDomain term addr value) sig m => [(Name, term addr)] -> m value
-record fs = send (Record fs)
+-- Booleans
 
--- FIXME: Support partial concretization of records.
-asRecord :: Has (RecordDomain term addr value) sig m => value -> m [(Name, term addr)]
-asRecord v = send (AsRecord v)
+dtrue :: Has (Dom val) sig m => m val
+dtrue = dbool True
 
-data RecordDomain term addr value (m :: Type -> Type) k where
-  Record   :: [(Name, term addr)] -> RecordDomain term addr value m value
-  AsRecord :: value               -> RecordDomain term addr value m [(Name, term addr)]
+dfalse :: Has (Dom val) sig m => m val
+dfalse = dbool False
+
+dbool :: Has (Dom val) sig m => Bool -> m val
+dbool = send . DBool
+
+dif :: Has (Dom val) sig m => val -> m a -> m a -> m a
+dif c t e = send $ DIf c t e
 
 
-type Domain term addr value
-  =   UnitDomain value
-  :+: BoolDomain value
-  :+: StringDomain value
-  :+: FunctionDomain term addr value
-  :+: RecordDomain term addr value
+-- Strings
+
+dstring :: Has (Dom val) sig m => Text -> m val
+dstring = send . DString
+
+
+-- Exceptions
+
+ddie :: Has (Dom val) sig m => String -> m val
+ddie = send . DDie
+
+data Dom val m k where
+  DVar :: Name -> Dom val m val
+  DAbs :: Name -> (val -> m val) -> Dom val m val
+  DApp :: val -> val -> Dom val m val
+  DInt :: Int -> Dom val m val
+  DUnit :: Dom val m val
+  DBool :: Bool -> Dom val m val
+  DIf :: val -> m a -> m a -> Dom val m a
+  DString :: Text -> Dom val m val
+  DDie :: String -> Dom val m val

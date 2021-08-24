@@ -22,7 +22,6 @@ newtype EnvC m a = EnvC { runEnv :: m a }
 instance Algebra sig m
       => Algebra (Env Name :+: sig) (EnvC m) where
   alg hdl sig ctx = case sig of
-    L (Alloc name)  -> pure (name <$ ctx)
     L (Bind _ _ m)  -> hdl (m <$ ctx)
     L (Lookup name) -> pure (Just name <$ ctx)
     R other         -> EnvC (alg (runEnv . hdl) other ctx)

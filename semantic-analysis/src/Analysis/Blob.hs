@@ -8,7 +8,8 @@ module Analysis.Blob
   , nullBlob
   ) where
 
-import           Analysis.File
+import           Analysis.File as A
+import           Analysis.Reference as A
 import           Data.Aeson
 import           Source.Language as Language
 import           Source.Source as Source
@@ -34,13 +35,13 @@ instance FromJSON Blob where
 -- The resulting Blob's span is taken from the 'totalSpan' of the source.
 fromSource :: Path.PartClass.AbsRel ar => Path.File ar -> Language -> Source -> Blob
 fromSource filepath language source
-  = Blob source (Analysis.File.File (Path.toAbsRel filepath) (totalSpan source) language)
+  = Blob source (A.File (A.Reference (Path.toAbsRel filepath) (totalSpan source)) language)
 
 blobLanguage :: Blob -> Language
-blobLanguage = Analysis.File.fileBody . blobFile
+blobLanguage = A.fileBody . blobFile
 
 blobPath :: Blob -> Path.AbsRelFile
-blobPath = Analysis.File.filePath . blobFile
+blobPath = A.refPath . A.fileRef . blobFile
 
 -- | Show FilePath for error or json outputs.
 blobFilePath :: Blob -> String
