@@ -45,6 +45,11 @@ data Concrete
   | Bool Bool
   | Int Int
   | String Text
+  -- | A neutral value, consisting of a variable at the head, followed by a “spine” of eliminations.
+  --
+  -- This constructor is key to hereditary substitution, whereby a value in 'Concrete' is a normal form by virtue of either being a value (i.e. one of the other constructors) or 'Neutral', somewhere inside a 'Closure'. In the latter case, when the surrounding closure is eliminated, if it substitutes out the variable at the head, the eliminations are applied, immediately reducing it. Since eliminations can’t be applied to any of the other constructors, there’s no way to represent redexes, so we’re left with a new term which is itself either already a value, or else is a neutral term underneath a closure.
+  --
+  -- This is essential for parametric modular analysis, as it allows us to obtain the same benefits not just for variables inside closures, but also variables which aren’t known from the surrounding (local) context (e.g. as-yet-unresolved imports). That in turn allows analysis to be performed 1. before we’ve computed an import graph, which is particularly difficult in some languages, 2. completely in parallel, and 3. incrementally.
   | Neutral Name (Snoc (Elim Concrete))
   -- NB: We derive the 'Semigroup' instance for 'Concrete' to take the second argument. This is equivalent to stating that the return value of an imperative sequence of statements is the value of its final statement.
   deriving Semigroup via Last Concrete
