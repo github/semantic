@@ -1,5 +1,7 @@
 module Analysis.Syntax
 ( Syntax(..)
+  -- * Pretty-printing
+, Print(..)
 ) where
 
 import Data.Text (Text)
@@ -12,3 +14,8 @@ class Syntax rep where
   string :: Text -> rep
 
   throw :: rep -> rep
+
+
+-- Pretty-printing
+
+newtype Print = Print { print_ :: ShowS }
