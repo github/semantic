@@ -58,6 +58,7 @@ library
     Analysis.Name
     Analysis.Project
     Analysis.Reference
+    Analysis.Syntax
     Analysis.Typecheck
   build-depends:
     , aeson                       ^>= 1.4
