@@ -4,7 +4,7 @@ module Analysis.Syntax
 , Print(..)
 ) where
 
-import Data.Text (Text)
+import Data.Text (Text, unpack)
 
 class Syntax rep where
   iff :: rep -> rep -> rep -> rep
@@ -29,8 +29,20 @@ instance Semigroup Print where
 instance Monoid Print where
   mempty = Print id
 
+instance Syntax Print where
+  iff c t e = parens (str "iff" <+> c <+> str "then" <+> t <+> str "else" <+> e)
+  noop = parens (str "noop")
+
+  bool b = parens (str (if b then "true" else "false"))
+  string = parens . text
+
+  throw e = parens (str "throw" <+> e)
+
 str :: String -> Print
 str = Print . showString
+
+text :: Text -> Print
+text = str . unpack
 
 char :: Char -> Print
 char = Print . showChar
