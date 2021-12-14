@@ -20,6 +20,9 @@ class Syntax rep where
 
 newtype Print = Print { print_ :: ShowS }
 
+instance Show Print where
+  showsPrec _ = print_
+
 instance Semigroup Print where
   Print a <> Print b = Print (a . b)
 
