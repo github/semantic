@@ -28,3 +28,17 @@ instance Semigroup Print where
 
 instance Monoid Print where
   mempty = Print id
+
+str :: String -> Print
+str = Print . showString
+
+char :: Char -> Print
+char = Print . showChar
+
+parens :: Print -> Print
+parens p = char '(' <> p <> char ')'
+
+(<+>) :: Print -> Print -> Print
+l <+> r = l <> char ' ' <> r
+
+infixr 6 <+>
