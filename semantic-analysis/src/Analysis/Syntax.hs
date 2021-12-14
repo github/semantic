@@ -22,3 +22,6 @@ newtype Print = Print { print_ :: ShowS }
 
 instance Semigroup Print where
   Print a <> Print b = Print (a . b)
+
+instance Monoid Print where
+  mempty = Print id
