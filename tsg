@@ -1,0 +1,57 @@
+(identifier) @id
+{
+  node @id.node
+}
+
+(string) @this
+{
+  node @this.node
+  attr (@this.node) type = "string"
+  attr (@this.node) text = (source-text @this)
+}
+
+(true) @this
+{
+  node @this.node
+  attr (@this.node) type = "true"
+}
+
+(false) @this
+{
+  node @this.node
+  attr (@this.node) type = "false"
+}
+
+(print_statement argument: (_) @arg) @this
+{
+  node @this.node
+  attr (@this.node) type = "print"
+  edge @this.node -> @arg.node
+}
+
+(raise_statement (_) @arg) @this
+{
+  node @this.node
+  attr (@this.node) type = "raise"
+  edge @this.node -> @arg.node
+}
+
+(block (_) @arg) @this
+{
+  node @this.node
+  edge @this.node -> @arg.node
+}
+
+; (else_clause body: (_) @body)
+; {
+;
+; }
+
+(if_statement condition: (_) @cond consequence: (_) @then alternative: (_) @else) @this
+{
+  node @this.node
+  attr (@this.node) type = "if"
+  attr (@this.node) condition = @cond.node
+  attr (@this.node) then = @then.node
+  ; attr (@this.node) else = @else.node
+}
