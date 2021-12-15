@@ -2,9 +2,13 @@ module Analysis.Syntax
 ( Syntax(..)
   -- * Pretty-printing
 , Print(..)
+  -- * Parsing
+, Tree(..)
 ) where
 
-import Data.Text (Text, unpack)
+import qualified Data.Aeson as A
+import qualified Data.Aeson.Types as A
+import           Data.Text (Text, pack, unpack)
 
 class Syntax rep where
   iff :: rep -> rep -> rep -> rep
@@ -54,3 +58,26 @@ parens p = char '(' <> p <> char ')'
 l <+> r = l <> char ' ' <> r
 
 infixr 6 <+>
+
+
+-- Parsing
+
+-- Temporary until I can figure out how to have aeson construct a rep directly.
+
+data Tree
+  = NoOp
+  | String Text
+  | Bool Bool
+  | If Tree Tree Tree
+  | Throw Tree
+
+instance A.FromJSON Tree where
+  parseJSON = A.withObject "Tree" $ \ o -> do
+    attrs <- o A..: pack "attrs"
+    t <- attrs A..: pack "type"
+    case t of
+      "string" -> String <$> attrs A..: pack "text"
+      "true"   -> pure (Bool True)
+      "false"  -> pure (Bool False)
+      "throw"  -> Throw . (!! 0) <$> o A..: pack "edges"
+      _        -> A.parseFail ("unrecognized type: " <> t)
