@@ -32,7 +32,7 @@
 (raise_statement (_) @arg) @this
 {
   node @this.node
-  attr (@this.node) type = "raise"
+  attr (@this.node) type = "throw"
   edge @this.node -> @arg.node
 }
 
