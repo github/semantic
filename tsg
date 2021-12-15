@@ -51,7 +51,9 @@
 {
   node @this.node
   attr (@this.node) type = "if"
-  attr (@this.node) condition = @cond.node
-  attr (@this.node) then = @then.node
-  ; attr (@this.node) else = @else.node
+  edge @this.node -> @cond.node
+  attr (@this.node -> @cond.node) type = "condition"
+  edge @this.node -> @then.node
+  attr (@this.node -> @then.node) type = "consequence"
+  ; edge @this.node -> @else.node
 }
