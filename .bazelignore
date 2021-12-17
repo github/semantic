@@ -1,6 +1,7 @@
 semantic/dist-newstyle
 semantic-analysis/dist-newstyle
 semantic-ast/dist-newstyle
+semantic-c/dist-newstyle
 semantic-codeql/dist-newstyle
 semantic-core/dist-newstyle
 semantic-go/dist-newstyle

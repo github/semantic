@@ -56,6 +56,8 @@ function flags {
   echo "-isemantic/test"
   echo "-isemantic-analysis/src"
   echo "-isemantic-ast/src"
+  echo "-isemantic-c/src"
+  echo "-isemantic-c/test"
   echo "-isemantic-codeql/src"
   echo "-isemantic-codeql/test"
   echo "-isemantic-core/src"

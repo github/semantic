@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+load(
+    "//:build/common.bzl",
+    "semantic_language_library",
+    "semantic_language_parsing_test",
+)
+
+semantic_language_library(
+    name = "semantic-c",
+    srcs = glob(["src/**/*.hs"]),
+    language = "c",
+)
+
+semantic_language_parsing_test(
+    language = "c",
+    semantic_package = "c",
+    ts_package = "c",
+)
