@@ -1,13 +1,22 @@
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE TupleSections #-}
 module Analysis.Syntax
 ( Syntax(..)
   -- * Pretty-printing
 , Print(..)
   -- * Parsing
-, Tree(..)
+, parseNode
 ) where
 
+import           Control.Applicative (Alternative(..), liftA3)
+import           Control.Monad (guard)
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Types as A
+import qualified Data.IntMap as IntMap
 import           Data.Text (Text, pack, unpack)
 
 class Syntax rep where
@@ -62,22 +71,21 @@ infixr 6 <+>
 
 -- Parsing
 
--- Temporary until I can figure out how to have aeson construct a rep directly.
-
-data Tree
-  = NoOp
-  | String Text
-  | Bool Bool
-  | If Tree Tree Tree
-  | Throw Tree
-
-instance A.FromJSON Tree where
-  parseJSON = A.withObject "Tree" $ \ o -> do
-    attrs <- o A..: pack "attrs"
-    t <- attrs A..: pack "type"
-    case t of
-      "string" -> String <$> attrs A..: pack "text"
-      "true"   -> pure (Bool True)
-      "false"  -> pure (Bool False)
-      "throw"  -> Throw . (!! 0) <$> o A..: pack "edges"
-      _        -> A.parseFail ("unrecognized type: " <> t)
+parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep)
+parseNode o = do
+  edges <- o A..: pack "edges"
+  index <- o A..: pack "index"
+  let parseType attrs = attrs A..: pack "type" >>= \case
+        "string" -> const . string <$> attrs A..: pack "text"
+        "true"   -> pure (const (bool True))
+        "false"  -> pure (const (bool False))
+        "throw"  -> fmap throw <$> edge (head edges)
+        "if"     -> liftA3 iff <$> findEdge (edgeNamed "condition") <*> findEdge (edgeNamed "consequence") <*> findEdge (edgeNamed "alternative") <|> pure (const noop)
+        t        -> A.parseFail ("unrecognized type: " <> t)
+      edge = A.withObject "edge" (fmap (flip (IntMap.!)) . (A..: pack "sink"))
+      edgeNamed name sink attrs = attrs A..: pack "type" >>= guard . (== name) >> pure (IntMap.! sink)
+      findEdge f = foldMap (A.withObject "edge" (\ edge -> do
+        sink <- edge A..: pack "sink"
+        attrs <- edge A..: pack "attrs"
+        f sink attrs)) edges
+  o A..: pack "attrs" >>= A.withObject "attrs" (fmap (index,) . parseType)
