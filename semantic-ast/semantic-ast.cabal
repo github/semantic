@@ -80,3 +80,34 @@ library
     , unordered-containers ^>= 0.2.10
 
   hs-source-dirs:      src
+
+executable generate-ast
+  import: haskell
+  hs-source-dirs: app
+  main-is: Main.hs
+  build-depends:
+    semantic-ast,
+    base,
+    filepath,
+    process,
+    template-haskell,
+    text,
+    semantic-source,
+    bazel-runfiles,
+    directory,
+    generic-lens,
+    lens,
+    neat-interpolation,
+    optparse-generic,
+    tree-sitter,
+    tree-sitter-c,
+    tree-sitter-go,
+    tree-sitter-java,
+    tree-sitter-json,
+    tree-sitter-php,
+    tree-sitter-python,
+    tree-sitter-ql,
+    tree-sitter-ruby,
+    tree-sitter-rust,
+    tree-sitter-tsx,
+    tree-sitter-typescript
