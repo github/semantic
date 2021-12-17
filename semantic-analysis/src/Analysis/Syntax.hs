@@ -9,6 +9,7 @@ module Analysis.Syntax
   -- * Pretty-printing
 , Print(..)
   -- * Parsing
+, parseGraph
 , parseNode
 ) where
 
@@ -18,6 +19,7 @@ import qualified Data.Aeson as A
 import qualified Data.Aeson.Types as A
 import qualified Data.IntMap as IntMap
 import           Data.Text (Text, pack, unpack)
+import qualified Data.Vector as V
 
 class Syntax rep where
   iff :: rep -> rep -> rep -> rep
@@ -70,6 +72,11 @@ infixr 6 <+>
 
 
 -- Parsing
+
+parseGraph :: Syntax  rep => A.Value -> A.Parser (IntMap.IntMap rep)
+parseGraph = A.withArray "nodes" $ \ nodes -> do
+  untied <- IntMap.fromList <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
+  pure (let tied = ($ tied) <$> untied in tied)
 
 parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep)
 parseNode o = do
