@@ -215,8 +215,14 @@ toName :: Named -> String -> Name
 toName named str = mkName (toNameString named str)
 
 toNameString :: Named -> String -> String
-toNameString named str = prefix named <> toHaskellPascalCaseIdentifier str
+toNameString named str = prefix named <> toHaskellPascalCaseIdentifier (dedup str)
   where
+    -- C’s u' and U' conflict
+    -- TODO: resolve this in tree-sitter-c
+    dedup "u'" = "u16'"
+    dedup "u\"" = "u16\""
+    dedup s = s
+
     prefix Anonymous = "Anonymous"
     prefix Named     = ""
 
