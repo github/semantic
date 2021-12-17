@@ -11,6 +11,7 @@ module Parsing.Parser
   -- * Parsers
   -- $abstract
 , SomeParser(..)
+, cParser
 , goParser
 , javaParser
 , javascriptParser
@@ -30,6 +31,7 @@ import           AST.Unmarshal
 import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Foreign.Ptr
+import qualified Language.C as CPrecise
 import qualified Language.CodeQL as CodeQLPrecise
 import qualified Language.Go as GoPrecise
 import qualified Language.Java as Java
@@ -80,6 +82,9 @@ data Parser term where
 data SomeParser c a where
   SomeParser :: c t => Parser (t a) -> SomeParser c a
 
+cParser :: c CPrecise.Term => (Language, SomeParser c Loc)
+cParser = (C, SomeParser (UnmarshalParser @CPrecise.Term CPrecise.tree_sitter_c))
+
 goParser :: c GoPrecise.Term => (Language, SomeParser c Loc)
 goParser = (Go, SomeParser (UnmarshalParser @GoPrecise.Term GoPrecise.tree_sitter_go))
 
@@ -115,7 +120,8 @@ typescriptParser = (TypeScript, SomeParser (UnmarshalParser @TypeScriptPrecise.T
 
 -- | The canonical set of parsers producing precise terms.
 preciseParsers
-  :: ( c Java.Term
+  :: ( c CPrecise.Term
+     , c Java.Term
      , c JSON.Term
      , c PythonPrecise.Term
      , c CodeQLPrecise.Term
@@ -127,7 +133,8 @@ preciseParsers
      )
   => Map Language (SomeParser c Loc)
 preciseParsers = Map.fromList
-  [ goParser
+  [ cParser
+  , goParser
   , javascriptParser
   , jsonParser
   , jsxParser

@@ -36,6 +36,7 @@ Available options:
 
 | Language       | Parse | AST Symbols† | Stack graphs |
 | :------------- | :---: | :---:        | :---:        |
+| C              | ✅    | ⬜️           | |
 | Ruby           | ✅    | ✅           | |
 | JavaScript     | ✅    | ✅           | |
 | TypeScript     | ✅    | ✅           | 🚧 |
