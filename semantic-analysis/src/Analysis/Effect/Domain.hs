@@ -80,7 +80,7 @@ dstring = send . DString
 
 -- Exceptions
 
-ddie :: Has (Dom val) sig m => String -> m val
+ddie :: Has (Dom val) sig m => val -> m val
 ddie = send . DDie
 
 data Dom val m k where
@@ -92,4 +92,4 @@ data Dom val m k where
   DBool :: Bool -> Dom val m val
   DIf :: val -> m a -> m a -> Dom val m a
   DString :: Text -> Dom val m val
-  DDie :: String -> Dom val m val
+  DDie :: val -> Dom val m val

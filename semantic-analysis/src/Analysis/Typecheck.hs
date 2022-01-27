@@ -242,6 +242,6 @@ instance ( Alternative m
       unify a arg
       pure (ret <$ ctx)
 
-    L (DDie msg) -> fail msg
+    L (DDie msg) -> fail (show msg)
 
     R other -> DomainC (alg (runDomain . hdl) other ctx)
