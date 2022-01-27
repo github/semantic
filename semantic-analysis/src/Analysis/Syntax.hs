@@ -1,19 +1,34 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.Syntax
 ( Syntax(..)
   -- * Pretty-printing
 , Print(..)
+  -- * Abstract interpretation
+, Interpret(..)
   -- * Parsing
 , parseGraph
 , parseNode
 ) where
 
+import           Analysis.Effect.Domain
+import           Analysis.Effect.Env (Env)
+import           Analysis.Effect.Store
 import           Control.Applicative (Alternative(..), liftA3)
+import           Control.Effect.Labelled
 import           Control.Monad (guard)
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Types as A
@@ -69,6 +84,22 @@ parens p = char '(' <> p <> char ')'
 l <+> r = l <> char ' ' <> r
 
 infixr 6 <+>
+
+
+-- Abstract interpretation
+
+newtype Interpret m i = Interpret { interpret :: (forall r . Interpret m r -> m r) -> m i }
+
+instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => Syntax (Interpret m val) where
+  iff c t e = Interpret (\ eval -> do
+    c' <- eval c
+    dif c' (eval t) (eval e))
+  noop = Interpret (const dunit)
+
+  bool b = Interpret (\ _ -> dbool b)
+  string s = Interpret (\ _ -> dstring s)
+
+  throw e = Interpret (\ eval -> eval e >>= ddie)
 
 
 -- Parsing
