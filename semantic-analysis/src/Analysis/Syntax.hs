@@ -88,7 +88,7 @@ infixr 6 <+>
 
 -- Abstract interpretation
 
-newtype Interpret m i = Interpret { interpret :: (forall r . Interpret m r -> m r) -> m i }
+newtype Interpret m i = Interpret { interpret :: (Interpret m i -> m i) -> m i }
 
 instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => Syntax (Interpret m val) where
   iff c t e = Interpret (\ eval -> do
