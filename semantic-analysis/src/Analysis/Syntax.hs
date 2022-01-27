@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds #-}
+-- {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE ExistentialQuantification #-}
@@ -18,6 +18,7 @@ module Analysis.Syntax
   -- * Pretty-printing
 , Print(..)
   -- * Abstract interpretation
+, eval0
 , eval
 , Interpret(..)
   -- * Parsing
@@ -33,6 +34,7 @@ import           Control.Effect.Labelled
 import           Control.Monad (guard)
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Types as A
+import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import           Data.Text (Text, pack, unpack)
 import qualified Data.Vector as V
@@ -88,6 +90,9 @@ infixr 6 <+>
 
 
 -- Abstract interpretation
+
+eval0 :: Interpret m i -> m i
+eval0 = fix eval
 
 eval :: (Interpret m i -> m i) -> (Interpret m i -> m i)
 eval eval (Interpret f) = f eval
