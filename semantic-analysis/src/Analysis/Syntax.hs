@@ -18,6 +18,7 @@ module Analysis.Syntax
   -- * Pretty-printing
 , Print(..)
   -- * Abstract interpretation
+, eval
 , Interpret(..)
   -- * Parsing
 , parseGraph
@@ -87,6 +88,9 @@ infixr 6 <+>
 
 
 -- Abstract interpretation
+
+eval :: (Interpret m i -> m i) -> (Interpret m i -> m i)
+eval eval (Interpret f) = f eval
 
 newtype Interpret m i = Interpret { interpret :: (Interpret m i -> m i) -> m i }
 
