@@ -124,12 +124,13 @@ parseFile path = do
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
-  untied <- IntMap.fromList <$> traverse (uncurry (A.withObject "node" . parseNode)) (zip [0..] (V.toList nodes))
+  untied <- IntMap.fromList <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
   pure (let tied = ($ tied) <$> untied in tied)
 
-parseNode :: Syntax rep => Int -> A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep)
-parseNode index o = do
+parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep)
+parseNode o = do
   edges <- o A..: pack "edges"
+  index <- o A..: pack "id"
   let parseType attrs = attrs A..: pack "type" >>= \case
         "string" -> const . string <$> attrs A..: pack "text"
         "true"   -> pure (const (bool True))
