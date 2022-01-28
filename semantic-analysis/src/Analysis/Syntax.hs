@@ -22,6 +22,7 @@ module Analysis.Syntax
 , eval
 , Interpret(..)
   -- * Parsing
+, parseFile
 , parseGraph
 , parseNode
 ) where
@@ -33,7 +34,9 @@ import           Control.Applicative (Alternative(..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Monad (guard)
 import qualified Data.Aeson as A
+import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
+import qualified Data.ByteString.Lazy as B
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import           Data.Text (Text, pack, unpack)
@@ -112,6 +115,11 @@ instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (D
 
 
 -- Parsing
+
+parseFile :: Syntax rep => FilePath -> IO (Maybe (IntMap.IntMap rep))
+parseFile path = do
+  contents <- B.readFile path
+  pure $ A.decodeWith A.json' (A.parse parseGraph) contents
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
