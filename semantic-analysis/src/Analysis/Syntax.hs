@@ -113,7 +113,7 @@ instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (D
 
 -- Parsing
 
-parseGraph :: Syntax  rep => A.Value -> A.Parser (IntMap.IntMap rep)
+parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
   untied <- IntMap.fromList <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
   pure (let tied = ($ tied) <$> untied in tied)
