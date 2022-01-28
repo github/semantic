@@ -34,6 +34,7 @@ import           Control.Applicative (Alternative(..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Monad (guard)
 import qualified Data.Aeson as A
+import qualified Data.Aeson.Internal as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
@@ -116,20 +117,19 @@ instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (D
 
 -- Parsing
 
-parseFile :: Syntax rep => FilePath -> IO (Maybe (IntMap.IntMap rep))
+parseFile :: Syntax rep => FilePath -> IO (Either (A.JSONPath, String) (IntMap.IntMap rep))
 parseFile path = do
   contents <- B.readFile path
-  pure $ A.decodeWith A.json' (A.parse parseGraph) contents
+  pure $ A.eitherDecodeWith A.json' (A.iparse parseGraph) contents
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
-  untied <- IntMap.fromList <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
+  untied <- IntMap.fromList <$> traverse (uncurry (A.withObject "node" . parseNode)) (zip [0..] (V.toList nodes))
   pure (let tied = ($ tied) <$> untied in tied)
 
-parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep)
-parseNode o = do
+parseNode :: Syntax rep => Int -> A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep)
+parseNode index o = do
   edges <- o A..: pack "edges"
-  index <- o A..: pack "index"
   let parseType attrs = attrs A..: pack "type" >>= \case
         "string" -> const . string <$> attrs A..: pack "text"
         "true"   -> pure (const (bool True))
