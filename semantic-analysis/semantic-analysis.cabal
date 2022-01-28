@@ -63,6 +63,7 @@ library
   build-depends:
     , aeson                       ^>= 1.4
     , base                         >= 4.13 && < 5
+    , bytestring                  ^>= 0.10.8.2
     , containers                  ^>= 0.6
     , fused-effects               ^>= 1.1
     , hashable
