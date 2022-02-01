@@ -137,6 +137,7 @@ parseNode o = do
         "false"  -> pure (const (bool False))
         "throw"  -> fmap throw <$> edge (head edges)
         "if"     -> liftA3 iff <$> findEdge (edgeNamed "condition") <*> findEdge (edgeNamed "consequence") <*> findEdge (edgeNamed "alternative") <|> pure (const noop)
+        "block"  -> pure (const (bool True))
         t        -> A.parseFail ("unrecognized type: " <> t)
       edge = A.withObject "edge" (fmap (flip (IntMap.!)) . (A..: pack "sink"))
       edgeNamed name sink attrs = attrs A..: pack "type" >>= guard . (== name) >> pure (IntMap.! sink)
