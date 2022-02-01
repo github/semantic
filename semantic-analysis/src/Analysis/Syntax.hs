@@ -32,7 +32,7 @@ module Analysis.Syntax
 import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind)
 import           Analysis.Effect.Store
-import           Analysis.Name (Name)
+import           Analysis.Name (Name, formatName)
 import           Control.Applicative (Alternative(..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Monad (guard)
@@ -41,6 +41,7 @@ import qualified Data.Aeson.Internal as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
+import           Data.Foldable (foldl')
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import           Data.Text (Text, pack, unpack)
@@ -54,6 +55,8 @@ class Syntax rep where
   string :: Text -> rep
 
   throw :: rep -> rep
+
+  let_ :: Name -> rep -> (rep -> rep) -> rep
 
 
 -- Pretty-printing
@@ -78,6 +81,8 @@ instance Syntax Print where
 
   throw e = parens (str "throw" <+> e)
 
+  let_ n v b = parens (str "let" <+> name n <+> char '=' <+> v <+> str "in" <+> b (name n))
+
 str :: String -> Print
 str = Print . showString
 
@@ -94,6 +99,9 @@ parens p = char '(' <> p <> char ')'
 l <+> r = l <> char ' ' <> r
 
 infixr 6 <+>
+
+name :: Name -> Print
+name = text . formatName
 
 
 -- Abstract interpretation
@@ -116,6 +124,10 @@ instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (D
   string s = Interpret (\ _ -> dstring s)
 
   throw e = Interpret (\ eval -> eval e >>= ddie)
+
+  let_ n v b = Interpret (\ eval -> do
+    v' <- eval v
+    let' n v' (eval (b (Interpret (pure (pure v'))))))
 
 
 -- Macro-expressible syntax
