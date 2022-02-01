@@ -1,3 +1,9 @@
+(module) @this
+{
+  node @this.node
+  attr (@this.node) type = "module"
+}
+
 (identifier) @id
 {
   node @id.node
@@ -66,4 +72,9 @@
 {
   edge @this.node -> @else.node
   attr (@this.node -> @else.node) type = "alternative"
+}
+
+(module (_) @child) @this
+{
+  edge @this.node -> @child.node
 }
