@@ -135,14 +135,15 @@ parseNode o = do
         "string" -> const . string <$> attrs A..: pack "text"
         "true"   -> pure (const (bool True))
         "false"  -> pure (const (bool False))
-        "throw"  -> fmap throw <$> edge (head edges)
+        "throw"  -> fmap throw <$> edge (const . pure . flip (IntMap.!)) (head edges)
         "if"     -> liftA3 iff <$> findEdge (edgeNamed "condition") <*> findEdge (edgeNamed "consequence") <*> findEdge (edgeNamed "alternative") <|> pure (const noop)
         "block"  -> pure (const (bool True))
         t        -> A.parseFail ("unrecognized type: " <> t)
-      edge = A.withObject "edge" (fmap (flip (IntMap.!)) . (A..: pack "sink"))
-      edgeNamed name sink attrs = attrs A..: pack "type" >>= guard . (== name) >> pure (IntMap.! sink)
-      findEdge f = foldMap (A.withObject "edge" (\ edge -> do
+      edge :: (IntMap.Key -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
+      edge f = A.withObject "edge" (\ edge -> do
         sink <- edge A..: pack "sink"
         attrs <- edge A..: pack "attrs"
-        f sink attrs)) edges
+        f sink attrs)
+      edgeNamed name sink attrs = attrs A..: pack "type" >>= guard . (== name) >> pure (IntMap.! sink)
+      findEdge f = foldMap (edge f) edges
   o A..: pack "attrs" >>= A.withObject "attrs" (fmap (index,) . parseType)
