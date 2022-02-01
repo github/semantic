@@ -45,18 +45,25 @@
   }
 }
 
-; (else_clause body: (_) @body)
-; {
-;
-; }
-
-(if_statement condition: (_) @cond consequence: (_) @then alternative: (_) @else) @this
+(else_clause body: (_) @body) @this
 {
+  let @this.node = @body.node
+}
+
+(if_statement (_)) @this {
   node @this.node
   attr (@this.node) type = "if"
+}
+
+(if_statement condition: (_) @cond consequence: (_) @then) @this {
   edge @this.node -> @cond.node
   attr (@this.node -> @cond.node) type = "condition"
   edge @this.node -> @then.node
   attr (@this.node -> @then.node) type = "consequence"
-  ; edge @this.node -> @else.node
+}
+
+(if_statement alternative: (_) @else) @this
+{
+  edge @this.node -> @else.node
+  attr (@this.node -> @else.node) type = "alternative"
 }
