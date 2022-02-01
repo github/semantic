@@ -36,10 +36,13 @@
   edge @this.node -> @arg.node
 }
 
-(block (_) @arg) @this
+(block (_)* @children) @this
 {
   node @this.node
-  edge @this.node -> @arg.node
+  attr (@this.node) type = "block"
+  for child in @children {
+    edge @this.node -> child.node
+  }
 }
 
 ; (else_clause body: (_) @body)
