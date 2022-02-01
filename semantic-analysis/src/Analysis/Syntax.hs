@@ -21,6 +21,8 @@ module Analysis.Syntax
 , eval0
 , eval
 , Interpret(..)
+  -- * Macro-expressible syntax
+, let'
   -- * Parsing
 , parseFile
 , parseGraph
@@ -28,8 +30,9 @@ module Analysis.Syntax
 ) where
 
 import           Analysis.Effect.Domain
-import           Analysis.Effect.Env (Env)
+import           Analysis.Effect.Env (Env, bind)
 import           Analysis.Effect.Store
+import           Analysis.Name (Name)
 import           Control.Applicative (Alternative(..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Monad (guard)
@@ -113,6 +116,15 @@ instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (D
   string s = Interpret (\ _ -> dstring s)
 
   throw e = Interpret (\ eval -> eval e >>= ddie)
+
+
+-- Macro-expressible syntax
+
+let' :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m) => Name -> val -> m a -> m a
+let' n v m = do
+  addr <- alloc n
+  addr .= v
+  bind n addr m
 
 
 -- Parsing
