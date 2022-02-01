@@ -244,4 +244,9 @@ instance ( Alternative m
 
     L (DDie msg) -> fail (show msg)
 
+    L (DLet n v b) -> do
+      addr <- A.alloc n
+      addr A..= v
+      A.bind n addr $ hdl (b v <$ ctx)
+
     R other -> DomainC (alg (runDomain . hdl) other ctx)
