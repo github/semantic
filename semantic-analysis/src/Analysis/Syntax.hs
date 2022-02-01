@@ -32,7 +32,7 @@ module Analysis.Syntax
 import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind)
 import           Analysis.Effect.Store
-import           Analysis.Name (Name, formatName)
+import           Analysis.Name (Name, formatName, nameI)
 import           Control.Applicative (Alternative(..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Monad (guard)
@@ -161,7 +161,7 @@ parseNode o = do
         "false"  -> pure (const (bool False))
         "throw"  -> fmap throw <$> resolve (head edges)
         "if"     -> liftA3 iff <$> findEdge (edgeNamed "condition") <*> findEdge (edgeNamed "consequence") <*> findEdge (edgeNamed "alternative") <|> pure (const noop)
-        "block"  -> pure (const (bool True))
+        "block"  -> fmap (foldl' (\ l (i, r) -> let_ (nameI i) l (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
         t        -> A.parseFail ("unrecognized type: " <> t)
       edge :: (IntMap.Key -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
       edge f = A.withObject "edge" (\ edge -> do
