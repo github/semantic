@@ -161,7 +161,7 @@ parseNode o = do
         "false"  -> pure (const (bool False))
         "throw"  -> fmap throw <$> resolve (head edges)
         "if"     -> liftA3 iff <$> findEdge (edgeNamed "condition") <*> findEdge (edgeNamed "consequence") <*> findEdge (edgeNamed "alternative") <|> pure (const noop)
-        "block"  -> fmap (foldl' (\ l (i, r) -> let_ (nameI i) l (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
+        "block"  -> fmap (foldl' (\ r (i, v) -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
         t        -> A.parseFail ("unrecognized type: " <> t)
       edge :: (IntMap.Key -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
       edge f = A.withObject "edge" (\ edge -> do
