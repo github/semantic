@@ -23,6 +23,7 @@ module Analysis.Effect.Domain
 , dstring
   -- * Exceptions
 , ddie
+  -- * Domain effect
 , Dom(..)
 ) where
 
@@ -82,6 +83,9 @@ dstring = send . DString
 
 ddie :: Has (Dom val) sig m => val -> m val
 ddie = send . DDie
+
+
+-- Domain effect
 
 data Dom val m k where
   DVar :: Name -> Dom val m val
