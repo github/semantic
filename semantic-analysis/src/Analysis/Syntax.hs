@@ -167,6 +167,7 @@ parseNode o = do
         sink <- edge A..: pack "sink"
         attrs <- edge A..: pack "attrs"
         f sink attrs)
-      resolve = edge (const . pure . flip (IntMap.!))
+      resolve = resolveWith (const (pure ()))
+      resolveWith f = edge (\ sink attrs -> f attrs >> pure (IntMap.! sink))
       findEdgeNamed name = foldMap (edge (\ sink attrs -> attrs A..: pack "type" >>= guard . (== name) >> pure (IntMap.! sink))) edges
   o A..: pack "attrs" >>= A.withObject "attrs" (fmap (index,) . parseType)
