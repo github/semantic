@@ -148,20 +148,20 @@ parseFile path = do
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
   untied <- IntMap.fromList <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
-  pure $ fix (\ tied -> ($ tied) <$> untied)
+  pure $ fix (\ tied -> ($ tied) . either id id <$> untied)
 
-parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep)
+parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, Either (IntMap.IntMap rep -> rep) (IntMap.IntMap rep -> rep))
 parseNode o = do
   edges <- o A..: pack "edges"
   index <- o A..: pack "id"
   let parseType attrs = attrs A..: pack "type" >>= \case
-        "string" -> const . string <$> attrs A..: pack "text"
-        "true"   -> pure (const (bool True))
-        "false"  -> pure (const (bool False))
-        "throw"  -> fmap throw <$> resolve (head edges)
-        "if"     -> liftA3 iff <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (const noop)
-        "block"  -> fmap (foldr (\ (i, v) r -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
-        "module" -> fmap (foldr (\ (i, v) r -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
+        "string" -> Left . const . string <$> attrs A..: pack "text"
+        "true"   -> pure (Left (const (bool True)))
+        "false"  -> pure (Left (const (bool False)))
+        "throw"  -> Left . fmap throw <$> resolve (head edges)
+        "if"     -> (\ c t e -> Left (liftA3 iff c t e)) <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (Left (const noop))
+        "block"  -> Left . fmap (foldr (\ (i, v) r -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
+        "module" -> Right . fmap (foldr (\ (i, v) r -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
         t        -> A.parseFail ("unrecognized type: " <> t)
       resolve = resolveWith (const (pure ()))
       resolveWith :: (A.Object -> A.Parser ()) -> A.Value -> A.Parser (IntMap.IntMap rep -> rep)
