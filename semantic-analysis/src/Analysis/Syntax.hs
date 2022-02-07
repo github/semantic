@@ -43,6 +43,7 @@ import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
+import           Data.Monoid (First(..))
 import           Data.Text (Text, pack, unpack)
 import qualified Data.Vector as V
 
@@ -140,28 +141,29 @@ let' n v m = do
 
 -- Parsing
 
-parseFile :: Syntax rep => FilePath -> IO (Either (A.JSONPath, String) (IntMap.IntMap rep))
+parseFile :: Syntax rep => FilePath -> IO (Either (A.JSONPath, String) (Maybe rep))
 parseFile path = do
   contents <- B.readFile path
-  pure $ A.eitherDecodeWith A.json' (A.iparse parseGraph) contents
+  pure $ snd <$> A.eitherDecodeWith A.json' (A.iparse parseGraph) contents
 
-parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep)
+parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
-  untied <- IntMap.fromList <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
-  pure $ fix (\ tied -> ($ tied) . either id id <$> untied)
+  (untied, First root) <- foldMap (\ (k, v, r) -> ([(k, v)], First r)) <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
+  let tied = fix (\ tied -> ($ tied) <$> IntMap.fromList untied)
+  pure (tied, root)
 
-parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, Either (IntMap.IntMap rep -> rep) (IntMap.IntMap rep -> rep))
+parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep, Maybe rep)
 parseNode o = do
   edges <- o A..: pack "edges"
   index <- o A..: pack "id"
   let parseType attrs = attrs A..: pack "type" >>= \case
-        "string" -> Left . const . string <$> attrs A..: pack "text"
-        "true"   -> pure (Left (const (bool True)))
-        "false"  -> pure (Left (const (bool False)))
-        "throw"  -> Left . fmap throw <$> resolve (head edges)
-        "if"     -> (\ c t e -> Left (liftA3 iff c t e)) <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (Left (const noop))
-        "block"  -> Left . fmap (foldr (\ (i, v) r -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
-        "module" -> Right . fmap (foldr (\ (i, v) r -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
+        "string" -> const . string <$> attrs A..: pack "text"
+        "true"   -> pure (const (bool True))
+        "false"  -> pure (const (bool False))
+        "throw"  -> fmap throw <$> resolve (head edges)
+        "if"     -> liftA3 iff <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (const noop)
+        "block"  -> fmap (foldr (\ (i, v) r -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
+        "module" -> fmap (foldr (\ (i, v) r -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
         t        -> A.parseFail ("unrecognized type: " <> t)
       resolve = resolveWith (const (pure ()))
       resolveWith :: (A.Object -> A.Parser ()) -> A.Value -> A.Parser (IntMap.IntMap rep -> rep)
@@ -171,4 +173,4 @@ parseNode o = do
         f attrs
         pure (IntMap.! sink))
       findEdgeNamed name = foldMap (resolveWith (\ attrs -> attrs A..: pack "type" >>= guard . (== name))) edges
-  o A..: pack "attrs" >>= A.withObject "attrs" (fmap (index,) . parseType)
+  o A..: pack "attrs" >>= A.withObject "attrs" (fmap (index,,Nothing) . parseType)
