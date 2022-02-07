@@ -150,13 +150,13 @@ parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
   (untied, First root) <- foldMap (\ (k, v, r) -> ([(k, v)], First r)) <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
   let tied = fix (\ tied -> ($ tied) <$> IntMap.fromList untied)
-  pure (tied, root)
+  pure (tied, ($ tied) <$> root)
 
-parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep, Maybe rep)
+parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep, Maybe (IntMap.IntMap rep -> rep))
 parseNode o = do
   edges <- o A..: pack "edges"
   index <- o A..: pack "id"
-  let parseType attrs = attrs A..: pack "type" >>= \case
+  let parseType attrs = \case
         "string" -> const . string <$> attrs A..: pack "text"
         "true"   -> pure (const (bool True))
         "false"  -> pure (const (bool False))
@@ -173,4 +173,7 @@ parseNode o = do
         f attrs
         pure (IntMap.! sink))
       findEdgeNamed name = foldMap (resolveWith (\ attrs -> attrs A..: pack "type" >>= guard . (== name))) edges
-  o A..: pack "attrs" >>= A.withObject "attrs" (fmap (index,,Nothing) . parseType)
+  o A..: pack "attrs" >>= A.withObject "attrs" (\ attrs -> do
+    ty <- attrs A..: pack "type"
+    let node = parseType attrs ty
+    (index,,Nothing) <$> node)
