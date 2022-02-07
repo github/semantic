@@ -175,5 +175,5 @@ parseNode o = do
       findEdgeNamed name = foldMap (resolveWith (\ attrs -> attrs A..: pack "type" >>= guard . (== name))) edges
   o A..: pack "attrs" >>= A.withObject "attrs" (\ attrs -> do
     ty <- attrs A..: pack "type"
-    let node = parseType attrs ty
-    (index,,Nothing) <$> node)
+    node <- parseType attrs ty
+    pure (index, node, if ty == "module" then Just node else Nothing))
