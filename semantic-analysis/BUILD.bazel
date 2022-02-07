@@ -21,6 +21,7 @@ haskell_library(
     compiler_flags = GHC_FLAGS + ["-XOverloadedStrings"],
     deps = [
         "//:base",
+        "//:bytestring",
         "//:containers",
         "//:filepath",
         "//:text",
@@ -30,5 +31,6 @@ haskell_library(
         "@stackage//:fused-effects",
         "@stackage//:hashable",
         "@stackage//:pathtype",
+        "@stackage//:vector",
     ],
 )
