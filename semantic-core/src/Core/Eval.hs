@@ -39,4 +39,4 @@ eval eval = \case
   If c t e  -> do
     c' <- eval c
     dif c' (eval t) (eval e)
-  Die s -> ddie s
+  Die s -> dstring s >>= ddie
