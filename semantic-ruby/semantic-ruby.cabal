@@ -3,7 +3,7 @@ cabal-version:       2.4
 name:                semantic-ruby
 version:             0.0.0.0
 synopsis:            Semantic support for Ruby.
-description:         Semantic support for Ruby using the semantic-core intermediate language.
+description:         Semantic support for Ruby.
 homepage:            https://github.com/github/semantic/tree/master/semantic-ruby#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT

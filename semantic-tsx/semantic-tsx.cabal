@@ -3,7 +3,7 @@ cabal-version:       2.4
 name:                semantic-tsx
 version:             0.0.0.0
 synopsis:            Semantic support for TSX.
-description:         Semantic support for TSX using the semantic-core intermediate language.
+description:         Semantic support for TSX.
 homepage:            https://github.com/github/semantic/tree/master/semantic-tsx#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT

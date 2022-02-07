@@ -4,7 +4,7 @@ name:                semantic-tags
 version:             0.0.0.0
 synopsis:            Tags computation
 description:         Tags computation for ASTs derived from tree-sitter grammars.
-homepage:            https://github.com/github/semantic/tree/master/semantic-core#readme
+homepage:            https://github.com/github/semantic/tree/master/semantic-tags#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT
 license-file:        LICENSE
