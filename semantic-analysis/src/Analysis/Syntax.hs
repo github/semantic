@@ -173,6 +173,7 @@ parseNode o = do
         attrs <- edge A..: pack "attrs"
         f attrs
         pure (IntMap.! sink))
+      findEdgeNamed :: (A.FromJSON a, Eq a) => a -> A.Parser (IntMap.IntMap rep -> rep)
       findEdgeNamed name = foldMap (resolveWith (\ attrs -> attrs A..: pack "type" >>= guard . (== name))) edges
   o A..: pack "attrs" >>= A.withObject "attrs" (\ attrs -> do
     ty <- attrs A..: pack "type"
