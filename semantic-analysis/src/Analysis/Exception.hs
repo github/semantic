@@ -1,3 +1,4 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Analysis.Exception
 ( Exception(..)
 , ExcSet(..)
@@ -11,3 +12,4 @@ newtype Exception = Exception { exceptionName :: String }
 
 -- | Sets whose elements are each a variable or an exception.
 newtype ExcSet = ExcSet { values :: Set.Set (Either Name Exception) }
+  deriving (Eq, Monoid, Semigroup, Ord, Show)
