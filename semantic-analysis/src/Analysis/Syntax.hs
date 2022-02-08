@@ -177,4 +177,4 @@ parseNode o = do
   o A..: pack "attrs" >>= A.withObject "attrs" (\ attrs -> do
     ty <- attrs A..: pack "type"
     node <- parseType attrs ty
-    pure (index, node, if ty == "module" then Just node else Nothing))
+    pure (index, node, node <$ guard (ty == "module")))
