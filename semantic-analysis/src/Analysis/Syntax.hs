@@ -142,6 +142,9 @@ parseFile path = do
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
   (untied, First root) <- foldMap (\ (k, v, r) -> ([(k, v)], First r)) <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
+  -- @untied@ is a list of key/value pairs, where the keys are graph node IDs and the values are functions from the final graph to the representations of said graph nodes. Likewise, @root@ is a function of the same variety, wrapped in a @Maybe@.
+  --
+  -- We define @tied@ as the fixpoint of the former to yield the former as a graph of type @IntMap.IntMap rep@, and apply the latter to said graph to yield the entry point, if any, from which to evaluate.
   let tied = fix (\ tied -> ($ tied) <$> IntMap.fromList untied)
   pure (tied, ($ tied) <$> root)
 
