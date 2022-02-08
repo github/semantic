@@ -1,2 +1,5 @@
 module Analysis.Exception
-() where
+( Exception(..)
+) where
+
+newtype Exception = Exception { exceptionName :: String }
