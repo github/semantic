@@ -119,7 +119,6 @@ def semantic_language_library(language, name, srcs, ts_package = "", nodetypes =
             "//:text",
             "//semantic-analysis",
             "//semantic-ast",
-            "//semantic-core",
             "//semantic-proto",
             "//semantic-scope-graph",
             "//semantic-source",

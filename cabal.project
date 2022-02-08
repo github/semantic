@@ -5,7 +5,6 @@ packages: semantic
           semantic-analysis
           semantic-ast
           semantic-codeql
-          semantic-core
           semantic-go
           semantic-java
           semantic-json

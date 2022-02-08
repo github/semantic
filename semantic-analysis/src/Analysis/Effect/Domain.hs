@@ -23,6 +23,9 @@ module Analysis.Effect.Domain
 , dstring
   -- * Exceptions
 , ddie
+  -- * Control flow
+, dlet
+  -- * Domain effect
 , Dom(..)
 ) where
 
@@ -80,8 +83,17 @@ dstring = send . DString
 
 -- Exceptions
 
-ddie :: Has (Dom val) sig m => String -> m val
+ddie :: Has (Dom val) sig m => val -> m val
 ddie = send . DDie
+
+
+-- Control flow
+
+dlet :: Has (Dom val) sig m => Name -> val -> (val -> m val) -> m val
+dlet n v b = send (DLet n v b)
+
+
+-- Domain effect
 
 data Dom val m k where
   DVar :: Name -> Dom val m val
@@ -92,4 +104,5 @@ data Dom val m k where
   DBool :: Bool -> Dom val m val
   DIf :: val -> m a -> m a -> Dom val m a
   DString :: Text -> Dom val m val
-  DDie :: String -> Dom val m val
+  DDie :: val -> Dom val m val
+  DLet :: Name -> val -> (val -> m val) -> Dom val m val

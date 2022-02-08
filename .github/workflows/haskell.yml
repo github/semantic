@@ -14,14 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ghc: ["8.10.1"]
-        cabal: ["3.2.0.0"]
+        ghc: ["8.10"]
+        cabal: ["3.2"]
 
     steps:
     - uses: actions/checkout@v2
       if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
-    - uses: actions/setup-haskell@v1
+    - uses: haskell/actions/setup@v1.2.2
       name: Setup Haskell
       with:
         ghc-version: ${{ matrix.ghc }}

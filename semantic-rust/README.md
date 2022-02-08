@@ -1,6 +1,6 @@
 # Semantic support for Rust
 
-This package implements `semantic` support for [Rust](https://www.rust-lang.org/) using the `semantic-core` intermediate language.
+This package implements `semantic` support for [Rust](https://www.rust-lang.org/).
 
 ## Generating AST
 

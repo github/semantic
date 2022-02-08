@@ -1,0 +1,82 @@
+; tree-sitter-graph definitions mapping Python ASTs to an analyzable IR.
+
+(module) @this
+{
+  node @this.node
+  attr (@this.node) type = "module"
+}
+
+(identifier) @id
+{
+  node @id.node
+}
+
+(string) @this
+{
+  node @this.node
+  attr (@this.node) type = "string"
+  attr (@this.node) text = (source-text @this)
+}
+
+(true) @this
+{
+  node @this.node
+  attr (@this.node) type = "true"
+}
+
+(false) @this
+{
+  node @this.node
+  attr (@this.node) type = "false"
+}
+
+(print_statement argument: (_) @arg) @this
+{
+  node @this.node
+  attr (@this.node) type = "print"
+  edge @this.node -> @arg.node
+}
+
+(raise_statement (_) @arg) @this
+{
+  node @this.node
+  attr (@this.node) type = "throw"
+  edge @this.node -> @arg.node
+}
+
+(block (_)* @children) @this
+{
+  node @this.node
+  attr (@this.node) type = "block"
+  for child in @children {
+    edge @this.node -> child.node
+  }
+}
+
+(else_clause body: (_) @body) @this
+{
+  let @this.node = @body.node
+}
+
+(if_statement (_)) @this {
+  node @this.node
+  attr (@this.node) type = "if"
+}
+
+(if_statement condition: (_) @cond consequence: (_) @then) @this {
+  edge @this.node -> @cond.node
+  attr (@this.node -> @cond.node) type = "condition"
+  edge @this.node -> @then.node
+  attr (@this.node -> @then.node) type = "consequence"
+}
+
+(if_statement alternative: (_) @else) @this
+{
+  edge @this.node -> @else.node
+  attr (@this.node -> @else.node) type = "alternative"
+}
+
+(module (_) @child) @this
+{
+  edge @this.node -> @child.node
+}

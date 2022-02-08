@@ -3,7 +3,7 @@ cabal-version:       2.4
 name:                semantic-php
 version:             0.0.0.0
 synopsis:            Semantic support for PHP.
-description:         Semantic support for PHP using the semantic-core intermediate language.
+description:         Semantic support for PHP.
 homepage:            https://github.com/github/semantic/tree/master/semantic-php#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT

@@ -3,7 +3,7 @@ cabal-version:       2.4
 name:                semantic-go
 version:             0.0.0.0
 synopsis:            Semantic support for Go.
-description:         Semantic support for Go using the semantic-core intermediate language.
+description:         Semantic support for Go.
 homepage:            https://github.com/github/semantic/tree/master/semantic-go#readme
 bug-reports:         https://github.com/github/semantic/issues
 license:             MIT

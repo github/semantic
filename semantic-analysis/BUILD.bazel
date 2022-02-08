@@ -18,9 +18,10 @@ load(
 haskell_library(
     name = "semantic-analysis",
     srcs = glob(["src/**/*.hs"]),
-    compiler_flags = GHC_FLAGS + ["-XOverloadedStrings"],
+    compiler_flags = GHC_FLAGS,
     deps = [
         "//:base",
+        "//:bytestring",
         "//:containers",
         "//:filepath",
         "//:text",
@@ -30,5 +31,6 @@ haskell_library(
         "@stackage//:fused-effects",
         "@stackage//:hashable",
         "@stackage//:pathtype",
+        "@stackage//:vector",
     ],
 )
