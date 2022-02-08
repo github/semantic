@@ -52,6 +52,7 @@ library
     Analysis.Effect.Domain
     Analysis.Effect.Env
     Analysis.Effect.Store
+    Analysis.Exception
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.Functor.Named
