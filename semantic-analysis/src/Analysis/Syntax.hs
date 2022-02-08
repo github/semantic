@@ -161,7 +161,11 @@ parseNode o = do
         "block"  -> children
         "module" -> children
         t        -> A.parseFail ("unrecognized type: " <> t)
-      children = fmap (foldr (\ (i, v) r -> let_ (nameI i) v (const r)) noop . zip [0..]) . sequenceA <$> traverse resolve edges
+      -- map the list of edges to a list of child nodes
+      children = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
+      -- chain a statement before any following syntax by let-binding it. note that this implies call-by-value since any side effects in the statement must be performed before the let's body.
+      chain :: Syntax rep => (Int, rep) -> rep -> rep
+      chain (i, v) r = let_ (nameI i) v (const r)
       resolve = resolveWith (const (pure ()))
       resolveWith :: (A.Object -> A.Parser ()) -> A.Value -> A.Parser (IntMap.IntMap rep -> rep)
       resolveWith f = A.withObject "edge" (\ edge -> do
