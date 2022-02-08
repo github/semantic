@@ -2,7 +2,6 @@ semantic/dist-newstyle
 semantic-analysis/dist-newstyle
 semantic-ast/dist-newstyle
 semantic-codeql/dist-newstyle
-semantic-core/dist-newstyle
 semantic-go/dist-newstyle
 semantic-java/dist-newstyle
 semantic-json/dist-newstyle
