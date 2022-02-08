@@ -1,3 +1,5 @@
+; tree-sitter-graph definitions mapping Python ASTs to an analyzable IR.
+
 (module) @this
 {
   node @this.node
