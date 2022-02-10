@@ -2,6 +2,7 @@
 module Analysis.Exception
 ( Exception(..)
 , ExcSet(..)
+, var
 ) where
 
 import           Analysis.Name
@@ -13,3 +14,6 @@ newtype Exception = Exception { exceptionName :: String }
 -- | Sets whose elements are each a variable or an exception.
 newtype ExcSet = ExcSet { values :: Set.Set (Either Name Exception) }
   deriving (Eq, Monoid, Semigroup, Ord, Show)
+
+var :: Name -> ExcSet
+var = ExcSet . Set.singleton . Left
