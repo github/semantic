@@ -1,4 +1,9 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Analysis.Exception
 ( Exception(..)
 , ExcSet(..)
@@ -8,8 +13,10 @@ module Analysis.Exception
 , ExcC(..)
 ) where
 
+import           Analysis.Effect.Domain
 import           Analysis.Name
-import           Control.Applicative (Alternative)
+import           Control.Algebra
+import           Control.Applicative (Alternative(..))
 import qualified Data.Set as Set
 
 newtype Exception = Exception { exceptionName :: String }
@@ -28,3 +35,21 @@ exc = ExcSet . Set.singleton . Right
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
+
+instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m) where
+  alg hdl sig ctx = ExcC $ case sig of
+    L dom   -> case dom of
+      DVar n    -> pure $ var n <$ ctx
+      DAbs _ b  -> runExcC (hdl (b mempty <$ ctx))
+      DApp f a  -> pure $ f <> a <$ ctx
+      DInt _    -> pure nil
+      DUnit     -> pure nil
+      DBool _   -> pure nil
+      DIf c t e -> fmap (mappend c) <$> runExcC (hdl (t <$ ctx) <|> hdl (e <$ ctx))
+      DString _ -> pure nil
+      -- FIXME: return a set indicating a failure with e as the payload
+      DDie e    -> pure $ e <$ ctx
+      where
+      nil = ExcSet mempty <$ ctx
+
+    R other -> alg (runExcC . hdl) other ctx
