@@ -69,7 +69,7 @@ dfalse = dbool False
 dbool :: Has (Dom val) sig m => Bool -> m val
 dbool = send . DBool
 
-dif :: Has (Dom val) sig m => val -> m a -> m a -> m a
+dif :: Has (Dom val) sig m => val -> m val -> m val -> m val
 dif c t e = send $ DIf c t e
 
 
