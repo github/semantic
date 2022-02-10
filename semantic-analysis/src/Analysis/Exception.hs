@@ -3,6 +3,7 @@ module Analysis.Exception
 ( Exception(..)
 , ExcSet(..)
 , var
+, exc
 ) where
 
 import           Analysis.Name
@@ -17,3 +18,6 @@ newtype ExcSet = ExcSet { values :: Set.Set (Either Name Exception) }
 
 var :: Name -> ExcSet
 var = ExcSet . Set.singleton . Left
+
+exc :: Exception -> ExcSet
+exc = ExcSet . Set.singleton . Right
