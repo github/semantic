@@ -94,6 +94,6 @@ data Dom val m k where
   DInt :: Int -> Dom val m val
   DUnit :: Dom val m val
   DBool :: Bool -> Dom val m val
-  DIf :: val -> m a -> m a -> Dom val m a
+  DIf :: val -> m val -> m val -> Dom val m val
   DString :: Text -> Dom val m val
   DDie :: val -> Dom val m val
