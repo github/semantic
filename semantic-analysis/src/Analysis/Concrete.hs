@@ -22,6 +22,7 @@ module Analysis.Concrete
 
 import           Analysis.Carrier.Fail.WithLoc
 import qualified Analysis.Carrier.Store.Precise as A
+import           Analysis.Data.Snoc
 import           Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.Functor.Named
@@ -62,10 +63,6 @@ instance Ord Concrete where
 
 instance Show Concrete where
   showsPrec p = showsPrec p . quote
-
-
-data Snoc a = Nil | Snoc a :> a
-  deriving (Foldable, Functor, Traversable)
 
 
 newtype Elim a = EApp a

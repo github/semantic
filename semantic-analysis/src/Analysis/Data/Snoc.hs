@@ -1,2 +1,7 @@
+{-# LANGUAGE DeriveTraversable #-}
 module Analysis.Data.Snoc
-() where
+( Snoc(..)
+) where
+
+data Snoc a = Nil | Snoc a :> a
+  deriving (Foldable, Functor, Traversable)
