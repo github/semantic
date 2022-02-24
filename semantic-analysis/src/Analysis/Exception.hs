@@ -16,7 +16,7 @@ module Analysis.Exception
 import           Analysis.Effect.Domain
 import           Analysis.Name
 import           Control.Algebra
-import           Control.Applicative (Alternative(..))
+import           Control.Applicative (Alternative (..))
 import qualified Data.Set as Set
 
 newtype Exception = Exception { exceptionName :: String }
