@@ -23,14 +23,20 @@ newtype Exception = Exception { exceptionName :: String }
   deriving (Eq, Ord, Show)
 
 -- | Sets whose elements are each a variable or an exception.
-newtype ExcSet = ExcSet { values :: Set.Set (Either Name Exception) }
-  deriving (Eq, Monoid, Semigroup, Ord, Show)
+data ExcSet = ExcSet { freeVariables :: Set.Set Name, exceptions :: Set.Set Exception }
+  deriving (Eq, Ord, Show)
+
+instance Semigroup ExcSet where
+  ExcSet v1 e1 <> ExcSet v2 e2 = ExcSet (v1 <> v2) (e1 <> e2)
+
+instance Monoid ExcSet where
+  mempty = ExcSet mempty mempty
 
 var :: Name -> ExcSet
-var = ExcSet . Set.singleton . Left
+var v = ExcSet (Set.singleton v) mempty
 
 exc :: Exception -> ExcSet
-exc = ExcSet . Set.singleton . Right
+exc e = ExcSet mempty (Set.singleton e)
 
 
 newtype ExcC m a = ExcC { runExcC :: m a }
@@ -50,6 +56,6 @@ instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m)
       -- FIXME: return a set indicating a failure with e as the payload
       DDie e    -> pure $ e <$ ctx
       where
-      nil = ExcSet mempty <$ ctx
+      nil = (mempty :: ExcSet) <$ ctx
 
     R other -> alg (runExcC . hdl) other ctx
