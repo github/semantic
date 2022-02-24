@@ -21,7 +21,7 @@ import           Control.Applicative (Alternative (..))
 import qualified Data.Foldable as Foldable
 import qualified Data.Set as Set
 
-newtype Exception = Exception { exceptionName :: String }
+newtype Exception = Exception { exceptionName :: Name }
   deriving (Eq, Ord, Show)
 
 -- | Sets whose elements are each a variable or an exception.
