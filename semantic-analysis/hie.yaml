@@ -1,0 +1,4 @@
+cradle:
+  cabal:
+    - path: "."
+      component: "lib:semantic-analysis"
