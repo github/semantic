@@ -1,0 +1,4 @@
+-- NB: This file exists solely for development of this single package. For cross-package development, cd to the root of the project and run `script/repl` from there.
+
+-- Local packages
+packages: .
