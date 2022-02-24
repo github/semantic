@@ -7,6 +7,7 @@
 module Analysis.Exception
 ( Exception(..)
 , ExcSet(..)
+, fromExceptions
 , var
 , exc
   -- * Exception tracing analysis
@@ -31,6 +32,9 @@ instance Semigroup ExcSet where
 
 instance Monoid ExcSet where
   mempty = ExcSet mempty mempty
+
+fromExceptions :: [Exception] -> ExcSet
+fromExceptions = ExcSet mempty . Set.fromList
 
 var :: Name -> ExcSet
 var v = ExcSet (Set.singleton v) mempty
