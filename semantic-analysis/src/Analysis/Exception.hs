@@ -18,6 +18,7 @@ import           Analysis.Effect.Domain
 import           Analysis.Name
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
+import qualified Data.Foldable as Foldable
 import qualified Data.Set as Set
 
 newtype Exception = Exception { exceptionName :: String }
@@ -33,8 +34,8 @@ instance Semigroup ExcSet where
 instance Monoid ExcSet where
   mempty = ExcSet mempty mempty
 
-fromExceptions :: [Exception] -> ExcSet
-fromExceptions = ExcSet mempty . Set.fromList
+fromExceptions :: Foldable t => t Exception -> ExcSet
+fromExceptions = ExcSet mempty . Set.fromList . Foldable.toList
 
 var :: Name -> ExcSet
 var v = ExcSet (Set.singleton v) mempty
