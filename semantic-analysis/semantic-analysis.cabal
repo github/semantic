@@ -58,6 +58,7 @@ library
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.Functor.Named
+    Analysis.Module
     Analysis.Name
     Analysis.Project
     Analysis.Reference
