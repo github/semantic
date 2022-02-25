@@ -58,7 +58,6 @@ instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m)
       DBool _   -> pure nil
       DIf c t e -> fmap (mappend c) <$> runExcC (hdl (t <$ ctx) <|> hdl (e <$ ctx))
       DString _ -> pure nil
-      -- FIXME: return a set indicating a failure with e as the payload
       DDie e    -> pure $ e <> fromExceptions [Exception n | n <- Set.toList (freeVariables e)] <$ ctx
       where
       nil = (mempty :: ExcSet) <$ ctx
