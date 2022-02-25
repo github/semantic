@@ -4,7 +4,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Analysis.Exception
+module Analysis.Analysis.Exception
 ( Exception(..)
 , ExcSet(..)
 , fromExceptions
