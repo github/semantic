@@ -1,0 +1,12 @@
+#!/bin/bash
+# Usage: script/repl [ARGS...]
+# Run a repl session capable of loading all of the components. Any passed arguments, e.g. module names or flags, will be passed to ghci.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+# cabal v2-build all --only-dependencies
+
+cores=$(sysctl -n machdep.cpu.core_count || echo 4)
+cabal v2-exec env -- -u GHC_ENVIRONMENT ghci +RTS -N$((cores + 1)) -RTS -ghci-script=.ghci.repl $(script/ghci-flags) -no-ignore-dot-ghci $@

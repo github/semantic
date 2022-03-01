@@ -6,13 +6,10 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Analysis.Concrete
@@ -22,6 +19,7 @@ module Analysis.Concrete
 
 import           Analysis.Carrier.Fail.WithLoc
 import qualified Analysis.Carrier.Store.Precise as A
+import           Analysis.Data.Snoc
 import           Analysis.Effect.Domain as A
 import           Analysis.File
 import           Analysis.Functor.Named
@@ -62,10 +60,6 @@ instance Ord Concrete where
 
 instance Show Concrete where
   showsPrec p = showsPrec p . quote
-
-
-data Snoc a = Nil | Snoc a :> a
-  deriving (Foldable, Functor, Traversable)
 
 
 newtype Elim a = EApp a
@@ -180,9 +174,5 @@ instance ( Has (A.Env A.PAddr) sig m
       _             -> fail "expected Bool"
     L (DString s) -> pure (String s <$ ctx)
     L (DDie msg)  -> fail (show (quote msg))
-    L (DLet n v b) -> do
-      addr <- A.alloc n
-      addr A..= v
-      A.bind n addr $ hdl (b v <$ ctx)
 
     R other       -> DomainC (alg (runDomain . hdl) other ctx)

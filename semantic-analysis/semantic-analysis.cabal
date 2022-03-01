@@ -49,9 +49,11 @@ library
     Analysis.Carrier.Store.Monovariant
     Analysis.Carrier.Store.Precise
     Analysis.Concrete
+    Analysis.Data.Snoc
     Analysis.Effect.Domain
     Analysis.Effect.Env
     Analysis.Effect.Store
+    Analysis.Exception
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.Functor.Named
