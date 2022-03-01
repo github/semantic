@@ -44,16 +44,17 @@ library
   import: common
   hs-source-dirs: src
   exposed-modules:
+    Analysis.Analysis.Concrete
+    Analysis.Analysis.Exception
+    Analysis.Analysis.Typecheck
     Analysis.Blob
     Analysis.Carrier.Fail.WithLoc
     Analysis.Carrier.Store.Monovariant
     Analysis.Carrier.Store.Precise
-    Analysis.Concrete
     Analysis.Data.Snoc
     Analysis.Effect.Domain
     Analysis.Effect.Env
     Analysis.Effect.Store
-    Analysis.Exception
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.Functor.Named
@@ -61,7 +62,6 @@ library
     Analysis.Project
     Analysis.Reference
     Analysis.Syntax
-    Analysis.Typecheck
   build-depends:
     , aeson                       ^>= 1.4
     , base                         >= 4.13 && < 5

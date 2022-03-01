@@ -12,7 +12,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Analysis.Concrete
+module Analysis.Analysis.Concrete
 ( Concrete(..)
 , concrete
 ) where

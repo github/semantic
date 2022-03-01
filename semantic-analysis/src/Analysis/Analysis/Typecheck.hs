@@ -15,7 +15,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Analysis.Typecheck
+module Analysis.Analysis.Typecheck
 ( Monotype (..)
 , Meta
 , Polytype (..)
