@@ -21,6 +21,9 @@ import           Control.Applicative (Alternative (..))
 import qualified Data.Foldable as Foldable
 import qualified Data.Set as Set
 
+-- | Names of exceptions thrown in the guest language and recorded by this analysis.
+--
+-- Not to be confused with exceptions thrown in Haskell itself.
 newtype Exception = Exception { exceptionName :: Name }
   deriving (Eq, Ord, Show)
 
