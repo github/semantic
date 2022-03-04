@@ -22,6 +22,7 @@ tested-with:
   GHC == 8.6.5
   GHC == 8.8.1
   GHC == 8.10.1
+  GHC == 9.2.1
 
 common haskell
   default-language: Haskell2010
