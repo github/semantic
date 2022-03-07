@@ -37,4 +37,4 @@
 :seti -Wno-type-defaults
 :set -Wno-unused-packages
 
-:load Analysis.Concrete Analysis.Exception Analysis.Syntax Analysis.Typecheck
+:load Analysis.Analysis.Concrete Analysis.Analysis.Exception Analysis.Syntax Analysis.Analysis.Typecheck
