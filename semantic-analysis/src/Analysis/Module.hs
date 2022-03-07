@@ -10,4 +10,5 @@ data Module a = Module
   { body    :: Map.Map Name a -> a
   , imports :: Set.Set Name
   , exports :: Map.Map Name a
+  , unknown :: Set.Set Name
   }
