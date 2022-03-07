@@ -1,4 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -26,18 +25,19 @@ import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind)
 import           Analysis.Effect.Store
 import           Analysis.Name (Name, formatName, nameI)
-import           Control.Applicative (Alternative(..), liftA3)
+import           Control.Applicative (Alternative (..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Monad (guard)
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Internal as A
+import qualified Data.Aeson.Key as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
-import           Data.Monoid (First(..))
-import           Data.Text (Text, pack, unpack)
+import           Data.Monoid (First (..))
+import           Data.Text (Text, unpack)
 import qualified Data.Vector as V
 
 class Syntax rep where
@@ -150,10 +150,10 @@ parseGraph = A.withArray "nodes" $ \ nodes -> do
 
 parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep, Maybe (IntMap.IntMap rep -> rep))
 parseNode o = do
-  edges <- o A..: pack "edges"
-  index <- o A..: pack "id"
+  edges <- o A..: A.fromString "edges"
+  index <- o A..: A.fromString "id"
   let parseType attrs = \case
-        "string" -> const . string <$> attrs A..: pack "text"
+        "string" -> const . string <$> attrs A..: A.fromString "text"
         "true"   -> pure (const (bool True))
         "false"  -> pure (const (bool False))
         "throw"  -> fmap throw <$> resolve (head edges)
@@ -169,13 +169,13 @@ parseNode o = do
       resolve = resolveWith (const (pure ()))
       resolveWith :: (A.Object -> A.Parser ()) -> A.Value -> A.Parser (IntMap.IntMap rep -> rep)
       resolveWith f = A.withObject "edge" (\ edge -> do
-        sink <- edge A..: pack "sink"
-        attrs <- edge A..: pack "attrs"
+        sink <- edge A..: A.fromString "sink"
+        attrs <- edge A..: A.fromString "attrs"
         f attrs
         pure (IntMap.! sink))
       findEdgeNamed :: (A.FromJSON a, Eq a) => a -> A.Parser (IntMap.IntMap rep -> rep)
-      findEdgeNamed name = foldMap (resolveWith (\ attrs -> attrs A..: pack "type" >>= guard . (== name))) edges
-  o A..: pack "attrs" >>= A.withObject "attrs" (\ attrs -> do
-    ty <- attrs A..: pack "type"
+      findEdgeNamed name = foldMap (resolveWith (\ attrs -> attrs A..: A.fromString "type" >>= guard . (== name))) edges
+  o A..: A.fromString "attrs" >>= A.withObject "attrs" (\ attrs -> do
+    ty <- attrs A..: A.fromString "type"
     node <- parseType attrs ty
     pure (index, node, node <$ guard (ty == "module")))
