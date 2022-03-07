@@ -1,5 +1,6 @@
 module Analysis.Module
 ( Module(..)
+, ModuleSet(..)
 ) where
 
 import           Analysis.Name
@@ -12,3 +13,5 @@ data Module a = Module
   , exports :: Map.Map Name a
   , unknown :: Set.Set Name
   }
+
+newtype ModuleSet a = ModuleSet { getModuleSet :: Map.Map Name (Module a) }
