@@ -157,6 +157,7 @@ parseNode o = do
     node <- parseType attrs edges ty
     pure (index, node, node <$ guard (ty == "module")))
   where
+  parseType :: Syntax rep => A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap rep -> rep)
   parseType attrs edges = \case
     "string" -> const . string <$> attrs A..: A.fromString "text"
     "true"   -> pure (const (bool True))
