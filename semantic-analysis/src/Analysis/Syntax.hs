@@ -166,6 +166,7 @@ parseNode o = do
     "if"     -> liftA3 iff <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (const noop)
     "block"  -> children
     "module" -> children
+    "import" -> const . throw . string <$> attrs A..: A.fromString "import"
     t        -> A.parseFail ("unrecognized type: " <> t)
     where
     -- map the list of edges to a list of child nodes
