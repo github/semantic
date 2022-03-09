@@ -162,12 +162,15 @@ parseNode o = do
     "true"   -> pure (const (bool True))
     "false"  -> pure (const (bool False))
     "throw"  -> fmap throw <$> resolve (head edges)
-    "if"     -> liftA3 iff <$> findEdgeNamed edges "condition" <*> findEdgeNamed edges "consequence" <*> findEdgeNamed edges "alternative" <|> pure (const noop)
-    "block"  -> children edges
-    "module" -> children edges
+    "if"     -> liftA3 iff <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (const noop)
+    "block"  -> children
+    "module" -> children
     t        -> A.parseFail ("unrecognized type: " <> t)
-  -- map the list of edges to a list of child nodes
-  children edges = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
+    where
+    -- map the list of edges to a list of child nodes
+    children = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
+    findEdgeNamed :: (A.FromJSON a, Eq a) => a -> A.Parser (IntMap.IntMap rep -> rep)
+    findEdgeNamed name = foldMap (resolveWith (\ attrs -> attrs A..: A.fromString "type" >>= guard . (== name))) edges
   -- chain a statement before any following syntax by let-binding it. note that this implies call-by-value since any side effects in the statement must be performed before the let's body.
   chain :: Syntax rep => (Int, rep) -> rep -> rep
   chain (i, v) r = let_ (nameI i) v (const r)
@@ -178,5 +181,3 @@ parseNode o = do
     attrs <- edge A..: A.fromString "attrs"
     f attrs
     pure (IntMap.! sink))
-  findEdgeNamed :: (Foldable t, A.FromJSON a, Eq a) => t A.Value -> a -> A.Parser (IntMap.IntMap rep -> rep)
-  findEdgeNamed edges name = foldMap (resolveWith (\ attrs -> attrs A..: A.fromString "type" >>= guard . (== name))) edges
