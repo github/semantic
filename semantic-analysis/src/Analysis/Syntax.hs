@@ -167,7 +167,7 @@ parseNode o = do
     "block"  -> children
     "module" -> children
     "import" -> const . throw . string <$> attrs A..: A.fromString "import"
-    t        -> A.parseFail ("unrecognized type: " <> t)
+    t        -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
     where
     -- map the list of edges to a list of child nodes
     children = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
