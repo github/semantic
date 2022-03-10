@@ -13,9 +13,11 @@
   attr (@this.node) import = (source-text @name)
 }
 
-(identifier) @id
+(identifier) @this
 {
-  node @id.node
+  node @this.node
+  attr (@this.node) type = "identifier"
+  attr (@this.node) text = (source-text @this)
 }
 
 (string) @this
