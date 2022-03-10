@@ -36,8 +36,9 @@ import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
+import           Data.List.NonEmpty (NonEmpty, fromList)
 import           Data.Monoid (First (..))
-import           Data.Text (Text, unpack)
+import           Data.Text (Text, pack, unpack)
 import qualified Data.Vector as V
 
 class Syntax rep where
@@ -52,6 +53,10 @@ class Syntax rep where
   throw :: rep -> rep
 
   let_ :: Name -> rep -> (rep -> rep) -> rep
+
+  -- * Statements
+
+  import' :: NonEmpty Text -> rep
 
 
 -- Pretty-printing
@@ -79,6 +84,8 @@ instance Syntax Print where
   throw e = parens (str "throw" <+> e)
 
   let_ n v b = let n' = text (formatName n) in parens (str "let" <+> n' <+> char '=' <+> v <+> str "in" <+> b n')
+
+  import' ns = foldr1 (\ a b -> a <> text (pack ".") <> b) (text <$> ns)
 
 str :: String -> Print
 str = Print . showString
@@ -128,6 +135,9 @@ instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (D
     v' <- eval v
     let' n v' (eval (b (Interpret (pure (pure v'))))))
 
+  import' _ = Interpret (\ _ -> do
+    dunit)
+
 
 -- Macro-expressible syntax
 
@@ -173,7 +183,7 @@ parseNode o = do
     "block"      -> children
     "module"     -> children
     "identifier" -> const . var <$> attrs A..: A.fromString "text"
-    "import"     -> const . throw . string <$> attrs A..: A.fromString "import"
+    "import"     -> const . import' . fromList <$> attrs A..: A.fromString "import"
     t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
     where
     -- map the list of edges to a list of child nodes

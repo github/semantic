@@ -6,11 +6,11 @@
   attr (@this.node) type = "module"
 }
 
-(import_statement name: (_) @name) @this
+(import_statement name: (dotted_name (identifier)* @names)) @this
 {
   node @this.node
   attr (@this.node) type = "import"
-  attr (@this.node) import = (source-text @name)
+  attr (@this.node) import = @names
 }
 
 (identifier) @this
