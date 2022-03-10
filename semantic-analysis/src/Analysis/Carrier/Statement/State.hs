@@ -1,3 +1,4 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Analysis.Carrier.Statement.State
 ( -- * Messages
   Message(..)
@@ -7,6 +8,7 @@ module Analysis.Carrier.Statement.State
 ) where
 
 import Control.Carrier.State.Church
+import Control.Monad.Fail as Fail
 import Data.List.NonEmpty (NonEmpty)
 import Data.Text (Text)
 
@@ -22,3 +24,4 @@ runStatement :: ([Message] -> a -> m r) -> StatementC m a -> m r
 runStatement k (StatementC m) = runState (k . reverse) [] m
 
 newtype StatementC m a = StatementC { runStatementC :: StateC [Message] m a }
+  deriving (Applicative, Functor, Monad, Fail.MonadFail)
