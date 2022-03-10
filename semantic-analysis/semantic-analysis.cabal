@@ -52,6 +52,7 @@ library
     Analysis.Analysis.Typecheck
     Analysis.Blob
     Analysis.Carrier.Fail.WithLoc
+    Analysis.Carrier.Statement.State
     Analysis.Carrier.Store.Monovariant
     Analysis.Carrier.Store.Precise
     Analysis.Data.Snoc
