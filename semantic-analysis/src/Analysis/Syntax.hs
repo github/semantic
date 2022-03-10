@@ -23,6 +23,7 @@ module Analysis.Syntax
 
 import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
+import           Analysis.Effect.Statement
 import           Analysis.Effect.Store
 import           Analysis.Name (Name, formatName, name, nameI)
 import           Control.Applicative (Alternative (..), liftA3)
@@ -115,7 +116,7 @@ eval eval (Interpret f) = f eval
 
 newtype Interpret m i = Interpret { interpret :: (Interpret m i -> m i) -> m i }
 
-instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => Syntax (Interpret m val) where
+instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has Statement sig m) => Syntax (Interpret m val) where
   var s = Interpret (\ _ -> do
     let n = name s
     a <- lookupEnv n
@@ -135,7 +136,8 @@ instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (D
     v' <- eval v
     let' n v' (eval (b (Interpret (pure (pure v'))))))
 
-  import' _ = Interpret (\ _ -> do
+  import' ns = Interpret (\ _ -> do
+    simport ns
     dunit)
 
 
