@@ -22,9 +22,9 @@ module Analysis.Syntax
 ) where
 
 import           Analysis.Effect.Domain
-import           Analysis.Effect.Env (Env, bind)
+import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Store
-import           Analysis.Name (Name, formatName, nameI)
+import           Analysis.Name (Name, formatName, name, nameI)
 import           Control.Applicative (Alternative (..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Monad (guard)
@@ -41,6 +41,8 @@ import           Data.Text (Text, unpack)
 import qualified Data.Vector as V
 
 class Syntax rep where
+  var :: Text -> rep
+
   iff :: rep -> rep -> rep -> rep
   noop :: rep
 
@@ -66,6 +68,8 @@ instance Monoid Print where
   mempty = Print id
 
 instance Syntax Print where
+  var = text
+
   iff c t e = parens (str "iff" <+> c <+> str "then" <+> t <+> str "else" <+> e)
   noop = parens (str "noop")
 
@@ -74,7 +78,7 @@ instance Syntax Print where
 
   throw e = parens (str "throw" <+> e)
 
-  let_ n v b = parens (str "let" <+> name n <+> char '=' <+> v <+> str "in" <+> b (name n))
+  let_ n v b = let n' = text (formatName n) in parens (str "let" <+> n' <+> char '=' <+> v <+> str "in" <+> b n')
 
 str :: String -> Print
 str = Print . showString
@@ -93,9 +97,6 @@ l <+> r = l <> char ' ' <> r
 
 infixr 6 <+>
 
-name :: Name -> Print
-name = text . formatName
-
 
 -- Abstract interpretation
 
@@ -108,6 +109,11 @@ eval eval (Interpret f) = f eval
 newtype Interpret m i = Interpret { interpret :: (Interpret m i -> m i) -> m i }
 
 instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => Syntax (Interpret m val) where
+  var s = Interpret (\ _ -> do
+    let n = name s
+    a <- lookupEnv n
+    maybe (dvar n) fetch a)
+
   iff c t e = Interpret (\ eval -> do
     c' <- eval c
     dif c' (eval t) (eval e))
@@ -159,15 +165,16 @@ parseNode o = do
   where
   parseType :: Syntax rep => A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap rep -> rep)
   parseType attrs edges = \case
-    "string" -> const . string <$> attrs A..: A.fromString "text"
-    "true"   -> pure (const (bool True))
-    "false"  -> pure (const (bool False))
-    "throw"  -> fmap throw <$> resolve (head edges)
-    "if"     -> liftA3 iff <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (const noop)
-    "block"  -> children
-    "module" -> children
-    "import" -> const . throw . string <$> attrs A..: A.fromString "import"
-    t        -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
+    "string"     -> const . string <$> attrs A..: A.fromString "text"
+    "true"       -> pure (const (bool True))
+    "false"      -> pure (const (bool False))
+    "throw"      -> fmap throw <$> resolve (head edges)
+    "if"         -> liftA3 iff <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (const noop)
+    "block"      -> children
+    "module"     -> children
+    "identifier" -> const . var <$> attrs A..: A.fromString "text"
+    "import"     -> const . throw . string <$> attrs A..: A.fromString "import"
+    t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
     where
     -- map the list of edges to a list of child nodes
     children = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
