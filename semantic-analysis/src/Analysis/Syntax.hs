@@ -68,7 +68,7 @@ instance Monoid Print where
   mempty = Print id
 
 instance Syntax Print where
-  var = text
+  var n = str "get" <+> text n
 
   iff c t e = parens (str "iff" <+> c <+> str "then" <+> t <+> str "else" <+> e)
   noop = parens (str "noop")
