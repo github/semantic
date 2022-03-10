@@ -57,6 +57,7 @@ library
     Analysis.Data.Snoc
     Analysis.Effect.Domain
     Analysis.Effect.Env
+    Analysis.Effect.Statement
     Analysis.Effect.Store
     Analysis.File
     Analysis.FlowInsensitive
