@@ -6,18 +6,23 @@
   attr (@this.node) type = "module"
 }
 
-(import_statement name: (dotted_name (identifier)* @names)) @this
-{
-  node @this.node
-  attr (@this.node) type = "import"
-  attr (@this.node) import = @names
-}
-
 (identifier) @this
 {
   node @this.node
   attr (@this.node) type = "identifier"
   attr (@this.node) text = (source-text @this)
+}
+
+(import_statement) @this
+{
+  node @this.node
+  attr (@this.node) type = "import"
+}
+
+(import_statement name: (dotted_name (identifier) @id)) @this
+{
+  edge @this.node -> @id.node
+  attr (@this.node -> @id.node) index = (named-child-index @id)
 }
 
 (string) @this
