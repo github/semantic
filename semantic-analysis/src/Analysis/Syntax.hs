@@ -37,6 +37,7 @@ import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
+import           Data.List (sortOn)
 import           Data.List.NonEmpty (NonEmpty, fromList)
 import           Data.Monoid (First (..))
 import           Data.Text (Text, pack, unpack)
@@ -185,20 +186,21 @@ parseNode o = do
     "block"      -> children
     "module"     -> children
     "identifier" -> const . var <$> attrs A..: A.fromString "text"
-    "import"     -> const . import' . fromList <$> attrs A..: A.fromString "import"
+    "import"     -> const . import' . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
     t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
     where
     -- map the list of edges to a list of child nodes
     children = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
     findEdgeNamed :: (A.FromJSON a, Eq a) => a -> A.Parser (IntMap.IntMap rep -> rep)
-    findEdgeNamed name = foldMap (resolveWith (\ attrs -> attrs A..: A.fromString "type" >>= guard . (== name))) edges
+    findEdgeNamed name = foldMap (resolveWith (\ rep attrs -> attrs A..: A.fromString "type" >>= (rep <$) . guard . (== name))) edges
+  moduleNameComponent :: A.Object -> A.Parser (Int, Text)
+  moduleNameComponent attrs = (,) <$> attrs A..: A.fromString "index" <*> attrs A..: A.fromString "text"
   -- chain a statement before any following syntax by let-binding it. note that this implies call-by-value since any side effects in the statement must be performed before the let's body.
   chain :: Syntax rep => (Int, rep) -> rep -> rep
   chain (i, v) r = let_ (nameI i) v (const r)
-  resolve = resolveWith (const (pure ()))
-  resolveWith :: (A.Object -> A.Parser ()) -> A.Value -> A.Parser (IntMap.IntMap rep -> rep)
+  resolve = resolveWith (const . pure)
+  resolveWith :: ((IntMap.IntMap rep -> rep) -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
   resolveWith f = A.withObject "edge" (\ edge -> do
     sink <- edge A..: A.fromString "sink"
     attrs <- edge A..: A.fromString "attrs"
-    f attrs
-    pure (IntMap.! sink))
+    f (IntMap.! sink) attrs)
