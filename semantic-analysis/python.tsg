@@ -10,6 +10,7 @@
 {
   node @this.node
   attr (@this.node) type = "identifier"
+  var @this.text = (source-text @this)
   attr (@this.node) text = (source-text @this)
 }
 
@@ -24,6 +25,7 @@
   edge @this.node -> @id.node
   attr (@id.node) role = "module-name-fragment"
   attr (@this.node -> @id.node) index = (named-child-index @id)
+  attr (@this.node -> @id.node) text = @id.text
 }
 
 (string) @this
