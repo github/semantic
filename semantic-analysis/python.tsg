@@ -22,6 +22,7 @@
 (import_statement name: (dotted_name (identifier) @id)) @this
 {
   edge @this.node -> @id.node
+  attr (@id.node) role = "module-name-fragment"
   attr (@this.node -> @id.node) index = (named-child-index @id)
 }
 
