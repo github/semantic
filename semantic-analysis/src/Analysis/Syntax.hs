@@ -119,7 +119,7 @@ eval :: (Interpret m i -> m i) -> (Interpret m i -> m i)
 eval eval (Interpret f) = f eval
 
 
-evalModule0 :: Interpret IO rep -> IO (Module rep)
+evalModule0 :: Functor m => Interpret m rep -> m (Module rep)
 evalModule0 i = mk <$> eval0 i where
   mk b = Module (const b) mempty mempty mempty
 
