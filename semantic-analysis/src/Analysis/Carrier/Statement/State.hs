@@ -10,8 +10,11 @@ module Analysis.Carrier.Statement.State
   -- * Statement carrier
 , runStatement
 , StatementC(..)
+  -- * Statement effect
+, module Analysis.Effect.Statement
 ) where
 
+import           Analysis.Effect.Statement hiding (Import)
 import qualified Analysis.Effect.Statement as S
 import           Control.Algebra
 import           Control.Carrier.State.Church
