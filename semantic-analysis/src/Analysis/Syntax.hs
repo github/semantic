@@ -23,10 +23,9 @@ module Analysis.Syntax
 , parseNode
 ) where
 
-import           Analysis.Carrier.Statement.State (StatementC)
+import           Analysis.Carrier.Statement.State
 import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
-import           Analysis.Effect.Statement
 import           Analysis.Effect.Store
 import           Analysis.Module
 import           Analysis.Name (Name, formatName, name, nameI)
@@ -43,9 +42,11 @@ import qualified Data.ByteString.Lazy as B
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import           Data.List (sortOn)
-import           Data.List.NonEmpty (NonEmpty, fromList)
+import           Data.List.NonEmpty (NonEmpty, fromList, toList)
 import           Data.Monoid (First (..))
+import qualified Data.Set as Set
 import           Data.Text (Text, pack, unpack)
+import qualified Data.Text as Text
 import qualified Data.Vector as V
 
 class Syntax rep where
@@ -125,9 +126,9 @@ evalModule0 :: Functor m => Interpret m rep -> m (Module rep)
 evalModule0 i = mk <$> eval0 i where
   mk b = Module (const b) mempty mempty mempty
 
-evalModule :: (Interpret (StatementC m) rep -> (StatementC m) rep) -> (Interpret (StatementC m) rep -> StatementC m (Module rep))
-evalModule f i = mk <$> eval f i where
-  mk b = Module (const b) mempty mempty mempty
+evalModule :: Applicative m => (Interpret (StatementC m) rep -> (StatementC m) rep) -> (Interpret (StatementC m) rep -> m (Module rep))
+evalModule f i = runStatement mk (eval f i) where
+  mk msgs b = pure (Module (const b) (Set.fromList (map (\ (Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
 
 
 newtype Interpret m i = Interpret { interpret :: (Interpret m i -> m i) -> m i }
