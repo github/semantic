@@ -12,6 +12,7 @@ module Analysis.Syntax
   -- * Abstract interpretation
 , eval0
 , eval
+, evalModule0
 , Interpret(..)
   -- * Macro-expressible syntax
 , let'
@@ -25,6 +26,7 @@ import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Statement
 import           Analysis.Effect.Store
+import           Analysis.Module
 import           Analysis.Name (Name, formatName, name, nameI)
 import           Control.Applicative (Alternative (..), liftA3)
 import           Control.Effect.Labelled
@@ -115,6 +117,12 @@ eval0 = fix eval
 
 eval :: (Interpret m i -> m i) -> (Interpret m i -> m i)
 eval eval (Interpret f) = f eval
+
+
+evalModule0 :: Interpret IO rep -> IO (Module rep)
+evalModule0 i = mk <$> eval0 i where
+  mk b = Module (const b) mempty mempty mempty
+
 
 newtype Interpret m i = Interpret { interpret :: (Interpret m i -> m i) -> m i }
 
