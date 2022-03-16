@@ -154,10 +154,10 @@ let' n v m = do
 
 -- Parsing
 
-parseFile :: Syntax rep => FilePath -> IO (Either String (Maybe rep))
+parseFile :: Syntax rep => FilePath -> IO (Either String rep)
 parseFile path = do
   contents <- B.readFile path
-  pure $ bimap snd snd (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents)
+  pure $ bimap snd snd (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) >>= maybe (Left "no root node found") Right
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
