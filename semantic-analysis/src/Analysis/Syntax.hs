@@ -34,6 +34,7 @@ import qualified Data.Aeson.Internal as A
 import qualified Data.Aeson.Key as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
+import           Data.Bifunctor (bimap)
 import qualified Data.ByteString.Lazy as B
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
@@ -153,10 +154,10 @@ let' n v m = do
 
 -- Parsing
 
-parseFile :: Syntax rep => FilePath -> IO (Either (A.JSONPath, String) (Maybe rep))
+parseFile :: Syntax rep => FilePath -> IO (Either String (Maybe rep))
 parseFile path = do
   contents <- B.readFile path
-  pure $ snd <$> A.eitherDecodeWith A.json' (A.iparse parseGraph) contents
+  pure $ bimap snd snd (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents)
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
