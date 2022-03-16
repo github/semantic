@@ -23,6 +23,7 @@ module Analysis.Syntax
 , parseNode
 ) where
 
+import           Analysis.Carrier.Statement.State (StatementC)
 import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Statement
@@ -124,7 +125,7 @@ evalModule0 :: Functor m => Interpret m rep -> m (Module rep)
 evalModule0 i = mk <$> eval0 i where
   mk b = Module (const b) mempty mempty mempty
 
-evalModule :: Functor m => (Interpret m rep -> m rep) -> (Interpret m rep -> m (Module rep))
+evalModule :: (Interpret (StatementC m) rep -> (StatementC m) rep) -> (Interpret (StatementC m) rep -> StatementC m (Module rep))
 evalModule f i = mk <$> eval f i where
   mk b = Module (const b) mempty mempty mempty
 
