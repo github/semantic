@@ -189,24 +189,24 @@ parseNode o = do
     ty <- attrs A..: A.fromString "type"
     node <- parseType attrs edges ty
     pure (index, node, node <$ guard (ty == "module")))
+
+parseType :: Syntax rep => A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap rep -> rep)
+parseType attrs edges = \case
+  "string"     -> const . string <$> attrs A..: A.fromString "text"
+  "true"       -> pure (const (bool True))
+  "false"      -> pure (const (bool False))
+  "throw"      -> fmap throw <$> resolve (head edges)
+  "if"         -> liftA3 iff <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (const noop)
+  "block"      -> children
+  "module"     -> children
+  "identifier" -> const . var <$> attrs A..: A.fromString "text"
+  "import"     -> const . import' . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
+  t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
   where
-  parseType :: Syntax rep => A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap rep -> rep)
-  parseType attrs edges = \case
-    "string"     -> const . string <$> attrs A..: A.fromString "text"
-    "true"       -> pure (const (bool True))
-    "false"      -> pure (const (bool False))
-    "throw"      -> fmap throw <$> resolve (head edges)
-    "if"         -> liftA3 iff <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (const noop)
-    "block"      -> children
-    "module"     -> children
-    "identifier" -> const . var <$> attrs A..: A.fromString "text"
-    "import"     -> const . import' . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
-    t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
-    where
-    -- map the list of edges to a list of child nodes
-    children = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
-    findEdgeNamed :: (A.FromJSON a, Eq a) => a -> A.Parser (IntMap.IntMap rep -> rep)
-    findEdgeNamed name = foldMap (resolveWith (\ rep attrs -> attrs A..: A.fromString "type" >>= (rep <$) . guard . (== name))) edges
+  -- map the list of edges to a list of child nodes
+  children = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
+  findEdgeNamed :: (A.FromJSON a, Eq a) => a -> A.Parser (IntMap.IntMap rep -> rep)
+  findEdgeNamed name = foldMap (resolveWith (\ rep attrs -> attrs A..: A.fromString "type" >>= (rep <$) . guard . (== name))) edges
   moduleNameComponent :: A.Object -> A.Parser (Int, Text)
   moduleNameComponent attrs = (,) <$> attrs A..: A.fromString "index" <*> attrs A..: A.fromString "text"
   -- chain a statement before any following syntax by let-binding it. note that this implies call-by-value since any side effects in the statement must be performed before the let's body.
