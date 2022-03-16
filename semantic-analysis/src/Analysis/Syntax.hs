@@ -13,6 +13,7 @@ module Analysis.Syntax
 , eval0
 , eval
 , evalModule0
+, evalModule
 , Interpret(..)
   -- * Macro-expressible syntax
 , let'
@@ -121,6 +122,10 @@ eval eval (Interpret f) = f eval
 
 evalModule0 :: Functor m => Interpret m rep -> m (Module rep)
 evalModule0 i = mk <$> eval0 i where
+  mk b = Module (const b) mempty mempty mempty
+
+evalModule :: Functor m => (Interpret m rep -> m rep) -> (Interpret m rep -> m (Module rep))
+evalModule f i = mk <$> eval f i where
   mk b = Module (const b) mempty mempty mempty
 
 
