@@ -197,16 +197,18 @@ parseType attrs edges = \case
   "false"      -> pure (const (bool False))
   "throw"      -> fmap throw <$> resolve (head edges)
   "if"         -> liftA3 iff <$> findEdgeNamed "condition" <*> findEdgeNamed "consequence" <*> findEdgeNamed "alternative" <|> pure (const noop)
-  "block"      -> children
-  "module"     -> children
+  "block"      -> children edges
+  "module"     -> children edges
   "identifier" -> const . var <$> attrs A..: A.fromString "text"
   "import"     -> const . import' . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
   t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
   where
-  -- map the list of edges to a list of child nodes
-  children = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
   findEdgeNamed :: (A.FromJSON a, Eq a) => a -> A.Parser (IntMap.IntMap rep -> rep)
   findEdgeNamed name = foldMap (resolveWith (\ rep attrs -> attrs A..: A.fromString "type" >>= (rep <$) . guard . (== name))) edges
+
+-- | Map a list of edges to a list of child nodes.
+children :: Syntax rep => [A.Value] -> A.Parser (IntMap.IntMap rep -> rep)
+children edges = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
 
 moduleNameComponent :: A.Object -> A.Parser (Int, Text)
 moduleNameComponent attrs = (,) <$> attrs A..: A.fromString "index" <*> attrs A..: A.fromString "text"
