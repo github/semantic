@@ -122,9 +122,9 @@ eval :: (Interpret m i -> m i) -> (Interpret m i -> m i)
 eval eval (Interpret f) = f eval
 
 
-evalModule0 :: Functor m => Interpret m rep -> m (Module rep)
-evalModule0 i = mk <$> eval0 i where
-  mk b = Module (const b) mempty mempty mempty
+evalModule0 :: Applicative m => Interpret (StatementC m) rep -> m (Module rep)
+evalModule0 i = runStatement mk (eval0 i)where
+  mk msgs b = pure (Module (const b) (Set.fromList (map (\ (Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
 
 evalModule :: Applicative m => (Interpret (StatementC m) rep -> (StatementC m) rep) -> (Interpret (StatementC m) rep -> m (Module rep))
 evalModule f i = runStatement mk (eval f i) where
