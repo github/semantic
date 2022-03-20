@@ -36,6 +36,7 @@ To serve these goals, the following options were considered alongside `tree-sitt
 15. **We have full control over the shape and productions of trees.** This capability isn't the case with a number of the other approaches. Not only can we parse comments, but tree-sitter also gives us the ability to optimize trees to be generalized or to meet other needs like syntax highlighting or evaluation ease.
 16. **Secure and well-tested.** We've actively invested in fuzzing and other security measures to properly deal with corner cases.
 17. **Incremental parsing and error recovery.** Tree-sitter has several features that make it suitable for use-cases that may require real-time updates to the parse tree. We see this in syntax-highlighting support for text editors like Atom, though it's outside the realm of our team's focus.
+18. Supports unicode
 
 ## Drawbacks of tree-sitter
 
@@ -46,4 +47,3 @@ To serve these goals, the following options were considered alongside `tree-sitt
 6. Generated C programs can be quite large.
 7. Parsing can be extremely slow for pathological inputs such as infinite loops, sometimes taking hours and even days.
 8. Writing a grammar for each language from scratch is _a lot_ of work.
-9. Support for unicode is currently lagging.
