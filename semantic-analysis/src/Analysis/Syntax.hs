@@ -27,8 +27,10 @@ import           Analysis.Carrier.Statement.State
 import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Store
+import           Analysis.File
 import           Analysis.Module
 import           Analysis.Name (Name, formatName, name, nameI)
+import           Analysis.Reference
 import           Control.Applicative (Alternative (..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Monad (guard)
@@ -48,6 +50,8 @@ import qualified Data.Set as Set
 import           Data.Text (Text, pack, unpack)
 import qualified Data.Text as Text
 import qualified Data.Vector as V
+import           Source.Span
+import qualified System.Path as Path
 
 class Syntax rep where
   var :: Text -> rep
@@ -169,10 +173,10 @@ let' n v m = do
 
 -- Parsing
 
-parseFile :: Syntax rep => FilePath -> IO (Either String rep)
+parseFile :: Syntax rep => FilePath -> IO (Either String (File rep))
 parseFile path = do
   contents <- B.readFile path
-  pure $ bimap snd snd (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) >>= maybe (Left "no root node found") Right
+  pure $ bimap snd (fmap (File (Reference (Path.filePath path) (point (Pos 0 0)))) . snd) (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) >>= maybe (Left "no root node found") Right
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
