@@ -30,7 +30,7 @@ import           Analysis.Effect.Store
 import           Analysis.File
 import           Analysis.Module
 import           Analysis.Name (Name, formatName, name, nameI)
-import           Analysis.Reference
+import           Analysis.Reference as Ref
 import           Control.Applicative (Alternative (..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Effect.Throw (Throw, throwError)
@@ -51,7 +51,6 @@ import qualified Data.Set as Set
 import           Data.Text (Text, pack, unpack)
 import qualified Data.Text as Text
 import qualified Data.Vector as V
-import           Source.Span
 import qualified System.Path as Path
 
 class Syntax rep where
@@ -180,7 +179,7 @@ parseFile path = do
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
-    Right (_, Just root) -> pure (File (Reference (Path.filePath path) (point (Pos 0 0))) root)
+    Right (_, Just root) -> pure (File (Ref.fromPath (Path.absRel path)) root)
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
