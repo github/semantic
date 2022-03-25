@@ -179,6 +179,8 @@ parseFile path = do
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
+    -- FIXME: this should get the path to the source file, not the path to the JSON.
+    -- FIXME: this should use the span of the source file, not an empty span.
     Right (_, Just root) -> pure (File (Ref.fromPath (Path.absRel path)) root)
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
