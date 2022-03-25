@@ -33,7 +33,7 @@ import           Analysis.Name (Name, formatName, name, nameI)
 import           Analysis.Reference
 import           Control.Applicative (Alternative (..), liftA3)
 import           Control.Effect.Labelled
-import           Control.Effect.Throw (Throw, liftEither, throwError)
+import           Control.Effect.Throw (Throw, throwError)
 import           Control.Monad (guard)
 import           Control.Monad.IO.Class
 import qualified Data.Aeson as A
@@ -41,7 +41,6 @@ import qualified Data.Aeson.Internal as A
 import qualified Data.Aeson.Key as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
-import           Data.Bifunctor (bimap)
 import qualified Data.ByteString.Lazy as B
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
@@ -178,8 +177,10 @@ let' n v m = do
 parseFile :: (Syntax rep, Has (Throw String) sig m, MonadIO m) => FilePath -> m (File rep)
 parseFile path = do
   contents <- liftIO (B.readFile path)
-  res <- liftEither (bimap snd (fmap (File (Reference (Path.filePath path) (point (Pos 0 0)))) . snd) (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents))
-  maybe (throwError "no root node found") pure res
+  case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
+    Left  (_, err)       -> throwError err
+    Right (_, Nothing)   -> throwError "no root node found"
+    Right (_, Just root) -> pure (File (Reference (Path.filePath path) (point (Pos 0 0))) root)
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
