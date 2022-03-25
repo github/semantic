@@ -34,6 +34,7 @@ import           Analysis.Reference
 import           Control.Applicative (Alternative (..), liftA3)
 import           Control.Effect.Labelled
 import           Control.Monad (guard)
+import           Control.Monad.IO.Class
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Internal as A
 import qualified Data.Aeson.Key as A
@@ -173,9 +174,9 @@ let' n v m = do
 
 -- Parsing
 
-parseFile :: Syntax rep => FilePath -> IO (Either String (File rep))
+parseFile :: (Syntax rep, MonadIO m) => FilePath -> m (Either String (File rep))
 parseFile path = do
-  contents <- B.readFile path
+  contents <- liftIO (B.readFile path)
   pure $ bimap snd (fmap (File (Reference (Path.filePath path) (point (Pos 0 0)))) . snd) (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) >>= maybe (Left "no root node found") Right
 
 parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
