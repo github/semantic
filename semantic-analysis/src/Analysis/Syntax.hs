@@ -6,7 +6,8 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Analysis.Syntax
-( Syntax(..)
+( Term(..)
+, Syntax(..)
   -- * Pretty-printing
 , Print(..)
   -- * Abstract interpretation
@@ -52,6 +53,17 @@ import           Data.Text (Text, pack, unpack)
 import qualified Data.Text as Text
 import qualified Data.Vector as V
 import qualified System.Path as Path
+
+data Term
+  = Var Text
+  | Noop
+  | Iff Term Term Term
+  | Bool Bool
+  | String Text
+  | Throw Term
+  | Let Name Term Term
+  | Import (NonEmpty Text)
+  deriving (Eq, Ord, Show)
 
 class Syntax rep where
   var :: Text -> rep
