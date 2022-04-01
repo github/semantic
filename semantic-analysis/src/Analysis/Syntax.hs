@@ -8,8 +8,6 @@
 module Analysis.Syntax
 ( Term(..)
 , Syntax(..)
-  -- * Pretty-printing
-, Print(..)
   -- * Abstract interpretation
 , eval0
 , eval
@@ -30,7 +28,7 @@ import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Store
 import           Analysis.File
 import           Analysis.Module
-import           Analysis.Name (Name, formatName, name, nameI)
+import           Analysis.Name (Name, name, nameI)
 import           Analysis.Reference as Ref
 import           Control.Applicative (Alternative (..), liftA3)
 import           Control.Effect.Labelled
@@ -49,7 +47,7 @@ import           Data.List (sortOn)
 import           Data.List.NonEmpty (NonEmpty, fromList, toList)
 import           Data.Monoid (First (..))
 import qualified Data.Set as Set
-import           Data.Text (Text, pack, unpack)
+import           Data.Text (Text, pack)
 import qualified Data.Text as Text
 import qualified Data.Vector as V
 import qualified System.Path as Path
@@ -82,52 +80,6 @@ class Syntax rep where
   -- * Statements
 
   import' :: NonEmpty Text -> rep
-
-
--- Pretty-printing
-
-newtype Print = Print { print_ :: ShowS }
-
-instance Show Print where
-  showsPrec _ = print_
-
-instance Semigroup Print where
-  Print a <> Print b = Print (a . b)
-
-instance Monoid Print where
-  mempty = Print id
-
-instance Syntax Print where
-  var n = str "get" <+> text (formatName n)
-
-  iff c t e = parens (str "iff" <+> c <+> str "then" <+> t <+> str "else" <+> e)
-  noop = parens (str "noop")
-
-  bool b = parens (str (if b then "true" else "false"))
-  string = parens . text
-
-  throw e = parens (str "throw" <+> e)
-
-  let_ n v b = let n' = text (formatName n) in parens (str "let" <+> n' <+> char '=' <+> v <+> str "in" <+> b n')
-
-  import' ns = foldr1 (\ a b -> a <> text (pack ".") <> b) (text <$> ns)
-
-str :: String -> Print
-str = Print . showString
-
-text :: Text -> Print
-text = str . unpack
-
-char :: Char -> Print
-char = Print . showChar
-
-parens :: Print -> Print
-parens p = char '(' <> p <> char ')'
-
-(<+>) :: Print -> Print -> Print
-l <+> r = l <> char ' ' <> r
-
-infixr 6 <+>
 
 
 -- Abstract interpretation
