@@ -185,7 +185,7 @@ let' n v m = do
 
 -- Parsing
 
-parseFile :: (Syntax rep, Has (Throw String) sig m, MonadIO m) => FilePath -> m (File rep)
+parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File Term)
 parseFile path = do
   contents <- liftIO (B.readFile path)
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
@@ -195,16 +195,16 @@ parseFile path = do
     -- FIXME: this should use the span of the source file, not an empty span.
     Right (_, Just root) -> pure (File (Ref.fromPath (Path.absRel path)) root)
 
-parseGraph :: Syntax rep => A.Value -> A.Parser (IntMap.IntMap rep, Maybe rep)
+parseGraph :: A.Value -> A.Parser (IntMap.IntMap Term, Maybe Term)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
   (untied, First root) <- foldMap (\ (k, v, r) -> ([(k, v)], First r)) <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
   -- @untied@ is a list of key/value pairs, where the keys are graph node IDs and the values are functions from the final graph to the representations of said graph nodes. Likewise, @root@ is a function of the same variety, wrapped in a @Maybe@.
   --
-  -- We define @tied@ as the fixpoint of the former to yield the former as a graph of type @IntMap.IntMap rep@, and apply the latter to said graph to yield the entry point, if any, from which to evaluate.
+  -- We define @tied@ as the fixpoint of the former to yield the former as a graph of type @IntMap.IntMap Term@, and apply the latter to said graph to yield the entry point, if any, from which to evaluate.
   let tied = fix (\ tied -> ($ tied) <$> IntMap.fromList untied)
   pure (tied, ($ tied) <$> root)
 
-parseNode :: Syntax rep => A.Object -> A.Parser (IntMap.Key, IntMap.IntMap rep -> rep, Maybe (IntMap.IntMap rep -> rep))
+parseNode :: A.Object -> A.Parser (IntMap.Key, IntMap.IntMap Term -> Term, Maybe (IntMap.IntMap Term -> Term))
 parseNode o = do
   edges <- o A..: A.fromString "edges"
   index <- o A..: A.fromString "id"
@@ -213,32 +213,32 @@ parseNode o = do
     node <- parseType attrs edges ty
     pure (index, node, node <$ guard (ty == "module")))
 
-parseType :: Syntax rep => A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap rep -> rep)
+parseType :: A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap Term -> Term)
 parseType attrs edges = \case
-  "string"     -> const . string <$> attrs A..: A.fromString "text"
-  "true"       -> pure (const (bool True))
-  "false"      -> pure (const (bool False))
-  "throw"      -> fmap throw <$> resolve (head edges)
-  "if"         -> liftA3 iff <$> findEdgeNamed edges "condition" <*> findEdgeNamed edges "consequence" <*> findEdgeNamed edges "alternative" <|> pure (const noop)
+  "string"     -> const . String <$> attrs A..: A.fromString "text"
+  "true"       -> pure (const (Bool True))
+  "false"      -> pure (const (Bool False))
+  "throw"      -> fmap Throw <$> resolve (head edges)
+  "if"         -> liftA3 Iff <$> findEdgeNamed edges "condition" <*> findEdgeNamed edges "consequence" <*> findEdgeNamed edges "alternative" <|> pure (const Noop)
   "block"      -> children edges
   "module"     -> children edges
-  "identifier" -> const . var . name <$> attrs A..: A.fromString "text"
-  "import"     -> const . import' . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
+  "identifier" -> const . Var . name <$> attrs A..: A.fromString "text"
+  "import"     -> const . Import . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
   t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
 
 findEdgeNamed :: (Foldable t, A.FromJSON a, Eq a) => t A.Value -> a -> A.Parser (IntMap.IntMap rep -> rep)
 findEdgeNamed edges name = foldMap (resolveWith (\ rep attrs -> attrs A..: A.fromString "type" >>= (rep <$) . guard . (== name))) edges
 
 -- | Map a list of edges to a list of child nodes.
-children :: Syntax rep => [A.Value] -> A.Parser (IntMap.IntMap rep -> rep)
-children edges = fmap (foldr chain noop . zip [0..]) . sequenceA <$> traverse resolve edges
+children :: [A.Value] -> A.Parser (IntMap.IntMap Term -> Term)
+children edges = fmap (foldr chain Noop . zip [0..]) . sequenceA <$> traverse resolve edges
 
 moduleNameComponent :: A.Object -> A.Parser (Int, Text)
 moduleNameComponent attrs = (,) <$> attrs A..: A.fromString "index" <*> attrs A..: A.fromString "text"
 
 -- | Chain a statement before any following syntax by let-binding it. Note that this implies call-by-value since any side effects in the statement must be performed before the let's body.
-chain :: Syntax rep => (Int, rep) -> rep -> rep
-chain (i, v) r = let_ (nameI i) v (const r)
+chain :: (Int, Term) -> Term -> Term
+chain = uncurry (Let . nameI)
 
 resolve :: A.Value -> A.Parser (IntMap.IntMap rep -> rep)
 resolve = resolveWith (const . pure)
