@@ -65,6 +65,7 @@ data Term
   | Import (NonEmpty Text)
   deriving (Eq, Ord, Show)
 
+-- TODO: 🔥
 class Syntax rep where
   var :: Name -> rep
 
