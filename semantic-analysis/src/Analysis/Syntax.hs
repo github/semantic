@@ -7,7 +7,6 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Analysis.Syntax
 ( Term(..)
-, Syntax(..)
   -- * Abstract interpretation
 , eval0
 , eval
@@ -61,24 +60,6 @@ data Term
   | Let Name Term Term
   | Import (NonEmpty Text)
   deriving (Eq, Ord, Show)
-
--- TODO: 🔥
-class Syntax rep where
-  var :: Name -> rep
-
-  iff :: rep -> rep -> rep -> rep
-  noop :: rep
-
-  bool :: Bool -> rep
-  string :: Text -> rep
-
-  throw :: rep -> rep
-
-  let_ :: Name -> rep -> (rep -> rep) -> rep
-
-  -- * Statements
-
-  import' :: NonEmpty Text -> rep
 
 
 -- Abstract interpretation
