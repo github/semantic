@@ -23,7 +23,7 @@ module Analysis.Syntax
 , parseNode
 ) where
 
-import           Analysis.Carrier.Statement.State
+import qualified Analysis.Carrier.Statement.State as S
 import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Store
@@ -126,18 +126,18 @@ eval :: (Interpret m i -> m i) -> (Interpret m i -> m i)
 eval eval (Interpret f) = f eval
 
 
-evalModule0 :: Applicative m => Interpret (StatementC m) rep -> m (Module rep)
-evalModule0 i = runStatement mk (eval0 i) where
-  mk msgs b = pure (Module (const b) (Set.fromList (map (\ (Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
+evalModule0 :: Applicative m => Interpret (S.StatementC m) rep -> m (Module rep)
+evalModule0 i = S.runStatement mk (eval0 i) where
+  mk msgs b = pure (Module (const b) (Set.fromList (map (\ (S.Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
 
-evalModule :: Applicative m => (Interpret (StatementC m) rep -> (StatementC m) rep) -> (Interpret (StatementC m) rep -> m (Module rep))
-evalModule f i = runStatement mk (eval f i) where
-  mk msgs b = pure (Module (const b) (Set.fromList (map (\ (Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
+evalModule :: Applicative m => (Interpret (S.StatementC m) rep -> (S.StatementC m) rep) -> (Interpret (S.StatementC m) rep -> m (Module rep))
+evalModule f i = S.runStatement mk (eval f i) where
+  mk msgs b = pure (Module (const b) (Set.fromList (map (\ (S.Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
 
 
 newtype Interpret m i = Interpret { interpret :: (Interpret m i -> m i) -> m i }
 
-instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has Statement sig m) => Syntax (Interpret m val) where
+instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m) => Syntax (Interpret m val) where
   var s = Interpret (\ _ -> do
     let n = name s
     a <- lookupEnv n
@@ -158,7 +158,7 @@ instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (D
     let' n v' (eval (b (Interpret (pure (pure v'))))))
 
   import' ns = Interpret (\ _ -> do
-    simport ns
+    S.simport ns
     dunit)
 
 
