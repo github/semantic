@@ -13,7 +13,6 @@ module Analysis.Syntax
 , eval
 , evalModule0
 , evalModule
-, Interpret(..)
   -- * Macro-expressible syntax
 , let'
   -- * Parsing
@@ -113,32 +112,6 @@ evalModule0 i = S.runStatement mk (eval0 i) where
 evalModule :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => (Term -> S.StatementC m val) -> (Term -> m (Module val))
 evalModule f i = S.runStatement mk (eval f i) where
   mk msgs b = pure (Module (const b) (Set.fromList (map (\ (S.Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
-
-
-newtype Interpret m i = Interpret { interpret :: (Interpret m i -> m i) -> m i }
-
-instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m) => Syntax (Interpret m val) where
-  var n = Interpret (\ _ -> do
-    a <- lookupEnv n
-    maybe (dvar n) fetch a)
-
-  iff c t e = Interpret (\ eval -> do
-    c' <- eval c
-    dif c' (eval t) (eval e))
-  noop = Interpret (const dunit)
-
-  bool b = Interpret (\ _ -> dbool b)
-  string s = Interpret (\ _ -> dstring s)
-
-  throw e = Interpret (\ eval -> eval e >>= ddie)
-
-  let_ n v b = Interpret (\ eval -> do
-    v' <- eval v
-    let' n v' (eval (b (Interpret (pure (pure v'))))))
-
-  import' ns = Interpret (\ _ -> do
-    S.simport ns
-    dunit)
 
 
 -- Macro-expressible syntax
