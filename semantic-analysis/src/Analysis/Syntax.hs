@@ -11,7 +11,6 @@ module Analysis.Syntax
   -- * Abstract interpretation
 , eval0
 , eval
-, evalTerm
 , evalModule0
 , evalModule
 , Interpret(..)
@@ -85,18 +84,14 @@ class Syntax rep where
 
 -- Abstract interpretation
 
-eval0 :: Interpret m i -> m i
+eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m) => Term -> m val
 eval0 = fix eval
 
-eval :: (Interpret m i -> m i) -> (Interpret m i -> m i)
-eval eval (Interpret f) = f eval
-
-
-evalTerm
+eval
   :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m)
   => (Term -> m val)
   -> (Term -> m val)
-evalTerm eval = \case
+eval eval = \case
   Var n     -> lookupEnv n >>= maybe (dvar n) fetch
   Noop      -> dunit
   Iff c t e -> do
@@ -111,11 +106,11 @@ evalTerm eval = \case
   Import ns -> S.simport ns >> dunit
 
 
-evalModule0 :: Applicative m => Interpret (S.StatementC m) rep -> m (Module rep)
+evalModule0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => Term -> m (Module val)
 evalModule0 i = S.runStatement mk (eval0 i) where
   mk msgs b = pure (Module (const b) (Set.fromList (map (\ (S.Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
 
-evalModule :: Applicative m => (Interpret (S.StatementC m) rep -> (S.StatementC m) rep) -> (Interpret (S.StatementC m) rep -> m (Module rep))
+evalModule :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => (Term -> S.StatementC m val) -> (Term -> m (Module val))
 evalModule f i = S.runStatement mk (eval f i) where
   mk msgs b = pure (Module (const b) (Set.fromList (map (\ (S.Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
 
