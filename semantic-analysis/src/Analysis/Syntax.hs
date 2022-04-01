@@ -11,6 +11,7 @@ module Analysis.Syntax
   -- * Abstract interpretation
 , eval0
 , eval
+, evalTerm
 , evalModule0
 , evalModule
 , Interpret(..)
@@ -89,6 +90,25 @@ eval0 = fix eval
 
 eval :: (Interpret m i -> m i) -> (Interpret m i -> m i)
 eval eval (Interpret f) = f eval
+
+
+evalTerm
+  :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m)
+  => (Term -> m val)
+  -> (Term -> m val)
+evalTerm eval = \case
+  Var n     -> lookupEnv n >>= maybe (dvar n) fetch
+  Noop      -> dunit
+  Iff c t e -> do
+    c' <- eval c
+    dif c' (eval t) (eval e)
+  Bool b    -> dbool b
+  String s  -> dstring s
+  Throw e   -> eval e >>= ddie
+  Let n v b -> do
+    v' <- eval v
+    let' n v' (eval b)
+  Import ns -> S.simport ns >> dunit
 
 
 evalModule0 :: Applicative m => Interpret (S.StatementC m) rep -> m (Module rep)
