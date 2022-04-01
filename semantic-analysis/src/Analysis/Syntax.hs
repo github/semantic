@@ -55,7 +55,7 @@ import qualified Data.Vector as V
 import qualified System.Path as Path
 
 data Term
-  = Var Text
+  = Var Name
   | Noop
   | Iff Term Term Term
   | Bool Bool
@@ -66,7 +66,7 @@ data Term
   deriving (Eq, Ord, Show)
 
 class Syntax rep where
-  var :: Text -> rep
+  var :: Name -> rep
 
   iff :: rep -> rep -> rep -> rep
   noop :: rep
@@ -97,7 +97,7 @@ instance Monoid Print where
   mempty = Print id
 
 instance Syntax Print where
-  var n = str "get" <+> text n
+  var n = str "get" <+> text (formatName n)
 
   iff c t e = parens (str "iff" <+> c <+> str "then" <+> t <+> str "else" <+> e)
   noop = parens (str "noop")
@@ -150,8 +150,7 @@ evalModule f i = S.runStatement mk (eval f i) where
 newtype Interpret m i = Interpret { interpret :: (Interpret m i -> m i) -> m i }
 
 instance (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m) => Syntax (Interpret m val) where
-  var s = Interpret (\ _ -> do
-    let n = name s
+  var n = Interpret (\ _ -> do
     a <- lookupEnv n
     maybe (dvar n) fetch a)
 
@@ -222,7 +221,7 @@ parseType attrs edges = \case
   "if"         -> liftA3 iff <$> findEdgeNamed edges "condition" <*> findEdgeNamed edges "consequence" <*> findEdgeNamed edges "alternative" <|> pure (const noop)
   "block"      -> children edges
   "module"     -> children edges
-  "identifier" -> const . var <$> attrs A..: A.fromString "text"
+  "identifier" -> const . var . name <$> attrs A..: A.fromString "text"
   "import"     -> const . import' . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
   t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
 
