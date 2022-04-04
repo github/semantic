@@ -70,10 +70,7 @@ exceptionTracing
      -> (term -> m ExcSet) )
   -> [File term]
   -> (A.MStore ExcSet, [File (Module ExcSet)])
-exceptionTracing eval
-  = run
-  . A.runStoreState
-  . traverse (runFile eval)
+exceptionTracing eval = A.runFiles (runFile eval)
 
 runFile
   :: ( Has (State (A.MStore ExcSet)) sig m
