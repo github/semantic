@@ -84,9 +84,10 @@ runFile
   -> m (File ExcSet)
 runFile eval = traverse run where
   run
-    = A.runStatement (const (pure . Foldable.fold))
+    = A.runStatement result
     . A.runEnv @ExcSet
     . convergeTerm (A.runStore @ExcSet . runExcC . fix (cacheTerm . eval))
+  result _msgs sets = pure (Foldable.fold sets)
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
