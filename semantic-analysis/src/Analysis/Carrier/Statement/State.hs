@@ -26,6 +26,7 @@ import           Data.Text (Text)
 
 data Message
   = Import (NonEmpty Text)
+  deriving (Eq, Ord, Show)
 
 
 -- Statement carrier
