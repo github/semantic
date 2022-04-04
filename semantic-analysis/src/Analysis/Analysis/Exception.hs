@@ -67,7 +67,7 @@ exceptionTracing
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> [File term]
-  -> (A.MStore ExcSet, [File (Set.Set ExcSet)])
+  -> (A.MStore ExcSet, [File ExcSet])
 exceptionTracing eval
   = run
   . A.runStoreState
@@ -81,10 +81,10 @@ runFile
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> File term
-  -> m (File (Set.Set ExcSet))
+  -> m (File ExcSet)
 runFile eval = traverse run where
   run
-    = A.runStatement (const pure)
+    = A.runStatement (const (pure . Foldable.fold))
     . A.runEnv @ExcSet
     . convergeTerm (A.runStore @ExcSet . runExcC . fix (cacheTerm . eval))
 
