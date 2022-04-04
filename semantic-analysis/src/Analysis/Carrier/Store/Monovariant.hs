@@ -92,7 +92,7 @@ instance Has (State (MStore value)) sig m
 -- Running
 
 runFiles
-  :: (forall m . File term -> m (File result))
+  :: (forall sig m . Has (State (MStore  value)) sig m => File term -> m (File result))
   -> [File term]
   -> (MStore value, [File result])
 runFiles runFile
