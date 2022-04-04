@@ -2,6 +2,7 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
@@ -19,10 +20,13 @@ module Analysis.Carrier.Store.Monovariant
 , EnvC(..)
   -- * Env effect
 , module Analysis.Effect.Env
+  -- * Running
+, runFiles
 ) where
 
 import Analysis.Effect.Env
 import Analysis.Effect.Store
+import Analysis.File (File)
 import Analysis.Name
 import Control.Algebra
 import Control.Carrier.State.Church
@@ -83,3 +87,15 @@ instance Has (State (MStore value)) sig m
         pure (MAddr n <$ Map.lookup (MAddr n) store <$ ctx)
 
     R other -> EnvC (alg (runEnv . hdl) other ctx)
+
+
+-- Running
+
+runFiles
+  :: (forall m . File term -> m (File result))
+  -> [File term]
+  -> (MStore value, [File result])
+runFiles runFile
+  = run
+  . runStoreState
+  . traverse runFile
