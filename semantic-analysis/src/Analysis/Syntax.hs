@@ -35,7 +35,6 @@ import           Control.Monad (guard)
 import           Control.Monad.IO.Class
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Internal as A
-import qualified Data.Aeson.Key as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
@@ -45,6 +44,7 @@ import           Data.List (sortOn)
 import           Data.List.NonEmpty (NonEmpty, fromList, toList)
 import           Data.Monoid (First (..))
 import qualified Data.Set as Set
+import           Data.String (IsString (..))
 import           Data.Text (Text, pack)
 import qualified Data.Text as Text
 import qualified Data.Vector as V
@@ -127,35 +127,35 @@ parseGraph = A.withArray "nodes" $ \ nodes -> do
 
 parseNode :: A.Object -> A.Parser (IntMap.Key, IntMap.IntMap Term -> Term, Maybe (IntMap.IntMap Term -> Term))
 parseNode o = do
-  edges <- o A..: A.fromString "edges"
-  index <- o A..: A.fromString "id"
-  o A..: A.fromString "attrs" >>= A.withObject "attrs" (\ attrs -> do
-    ty <- attrs A..: A.fromString "type"
+  edges <- o A..: fromString "edges"
+  index <- o A..: fromString "id"
+  o A..: fromString "attrs" >>= A.withObject "attrs" (\ attrs -> do
+    ty <- attrs A..: fromString "type"
     node <- parseType attrs edges ty
     pure (index, node, node <$ guard (ty == "module")))
 
 parseType :: A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap Term -> Term)
 parseType attrs edges = \case
-  "string"     -> const . String <$> attrs A..: A.fromString "text"
+  "string"     -> const . String <$> attrs A..: fromString "text"
   "true"       -> pure (const (Bool True))
   "false"      -> pure (const (Bool False))
   "throw"      -> fmap Throw <$> resolve (head edges)
   "if"         -> liftA3 Iff <$> findEdgeNamed edges "condition" <*> findEdgeNamed edges "consequence" <*> findEdgeNamed edges "alternative" <|> pure (const Noop)
   "block"      -> children edges
   "module"     -> children edges
-  "identifier" -> const . Var . name <$> attrs A..: A.fromString "text"
+  "identifier" -> const . Var . name <$> attrs A..: fromString "text"
   "import"     -> const . Import . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
   t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
 
 findEdgeNamed :: (Foldable t, A.FromJSON a, Eq a) => t A.Value -> a -> A.Parser (IntMap.IntMap rep -> rep)
-findEdgeNamed edges name = foldMap (resolveWith (\ rep attrs -> attrs A..: A.fromString "type" >>= (rep <$) . guard . (== name))) edges
+findEdgeNamed edges name = foldMap (resolveWith (\ rep attrs -> attrs A..: fromString "type" >>= (rep <$) . guard . (== name))) edges
 
 -- | Map a list of edges to a list of child nodes.
 children :: [A.Value] -> A.Parser (IntMap.IntMap Term -> Term)
 children edges = fmap (foldr chain Noop . zip [0..]) . sequenceA <$> traverse resolve edges
 
 moduleNameComponent :: A.Object -> A.Parser (Int, Text)
-moduleNameComponent attrs = (,) <$> attrs A..: A.fromString "index" <*> attrs A..: A.fromString "text"
+moduleNameComponent attrs = (,) <$> attrs A..: fromString "index" <*> attrs A..: fromString "text"
 
 -- | Chain a statement before any following syntax by let-binding it. Note that this implies call-by-value since any side effects in the statement must be performed before the let's body.
 chain :: (Int, Term) -> Term -> Term
@@ -166,6 +166,6 @@ resolve = resolveWith (const . pure)
 
 resolveWith :: ((IntMap.IntMap rep -> rep) -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
 resolveWith f = A.withObject "edge" (\ edge -> do
-  sink <- edge A..: A.fromString "sink"
-  attrs <- edge A..: A.fromString "attrs"
+  sink <- edge A..: fromString "sink"
+  attrs <- edge A..: fromString "attrs"
   f (IntMap.! sink) attrs)
