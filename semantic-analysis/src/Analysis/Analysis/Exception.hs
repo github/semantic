@@ -25,6 +25,7 @@ import           Analysis.Effect.Env (Env)
 import           Analysis.Effect.Store
 import           Analysis.File
 import           Analysis.FlowInsensitive (cacheTerm, convergeTerm)
+import           Analysis.Module
 import           Analysis.Name
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
@@ -33,6 +34,7 @@ import           Control.Effect.State
 import qualified Data.Foldable as Foldable
 import           Data.Function (fix)
 import qualified Data.Set as Set
+import qualified Data.Text as Text
 
 -- | Names of exceptions thrown in the guest language and recorded by this analysis.
 --
@@ -67,7 +69,7 @@ exceptionTracing
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> [File term]
-  -> (A.MStore ExcSet, [File ExcSet])
+  -> (A.MStore ExcSet, [File (Module ExcSet)])
 exceptionTracing eval
   = run
   . A.runStoreState
@@ -81,13 +83,16 @@ runFile
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> File term
-  -> m (File ExcSet)
+  -> m (File (Module ExcSet))
 runFile eval = traverse run where
   run
     = A.runStatement result
     . A.runEnv @ExcSet
     . convergeTerm (A.runStore @ExcSet . runExcC . fix (cacheTerm . eval))
-  result _msgs sets = pure (Foldable.fold sets)
+  result msgs sets = do
+    let set = Foldable.fold sets
+        imports = Set.fromList (map (\ (A.Import components) -> name (Text.intercalate (Text.pack ".") (Foldable.toList components))) msgs)
+    pure (Module (const set) imports mempty (freeVariables set))
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
