@@ -88,10 +88,7 @@ eval eval = \case
   Function n ps b -> do
     addr <- alloc n
     v <- bind n addr $ dabs ps (\ as ->
-      foldr (\ (p, a) m -> do
-      addr <- alloc p
-      addr .= a
-      bind n addr m) (eval b) (zip ps as))
+      foldr (\ (p, a) m -> let' p a m) (eval b) (zip ps as))
     addr .= v
     pure v
 
