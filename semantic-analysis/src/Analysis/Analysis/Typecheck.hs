@@ -30,7 +30,7 @@ import           Analysis.FlowInsensitive
 import           Analysis.Functor.Named
 import           Analysis.Reference
 import           Control.Algebra
-import           Control.Applicative (Alternative(..))
+import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Fresh.Strict as Fresh
 import           Control.Carrier.Reader hiding (Local)
 import           Control.Carrier.State.Strict
@@ -42,7 +42,7 @@ import           Data.Function (fix)
 import qualified Data.IntMap as IM
 import qualified Data.IntSet as IS
 import           Data.Maybe (fromJust, fromMaybe)
-import           Data.Semigroup (Last(..))
+import           Data.Semigroup (Last (..))
 import qualified Data.Set as Set
 import           Data.Void
 import           GHC.Generics (Generic1)
