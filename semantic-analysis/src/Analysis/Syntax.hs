@@ -133,7 +133,7 @@ newtype Graph = Graph { terms :: IntMap.IntMap Term }
 parseGraph :: A.Value -> A.Parser (Graph, Maybe Term)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
   (untied, First root) <- fold <$> traverse parseNode (V.toList nodes)
-  -- @untied@ is a list of key/value pairs, where the keys are graph node IDs and the values are functions from the final graph to the representations of said graph nodes. Likewise, @root@ is a function of the same variety, wrapped in a @Maybe@.
+  -- @untied@ is an intmap, where the keys are graph node IDs and the values are functions from the final graph to the representations of said graph nodes. Likewise, @root@ is a function of the same variety, wrapped in a @Maybe@.
   --
   -- We define @tied@ as the fixpoint of the former to yield the former as a graph of type @Graph@, and apply the latter to said graph to yield the entry point, if any, from which to evaluate.
   let tied = fix (\ tied -> ($ Graph tied) <$> untied)
