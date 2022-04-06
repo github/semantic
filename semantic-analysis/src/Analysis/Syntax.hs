@@ -86,8 +86,7 @@ eval eval = \case
     v' <- eval v
     let' n v' (eval b)
   Import ns -> S.simport ns >> dunit
-  Function n ps b -> letrec n (dabs ps (\ as ->
-    foldr (uncurry let') (eval b) (zip ps as)))
+  Function n ps b -> letrec n (dabs ps (foldr (uncurry let') (eval b) . zip ps))
 
 
 evalModule0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => Term -> m (Module val)
