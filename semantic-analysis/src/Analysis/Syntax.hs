@@ -87,7 +87,7 @@ eval eval = \case
   Import ns -> S.simport ns >> dunit
   Function n ps b -> do
     addr <- alloc n
-    v <- dabs ps (\ as ->
+    v <- bind n addr $ dabs ps (\ as ->
       foldr (\ (p, a) m -> do
       addr <- alloc p
       addr .= a
