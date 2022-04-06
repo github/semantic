@@ -127,16 +127,18 @@ parseFile path = do
     -- FIXME: this should use the span of the source file, not an empty span.
     Right (_, Just root) -> pure (File (Ref.fromPath (Path.absRel path)) root)
 
-parseGraph :: A.Value -> A.Parser (IntMap.IntMap Term, Maybe Term)
+type Graph = IntMap.IntMap Term
+
+parseGraph :: A.Value -> A.Parser (Graph, Maybe Term)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
   (untied, First root) <- foldMap (\ (k, v, r) -> ([(k, v)], First r)) <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
   -- @untied@ is a list of key/value pairs, where the keys are graph node IDs and the values are functions from the final graph to the representations of said graph nodes. Likewise, @root@ is a function of the same variety, wrapped in a @Maybe@.
   --
-  -- We define @tied@ as the fixpoint of the former to yield the former as a graph of type @IntMap.IntMap Term@, and apply the latter to said graph to yield the entry point, if any, from which to evaluate.
+  -- We define @tied@ as the fixpoint of the former to yield the former as a graph of type @Graph@, and apply the latter to said graph to yield the entry point, if any, from which to evaluate.
   let tied = fix (\ tied -> ($ tied) <$> IntMap.fromList untied)
   pure (tied, ($ tied) <$> root)
 
-parseNode :: A.Object -> A.Parser (IntMap.Key, IntMap.IntMap Term -> Term, Maybe (IntMap.IntMap Term -> Term))
+parseNode :: A.Object -> A.Parser (IntMap.Key, Graph -> Term, Maybe (Graph -> Term))
 parseNode o = do
   edges <- o A..: fromString "edges"
   index <- o A..: fromString "id"
@@ -145,7 +147,7 @@ parseNode o = do
     node <- parseTerm attrs edges ty
     pure (index, node, node <$ guard (ty == "module")))
 
-parseTerm :: A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap Term -> Term)
+parseTerm :: A.Object -> [A.Value] -> String -> A.Parser (Graph -> Term)
 parseTerm attrs edges = \case
   "string"     -> const . String <$> attrs A..: fromString "text"
   "true"       -> pure (const (Bool True))
@@ -158,11 +160,11 @@ parseTerm attrs edges = \case
   "import"     -> const . Import . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
   t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
 
-findEdgeNamed :: (Foldable t, A.FromJSON a, Eq a) => t A.Value -> a -> A.Parser (IntMap.IntMap rep -> rep)
+findEdgeNamed :: (Foldable t, A.FromJSON a, Eq a) => t A.Value -> a -> A.Parser (Graph -> Term)
 findEdgeNamed edges name = foldMap (resolveWith (\ rep attrs -> attrs A..: fromString "type" >>= (rep <$) . guard . (== name))) edges
 
 -- | Map a list of edges to a list of child nodes.
-children :: [A.Value] -> A.Parser (IntMap.IntMap Term -> Term)
+children :: [A.Value] -> A.Parser (Graph -> Term)
 children edges = fmap (foldr chain Noop . zip [0..]) . sequenceA <$> traverse resolve edges
 
 moduleNameComponent :: A.Object -> A.Parser (Int, Text)
@@ -172,10 +174,10 @@ moduleNameComponent attrs = (,) <$> attrs A..: fromString "index" <*> attrs A..:
 chain :: (Int, Term) -> Term -> Term
 chain = uncurry (Let . nameI)
 
-resolve :: A.Value -> A.Parser (IntMap.IntMap rep -> rep)
+resolve :: A.Value -> A.Parser (Graph -> Term)
 resolve = resolveWith (const . pure)
 
-resolveWith :: ((IntMap.IntMap b -> b) -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
+resolveWith :: ((Graph -> Term) -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
 resolveWith f = resolveWith' (f . flip (IntMap.!))
 
 resolveWith' :: (Int -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
