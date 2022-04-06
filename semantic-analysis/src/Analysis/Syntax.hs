@@ -142,11 +142,11 @@ parseNode o = do
   index <- o A..: fromString "id"
   o A..: fromString "attrs" >>= A.withObject "attrs" (\ attrs -> do
     ty <- attrs A..: fromString "type"
-    node <- parseType attrs edges ty
+    node <- parseTerm attrs edges ty
     pure (index, node, node <$ guard (ty == "module")))
 
-parseType :: A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap Term -> Term)
-parseType attrs edges = \case
+parseTerm :: A.Object -> [A.Value] -> String -> A.Parser (IntMap.IntMap Term -> Term)
+parseTerm attrs edges = \case
   "string"     -> const . String <$> attrs A..: fromString "text"
   "true"       -> pure (const (Bool True))
   "false"      -> pure (const (Bool False))
