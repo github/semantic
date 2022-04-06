@@ -36,7 +36,7 @@ import           Data.Text as Text (Text)
 import           Prelude hiding (fail)
 
 data Concrete
-  = Closure Reference (Named (Concrete -> Concrete))
+  = Closure Reference Name (Concrete -> Concrete)
   | Unit
   | Bool Bool
   | Int Int
@@ -67,9 +67,9 @@ vvar :: Name -> Concrete
 vvar n = Neutral n Nil
 
 velim :: Concrete -> Elim Concrete -> Concrete
-velim (Closure _ f)  (EApp a) = namedValue f a
-velim (Neutral h as) a        = Neutral h (as :> a)
-velim _              _        = error "velim: cannot eliminate" -- FIXME: fail in the monad instead
+velim (Closure _ _ f) (EApp a) = f a
+velim (Neutral h as)  a        = Neutral h (as :> a)
+velim _               _        = error "velim: cannot eliminate" -- FIXME: fail in the monad instead
 
 -- FIXME: so why use HOAS at all then?
 -- FIXME: construct in de Bruijn-indexed rep & simple eval instead of substituting.
@@ -82,7 +82,7 @@ vsubst n v = go
       | otherwise -> Neutral n'     as'
       where
       as' = fmap go <$> as
-    Closure r b   -> Closure r ((go .) <$> b) -- NB: Shadowing can’t happen because n' can’t occur inside b
+    Closure r n b -> Closure r n (go . b) -- NB: Shadowing can’t happen because n' can’t occur inside b
     Unit          -> Unit
     Bool b        -> Bool b
     Int i         -> Int i
@@ -91,7 +91,7 @@ vsubst n v = go
 
 data FO
   = FOVar Name
-  | FOClosure Reference (Named FO)
+  | FOClosure Reference Name FO
   | FOUnit
   | FOBool Bool
   | FOInt Int
@@ -103,12 +103,12 @@ data FO
 quote :: Concrete -> FO
 quote = \case
 -- FIXME: should quote take a Level incremented under binders?
-  Closure r body -> FOClosure r ((\ f -> quote (f (vvar (namedName body)))) <$> body)
-  Unit           -> FOUnit
-  Bool b         -> FOBool b
-  Int i          -> FOInt i
-  String s       -> FOString s
-  Neutral n sp   -> foldl' (\ f (EApp a) -> FOApp f (quote a)) (FOVar n) sp
+  Closure r n body -> FOClosure r n (quote (body (vvar n)))
+  Unit             -> FOUnit
+  Bool b           -> FOBool b
+  Int i            -> FOInt i
+  String s         -> FOString s
+  Neutral n sp     -> foldl' (\ f (EApp a) -> FOApp f (quote a)) (FOVar n) sp
 
 
 type Eval term m value = (term -> m value) -> (term -> m value)
@@ -160,7 +160,7 @@ instance ( Has (A.Env A.PAddr) sig m
     L (DAbs n b)  -> do
       b' <- hdl (b (vvar n) <$ ctx)
       ref <- ask
-      pure $ Closure ref . named n . flip (vsubst n) <$> b'
+      pure $ Closure ref n . flip (vsubst n) <$> b'
     L (DApp f a)  -> pure $ velim f (EApp a) <$ ctx
     L (DInt i)    -> pure (Int i <$ ctx)
     L DUnit       -> pure (Unit <$ ctx)
