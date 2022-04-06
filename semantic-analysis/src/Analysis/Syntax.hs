@@ -127,7 +127,7 @@ parseFile path = do
     -- FIXME: this should use the span of the source file, not an empty span.
     Right (_, Just root) -> pure (File (Ref.fromPath (Path.absRel path)) root)
 
-type Graph = IntMap.IntMap Term
+newtype Graph = Graph { terms :: IntMap.IntMap Term }
 
 parseGraph :: A.Value -> A.Parser (Graph, Maybe Term)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
@@ -135,8 +135,8 @@ parseGraph = A.withArray "nodes" $ \ nodes -> do
   -- @untied@ is a list of key/value pairs, where the keys are graph node IDs and the values are functions from the final graph to the representations of said graph nodes. Likewise, @root@ is a function of the same variety, wrapped in a @Maybe@.
   --
   -- We define @tied@ as the fixpoint of the former to yield the former as a graph of type @Graph@, and apply the latter to said graph to yield the entry point, if any, from which to evaluate.
-  let tied = fix (\ tied -> ($ tied) <$> IntMap.fromList untied)
-  pure (tied, ($ tied) <$> root)
+  let tied = fix (\ tied -> ($ Graph tied) <$> IntMap.fromList untied)
+  pure (Graph tied, ($ Graph tied) <$> root)
 
 parseNode :: A.Object -> A.Parser (IntMap.Key, Graph -> Term, Maybe (Graph -> Term))
 parseNode o = do
@@ -178,7 +178,7 @@ resolve :: A.Value -> A.Parser (Graph -> Term)
 resolve = resolveWith (const . pure)
 
 resolveWith :: ((Graph -> Term) -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
-resolveWith f = resolveWith' (f . flip (IntMap.!))
+resolveWith f = resolveWith' (f . flip ((IntMap.!) . terms))
 
 resolveWith' :: (IntMap.Key -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
 resolveWith' f = A.withObject "edge" (\ edge -> do
