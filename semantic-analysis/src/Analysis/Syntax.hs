@@ -131,15 +131,15 @@ newtype Graph = Graph { terms :: IntMap.IntMap Term }
 
 parseGraph :: A.Value -> A.Parser (Graph, Maybe Term)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
-  (untied, First root) <- foldMap (\ (k, v, r) -> ([(k, v)], r)) <$> traverse (A.withObject "node" parseNode) (V.toList nodes)
+  (untied, First root) <- foldMap (\ (k, v, r) -> ([(k, v)], r)) <$> traverse parseNode (V.toList nodes)
   -- @untied@ is a list of key/value pairs, where the keys are graph node IDs and the values are functions from the final graph to the representations of said graph nodes. Likewise, @root@ is a function of the same variety, wrapped in a @Maybe@.
   --
   -- We define @tied@ as the fixpoint of the former to yield the former as a graph of type @Graph@, and apply the latter to said graph to yield the entry point, if any, from which to evaluate.
   let tied = fix (\ tied -> ($ Graph tied) <$> IntMap.fromList untied)
   pure (Graph tied, ($ Graph tied) <$> root)
 
-parseNode :: A.Object -> A.Parser (IntMap.Key, Graph -> Term, First (Graph -> Term))
-parseNode o = do
+parseNode :: A.Value -> A.Parser (IntMap.Key, Graph -> Term, First (Graph -> Term))
+parseNode = A.withObject "node" $ \ o -> do
   edges <- o A..: fromString "edges"
   index <- o A..: fromString "id"
   o A..: fromString "attrs" >>= A.withObject "attrs" (\ attrs -> do
