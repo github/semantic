@@ -59,6 +59,7 @@ data Term
   | Throw Term
   | Let Name Term Term
   | Import (NonEmpty Text)
+  | Function Name [Name] Term
   deriving (Eq, Ord, Show)
 
 
@@ -84,6 +85,15 @@ eval eval = \case
     v' <- eval v
     let' n v' (eval b)
   Import ns -> S.simport ns >> dunit
+  Function n ps b -> do
+    addr <- alloc n
+    v <- dabs ps (\ as ->
+      foldr (\ (p, a) m -> do
+      addr <- alloc p
+      addr .= a
+      bind n addr m) (eval b) (zip ps as))
+    addr .= v
+    pure v
 
 
 evalModule0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => Term -> m (Module val)
