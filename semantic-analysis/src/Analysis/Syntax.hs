@@ -176,7 +176,10 @@ resolve :: A.Value -> A.Parser (IntMap.IntMap rep -> rep)
 resolve = resolveWith (const . pure)
 
 resolveWith :: ((IntMap.IntMap b -> b) -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
-resolveWith f = A.withObject "edge" (\ edge -> do
+resolveWith f = resolveWith' (f . flip (IntMap.!))
+
+resolveWith' :: (Int -> A.Object -> A.Parser a) -> A.Value -> A.Parser a
+resolveWith' f = A.withObject "edge" (\ edge -> do
   sink <- edge A..: fromString "sink"
   attrs <- edge A..: fromString "attrs"
-  f (IntMap.! sink) attrs)
+  f sink attrs)
