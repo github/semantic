@@ -14,6 +14,7 @@ module Analysis.Syntax
 , evalModule
   -- * Macro-expressible syntax
 , let'
+, letrec
   -- * Parsing
 , parseFile
 , parseGraph
@@ -109,6 +110,13 @@ let' n v m = do
   addr <- alloc n
   addr .= v
   bind n addr m
+
+letrec :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m) => Name -> m val -> m val
+letrec n m = do
+  addr <- alloc n
+  v <- bind n addr m
+  addr .= v
+  pure v
 
 
 -- Parsing
