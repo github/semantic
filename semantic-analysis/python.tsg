@@ -97,8 +97,7 @@
 {
   node @this.node
   attr (@this.node) type = "function"
-  edge @this.node -> @name.node
-  attr (@this.node -> @name.node) type = "name"
+  attr (@this.node) name = (source-text @name)
   edge @this.node -> @body.node
   attr (@this.node -> @body.node) type = "body"
 }
