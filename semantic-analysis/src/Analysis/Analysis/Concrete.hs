@@ -36,7 +36,7 @@ import           Data.Text as Text (Text)
 import           Prelude hiding (fail)
 
 data Concrete
-  = Closure Reference Name (Concrete -> Concrete)
+  = Closure Reference [Name] ([Concrete] -> Concrete)
   | Unit
   | Bool Bool
   | Int Int
@@ -60,7 +60,7 @@ instance Show Concrete where
   showsPrec p = showsPrec p . quote
 
 
-newtype Elim a = EApp a
+newtype Elim a = EApp [a]
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 vvar :: Name -> Concrete
@@ -91,24 +91,24 @@ vsubst n v = go
 
 data FO
   = FOVar Name
-  | FOClosure Reference Name FO
+  | FOClosure Reference [Name] FO
   | FOUnit
   | FOBool Bool
   | FOInt Int
   | FOString Text
-  | FOApp FO FO
+  | FOApp FO [FO]
   deriving (Eq, Ord, Show)
 
 
 quote :: Concrete -> FO
 quote = \case
 -- FIXME: should quote take a Level incremented under binders?
-  Closure r n body -> FOClosure r n (quote (body (vvar n)))
+  Closure r n body -> FOClosure r n (quote (body (map vvar n)))
   Unit             -> FOUnit
   Bool b           -> FOBool b
   Int i            -> FOInt i
   String s         -> FOString s
-  Neutral n sp     -> foldl' (\ f (EApp a) -> FOApp f (quote a)) (FOVar n) sp
+  Neutral n sp     -> foldl' (\ f (EApp a) -> FOApp f (map quote a)) (FOVar n) sp
 
 
 type Eval term m value = (term -> m value) -> (term -> m value)
@@ -158,9 +158,10 @@ instance ( Has (A.Env A.PAddr) sig m
   alg hdl sig ctx = case sig of
     L (DVar n)    -> pure (vvar n <$ ctx)
     L (DAbs n b)  -> do
-      b' <- hdl (b (vvar n) <$ ctx)
+      b' <- hdl (b (map vvar n) <$ ctx)
       ref <- ask
-      pure $ Closure ref n . flip (vsubst n) <$> b'
+      let closure body = Closure ref n (\ args -> let substs = zipWith vsubst n args in foldl' (.) id substs body)
+      pure $ closure <$> b'
     L (DApp f a)  -> pure $ velim f (EApp a) <$ ctx
     L (DInt i)    -> pure (Int i <$ ctx)
     L DUnit       -> pure (Unit <$ ctx)

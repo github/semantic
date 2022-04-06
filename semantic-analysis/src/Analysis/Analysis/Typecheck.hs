@@ -37,7 +37,7 @@ import           Control.Carrier.State.Strict
 import           Control.Effect.Labelled
 import           Control.Monad (ap, guard, unless)
 import           Control.Monad.Trans.Class
-import           Data.Foldable (for_)
+import           Data.Foldable (for_, sequenceA_)
 import           Data.Function (fix)
 import qualified Data.IntMap as IM
 import qualified Data.IntSet as IS
@@ -54,7 +54,7 @@ data Monotype a
   | Bool
   | Int
   | String
-  | Monotype a :-> Monotype a
+  | [Monotype a] :-> Monotype a
   -- | (Locally) undefined names whose types are unknown. May not be eliminated by unification.
   | TypeOf Name
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
@@ -78,7 +78,7 @@ instance Monad Monotype where
     Int      -> Int
     String   -> String
     TypeOf n -> TypeOf n
-    a :-> b  -> (a >>= f) :-> (b >>= f)
+    a :-> b  -> (map (>>= f) a) :-> (b >>= f)
 
 
 type Type = Monotype Meta
@@ -180,7 +180,7 @@ type Substitution = IM.IntMap Type
 solve :: (Has (State Substitution) sig m, MonadFail m) => Set.Set (Type, Type) -> m ()
 solve cs = for_ cs (uncurry solve)
   where solve = curry $ \case
-          (a1 :-> b1, a2 :-> b2)            -> solve a1 a2 *> solve b1 b2
+          (a1 :-> b1, a2 :-> b2)            -> sequenceA_ (zipWith solve a1 a2) *> solve b1 b2
           (Var m1   , Var m2)    | m1 == m2 -> pure ()
           (Var m1   , t2)                   -> do
             sol <- solution m1
@@ -230,16 +230,16 @@ instance ( Alternative m
     L (DString _) -> pure (String <$ ctx)
 
     L (DAbs n b) -> do
-      addr <- A.alloc n
-      arg <- meta
-      addr A..= arg
-      ty <- hdl (b arg <$ ctx)
-      pure ((arg :->) <$> ty)
+      addrs <- traverse A.alloc n
+      args <- traverse (const meta) n
+      sequenceA_ (zipWith (A..=) addrs args)
+      ty <- hdl (b args <$ ctx)
+      pure ((args :->) <$> ty)
     L (DApp f a) -> do
-      arg <- meta
+      args <- traverse (const meta) a
       ret <- meta
-      unify f (arg :-> ret)
-      unify a arg
+      unify f (args :-> ret)
+      sequenceA_ (zipWith unify a args)
       pure (ret <$ ctx)
 
     L (DDie msg) -> fail (show msg)

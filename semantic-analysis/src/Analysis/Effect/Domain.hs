@@ -39,10 +39,10 @@ dvar = send . DVar
 
 -- Functions
 
-dabs :: Has (Dom val) sig m => Name -> (val -> m val) -> m val
+dabs :: Has (Dom val) sig m => [Name] -> ([val] -> m val) -> m val
 dabs n = send . DAbs n
 
-dapp :: Has (Dom val) sig m => val -> val -> m val
+dapp :: Has (Dom val) sig m => val -> [val] -> m val
 dapp f a = send $ DApp f a
 
 
@@ -89,8 +89,8 @@ ddie = send . DDie
 
 data Dom val m k where
   DVar :: Name -> Dom val m val
-  DAbs :: Name -> (val -> m val) -> Dom val m val
-  DApp :: val -> val -> Dom val m val
+  DAbs :: [Name] -> ([val] -> m val) -> Dom val m val
+  DApp :: val -> [val] -> Dom val m val
   DInt :: Int -> Dom val m val
   DUnit :: Dom val m val
   DBool :: Bool -> Dom val m val

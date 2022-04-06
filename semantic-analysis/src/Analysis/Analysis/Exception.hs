@@ -99,7 +99,7 @@ instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m)
     L dom   -> case dom of
       DVar n    -> pure $ var n <$ ctx
       DAbs _ b  -> runExcC (hdl (b mempty <$ ctx))
-      DApp f a  -> pure $ f <> a <$ ctx
+      DApp f a  -> pure $ f <> Foldable.fold a <$ ctx
       DInt _    -> pure nil
       DUnit     -> pure nil
       DBool _   -> pure nil
