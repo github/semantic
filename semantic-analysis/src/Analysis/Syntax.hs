@@ -92,8 +92,7 @@ eval eval = \case
 
 
 evalModule0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => Term -> m (Module val)
-evalModule0 i = S.runStatement mk (eval0 i) where
-  mk msgs b = pure (Module (const b) (Set.fromList (map (\ (S.Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
+evalModule0 = evalModule eval0
 
 evalModule :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => (Term -> S.StatementC m val) -> (Term -> m (Module val))
 evalModule f i = S.runStatement mk (eval f i) where
