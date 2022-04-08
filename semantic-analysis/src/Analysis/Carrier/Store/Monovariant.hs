@@ -36,7 +36,7 @@ import Control.Monad.Fail as Fail
 import Data.Map as Map
 import Data.Set as Set
 
-newtype MAddr = MAddr Name
+newtype MAddr = MAddr { getMAddr :: Name }
   deriving (Eq, Ord, Show)
 
 newtype MStore value = MStore { getMStore :: Map.Map MAddr (Set.Set value) }
