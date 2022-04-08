@@ -33,6 +33,7 @@ import           Control.Effect.Labelled
 import           Control.Effect.State
 import qualified Data.Foldable as Foldable
 import           Data.Function (fix)
+import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 
@@ -87,9 +88,9 @@ runFile eval = traverse run where
     . A.runEnv @ExcSet
     . convergeTerm (A.runStore @ExcSet . runExcC . fix (cacheTerm . eval))
   result msgs sets = do
+    exports <- gets @(A.MStore ExcSet) (fmap Foldable.fold . Map.mapKeys A.getMAddr . A.getMStore)
     let set = Foldable.fold sets
         imports = foldMap extractImport msgs
-        exports = mempty
     pure (Module (const set) imports exports (freeVariables set))
   extractImport (A.Import components) = Set.singleton (name (Text.intercalate (Text.pack ".") (Foldable.toList components)))
   extractImport (A.Export _)          = mempty
