@@ -14,7 +14,7 @@ module Analysis.Carrier.Statement.State
 , module Analysis.Effect.Statement
 ) where
 
-import           Analysis.Effect.Statement hiding (Import)
+import           Analysis.Effect.Statement hiding (Export, Import)
 import qualified Analysis.Effect.Statement as S
 import           Control.Algebra
 import           Control.Carrier.State.Church
@@ -26,6 +26,7 @@ import           Data.Text (Text)
 
 data Message
   = Import (NonEmpty Text)
+  | Export Text
   deriving (Eq, Ord, Show)
 
 
@@ -40,4 +41,5 @@ newtype StatementC m a = StatementC { runStatementC :: StateC [Message] m a }
 instance Algebra sig m => Algebra (S.Statement :+: sig) (StatementC m) where
   alg hdl sig ctx = case sig of
     L (S.Import ns) -> StatementC ((<$ ctx) <$> modify (Import ns:))
+    L (S.Export n)  -> StatementC ((<$ ctx) <$> modify (Export n:))
     R other         -> StatementC (alg (runStatementC . hdl) (R other) ctx)
