@@ -10,8 +10,6 @@ module Analysis.Syntax
   -- * Abstract interpretation
 , eval0
 , eval
-, evalModule0
-, evalModule
   -- * Macro-expressible syntax
 , let'
   -- * Parsing
@@ -25,7 +23,6 @@ import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Store
 import           Analysis.File
-import           Analysis.Module
 import           Analysis.Name (Name, name, nameI)
 import           Analysis.Reference as Ref
 import           Control.Applicative (Alternative (..), liftA3)
@@ -41,12 +38,10 @@ import qualified Data.ByteString.Lazy as B
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import           Data.List (sortOn)
-import           Data.List.NonEmpty (NonEmpty, fromList, toList)
+import           Data.List.NonEmpty (NonEmpty, fromList)
 import           Data.Monoid (First (..))
-import qualified Data.Set as Set
 import           Data.String (IsString (..))
-import           Data.Text (Text, pack)
-import qualified Data.Text as Text
+import           Data.Text (Text)
 import qualified Data.Vector as V
 import qualified System.Path as Path
 
@@ -84,15 +79,6 @@ eval eval = \case
     v' <- eval v
     let' n v' (eval b)
   Import ns -> S.simport ns >> dunit
-
-
-evalModule0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => Term -> m (Module val)
-evalModule0 i = S.runStatement mk (eval0 i) where
-  mk msgs b = pure (Module (const b) (Set.fromList (map (\ (S.Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
-
-evalModule :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m) => (Term -> S.StatementC m val) -> (Term -> m (Module val))
-evalModule f i = S.runStatement mk (eval f i) where
-  mk msgs b = pure (Module (const b) (Set.fromList (map (\ (S.Import cs) -> name (Text.intercalate (pack ".") (toList cs))) msgs)) mempty mempty)
 
 
 -- Macro-expressible syntax
