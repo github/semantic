@@ -89,7 +89,8 @@ runFile eval = traverse run where
   result msgs sets = do
     let set = Foldable.fold sets
         imports = Set.fromList (map extractImport msgs)
-    pure (Module (const set) imports mempty (freeVariables set))
+        exports = mempty
+    pure (Module (const set) imports exports (freeVariables set))
   extractImport (A.Import components) = name (Text.intercalate (Text.pack ".") (Foldable.toList components))
 
 newtype ExcC m a = ExcC { runExcC :: m a }
