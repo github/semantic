@@ -88,11 +88,11 @@ runFile eval = traverse run where
     . convergeTerm (A.runStore @ExcSet . runExcC . fix (cacheTerm . eval))
   result msgs sets = do
     let set = Foldable.fold sets
-        imports = Set.fromList (map extractImport msgs)
+        imports = foldMap extractImport msgs
         exports = mempty
     pure (Module (const set) imports exports (freeVariables set))
-  extractImport (A.Import components) = name (Text.intercalate (Text.pack ".") (Foldable.toList components))
-  extractImport (A.Export component)  = name component
+  extractImport (A.Import components) = Set.singleton (name (Text.intercalate (Text.pack ".") (Foldable.toList components)))
+  extractImport (A.Export _)          = mempty
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
