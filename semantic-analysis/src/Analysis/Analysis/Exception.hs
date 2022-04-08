@@ -93,7 +93,6 @@ runFile eval = traverse run where
         imports = Set.fromList (map extractImport msgs)
     pure (Module (const set) imports exports (freeVariables set))
   extractImport (A.Import components) = name (Text.intercalate (Text.pack ".") (Foldable.toList components))
-  extractImport (A.Export component)  = name component
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)

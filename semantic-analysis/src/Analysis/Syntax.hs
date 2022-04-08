@@ -98,7 +98,6 @@ evalModule :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, H
 evalModule f i = S.runStatement mk (eval f i) where
   mk msgs b = pure (Module (const b) (Set.fromList (map formatImport msgs)) mempty mempty)
   formatImport (S.Import cs) = name (Text.intercalate (pack ".") (toList cs))
-  formatImport (S.Export c)  = name c
 
 
 -- Macro-expressible syntax
