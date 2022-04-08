@@ -14,6 +14,7 @@ module Analysis.Analysis.Exception
 , fromExceptions
 , var
 , exc
+, subst
   -- * Exception tracing analysis
 , ExcC(..)
 ) where
@@ -61,6 +62,9 @@ var v = ExcSet (Set.singleton v) mempty
 
 exc :: Exception -> ExcSet
 exc e = ExcSet mempty (Set.singleton e)
+
+subst  :: Name -> ExcSet -> ExcSet -> ExcSet
+subst name (ExcSet fvs' es') (ExcSet fvs es) = ExcSet (Set.delete name fvs <> fvs') (es <> es')
 
 
 exceptionTracing
