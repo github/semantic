@@ -24,7 +24,7 @@ import           Data.Text (Text)
 
 -- Messages
 
-data Message
+newtype Message
   = Import (NonEmpty Text)
   deriving (Eq, Ord, Show)
 
