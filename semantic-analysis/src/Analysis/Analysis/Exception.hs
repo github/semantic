@@ -90,10 +90,10 @@ runFile eval = traverse run where
   result msgs sets = do
     exports <- gets @(A.MStore ExcSet) (fmap Foldable.fold . Map.mapKeys A.getMAddr . A.getMStore)
     let set = Foldable.fold sets
-        imports = foldMap extractImport msgs
+        imports = Set.fromList (map extractImport msgs)
     pure (Module (const set) imports exports (freeVariables set))
-  extractImport (A.Import components) = Set.singleton (name (Text.intercalate (Text.pack ".") (Foldable.toList components)))
-  extractImport (A.Export _)          = mempty
+  extractImport (A.Import components) = name (Text.intercalate (Text.pack ".") (Foldable.toList components))
+  extractImport (A.Export component)  = name component
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
