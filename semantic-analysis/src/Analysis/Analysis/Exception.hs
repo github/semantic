@@ -95,7 +95,7 @@ runFile eval = traverse run where
     exports <- gets @(A.MStore ExcSet) (fmap Foldable.fold . Map.mapKeys A.getMAddr . A.getMStore)
     let set = Foldable.fold sets
         imports = Set.fromList (map extractImport msgs)
-    pure (Module (const set) imports exports (freeVariables set))
+    pure (Module (Foldable.foldl' (flip (uncurry subst)) set . Map.toList) imports exports (freeVariables set))
   extractImport (A.Import components) = name (Text.intercalate (Text.pack ".") (Foldable.toList components))
 
 newtype ExcC m a = ExcC { runExcC :: m a }
