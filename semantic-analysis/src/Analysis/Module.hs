@@ -23,5 +23,5 @@ instance Semigroup (ModuleSet a) where
 
 link :: ModuleSet a -> Module a -> Module a
 link (ModuleSet ms) m = Module body' (imports m Set.\\ Map.keysSet ms) (exports m) unknown' where
-  (unknown', body') = foldl' (uncurry resolve) (unknown m, body m) (Map.restrictKeys ms (imports m))
-  resolve unknown body m = (unknown Set.\\ Map.keysSet (exports m), body . mappend (Map.restrictKeys (exports m) unknown))
+  (unknown', body') = foldl' (uncurry resolveSymbolsInModule) (unknown m, body m) (Map.restrictKeys ms (imports m))
+  resolveSymbolsInModule unknown body m = (unknown Set.\\ Map.keysSet (exports m), body . mappend (Map.restrictKeys (exports m) unknown))
