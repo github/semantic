@@ -88,8 +88,9 @@ runFile eval = traverse run where
     . convergeTerm (A.runStore @ExcSet . runExcC . fix (cacheTerm . eval))
   result msgs sets = do
     let set = Foldable.fold sets
-        imports = Set.fromList (map (\ (A.Import components) -> name (Text.intercalate (Text.pack ".") (Foldable.toList components))) msgs)
+        imports = Set.fromList (map extractImport msgs)
     pure (Module (const set) imports mempty (freeVariables set))
+  extractImport (A.Import components) = name (Text.intercalate (Text.pack ".") (Foldable.toList components))
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
