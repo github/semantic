@@ -1,5 +1,10 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
+{- |
+The @'Statement'@ effect is designed to provide instrumentation for source-level interactions we need visibility into which are nevertheless not (currently) modelled by expressions: e.g. statements, declarations, certain directives, etc.
+
+Currently this is limited to imports, where the value-level semantics are (for many languages) essentially the unit value, but where the effect of bringing an environment and entire subset of the store into scope are essential to track for modular interpretation.
+-}
 module Analysis.Effect.Statement
 ( -- * Statement effect
   simport
