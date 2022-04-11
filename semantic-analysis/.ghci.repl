@@ -32,9 +32,12 @@
 -- 8.10+
 :seti -Wno-missing-safe-haskell-mode
 :seti -Wno-prepositive-qualified-module
+-- 9.2+
+:seti -Wno-missing-kind-signatures
+:seti -Wno-missing-signatures
 
 -- We have this one on in the project but not in the REPL to reduce noise
 :seti -Wno-type-defaults
 :set -Wno-unused-packages
 
-:load Analysis.Concrete Analysis.Exception Analysis.Syntax Analysis.Typecheck
+:load Analysis.Analysis.Concrete Analysis.Analysis.Exception Analysis.Syntax Analysis.Analysis.Typecheck

@@ -1,12 +1,16 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Analysis.Analysis.Exception
 ( Exception(..)
 , ExcSet(..)
+, exceptionTracing
 , fromExceptions
 , var
 , exc
@@ -14,12 +18,23 @@ module Analysis.Analysis.Exception
 , ExcC(..)
 ) where
 
+import qualified Analysis.Carrier.Statement.State as A
+import qualified Analysis.Carrier.Store.Monovariant as A
 import           Analysis.Effect.Domain
+import           Analysis.Effect.Env (Env)
+import           Analysis.Effect.Store
+import           Analysis.File
+import           Analysis.FlowInsensitive (cacheTerm, convergeTerm)
+import           Analysis.Module
 import           Analysis.Name
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
+import           Control.Effect.Labelled
+import           Control.Effect.State
 import qualified Data.Foldable as Foldable
+import           Data.Function (fix)
 import qualified Data.Set as Set
+import qualified Data.Text as Text
 
 -- | Names of exceptions thrown in the guest language and recorded by this analysis.
 --
@@ -46,6 +61,35 @@ var v = ExcSet (Set.singleton v) mempty
 exc :: Exception -> ExcSet
 exc e = ExcSet mempty (Set.singleton e)
 
+
+exceptionTracing
+  :: Ord term
+  => ( forall sig m
+     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has A.Statement sig m)
+     => (term -> m ExcSet)
+     -> (term -> m ExcSet) )
+  -> [File term]
+  -> (A.MStore ExcSet, [File (Module ExcSet)])
+exceptionTracing eval = A.runFiles (runFile eval)
+
+runFile
+  :: ( Has (State (A.MStore ExcSet)) sig m
+     , Ord term )
+  => ( forall sig m
+     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has A.Statement sig m)
+     => (term -> m ExcSet)
+     -> (term -> m ExcSet) )
+  -> File term
+  -> m (File (Module ExcSet))
+runFile eval = traverse run where
+  run
+    = A.runStatement result
+    . A.runEnv @ExcSet
+    . convergeTerm (A.runStore @ExcSet . runExcC . fix (cacheTerm . eval))
+  result msgs sets = do
+    let set = Foldable.fold sets
+        imports = Set.fromList (map (\ (A.Import components) -> name (Text.intercalate (Text.pack ".") (Foldable.toList components))) msgs)
+    pure (Module (const set) imports mempty (freeVariables set))
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)

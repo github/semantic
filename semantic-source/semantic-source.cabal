@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic-source
-version:             0.1.0.1
+version:             0.1.0.2
 synopsis:            Types and functionality for working with source code
 description:         Types and functionality for working with source code (program text).
 homepage:            https://github.com/github/semantic/tree/master/semantic-source#readme
@@ -22,6 +22,7 @@ tested-with:
   GHC == 8.6.5
   GHC == 8.8.1
   GHC == 8.10.1
+  GHC == 9.2.1
 
 common haskell
   default-language: Haskell2010
@@ -43,6 +44,9 @@ common haskell
     ghc-options:
       -Wno-missing-safe-haskell-mode
       -Wno-prepositive-qualified-module
+  if (impl(ghc >= 9.2))
+    ghc-options:
+      -Wno-missing-kind-signatures
 
 library
   import: haskell
@@ -53,13 +57,13 @@ library
     Source.Source
     Source.Span
   build-depends:
-    , aeson          ^>= 1.4.2.0
+    , aeson           >= 1.4.2.0 && < 3
     , base            >= 4.12 && < 5
-    , bytestring     ^>= 0.10.8.2
+    , bytestring      >= 0.10.8.2 && < 0.13
     , deepseq        ^>= 1.4.4.0
     , containers     ^>= 0.6.2
     , hashable        >= 1.2.7 && < 1.4
-    , lingo          ^>= 0.5.0.1
+    , lingo          ^>= 0.5.0.3
     , pathtype       ^>= 0.8.1
     , semilattices   ^>= 0.0.0.3
     , text           ^>= 1.2.3.2

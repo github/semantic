@@ -1,3 +1,7 @@
+# 0.1.0.2
+
+- Support ghc 9.2.
+
 # 0.1.0.0
 
 - Adds `CodeQL` language constructor.

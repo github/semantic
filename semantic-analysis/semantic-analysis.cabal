@@ -39,6 +39,9 @@ common common
     ghc-options:
       -Wno-missing-safe-haskell-mode
       -Wno-prepositive-qualified-module
+  if (impl(ghc >= 9.2))
+    ghc-options:
+      -Wno-missing-kind-signatures
 
 library
   import: common
@@ -49,23 +52,26 @@ library
     Analysis.Analysis.Typecheck
     Analysis.Blob
     Analysis.Carrier.Fail.WithLoc
+    Analysis.Carrier.Statement.State
     Analysis.Carrier.Store.Monovariant
     Analysis.Carrier.Store.Precise
     Analysis.Data.Snoc
     Analysis.Effect.Domain
     Analysis.Effect.Env
+    Analysis.Effect.Statement
     Analysis.Effect.Store
     Analysis.File
     Analysis.FlowInsensitive
     Analysis.Functor.Named
+    Analysis.Module
     Analysis.Name
     Analysis.Project
     Analysis.Reference
     Analysis.Syntax
   build-depends:
-    , aeson                       ^>= 1.4
+    , aeson                        >= 1.4 && < 3
     , base                         >= 4.13 && < 5
-    , bytestring                  ^>= 0.10.8.2
+    , bytestring                   >= 0.10.8.2 && < 0.13
     , containers                  ^>= 0.6
     , fused-effects               ^>= 1.1
     , hashable
