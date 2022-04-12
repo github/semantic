@@ -26,6 +26,7 @@ import qualified System.Path.PartClass as Path.PartClass
 -- | The various languages we support.
 data Language
     = Unknown
+    | C
     | Go
     | Haskell
     | Java
@@ -50,6 +51,9 @@ instance SLanguage 'Unknown where
 
 instance SLanguage 'CodeQL where
   reflect _ = CodeQL
+
+instance SLanguage 'C where
+  reflect _ = C
 
 instance SLanguage 'Go where
   reflect _ = Go
@@ -110,6 +114,7 @@ forPath path =
 languageToText :: Language -> T.Text
 languageToText = \case
   Unknown -> "Unknown"
+  C -> "C"
   CodeQL -> "CodeQL"
   Go -> "Go"
   Haskell -> "Haskell"
@@ -126,6 +131,7 @@ languageToText = \case
 
 textToLanguage :: T.Text -> Language
 textToLanguage = \case
+  "C" -> C
   "CodeQL" -> CodeQL
   "Go" -> Go
   "Haskell" -> Haskell

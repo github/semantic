@@ -125,6 +125,7 @@ library
     , proto-lens >= 0.5 && < 0.8
     , semantic-analysis ^>= 0
     , semantic-ast
+    , semantic-c ^>= 0
     , semantic-codeql ^>= 0
     , semantic-go ^>= 0
     , semantic-java ^>= 0

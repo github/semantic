@@ -35,6 +35,7 @@ import System.Exit
 import System.IO
 import System.Process
 import Text.Printf
+import qualified TreeSitter.C as C (tree_sitter_c)
 import qualified TreeSitter.Go as Go (tree_sitter_go)
 import qualified TreeSitter.JSON as JSON (tree_sitter_json)
 import qualified TreeSitter.Java as Java (tree_sitter_java)
@@ -72,6 +73,7 @@ pathForLanguage :: Bazel.Runfiles -> Language -> FilePath
 pathForLanguage rf =
   let loc = Bazel.rlocation rf
    in \case
+        C -> loc "tree-sitter-c/vendor/tree-sitter-c/src/node-types.json"
         CodeQL -> loc "tree-sitter-ql/vendor/tree-sitter-ql/src/node-types.json"
         Go -> loc "tree-sitter-go/vendor/tree-sitter-go/src/node-types.json"
         PHP -> loc "tree-sitter-php/vendor/tree-sitter-php/src/node-types.json"
@@ -88,6 +90,7 @@ targetForLanguage :: Language -> FilePath
 targetForLanguage x =
   let go lc = printf "semantic-%s/src/Language/%s/AST.hs" (lc :: String) (show x)
    in case x of
+        C -> go "c"
         CodeQL -> go "codeql"
         Go -> go "go"
         PHP -> go "php"
@@ -102,6 +105,7 @@ targetForLanguage x =
 parserForLanguage :: Language -> Ptr TreeSitter.Language.Language
 parserForLanguage = \case
   Unknown -> error "Unknown language encountered"
+  C -> C.tree_sitter_c
   CodeQL -> (CodeQL.tree_sitter_ql)
   Go -> Go.tree_sitter_go
   Haskell -> error "Haskell backend not implemented yet"
@@ -121,7 +125,7 @@ parserForLanguage = \case
 --   CodeQL -> r
 
 validLanguages :: [Language]
-validLanguages = [CodeQL, Go, Java, PHP, Python, Ruby, TypeScript, TSX]
+validLanguages = [C, CodeQL, Go, Java, PHP, Python, Ruby, TypeScript, TSX]
 
 emit :: FilePath -> Language -> IO ()
 emit root lang = do

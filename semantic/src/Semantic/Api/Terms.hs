@@ -24,6 +24,7 @@ import           Data.ByteString.Builder
 import           Data.Either
 import           Data.Foldable (fold)
 import           Data.Map.Strict (Map)
+import qualified Language.C as C
 import qualified Language.CodeQL as CodeQL
 import qualified Language.Go as Go
 import qualified Language.Java as Java
@@ -74,6 +75,9 @@ showTermParsers = preciseParsers
 class ShowTerm term where
   showTerm :: (Has (Reader Config) sig m) => term Loc -> m Builder
 
+instance ShowTerm C.Term where
+  showTerm = serialize Show . void . C.getTerm
+
 instance ShowTerm Go.Term where
   showTerm = serialize Show . void . Go.getTerm
 
@@ -107,6 +111,9 @@ jsonTermParsers = preciseParsers
 class JSONTerm term where
   jsonTerm :: (Has (Reader Config) sig m) => term Loc -> m Builder
 
+instance JSONTerm C.Term where
+  jsonTerm = serialize Marshal . C.getTerm
+
 instance JSONTerm Go.Term where
   jsonTerm = serialize Marshal . Go.getTerm
 
@@ -139,6 +146,9 @@ sexprTermParsers = preciseParsers
 
 class SExprTerm term where
   sexprTerm :: term Loc -> Builder
+
+instance SExprTerm C.Term where
+  sexprTerm = SExpr.Precise.serializeSExpression . C.getTerm
 
 instance SExprTerm Go.Term where
   sexprTerm = SExpr.Precise.serializeSExpression . Go.getTerm
