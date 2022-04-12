@@ -125,6 +125,9 @@ parseGraph = A.withArray "nodes" $ \ nodes -> do
   let tied = fix (\ tied -> ($ Graph tied) <$> untied)
   pure (Graph tied, ($ Graph tied) <$> root)
 
+-- | Parse a node from a JSON @Value@ into a pair of a partial graph of unfixed terms and optionally an unfixed term representing the root node.
+--
+-- The partial graph is represented as an adjacency map relating node IDs to unfixed terms—terms which may make reference to a completed graph to find edges, and which therefore can't be inspected until the full graph is known.
 parseNode :: A.Value -> A.Parser (IntMap.IntMap (Graph -> Term), First (Graph -> Term))
 parseNode = A.withObject "node" $ \ o -> do
   edges <- o A..: fromString "edges"
