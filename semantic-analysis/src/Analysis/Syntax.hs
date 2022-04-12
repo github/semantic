@@ -116,6 +116,7 @@ parseFile path = do
 
 newtype Graph = Graph { terms :: IntMap.IntMap Term }
 
+-- | Parse a @Value@ into an entire graph of terms, as well as a root node, if any exists.
 parseGraph :: A.Value -> A.Parser (Graph, Maybe Term)
 parseGraph = A.withArray "nodes" $ \ nodes -> do
   (untied, First root) <- fold <$> traverse parseNode (V.toList nodes)
