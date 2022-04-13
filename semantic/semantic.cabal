@@ -103,21 +103,21 @@ library
   -- as caret-operator bounds relative to a version in Stackage.
   -- These are currently pinned to lts-13.13.
   build-depends:
-    , aeson ^>= 1.4.2.0
-    , algebraic-graphs ^>= 0.3
+    , aeson >= 1.4.2.0 && < 3
+    , algebraic-graphs >= 0.3 && < 0.7
     , ansi-terminal >= 0.8.2 && <1
     , async ^>= 2.2.1
     , base >= 4.13 && < 5
-    , bytestring ^>= 0.10.8.2
-    , containers ^>= 0.6.0.1
+    , bytestring >= 0.10.8.2 && < 0.13
+    , containers ^>= 0.6.2
     , directory-tree ^>= 0.12.1
     , filepath ^>= 1.4.2.1
     , fused-effects ^>= 1.1
-    , ghc-prim >= 0.5 && < 0.7
+    , ghc-prim >= 0.5 && < 0.9
     , hostname ^>= 1.0
     , hscolour ^>= 1.24.4
-    , lens >= 4.17 && < 4.20
-    , network ^>= 2.8.0.0
+    , lens >= 4.17 && < 5.2
+    , network >= 2.8 && < 3.2
     , network-uri ^>= 2.6.1.0
     , optparse-applicative >= 0.14.3 && < 0.16
     , pathtype ^>= 0.8.1

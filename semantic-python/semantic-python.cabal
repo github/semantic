@@ -62,7 +62,7 @@ library
     , semantic-proto ^>= 0
     , semantic-source ^>= 0.1.0.1
     , semantic-tags ^>= 0.0
-    , template-haskell  >= 2.15 && < 2.17
+    , template-haskell  >= 2.15 && < 2.19
     , text ^>= 1.2.3
     , tree-sitter ^>= 0.9
     , tree-sitter-python ^>= 0.9.0.2
