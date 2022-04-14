@@ -18,7 +18,7 @@ mkStaticallyKnownRuleGrammarData :: Name -> Ptr Language -> Q [Dec]
 mkStaticallyKnownRuleGrammarData name language = do
   symbols <- renameDups . map ((,) . fst <*> uncurry symbolToName) . (++ [(Regular, "ParseError")]) <$> runIO (languageSymbols language)
   Module _ modName <- thisModule
-  let mkMatch symbolType str = match (conP (Name (OccName str) (NameQ modName)) []) (normalB [e|$(lift symbolType)|]) []
+  let mkMatch symbolType str = match (conP (Name (OccName str) (NameQ modName)) []) (normalB (lift symbolType)) []
   datatype <- dataD (pure []) name [] Nothing (flip normalC [] . mkName . snd <$> symbols)
     [ derivClause Nothing (map conT [ ''Bounded, ''Enum, ''Eq, ''Ix, ''Ord, ''Show ]) ]
   symbolInstance <- [d|
