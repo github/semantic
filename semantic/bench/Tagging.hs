@@ -16,7 +16,6 @@ import           Control.Monad
 import           Data.Foldable
 import           Gauge
 import           System.FilePath.Glob
-import qualified System.Path as Path
 
 import qualified Analysis.File as File
 import           Data.Flag
@@ -28,8 +27,8 @@ import           Semantic.Task.Files
 
 benchmarks :: Benchmark
 benchmarks = bgroup "tagging"
-  [ bench "jquery" $ runTagging' (Path.relFile "semantic/test/fixtures/jquery-3.5.1.min.js")
-  , bench "sinatra" $ runTagging' (Path.relFile "semantic/test/fixtures/base.rb")
+  [ bench "jquery" $ runTagging' "semantic/test/fixtures/jquery-3.5.1.min.js"
+  , bench "sinatra" $ runTagging' "semantic/test/fixtures/base.rb"
   ]
   -- Feel free to turn these on or write other benchmarks
   -- [ pythonBenchmarks
@@ -37,7 +36,7 @@ benchmarks = bgroup "tagging"
   -- , rubyBenchmarks
   -- ]
 
-runTagging' :: Path.RelFile -> Benchmarkable
+runTagging' :: FilePath -> Benchmarkable
 runTagging' path = nfIO . withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
   runTask session (runParse (parseSymbolsFilePath path)) >>= either throwIO pure
@@ -60,7 +59,7 @@ rubyBenchmarks = bgroup "ruby"
   ]
   where dir = Path.relDir "tmp/ruby-examples/ruby_spec/command_line"
 
-runTagging :: Path.RelDir -> String -> Benchmarkable
+runTagging :: FilePath -> String -> Benchmarkable
 runTagging dir glob = nfIO . withOptions testOptions $ \ config logger statter -> do
   let session = TaskSession config "-" False logger statter
   files <- globDir1 (compile glob) (Path.toString dir)
@@ -73,7 +72,7 @@ parseSymbolsFilePath ::
   , Has Parse sig m
   , Has Files sig m
   )
-  => Path.RelFile
+  => FilePath
   -> m ParseTreeSymbolResponse
 parseSymbolsFilePath path = readBlob (File.fromPath path) >>= parseSymbols . pure @[]
 

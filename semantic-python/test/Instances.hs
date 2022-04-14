@@ -12,7 +12,6 @@ module Instances () where
 import           Analysis.File
 import           Data.Aeson
 import           Data.Text (pack)
-import qualified System.Path as Path
 
 instance ToJSON a => ToJSON (File a) where
   toJSON File{filePath, fileSpan, fileBody} = object
@@ -21,5 +20,5 @@ instance ToJSON a => ToJSON (File a) where
     , "body" .= fileBody
     ]
 
-instance ToJSON Path.AbsRelFile where
-  toJSON p = toJSON (pack (Path.toString p))
+instance ToJSON FilePath where
+  toJSON p = toJSON (pack p)

@@ -68,7 +68,6 @@ test-suite test
   main-is:          PreciseTest.hs
   build-depends:
     , base
-    , pathtype ^>= 0.8.1
     , semantic-ast
     , semantic-ruby
     , tasty
@@ -86,7 +85,6 @@ executable benchmarks
     , bytestring
     , gauge ^>= 0.2.5
     , Glob
-    , pathtype ^>= 0.8.1
     , semantic-ast
     , semantic-ruby
     , tree-sitter-ruby ^>= 0.5.0.2

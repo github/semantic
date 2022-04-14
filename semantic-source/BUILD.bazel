@@ -27,10 +27,9 @@ haskell_library(
         "//:deepseq",
         "//:filepath",
         "//:text",
-        "@stackage//:lingo",
         "@stackage//:aeson",
         "@stackage//:hashable",
-        "@stackage//:pathtype",
+        "@stackage//:lingo",
         "@stackage//:semilattices",
     ],
 )

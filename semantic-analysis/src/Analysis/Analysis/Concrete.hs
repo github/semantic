@@ -35,10 +35,9 @@ import           Data.Semigroup (Last(..))
 import           Data.Text as Text (Text)
 import           Prelude hiding (fail)
 import           Source.Span
-import qualified System.Path as Path
 
 data Concrete
-  = Closure Path.AbsRelFile Span (Named (Concrete -> Concrete))
+  = Closure FilePath Span (Named (Concrete -> Concrete))
   | Unit
   | Bool Bool
   | Int Int
@@ -93,7 +92,7 @@ vsubst n v = go
 
 data FO
   = FOVar Name
-  | FOClosure Path.AbsRelFile Span (Named FO)
+  | FOClosure FilePath Span (Named FO)
   | FOUnit
   | FOBool Bool
   | FOInt Int

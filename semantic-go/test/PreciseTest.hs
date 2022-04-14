@@ -7,7 +7,6 @@ import qualified Language.Go.AST as Go
 import           Language.Go.Grammar
 import           AST.TestHelpers
 import           AST.Unmarshal
-import qualified System.Path as Path
 import           Test.Tasty
 import qualified System.Path.Fixture as Fixture
 
@@ -15,11 +14,11 @@ main :: IO ()
 main = do
 #if BAZEL_BUILD
   rf <- Fixture.create
-  let ?project = Path.relDir "external/tree-sitter-go"
+  let ?project = "external/tree-sitter-go"
       ?runfiles = rf
   let dirs = Fixture.absRelDir "corpus"
 #else
-  dirs <- Path.absRel <$> Go.getTestCorpusDir
+  dirs <- Go.getTestCorpusDir
 #endif
 
   readCorpusFiles' dirs

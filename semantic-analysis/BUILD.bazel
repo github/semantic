@@ -30,7 +30,6 @@ haskell_library(
         "@stackage//:aeson",
         "@stackage//:fused-effects",
         "@stackage//:hashable",
-        "@stackage//:pathtype",
         "@stackage//:vector",
     ],
 )

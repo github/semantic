@@ -4,12 +4,14 @@ module Semantic.CLI (main) where
 
 import qualified Analysis.File as File
 import qualified Control.Carrier.Parse.Measured as Parse
+import           Control.Concurrent (mkWeakThreadId, myThreadId)
 import           Control.Exception
 import qualified Data.Flag as Flag
 import           Data.Foldable
 import           Data.Handle
 import           Data.List (intercalate)
 import           Options.Applicative hiding (style)
+import           Proto.Semantic_JSON ()
 import           Semantic.Api hiding (File)
 import           Semantic.Config
 import qualified Semantic.Task as Task
@@ -20,13 +22,8 @@ import           Semantic.Version
 import           Serializing.Format
 import qualified Source.Language as Language
 import           System.Exit (die)
-import qualified System.Path as Path
-import qualified System.Path.PartClass as Path.PartClass
-
-import Control.Concurrent (mkWeakThreadId, myThreadId)
-import Proto.Semantic_JSON ()
-import System.Mem.Weak (deRefWeak)
-import System.Posix.Signals
+import           System.Mem.Weak (deRefWeak)
+import           System.Posix.Signals
 
 newtype SignalException = SignalException Signal
   deriving (Show)
@@ -77,7 +74,7 @@ optionsParser = do
 argumentsParser :: Parser (Parse.ParseC Task.TaskC ())
 argumentsParser = do
   subparser <- hsubparser parseCommand
-  output <- ToPath <$> pathOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
+  output <- ToPath <$> option path (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
   pure $ subparser >>= Task.write output
 
 parseCommand :: Mod CommandFields (Parse.ParseC Task.TaskC Builder)
@@ -112,11 +109,8 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
 filePathReader :: ReadM (File.File Language.Language)
 filePathReader = File.fromPath <$> path
 
-path :: (Path.PartClass.FileDir fd) => ReadM (Path.AbsRel fd)
-path = eitherReader Path.parse
-
-pathOption :: Path.PartClass.FileDir fd => Mod OptionFields (Path.AbsRel fd) -> Parser (Path.AbsRel fd)
-pathOption = option path
+path :: ReadM String
+path = str
 
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
 options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))

@@ -8,7 +8,6 @@ import           Data.Foldable
 import           Gauge
 import           System.Exit (die)
 import           System.FilePath.Glob
-import qualified System.Path as Path
 import           Language.Ruby
 import qualified Language.Ruby.AST as Rb
 import           AST.Unmarshal
@@ -18,14 +17,13 @@ benchmarks = bgroup "parsing" [ rubyBenchmarks ]
 
 rubyBenchmarks :: Benchmark
 rubyBenchmarks = bench "ruby" $ parseAllFiles dir "*.rb"
-  where dir = Path.relDir "../semantic/tmp/ruby-examples/ruby_spec/command_line"
+  where dir = "../semantic/tmp/ruby-examples/ruby_spec/command_line"
 
-parseAllFiles :: Path.RelDir -> String -> Benchmarkable
+parseAllFiles :: FilePath -> String -> Benchmarkable
 parseAllFiles dir glob = nfIO $ do
-  files <- globDir1 (compile glob) (Path.toString dir)
-  let paths = Path.relFile <$> files
-  when (null paths) (die $ "No files found in " <> (Path.toString dir))
-  for_ paths $ \ file -> do
+  files <- globDir1 (compile glob) dir
+  when (null files) (die $ "No files found in " <> dir)
+  for_ files $ \ file -> do
     -- print (Path.toString file)
-    contents <- B.readFile (Path.toString file)
+    contents <- B.readFile file
     either die pure =<< parseByteString @Rb.Program @() tree_sitter_ruby contents

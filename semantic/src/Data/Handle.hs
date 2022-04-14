@@ -23,7 +23,6 @@ import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Lazy.Char8 as BLC
 import qualified System.IO as IO
-import qualified System.Path as Path
 import Data.Blob
 
 data Handle mode where
@@ -46,8 +45,8 @@ stdout = WriteHandle IO.stdout
 stderr :: Handle 'IO.WriteMode
 stderr = WriteHandle IO.stderr
 
-openFileForReading :: Path.AbsRelFile -> IO (Handle 'IO.ReadMode)
-openFileForReading path = ReadHandle <$> IO.openFile (Path.toString path) IO.ReadMode
+openFileForReading :: FilePath -> IO (Handle 'IO.ReadMode)
+openFileForReading path = ReadHandle <$> IO.openFile path IO.ReadMode
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob]

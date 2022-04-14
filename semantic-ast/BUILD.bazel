@@ -37,7 +37,6 @@ haskell_library(
         "@stackage//:fused-effects",
         "@stackage//:hedgehog",
         "@stackage//:optparse-applicative",
-        "@stackage//:pathtype",
         "@stackage//:pretty-simple",
         "@stackage//:tasty",
         "@stackage//:tasty-hedgehog",

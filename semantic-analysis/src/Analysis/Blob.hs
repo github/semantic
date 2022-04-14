@@ -13,8 +13,6 @@ import           Analysis.Reference as A
 import           Data.Aeson
 import           Source.Language as Language
 import           Source.Source as Source
-import qualified System.Path as Path
-import qualified System.Path.PartClass as Path.PartClass
 
 -- | The source, path information, and language of a file read from disk.
 data Blob = Blob
@@ -25,27 +23,27 @@ data Blob = Blob
 instance FromJSON Blob where
   parseJSON = withObject "Blob" $ \b -> do
     src <- b .: "content"
-    Right pth <- fmap Path.parse (b .: "path")
+    pth <- b .: "path"
     lang <- b .: "language"
     let lang' = if knownLanguage lang then lang else Language.forPath pth
-    pure (fromSource (pth :: Path.AbsRelFile) lang' src)
+    pure (fromSource (pth :: FilePath) lang' src)
 
 
 -- | Create a Blob from a provided path, language, and UTF-8 source.
 -- The resulting Blob's span is taken from the 'totalSpan' of the source.
-fromSource :: Path.PartClass.AbsRel ar => Path.File ar -> Language -> Source -> Blob
+fromSource :: FilePath -> Language -> Source -> Blob
 fromSource filepath language source
-  = Blob source (A.File (A.Reference (Path.toAbsRel filepath) (totalSpan source)) language)
+  = Blob source (A.File (A.Reference filepath (totalSpan source)) language)
 
 blobLanguage :: Blob -> Language
 blobLanguage = A.fileBody . blobFile
 
-blobPath :: Blob -> Path.AbsRelFile
+blobPath :: Blob -> FilePath
 blobPath = A.refPath . A.fileRef . blobFile
 
 -- | Show FilePath for error or json outputs.
 blobFilePath :: Blob -> String
-blobFilePath = Path.toString . blobPath
+blobFilePath = blobPath
 
 nullBlob :: Blob -> Bool
 nullBlob = Source.null . blobSource

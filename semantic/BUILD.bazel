@@ -37,7 +37,6 @@ semantic_common_dependencies = [
     "@stackage//:fused-effects-exceptions",
     "@stackage//:hashable",
     "@stackage//:network",
-    "@stackage//:pathtype",
     "@stackage//:recursion-schemes",
     "@stackage//:safe-exceptions",
     "@stackage//:scientific",
@@ -124,7 +123,6 @@ haskell_binary(
         "@stackage//:Glob",
         "@stackage//:fused-effects",
         "@stackage//:gauge",
-        "@stackage//:pathtype",
     ],
 )
 

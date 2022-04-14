@@ -5,7 +5,6 @@ import           Analysis.File
 import           Control.Exception (fromException)
 import qualified Data.Blob as Blob
 import           SpecHelpers
-import qualified System.Path as Path
 
 import Semantic.Api hiding (Blob)
 
@@ -16,12 +15,12 @@ setBlobLanguage lang b = b { blobFile = (blobFile b) { fileBody = lang }}
 spec :: Spec
 spec = do
   describe "parseBlob" $ do
-    let methodsBlob = Blob.fromSource (Path.relFile "methods.rb") Ruby "def foo\nend\n"
+    let methodsBlob = Blob.fromSource "methods.rb" Ruby "def foo\nend\n"
 
     it "throws if given an unknown language for sexpression output" $ do
       res <- runTaskWithOptions defaultOptions (runParseWithConfig (parseTermBuilder TermSExpression [setBlobLanguage Unknown methodsBlob]))
       case res of
-        Left exc   -> fromException exc `shouldBe` Just (NoLanguageForBlob $ Path.absRel "methods.rb")
+        Left exc   -> fromException exc `shouldBe` Just (NoLanguageForBlob "methods.rb")
         Right _bad -> fail "Expected parseTermBuilder to fail for an unknown language"
 
     it "renders with the specified renderer" $ do

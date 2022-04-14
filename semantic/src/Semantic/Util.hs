@@ -25,14 +25,13 @@ import           Semantic.Task
 import qualified Source.Language as Language
 import           Source.Span (Pos (..), point)
 import           System.Exit (die)
-import qualified System.Path as Path
 
 parseFile, parseFileQuiet :: Parser term -> FilePath -> IO term
 parseFile      parser = runTask'     . (parse parser <=< readBlob . fileForPath)
 parseFileQuiet parser = runTaskQuiet . (parse parser <=< readBlob . fileForPath)
 
 fileForPath :: FilePath -> File Language.Language
-fileForPath (Path.absRel -> p) = File (Reference p (point (Pos 1 1))) (Language.forPath p)
+fileForPath p = File (Reference p (point (Pos 1 1))) (Language.forPath p)
 
 runTask', runTaskQuiet :: ParseC TaskC a -> IO a
 runTask'     task = runTaskWithOptions debugOptions   (asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task) >>= either (die . displayException) pure
