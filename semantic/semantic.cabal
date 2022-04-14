@@ -116,7 +116,6 @@ library
     , directory-tree ^>= 0.12.1
     , filepath ^>= 1.4.2.1
     , fused-effects ^>= 1.1
-    , ghc-prim >= 0.5 && < 0.9
     , hostname ^>= 1.0
     , hscolour ^>= 1.24.4
     , lens >= 4.17 && < 5.2
@@ -147,15 +146,6 @@ library
     , text ^>= 1.2.3.2
     , time >= 1.8.0.2 && < 1.10
     , tree-sitter ^>= 0.9.0.1
-    , tree-sitter-go ^>= 0.5.0.0
-    , tree-sitter-java ^>= 0.7.0.0
-    , tree-sitter-json ^>= 0.7.0.0
-    , tree-sitter-php ^>= 0.5.0.0
-    , tree-sitter-python ^>= 0.9.0.1
-    , tree-sitter-ql ^>= 0.1.0.1
-    , tree-sitter-ruby ^>= 0.5.0.0
-    , tree-sitter-tsx ^>= 0.5.0.0
-    , tree-sitter-typescript ^>= 0.5.0.0
     , unix ^>= 2.7.2.2
 
 executable semantic
