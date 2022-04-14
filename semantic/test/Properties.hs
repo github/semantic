@@ -9,16 +9,16 @@ module Properties
   , monoidal
   ) where
 
-import Hedgehog
 import GHC.Stack
+import Hedgehog
 
 associative :: (Eq a, Show a) => (a -> a -> a) -> Gen a -> Property
-associative fn gen = property . withFrozenCallStack $ do
+associative fn gen = property $ withFrozenCallStack $ do
   (a, b, c) <- forAll ((,,) <$> gen <*> gen <*> gen)
   fn a (fn b c) === fn (fn a b) c
 
 monoidal :: (Eq a, Show a, Monoid a) => Gen a -> Property
-monoidal gen = property . withFrozenCallStack $ do
+monoidal gen = property $ withFrozenCallStack $ do
   it <- forAll gen
   mempty <> it === it
   it <> mempty === it
