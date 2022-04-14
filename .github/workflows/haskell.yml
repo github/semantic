@@ -24,7 +24,6 @@ jobs:
       name: Setup Haskell
       with:
         ghc-version: ${{ matrix.ghc }}
-        cabal-version: ${{ matrix.cabal }}
 
     - uses: actions/cache@v1
       id: cache-cabal
