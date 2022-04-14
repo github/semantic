@@ -23,7 +23,7 @@ import           Control.Effect.State
 import           Control.Effect.Writer
 import           Control.Monad
 import           Data.Foldable
-import           Data.Text as Text hiding (elem)
+import           Data.Text (Text)
 import qualified Language.Ruby.AST as Rb
 import           Proto.Semantic as P
 import           Source.Loc

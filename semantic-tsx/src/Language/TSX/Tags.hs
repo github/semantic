@@ -19,7 +19,7 @@ import           Control.Effect.Reader
 import           Control.Effect.State
 import           Control.Effect.Writer
 import           Data.Foldable
-import           Data.Text as Text hiding (elem)
+import           Data.Text (Text)
 import qualified Language.TSX.AST as Tsx
 import           Proto.Semantic as P
 import           Source.Loc
