@@ -3,6 +3,19 @@
 Program analysis by abstract definitional interpretation.
 
 
+## Goals
+
+The goal of this package is to provide
+
+1. general facilities for performing program analysis of programs via abstract (definitional) interpretation of an intermediate language,
+
+2. conveniences to aid in translating programs in arbitrary surface languages into said intermediate language,
+
+3. facilities for tailoring and tuning program analyses to vary performance, precision, and sensitivities, and
+
+4. a small variety of specific program analyses to serve both as examples and as useful tools in their own right.
+
+
 ## Development
 
 This project consists of a Haskell package named `semantic-analysis`. The library’s sources are in [`src`][].
