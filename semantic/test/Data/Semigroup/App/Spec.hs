@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Data.Semigroup.App.Spec (testTree) where
 
 import           Data.Semigroup.App
