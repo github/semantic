@@ -16,6 +16,15 @@ The goal of this package is to provide
 4. a small variety of specific program analyses to serve both as examples and as useful tools in their own right.
 
 
+## Non-goals
+
+On the other hand, this package will not provide
+
+1. support for specific surface languages, or
+
+2. facilities for dealing with the meta-structure of programs, i.e. where to find modules, how projects and their files are configured, etc.
+
+
 ## Development
 
 This project consists of a Haskell package named `semantic-analysis`. The library’s sources are in [`src`][].
