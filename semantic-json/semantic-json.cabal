@@ -72,4 +72,3 @@ test-suite test
     , semantic-ast
     , semantic-json
     , tasty
-    , tree-sitter-json ^>= 0.7.0.1

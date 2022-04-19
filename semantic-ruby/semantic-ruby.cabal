@@ -75,7 +75,6 @@ test-suite test
     , semantic-ast
     , semantic-ruby
     , tasty
-    , tree-sitter-ruby ^>= 0.5.0.2
 
 executable benchmarks
   import:              haskell

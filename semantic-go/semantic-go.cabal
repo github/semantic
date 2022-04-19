@@ -75,4 +75,3 @@ test-suite test
     , semantic-ast
     , semantic-go
     , tasty
-    , tree-sitter-go ^>= 0.5.0.1
