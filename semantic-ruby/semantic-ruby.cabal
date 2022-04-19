@@ -92,7 +92,6 @@ executable benchmarks
     , pathtype ^>= 0.8.1
     , semantic-ast
     , semantic-ruby
-    , tree-sitter-ruby ^>= 0.5.0.2
 
 executable tree-sitter-ruby
   import: haskell
@@ -104,4 +103,3 @@ executable tree-sitter-ruby
     , bytestring
     , semantic-ast
     , semantic-ruby
-    , tree-sitter-ruby ^>= 0.5.0.2

@@ -141,4 +141,3 @@ executable benchmark
     , gauge ^>= 0.2.5
     , semantic-ast
     , semantic-python
-    , tree-sitter-python ^>= 0.9.0.2
