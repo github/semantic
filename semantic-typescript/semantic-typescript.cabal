@@ -75,3 +75,4 @@ test-suite test
     , semantic-ast
     , semantic-typescript
     , tasty
+    , tree-sitter-typescript ^>= 0.5.0.1
