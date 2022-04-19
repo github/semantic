@@ -128,6 +128,7 @@ test-suite test
     , semantic-ast
     , semantic-python
     , tasty
+    , tree-sitter-python ^>= 0.9.0.2
 
 executable benchmark
   import: haskell

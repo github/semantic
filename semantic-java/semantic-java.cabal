@@ -75,3 +75,4 @@ test-suite test
     , semantic-ast
     , semantic-java
     , tasty
+    , tree-sitter-java ^>= 0.7.0.1
