@@ -1,9 +1,9 @@
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 module AST.GenerateSyntax
@@ -12,7 +12,8 @@ module AST.GenerateSyntax
 , astDeclarationsIO
 ) where
 
-import           AST.Deserialize (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
+import           AST.Deserialize
+    (Children (..), Datatype (..), DatatypeName (..), Field (..), Multiple (..), Named (..), Required (..), Type (..))
 import qualified AST.Parse as Parse
 import           AST.Token
 import           AST.Traversable1.Class
@@ -144,7 +145,7 @@ symbolMatchingInstance allSymbols name named (DatatypeName str) = do
   let tsSymbols = elemIndices (str, named) allSymbols
       names = intercalate ", " $ fmap (debugPrefix . (!!) allSymbols) tsSymbols
   [d|instance TS.SymbolMatching $(conT name) where
-      matchedSymbols _   = tsSymbols
+      matchedSymbols _   = $(lift tsSymbols)
       showFailure _ node = "expected " <> $(litE (stringL names))
                         <> " but got " <> if nodeSymbol node == 65535 then "ERROR" else genericIndex debugSymbolNames (nodeSymbol node)
                         <> " [" <> show r1 <> ", " <> show c1 <> "] -"

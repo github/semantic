@@ -38,6 +38,9 @@ common haskell
     ghc-options:
       -Wno-missing-safe-haskell-mode
       -Wno-prepositive-qualified-module
+  if (impl(ghc >= 9.2))
+    ghc-options:
+      -Wno-missing-kind-signatures
   cpp-options:
     -DBAZEL_BUILD=0
 
@@ -53,7 +56,7 @@ library
     , base  >= 4.13 && < 5
     , semantic-ast
     , semantic-tags ^>= 0.0
-    , template-haskell  >= 2.15 && < 2.17
+    , template-haskell  >= 2.15 && < 2.19
     , text ^>= 1.2.3
     , tree-sitter ^>= 0.9
     , tree-sitter-json ^>= 0.7.0.1
@@ -69,4 +72,3 @@ test-suite test
     , semantic-ast
     , semantic-json
     , tasty
-    , tree-sitter-json ^>= 0.7.0.1

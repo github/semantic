@@ -11,7 +11,7 @@ import qualified Source.Source as Source
 import           Source.Span
 import qualified Test.Tasty as Tasty
 import           Test.Tasty.HUnit
-import           Test.Tasty.Hedgehog (testProperty)
+import           Test.Tasty.Hedgehog (testPropertyNamed)
 
 
 source :: MonadGen m => Range.Range Int -> m Source.Source
@@ -22,23 +22,23 @@ source r = Gen.frequency [ (1, empty), (20, nonEmpty) ] where
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Source.Source"
   [ Tasty.testGroup "lineRanges"
-    [ testProperty "produces 1 more range than there are newlines" . property $ do
+    [ testPropertyNamed "produces 1 more range than there are newlines" "Source_lineRanges_produces_1_more_range_than_there_are_newlines" . property $ do
         source <- forAll (source (Range.linear 0 100))
         summarize source
         length (Source.lineRanges source) === length (Text.splitOn "\r\n" (Source.toText source) >>= Text.splitOn "\r" >>= Text.splitOn "\n")
 
-    , testProperty "produces exhaustive ranges" . property $ do
+    , testPropertyNamed "produces exhaustive ranges" "Source_lineRanges_produces_exhaustive_ranges" . property $ do
         source <- forAll (source (Range.linear 0 100))
         summarize source
         foldMap (Source.slice source) (Source.lineRanges source) === source
     ]
 
   , Tasty.testGroup "totalSpan"
-    [ testProperty "covers single lines" . property $ do
+    [ testPropertyNamed "covers single lines" "Source_totalSpan_covers_single_lines" . property $ do
         n <- forAll $ Gen.int (Range.linear 0 100)
         Source.totalSpan (Source.fromText (Text.replicate n "*")) === Span (Pos 1 1) (Pos 1 (max 1 (succ n)))
 
-    , testProperty "covers multiple lines" . property $ do
+    , testPropertyNamed "covers multiple lines" "Source_totalSpan_covers_multiple_lines" . property $ do
         n <- forAll $ Gen.int (Range.linear 0 100)
         Source.totalSpan (Source.fromText (Text.intersperse '\n' (Text.replicate n "*"))) === Span (Pos 1 1) (Pos (max 1 n) (if n > 0 then 2 else 1))
     ]

@@ -14,18 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ghc: ["8.10"]
-        cabal: ["3.2"]
+        ghc: ["8.10", "9.2"]
 
     steps:
     - uses: actions/checkout@v2
       if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
-    - uses: haskell/actions/setup@v1.2.2
+    - uses: haskell/actions/setup@v1
       name: Setup Haskell
       with:
         ghc-version: ${{ matrix.ghc }}
-        cabal-version: ${{ matrix.cabal }}
 
     - uses: actions/cache@v1
       id: cache-cabal
@@ -47,7 +45,7 @@ jobs:
     - name: Configure project
       run: |
         cabal v2-update
-        cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-benchmarks --enable-tests --write-ghc-environment-files=always -j2
+        cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-tests --write-ghc-environment-files=always -j2
 
     - name: Restore from cache
       run: ./cabal-cache sync-from-archive --threads=2 --archive-uri=dist-cache || true
@@ -56,7 +54,7 @@ jobs:
       run: |
         cabal v2-build --project-file=cabal.project.ci semantic:exe:semantic
         cabal v2-run   --project-file=cabal.project.ci semantic:test
-        cabal v2-run   --project-file=cabal.project.ci semantic-tags:test
+        cabal v2-build --project-file=cabal.project.ci semantic-analysis
         cabal v2-run   --project-file=cabal.project.ci semantic-codeql:test
         cabal v2-run   --project-file=cabal.project.ci semantic-go:test
         cabal v2-run   --project-file=cabal.project.ci semantic-java:test
@@ -65,6 +63,7 @@ jobs:
         # cabal v2-run   --project-file=cabal.project.ci semantic-python:test:compiling
         # cabal v2-run   --project-file=cabal.project.ci semantic-python:test:graphing
         cabal v2-run   --project-file=cabal.project.ci semantic-ruby:test
+        cabal v2-run   --project-file=cabal.project.ci semantic-tags:test
         cabal v2-run   --project-file=cabal.project.ci semantic-tsx:test
         cabal v2-run   --project-file=cabal.project.ci semantic-typescript:test
         cabal v2-run   --project-file=cabal.project.ci semantic-source:test
