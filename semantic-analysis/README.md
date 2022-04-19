@@ -1,6 +1,6 @@
 # semantic-analysis
 
-Program analysis by abstract definitional interpretation.
+Polyglot program analysis by means of abstract definitional interpretation.
 
 
 ## Goals
