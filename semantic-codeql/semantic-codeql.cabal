@@ -75,4 +75,3 @@ test-suite test
     , semantic-ast
     , semantic-codeql
     , tasty
-    , tree-sitter-ql ^>= 0.1.0.2
