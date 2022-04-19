@@ -17,8 +17,10 @@ module AST.Marshal.JSON
 
 import           AST.Parse
 import           Data.Aeson as Aeson hiding (Success)
+import           Data.Bifunctor (first)
 import           Data.List.NonEmpty (NonEmpty)
-import           Data.Text (Text)
+import           Data.String (fromString)
+import           Data.Text (Text, unpack)
 import qualified Data.Text as Text
 import           GHC.Generics
 
@@ -27,7 +29,7 @@ import           GHC.Generics
 -- Serialize unmarshaled ASTs into JSON representation by auto-deriving Aeson instances generically
 class MarshalJSON t where
   marshal :: (ToJSON a) => t a -> Value
-  marshal = object . fields []
+  marshal = object . map (first (fromString . unpack)) . fields []
   fields :: (ToJSON a) => [(Text, Value)] -> t a -> [(Text, Value)]
   default fields :: ( Generic1 t, GFields (Rep1 t), ToJSON a) => [(Text, Value)] -> t a -> [(Text, Value)]
   fields acc = gfields acc . from1
@@ -81,7 +83,7 @@ instance (GValue t) => GValue (NonEmpty :.: t) where
 
 instance (GValue t) => GValue (Err :.: t) where
   gvalue (Comp1 (Success t)) = gvalue t
-  gvalue (Comp1 (Fail _)) = Null
+  gvalue (Comp1 (Fail _))    = Null
 
 -- GFields operates on product field types: it takes an accumulator, a datatype, and returns a new accumulator value.
 class GFields f where

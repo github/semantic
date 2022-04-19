@@ -143,7 +143,7 @@ newReference name props = do
   CurrentScope currentAddress <- currentScope
   scope <- lookupScope currentAddress
 
-  let refProps = Reference.ReferenceInfo (props^.span_) (Props.Reference.kind props) lowerBound
+  let refProps = Reference.ReferenceInfo (props ^. span_) (Props.Reference.kind props) lowerBound
       insertRef' :: ScopeGraph.Path Name -> ScopeGraph.ScopeGraph Name -> ScopeGraph.ScopeGraph Name
       insertRef' path scopeGraph = let
           scope' = (ScopeGraph.insertReference (Reference.Reference name) lowerBound (Props.Reference.span props) (getField @"kind" props) path) scope
@@ -179,9 +179,9 @@ declareMaybeName :: ScopeGraphEff sig m
                  => Maybe Name
                  -> Props.Declaration
                  -> m Name
-declareMaybeName maybeName props = do
+declareMaybeName maybeName props@(Props.Declaration kind _ associatedScope span) = do
   case maybeName of
     Just name -> name <$ declare name props
     _         -> do
       name <- Name.gensym
-      name <$ declare name (props { Props.relation = ScopeGraph.Gensym })
+      name <$ declare name (Props.Declaration kind ScopeGraph.Gensym associatedScope span)
