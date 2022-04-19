@@ -38,6 +38,9 @@ common haskell
     ghc-options:
       -Wno-missing-safe-haskell-mode
       -Wno-prepositive-qualified-module
+  if (impl(ghc >= 9.2))
+    ghc-options:
+      -Wno-missing-kind-signatures
 
 executable semantic-parse
   import:              haskell
@@ -54,6 +57,5 @@ executable semantic-parse
     , semantic-ast
     , semantic-python
     , semantic-source ^>= 0.1.0.1
-    , tree-sitter-python ^>= 0.9.0.1
   hs-source-dirs:      app
   default-language:    Haskell2010

@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Range.Test
 ( testTree
 ) where
@@ -8,12 +9,12 @@ import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 import           Source.Range
 import qualified Test.Tasty as Tasty
-import           Test.Tasty.Hedgehog (testProperty)
+import           Test.Tasty.Hedgehog (testPropertyNamed)
 
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Source.Range"
   [ Tasty.testGroup "Semigroup"
-    [ testProperty "associativity" . property $ do
+    [ testPropertyNamed "associativity" "Range_associativity" . property $ do
       (a, b, c) <- forAll ((,,) <$> range <*> range <*> range)
       a <> (b <> c) === (a <> b) <> c
     ]

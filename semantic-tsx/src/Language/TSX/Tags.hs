@@ -11,19 +11,19 @@ module Language.TSX.Tags
   )
 where
 
-import AST.Element
+import           AST.Element
 import qualified AST.Parse as Parse
-import AST.Token
-import AST.Traversable1
-import Control.Effect.Reader
-import Control.Effect.Writer
-import Control.Effect.State
-import Data.Foldable
-import Data.Text as Text
+import           AST.Token
+import           AST.Traversable1
+import           Control.Effect.Reader
+import           Control.Effect.State
+import           Control.Effect.Writer
+import           Data.Foldable
+import           Data.Text (Text)
 import qualified Language.TSX.AST as Tsx
-import Proto.Semantic as P
-import Source.Loc
-import Source.Source as Source
+import           Proto.Semantic as P
+import           Source.Loc
+import           Source.Source as Source
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags t where
@@ -62,13 +62,13 @@ instance ToTags Tsx.FunctionDeclaration where
 instance ToTags Tsx.MethodDefinition where
   tags t@Tsx.MethodDefinition {ann = Loc {byteRange}, name} = case name of
     EPrj Tsx.PropertyIdentifier {text, ann} -> yieldTag text P.METHOD P.DEFINITION ann byteRange >> gtags t
-    _ -> gtags t
+    _                                       -> gtags t
 
 instance ToTags Tsx.Pair where
   tags t@Tsx.Pair {ann = Loc {byteRange}, key, value = Parse.Success (Tsx.Expression expr)} = case (key, expr) of
-    (EPrj Tsx.PropertyIdentifier {text, ann}, Prj Tsx.Function {}) -> yield text ann
+    (EPrj Tsx.PropertyIdentifier {text, ann}, Prj Tsx.Function {})      -> yield text ann
     (EPrj Tsx.PropertyIdentifier {text, ann}, Prj Tsx.ArrowFunction {}) -> yield text ann
-    _ -> gtags t
+    _                                                                   -> gtags t
     where
       yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
   tags _ = pure ()
@@ -89,8 +89,8 @@ instance ToTags Tsx.CallExpression where
         Prj Tsx.Function {name = Just (Parse.Success (Tsx.Identifier {text, ann}))} -> yield text ann
         Prj Tsx.ParenthesizedExpression {extraChildren} -> for_ extraChildren $ \x -> case x of
           EPrj (Tsx.Expression expr) -> match expr
-          Parse.Success x -> tags x
-          Parse.Fail _ -> pure ()
+          Parse.Success x            -> tags x
+          Parse.Fail _               -> pure ()
         _ -> gtags t
       yield name loc = yieldTag name P.CALL P.REFERENCE loc byteRange >> gtags t
   tags _ = pure ()
@@ -103,14 +103,14 @@ instance ToTags Tsx.Class where
 instance ToTags Tsx.Module where
   tags t@Tsx.Module {ann = Loc {byteRange}, name} = case name of
     EPrj Tsx.Identifier {text, ann} -> yieldTag text P.MODULE P.DEFINITION ann byteRange >> gtags t
-    _ -> gtags t
+    _                               -> gtags t
 
 instance ToTags Tsx.VariableDeclarator where
   tags t@Tsx.VariableDeclarator {ann = Loc {byteRange}, name, value = Just (Parse.Success (Tsx.Expression expr))} =
     case (expr, name) of
-      (Prj Tsx.Function {}, EPrj Tsx.Identifier {text, ann}) -> yield text ann
+      (Prj Tsx.Function {}, EPrj Tsx.Identifier {text, ann})      -> yield text ann
       (Prj Tsx.ArrowFunction {}, EPrj Tsx.Identifier {text, ann}) -> yield text ann
-      _ -> gtags t
+      _                                                           -> gtags t
     where
       yield text loc = yieldTag text P.FUNCTION P.DEFINITION loc byteRange >> gtags t
   tags t = gtags t
