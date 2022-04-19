@@ -74,4 +74,3 @@ test-suite test
     , semantic-ast
     , semantic-rust
     , tasty
-    , tree-sitter-rust ^>= 0.1.0.0
