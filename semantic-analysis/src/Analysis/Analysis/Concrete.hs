@@ -28,17 +28,15 @@ import           Control.Algebra
 import           Control.Carrier.Fresh.Strict
 import           Control.Carrier.Reader hiding (Local)
 import           Control.Effect.Labelled
-import           Control.Monad.Trans.Class (MonadTrans(..))
+import           Control.Monad.Trans.Class (MonadTrans (..))
 import           Data.Foldable (foldl')
 import           Data.Function (fix, on)
-import           Data.Semigroup (Last(..))
+import           Data.Semigroup (Last (..))
 import           Data.Text as Text (Text)
 import           Prelude hiding (fail)
-import           Source.Span
-import qualified System.Path as Path
 
 data Concrete
-  = Closure Path.AbsRelFile Span (Named (Concrete -> Concrete))
+  = Closure Reference [Name] ([Concrete] -> Concrete)
   | Unit
   | Bool Bool
   | Int Int
@@ -62,14 +60,14 @@ instance Show Concrete where
   showsPrec p = showsPrec p . quote
 
 
-newtype Elim a = EApp a
+newtype Elim a = EApp [a]
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 vvar :: Name -> Concrete
 vvar n = Neutral n Nil
 
 velim :: Concrete -> Elim Concrete -> Concrete
-velim (Closure _ _ f) (EApp a) = namedValue f a
+velim (Closure _ _ f) (EApp a) = f a
 velim (Neutral h as)  a        = Neutral h (as :> a)
 velim _               _        = error "velim: cannot eliminate" -- FIXME: fail in the monad instead
 
@@ -84,7 +82,7 @@ vsubst n v = go
       | otherwise -> Neutral n'     as'
       where
       as' = fmap go <$> as
-    Closure p s b -> Closure p s ((go .) <$> b) -- NB: Shadowing can’t happen because n' can’t occur inside b
+    Closure r n b -> Closure r n (go . b) -- NB: Shadowing can’t happen because n' can’t occur inside b
     Unit          -> Unit
     Bool b        -> Bool b
     Int i         -> Int i
@@ -93,24 +91,24 @@ vsubst n v = go
 
 data FO
   = FOVar Name
-  | FOClosure Path.AbsRelFile Span (Named FO)
+  | FOClosure Reference [Name] FO
   | FOUnit
   | FOBool Bool
   | FOInt Int
   | FOString Text
-  | FOApp FO FO
+  | FOApp FO [FO]
   deriving (Eq, Ord, Show)
 
 
 quote :: Concrete -> FO
 quote = \case
 -- FIXME: should quote take a Level incremented under binders?
-  Closure path span body -> FOClosure path span ((\ f -> quote (f (vvar (namedName body)))) <$> body)
-  Unit                   -> FOUnit
-  Bool b                 -> FOBool b
-  Int i                  -> FOInt i
-  String s               -> FOString s
-  Neutral n sp           -> foldl' (\ f (EApp a) -> FOApp f (quote a)) (FOVar n) sp
+  Closure r n body -> FOClosure r n (quote (body (map vvar n)))
+  Unit             -> FOUnit
+  Bool b           -> FOBool b
+  Int i            -> FOInt i
+  String s         -> FOString s
+  Neutral n sp     -> foldl' (\ f (EApp a) -> FOApp f (map quote a)) (FOVar n) sp
 
 
 type Eval term m value = (term -> m value) -> (term -> m value)
@@ -160,9 +158,10 @@ instance ( Has (A.Env A.PAddr) sig m
   alg hdl sig ctx = case sig of
     L (DVar n)    -> pure (vvar n <$ ctx)
     L (DAbs n b)  -> do
-      b' <- hdl (b (vvar n) <$ ctx)
+      b' <- hdl (b (map vvar n) <$ ctx)
       ref <- ask
-      pure $ Closure (refPath ref) (refSpan ref) . named n . flip (vsubst n) <$> b'
+      let closure body = Closure ref n (\ args -> let substs = zipWith vsubst n args in foldl' (.) id substs body)
+      pure $ closure <$> b'
     L (DApp f a)  -> pure $ velim f (EApp a) <$ ctx
     L (DInt i)    -> pure (Int i <$ ctx)
     L DUnit       -> pure (Unit <$ ctx)
