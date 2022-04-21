@@ -13,22 +13,22 @@ module Language.Ruby.Tags
   )
 where
 
-import AST.Element
+import           AST.Element
 import qualified AST.Parse as Parse
-import AST.Token
-import AST.Traversable1
+import           AST.Token
+import           AST.Traversable1
 import qualified AST.Unmarshal as TS
-import Control.Effect.Reader
-import Control.Effect.State
-import Control.Effect.Writer
-import Control.Monad
-import Data.Foldable
-import Data.Text as Text
+import           Control.Effect.Reader
+import           Control.Effect.State
+import           Control.Effect.Writer
+import           Control.Monad
+import           Data.Foldable
+import           Data.Text (Text)
 import qualified Language.Ruby.AST as Rb
-import Proto.Semantic as P
-import Source.Loc
-import Source.Range as Range
-import Source.Source as Source
+import           Proto.Semantic as P
+import           Source.Loc
+import           Source.Range as Range
+import           Source.Source as Source
 import qualified Tags.Tagging.Precise as Tags
 
 class ToTags t where
@@ -85,14 +85,14 @@ instance ToTags Rb.Class where
         name = Parse.Success expr,
         extraChildren
       } = enterScope True $ case expr of
-      Prj Rb.Constant {text, ann} -> yield text ann
-      Prj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}} -> yield text ann
+      Prj Rb.Constant {text, ann}                                    -> yield text ann
+      Prj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}}   -> yield text ann
       Prj Rb.ScopeResolution {name = EPrj Rb.Identifier {text, ann}} -> yield text ann
-      _ -> gtags t
+      _                                                              -> gtags t
       where
         range' = case extraChildren of
           EPrj Rb.Superclass {ann = Loc {byteRange = Range {end}}} : _ -> Range start end
-          _ -> Range start (getEnd expr)
+          _                                                            -> Range start (getEnd expr)
         getEnd = Range.end . byteRange . TS.gann
         yield name loc = yieldTag name P.CLASS P.DEFINITION loc range' >> gtags t
   tags _ = pure ()
@@ -104,14 +104,14 @@ instance ToTags Rb.SingletonClass where
         value = Parse.Success (Rb.Arg expr),
         extraChildren
       } = enterScope True $ case expr of
-      Prj (Rb.Primary (Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Constant {text, ann})))))) -> yield text ann
-      Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}})))) -> yield text ann
+      Prj (Rb.Primary (Prj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Constant {text, ann}))))))                -> yield text ann
+      Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}}))))   -> yield text ann
       Prj (Rb.Primary (Prj (Rb.Lhs (Prj Rb.ScopeResolution {name = EPrj Rb.Identifier {text, ann}})))) -> yield text ann
-      _ -> gtags t
+      _                                                                                                -> gtags t
       where
         range' = case extraChildren of
           Parse.Success x : _ -> Range start (getStart x)
-          _ -> range
+          _                   -> range
         getStart = Range.start . byteRange . TS.gann
         yield name loc = yieldTag name P.CLASS P.DEFINITION loc range' >> gtags t
   tags _ = pure ()
@@ -123,14 +123,14 @@ instance ToTags Rb.Module where
         name = Parse.Success expr,
         extraChildren
       } = enterScope True $ case expr of
-      Prj Rb.Constant {text, ann} -> yield text ann
-      Prj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}} -> yield text ann
+      Prj Rb.Constant {text, ann}                                    -> yield text ann
+      Prj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}}   -> yield text ann
       Prj Rb.ScopeResolution {name = EPrj Rb.Identifier {text, ann}} -> yield text ann
-      _ -> gtags t
+      _                                                              -> gtags t
       where
         range' = case extraChildren of
           Parse.Success x : _ -> Range start (getStart x)
-          _ -> Range start (getEnd expr)
+          _                   -> Range start (getEnd expr)
         getEnd = Range.end . byteRange . TS.gann
         getStart = Range.start . byteRange . TS.gann
         yield name loc = yieldTag name P.MODULE P.DEFINITION loc range' >> gtags t
@@ -148,16 +148,16 @@ yieldMethodNameTag ::
   Rb.MethodName Loc ->
   m ()
 yieldMethodNameTag t range (Rb.MethodName expr) = enterScope True $ case expr of
-  Prj Rb.Identifier {text, ann} -> yield text ann
-  Prj Rb.Constant {text, ann} -> yield text ann
+  Prj Rb.Identifier {text, ann}                                             -> yield text ann
+  Prj Rb.Constant {text, ann}                                               -> yield text ann
   -- Prj Rb.ClassVariable { text = name } -> yield name
-  Prj Rb.Operator {text, ann} -> yield text ann
+  Prj Rb.Operator {text, ann}                                               -> yield text ann
   -- Prj Rb.GlobalVariable { text = name } -> yield name
   -- Prj Rb.InstanceVariable { text = name } -> yield name
   Prj Rb.Setter {extraChildren = Parse.Success (Rb.Identifier {text, ann})} -> yield (text <> "=") ann-- NB: Matches existing tags output, TODO: Remove this.
         -- TODO: Should we report symbol method names as tags?
         -- Prj Rb.Symbol { extraChildren = [Prj Rb.EscapeSequence { text = name }] } -> yield name
-  _ -> gtags t
+  _                                                                         -> gtags t
   where
     yield name loc = yieldTag name P.METHOD P.DEFINITION loc range >> gtags t
 
@@ -178,7 +178,7 @@ instance ToTags Rb.Method where
       where
         range' = case parameters of
           Just (Parse.Success (Rb.MethodParameters {ann = Loc {byteRange = Range {end}}})) -> Range start end
-          _ -> Range start (getEnd n)
+          _                                                                                -> Range start (getEnd n)
         getEnd = Range.end . byteRange . TS.gann
   tags _ = pure ()
 
@@ -192,7 +192,7 @@ instance ToTags Rb.SingletonMethod where
       where
         range' = case parameters of
           Just (Parse.Success (Rb.MethodParameters {ann = Loc {byteRange = Range {end}}})) -> Range start end
-          _ -> Range start (getEnd n)
+          _                                                                                -> Range start (getEnd n)
         getEnd = Range.end . byteRange . TS.gann
   tags _ = pure ()
 
@@ -206,7 +206,7 @@ instance ToTags Rb.Lambda where
   tags Rb.Lambda {body = Parse.Success b, parameters} = enterScope False $ do
     case parameters of
       Just (Parse.Success p) -> tags p
-      _ -> pure ()
+      _                      -> pure ()
     tags b
   tags _ = pure ()
 
@@ -215,10 +215,10 @@ instance ToTags Rb.If where
     tags cond
     case consequence of
       Just (Parse.Success cons) -> tags cons
-      _ -> pure ()
+      _                         -> pure ()
     case alternative of
       Just (Parse.Success alt) -> tags alt
-      _ -> pure ()
+      _                        -> pure ()
   tags _ = pure ()
 
 instance ToTags Rb.Elsif where
@@ -226,10 +226,10 @@ instance ToTags Rb.Elsif where
     tags cond
     case consequence of
       Just (Parse.Success cons) -> tags cons
-      _ -> pure ()
+      _                         -> pure ()
     case alternative of
       Just (Parse.Success alt) -> tags alt
-      _ -> pure ()
+      _                        -> pure ()
   tags _ = pure ()
 
 instance ToTags Rb.Unless where
@@ -237,19 +237,19 @@ instance ToTags Rb.Unless where
     tags cond
     case consequence of
       Just (Parse.Success cons) -> tags cons
-      _ -> pure ()
+      _                         -> pure ()
     case alternative of
       Just (Parse.Success alt) -> tags alt
-      _ -> pure ()
+      _                        -> pure ()
   tags _ = pure ()
 
 instance ToTags Rb.While where
   tags Rb.While {condition = Parse.Success cond, body = Parse.Success b} = tags cond >> tags b
-  tags _ = pure ()
+  tags _                                                                 = pure ()
 
 instance ToTags Rb.Until where
   tags Rb.Until {condition = Parse.Success cond, body = Parse.Success b} = tags cond >> tags b
-  tags _ = pure ()
+  tags _                                                                 = pure ()
 
 instance ToTags Rb.Regex where
   tags Rb.Regex {} = pure ()
@@ -263,9 +263,9 @@ instance ToTags Rb.Lhs where
     -- NOTE: Calls do not look for locals
     Prj Rb.Call {ann = Loc {byteRange}, method} -> case method of
       EPrj Rb.Identifier {text, ann} -> yieldCall text ann byteRange
-      EPrj Rb.Constant {text, ann} -> yieldCall text ann byteRange
-      EPrj Rb.Operator {text, ann} -> yieldCall text ann byteRange
-      _ -> gtags t
+      EPrj Rb.Constant {text, ann}   -> yieldCall text ann byteRange
+      EPrj Rb.Operator {text, ann}   -> yieldCall text ann byteRange
+      _                              -> gtags t
     -- These do check for locals before yielding a call tag
     Prj (Rb.Variable (Prj Rb.Identifier {ann = loc@Loc {byteRange}, text})) -> yield text P.CALL loc byteRange
     Prj Rb.ScopeResolution {ann = loc@Loc {byteRange}, name = EPrj Rb.Identifier {text}} -> yield text P.CALL loc byteRange
@@ -292,9 +292,9 @@ instance ToTags Rb.MethodCall where
       EPrj Rb.ScopeResolution {name = EPrj Rb.Constant {text, ann}} -> yield text P.CALL ann -- TODO: Should yield Constant
       EPrj Rb.Call {method} -> case method of
         EPrj Rb.Identifier {text, ann} -> yield text P.CALL ann
-        EPrj Rb.Constant {text, ann} -> yield text P.CALL ann
-        EPrj Rb.Operator {text, ann} -> yield text P.CALL ann
-        _ -> gtags t
+        EPrj Rb.Constant {text, ann}   -> yield text P.CALL ann
+        EPrj Rb.Operator {text, ann}   -> yield text P.CALL ann
+        _                              -> gtags t
       _ -> gtags t
       where
         yield name kind loc = yieldTag name kind P.REFERENCE loc byteRange >> gtags t
@@ -308,10 +308,10 @@ instance ToTags Rb.Alias where
       } = do
       case aliasExpr of
         Prj Rb.Identifier {ann, text} -> yieldTag text P.FUNCTION P.DEFINITION ann byteRange
-        _ -> tags aliasExpr
+        _                             -> tags aliasExpr
       case nameExpr of
         Prj Rb.Identifier {ann, text} -> yieldTag text P.CALL P.REFERENCE ann byteRange
-        _ -> tags nameExpr
+        _                             -> tags nameExpr
       gtags t
   tags _ = pure ()
 
@@ -326,7 +326,7 @@ instance ToTags Rb.Undef where
           Parse.Success (Rb.MethodName expr) -> do
             case expr of
               Prj Rb.Identifier {ann, text} -> yieldTag text P.CALL P.REFERENCE ann byteRange
-              _ -> tags expr
+              _                             -> tags expr
           Parse.Fail _ -> pure ()
       gtags t
 
@@ -376,8 +376,8 @@ instance ToTags Rb.Assignment where
   tags t@Rb.Assignment {left} = do
     case left of
       EPrj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier {text})))) -> modify (text :)
-      EPrj Rb.LeftAssignmentList {extraChildren} -> introduceLhsLocals extraChildren
-      _ -> pure ()
+      EPrj Rb.LeftAssignmentList {extraChildren}                   -> introduceLhsLocals extraChildren
+      _                                                            -> pure ()
     gtags t
     where
       introduceLhsLocals xs = for_ xs $ \x -> case x of
@@ -390,7 +390,7 @@ instance ToTags Rb.OperatorAssignment where
   tags t@Rb.OperatorAssignment {left} = do
     case left of
       EPrj (Rb.Lhs (Prj (Rb.Variable (Prj Rb.Identifier {text})))) -> modify (text :)
-      _ -> pure ()
+      _                                                            -> pure ()
     gtags t
 
 gtags ::

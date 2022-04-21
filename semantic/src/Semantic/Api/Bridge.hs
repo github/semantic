@@ -26,7 +26,7 @@ import qualified Source.Span as Source
 -- This is suitable for types such as 'Pos' which are representationally equivalent
 -- in their API, legacy, and native forms. All 'Lens' laws apply.
 --
--- Foreign to native: @x^.bridging@
+-- Foreign to native: @x ^. bridging@
 -- Native to foreign: @bridging # x@
 -- Native to 'Just' foreign: @bridging #? x@.
 -- 'Maybe' foreign to 'Maybe' native: @x >>= preview bridging@
@@ -54,17 +54,17 @@ infixr 8 #?
 instance APIBridge API.Position Source.Pos where
   bridging = iso fromAPI toAPI where
     toAPI Source.Pos{..}     = defMessage & P.line .~ fromIntegral line & P.column .~ fromIntegral column
-    fromAPI position = Source.Pos (fromIntegral (position^.line)) (fromIntegral (position^.column))
+    fromAPI position = Source.Pos (fromIntegral (position ^. line)) (fromIntegral (position ^. column))
 
 instance APIConvert API.Span Source.Span where
   converting = prism' toAPI fromAPI where
     toAPI Source.Span{..} = defMessage & P.maybe'start .~ (bridging #? start) & P.maybe'end .~ (bridging #? end)
-    fromAPI span = Source.Span <$> (span^.maybe'start >>= preview bridging) <*> (span^.maybe'end >>= preview bridging)
+    fromAPI span = Source.Span <$> (span ^. maybe'start >>= preview bridging) <*> (span ^. maybe'end >>= preview bridging)
 
 instance APIBridge API.ByteRange Source.Range where
   bridging = iso fromAPI toAPI where
     toAPI Source.Range{..} = defMessage & P.start .~ fromIntegral start & P.end .~ fromIntegral end
-    fromAPI range = Source.Range (fromIntegral (range^.start)) (fromIntegral (range^.end))
+    fromAPI range = Source.Range (fromIntegral (range ^. start)) (fromIntegral (range ^. end))
 
 instance APIBridge T.Text Data.Language where
   bridging = iso Data.textToLanguage Data.languageToText
@@ -77,9 +77,9 @@ instance APIBridge API.Blob Data.Blob where
       & P.path .~ T.pack (Data.blobFilePath b)
       & P.language .~ (bridging # Data.blobLanguage b)
     apiBlobToBlob blob =
-      let src = blob^.content.to Source.fromText
-          pth = blob^.path._Text
+      let src = blob ^. content.to Source.fromText
+          pth = blob ^. path._Text
       in Data.Blob
       { blobSource = src
-      , blobFile = File (Reference pth (Source.totalSpan src)) (blob^.language.bridging)
+      , blobFile = File (Reference pth (Source.totalSpan src)) (blob ^. language.bridging)
       }

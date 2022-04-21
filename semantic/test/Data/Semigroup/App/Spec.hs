@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Data.Semigroup.App.Spec (testTree) where
 
 import           Data.Semigroup.App
@@ -17,10 +18,10 @@ merge = AppMerge <$> Gen.maybe (Gen.string (Range.linear 0 10) Gen.ascii)
 testTree :: Tasty.TestTree
 testTree = Tasty.testGroup "Data.Semigroup.App"
   [ Tasty.testGroup "App"
-    [ Tasty.testProperty "is associative" (associative (<>) app)
+    [ Tasty.testPropertyNamed "is associative" "App_is_associative" (associative (<>) app)
     ]
   , Tasty.testGroup "AppMerge"
-    [ Tasty.testProperty "is associative" (associative (<>) merge)
-    , Tasty.testProperty "is monoidal" (monoidal merge)
+    [ Tasty.testPropertyNamed "is associative" "AppMerge_is_associative" (associative (<>) merge)
+    , Tasty.testPropertyNamed "is monoidal" "AppMerge_is_monoidal" (monoidal merge)
     ]
   ]

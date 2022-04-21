@@ -78,10 +78,10 @@ test-suite test
     Source.Test
   build-depends:
     , base
-    , hedgehog        ^>= 1
+    , hedgehog         >= 1 && < 1.2
     , semantic-source
     , tasty            >= 1.2 && <2
-    , tasty-hedgehog  ^>= 1.0.0.1
+    , tasty-hedgehog   >= 1.0.0.1 && < 1.3
     , tasty-hunit      >= 0.10 && <1
     , text
 

@@ -14,6 +14,7 @@ module Analysis.Analysis.Exception
 , fromExceptions
 , var
 , exc
+, subst
   -- * Exception tracing analysis
 , ExcC(..)
 ) where
@@ -33,6 +34,7 @@ import           Control.Effect.Labelled
 import           Control.Effect.State
 import qualified Data.Foldable as Foldable
 import           Data.Function (fix)
+import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 
@@ -61,6 +63,9 @@ var v = ExcSet (Set.singleton v) mempty
 exc :: Exception -> ExcSet
 exc e = ExcSet mempty (Set.singleton e)
 
+subst  :: Name -> ExcSet -> ExcSet -> ExcSet
+subst name (ExcSet fvs' es') (ExcSet fvs es) = ExcSet (Set.delete name fvs <> fvs') (es <> es')
+
 
 exceptionTracing
   :: Ord term
@@ -87,9 +92,11 @@ runFile eval = traverse run where
     . A.runEnv @ExcSet
     . convergeTerm (A.runStore @ExcSet . runExcC . fix (cacheTerm . eval))
   result msgs sets = do
+    exports <- gets @(A.MStore ExcSet) (fmap Foldable.fold . Map.mapKeys A.getMAddr . A.getMStore)
     let set = Foldable.fold sets
-        imports = Set.fromList (map (\ (A.Import components) -> name (Text.intercalate (Text.pack ".") (Foldable.toList components))) msgs)
-    pure (Module (const set) imports mempty (freeVariables set))
+        imports = Set.fromList (map extractImport msgs)
+    pure (Module (Foldable.foldl' (flip (uncurry subst)) set . Map.toList) imports exports (freeVariables set))
+  extractImport (A.Import components) = name (Text.intercalate (Text.pack ".") (Foldable.toList components))
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
@@ -99,7 +106,7 @@ instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m)
     L dom   -> case dom of
       DVar n    -> pure $ var n <$ ctx
       DAbs _ b  -> runExcC (hdl (b mempty <$ ctx))
-      DApp f a  -> pure $ f <> a <$ ctx
+      DApp f a  -> pure $ f <> Foldable.fold a <$ ctx
       DInt _    -> pure nil
       DUnit     -> pure nil
       DBool _   -> pure nil

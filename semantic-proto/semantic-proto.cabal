@@ -25,7 +25,7 @@ library
     , Proto.Semantic_JSON
   build-depends:
     , base                >= 4.13 && < 5
-    , aeson              ^>= 1.4.2.0
+    , aeson               >= 1.4.2.0 && < 3
     , text               ^>= 1.2.3.1
     , proto-lens          >= 0.5 && < 0.8
     , proto-lens-jsonpb
@@ -53,3 +53,6 @@ library
     ghc-options:
       -Wno-missing-safe-haskell-mode
       -Wno-prepositive-qualified-module
+  if (impl(ghc >= 9.2))
+    ghc-options:
+      -Wno-missing-kind-signatures

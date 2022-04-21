@@ -93,6 +93,15 @@
   attr (@this.node -> @else.node) type = "alternative"
 }
 
+(function_definition name: (_) @name body: (_) @body) @this
+{
+  node @this.node
+  attr (@this.node) type = "function"
+  attr (@this.node) name = (source-text @name)
+  edge @this.node -> @body.node
+  attr (@this.node -> @body.node) type = "body"
+}
+
 (module (_) @child) @this
 {
   edge @this.node -> @child.node

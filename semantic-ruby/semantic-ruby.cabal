@@ -38,6 +38,9 @@ common haskell
     ghc-options:
       -Wno-missing-safe-haskell-mode
       -Wno-prepositive-qualified-module
+  if (impl(ghc >= 9.2))
+    ghc-options:
+      -Wno-missing-kind-signatures
   cpp-options:
     -DBAZEL_BUILD=0
 
@@ -56,7 +59,7 @@ library
     , semantic-proto ^>= 0
     , semantic-source ^>= 0.1.0.1
     , semantic-tags ^>= 0.0
-    , template-haskell  >= 2.15 && < 2.17
+    , template-haskell  >= 2.15 && < 2.19
     , text ^>= 1.2.3
     , tree-sitter ^>= 0.9
     , tree-sitter-ruby ^>= 0.5.0.2
@@ -87,7 +90,6 @@ executable benchmarks
     , Glob
     , semantic-ast
     , semantic-ruby
-    , tree-sitter-ruby ^>= 0.5.0.2
 
 executable tree-sitter-ruby
   import: haskell
@@ -99,4 +101,3 @@ executable tree-sitter-ruby
     , bytestring
     , semantic-ast
     , semantic-ruby
-    , tree-sitter-ruby ^>= 0.5.0.2
