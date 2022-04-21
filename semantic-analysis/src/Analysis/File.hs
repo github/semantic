@@ -14,8 +14,6 @@ import           Data.Maybe (fromJust, listToMaybe)
 import           GHC.Stack
 import           Source.Language as Language
 import           Source.Span
-import qualified System.Path as Path
-import qualified System.Path.PartClass as Path.PartClass
 
 -- Files
 
@@ -29,10 +27,10 @@ data File a = File
 -- Constructors
 
 fromBody :: HasCallStack => a -> File a
-fromBody body = File (A.Reference (Path.absRel (srcLocFile srcLoc)) (spanFromSrcLoc srcLoc)) body where
+fromBody = File (A.Reference (srcLocFile srcLoc) (spanFromSrcLoc srcLoc)) where
   srcLoc = snd (fromJust (listToMaybe (getCallStack callStack)))
 
-fromPath :: Path.PartClass.AbsRel ar => Path.File ar -> File Language
+fromPath :: FilePath -> File Language
 fromPath p = File (A.fromPath p) (Language.forPath p)
 
 

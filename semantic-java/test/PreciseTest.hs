@@ -11,7 +11,6 @@ where
 import AST.TestHelpers
 import AST.Unmarshal
 import qualified Language.Java.AST as Java
-import qualified System.Path as Path
 import qualified System.Path.Fixture as Fixture
 import Test.Tasty
 import TreeSitter.Java
@@ -21,11 +20,11 @@ main = do
 #if BAZEL_BUILD
   rf <- Fixture.create
   --
-  let ?project = Path.relDir "external/tree-sitter-java"
+  let ?project = "external/tree-sitter-java"
       ?runfiles = rf
   let dirs = Fixture.absRelDir "corpus"
 #else
-  dirs <- Path.absRel <$> Java.getTestCorpusDir
+  dirs <- Java.getTestCorpusDir
 #endif
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)

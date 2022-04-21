@@ -20,8 +20,6 @@ import qualified Data.Languages as Lingo
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import           GHC.Generics (Generic)
-import qualified System.Path as Path
-import qualified System.Path.PartClass as Path.PartClass
 
 -- | The various languages we support.
 data Language
@@ -96,13 +94,13 @@ knownLanguage = (/= Unknown)
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = fmap T.unpack (maybe mempty Lingo.languageExtensions (Map.lookup (languageToText language) Lingo.languages))
 
-forPath :: Path.PartClass.AbsRel ar => Path.File ar -> Language
+forPath :: FilePath -> Language
 forPath path =
   let spurious lang = lang `elem` [ "Hack" -- .php files
                                   , "GCC Machine Description" -- .md files
                                   , "XML" -- .tsx files
                                   ]
-      allResults = Lingo.languageName <$> Lingo.languagesForPath (Path.toString path)
+      allResults = Lingo.languageName <$> Lingo.languagesForPath path
   in case filter (not . spurious) allResults of
     [result] -> textToLanguage result
     _        -> Unknown

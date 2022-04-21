@@ -22,9 +22,7 @@ import           Data.Int
 import qualified Data.Text as Text
 import           Data.Traversable
 import           System.FilePath.Glob
-import           System.Path ((</>))
-import qualified System.Path as Path
-import qualified System.Path.Directory as Path
+import           System.FilePath
 import qualified System.Process as Process
 import qualified System.Path.Fixture as Fixture
 import qualified Test.Tasty as Tasty
@@ -42,12 +40,12 @@ data LanguageExample =
   LanguageExample
     { languageName      :: String
     , languageExtension :: String
-    , languageSkips     :: [Path.RelFile]
-    , languageDirSkips  :: [Path.RelDir]
+    , languageSkips     :: [FilePath]
+    , languageDirSkips  :: [FilePath]
     }
   deriving (Eq, Show)
 
-le :: String -> String -> [Path.RelFile] -> [Path.RelDir] -> LanguageExample
+le :: String -> String -> [FilePath] -> [FilePath] -> LanguageExample
 le = LanguageExample
 
 examples :: [LanguageExample]
@@ -59,8 +57,8 @@ examples =
   -- , le "typescript" "**/*.[jt]sx" tsxSkips mempty
   ]
 
-goFileSkips :: [Path.RelFile]
-goFileSkips = Path.relPath <$>
+goFileSkips :: [FilePath]
+goFileSkips =
   [
   -- Super slow
     "go/src/vendor/golang_org/x/text/unicode/norm/tables.go"
@@ -83,8 +81,8 @@ goFileSkips = Path.relPath <$>
 
   ]
 
-goDirSkips :: [Path.RelDir]
-goDirSkips = Path.relDir <$>
+goDirSkips :: [FilePath]
+goDirSkips =
   [ "go/src/cmd/compile/internal/ssa"
   , "go/test/fixedbugs"
   , "go/test/syntax"
@@ -92,11 +90,11 @@ goDirSkips = Path.relDir <$>
   , "go/test"
   ]
 
-pythonFileSkips :: [Path.RelFile]
+pythonFileSkips :: [FilePath]
 pythonFileSkips = []
 
-rubySkips :: [Path.RelFile]
-rubySkips = Path.relFile <$>
+rubySkips :: [FilePath]
+rubySkips =
   [
   -- Doesn't parse b/c of issue with r<<i
     "ruby_spec/core/enumerable/shared/inject.rb"
@@ -117,33 +115,33 @@ rubySkips = Path.relFile <$>
   , "ruby_spec/language/lambda_spec.rb"
   ]
 
-tsxSkips :: [Path.RelFile]
-tsxSkips = Path.relFile <$>
+tsxSkips :: [FilePath]
+tsxSkips =
   [
   ]
 
-typescriptSkips :: [Path.RelFile]
-typescriptSkips = Path.relFile <$>
+typescriptSkips :: [FilePath]
+typescriptSkips =
   [ "npm/node_modules/slide/lib/async-map-ordered.js"
   , "npm/node_modules/request/node_modules/har-validator/node_modules/ajv/dist/regenerator.min.js"
   ]
 
 
 
-buildExamples :: Fixture.HasFixture => TaskSession -> LanguageExample -> Path.AbsRelDir -> IO Tasty.TestTree
+buildExamples :: Fixture.HasFixture => TaskSession -> LanguageExample -> FilePath -> IO Tasty.TestTree
 buildExamples session lang tsDir = do
   let fileSkips = fmap (tsDir </>) (languageSkips lang)
       dirSkips  = fmap (tsDir </>) (languageDirSkips lang)
 
 
 
-  files <- globDir1 (compile (languageExtension lang)) (Path.toString tsDir)
+  files <- globDir1 (compile (languageExtension lang)) tsDir
   when (null files)
-    (fail ("Nothing in dir " <> Path.toString tsDir))
+    (fail ("Nothing in dir " <> tsDir))
 
-  let paths = filter (\x -> Path.takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ Path.absRel <$> files
+  let paths = filter (\x -> takeDirectory x `notElem` dirSkips) . filter (`notElem` fileSkips) $ files
   trees <- for paths $ \file -> do
-    pure . HUnit.testCase (Path.toString file) $ do
+    pure . HUnit.testCase file $ do
       precise <- runTask session (runParse (parseSymbolsFilePath file))
       assertOK "precise" precise
   pure (Tasty.testGroup (languageName lang) trees)
@@ -172,7 +170,7 @@ main = withOptions testOptions $ \ config logger statter -> do
 #if BAZEL_BUILD
   rf <- Fixture.create
   let ?runfiles = rf
-  let ?project = Path.relDir "semantic"
+  let ?project = "semantic"
 #endif
 
   let session = TaskSession config "-" False logger statter
@@ -188,6 +186,6 @@ parseSymbolsFilePath ::
   , Has Parse sig m
   , Has Files sig m
   )
-  => Path.AbsRelFile
+  => FilePath
   -> m ParseTreeSymbolResponse
 parseSymbolsFilePath path = readBlob (File.fromPath path) >>= parseSymbols . pure @[]

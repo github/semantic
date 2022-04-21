@@ -71,7 +71,6 @@ test-suite test
   main-is:          PreciseTest.hs
   build-depends:
     , base
-    , pathtype ^>= 0.8.1
     , semantic-ast
     , semantic-go
     , tasty

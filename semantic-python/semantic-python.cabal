@@ -84,7 +84,6 @@ library
   --              , containers ^>= 0.6
   --              , directory ^>= 1.3.3
   --              , exceptions ^>= 0.10.2
-  --              , pathtype ^>= 0.8.1
   --              , pretty-show ^>= 1.9.5
   --              , process ^>= 1.6.5
   --              , resourcet ^>= 1.2.2
@@ -112,7 +111,6 @@ library
   --              , semantic-python
   --             --  , semantic-scope-graph
   --              , bytestring
-  --              , pathtype
   --              , tasty
   --              , tasty-hunit
 
@@ -124,7 +122,6 @@ test-suite test
   main-is:          PreciseTest.hs
   build-depends:
     , base
-    , pathtype ^>= 0.8.1
     , semantic-ast
     , semantic-python
     , tasty

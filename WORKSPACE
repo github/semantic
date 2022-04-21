@@ -101,7 +101,6 @@ stack_snapshot(
         "optparse-applicative",
         "optparse-generic",
         "parsers",
-        "pathtype",
         "pretty-show",
         "pretty-simple",
         "prettyprinter",

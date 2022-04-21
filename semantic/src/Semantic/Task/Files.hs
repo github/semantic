@@ -36,9 +36,7 @@ import           Data.Handle
 import           Prelude hiding (readFile)
 import           Semantic.IO
 import           Source.Language (Language)
-import qualified System.IO as IO hiding (withBinaryFile)
-import qualified System.Path as Path
-import qualified System.Path.IO as IO (withBinaryFile)
+import qualified System.IO as IO
 
 data Source blob where
   FromPath       :: File Language                   -> Source Blob
@@ -46,13 +44,13 @@ data Source blob where
   FromPathPair   :: File Language -> File Language  -> Source BlobPair
   FromPairHandle :: Handle 'IO.ReadMode             -> Source [BlobPair]
 
-data Destination = ToPath Path.AbsRelFile | ToHandle (Handle 'IO.WriteMode)
+data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files (m :: * -> *) k where
   Read :: Source a -> Files m a
-  ReadProject :: Maybe Path.AbsRelDir -> Path.AbsRelFileDir -> Language -> [Path.AbsRelDir] -> Files m Project
-  FindFiles :: Path.AbsRelDir -> [String] -> [Path.AbsRelDir] -> Files m [Path.AbsRelFile]
+  ReadProject :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files m Project
+  FindFiles :: FilePath -> [String] -> [FilePath] -> Files m [FilePath]
   Write :: Destination -> B.Builder -> Files m ()
 
 
@@ -93,10 +91,10 @@ readBlobPairs :: Has Files sig m => Either (Handle 'IO.ReadMode) [(File Language
 readBlobPairs (Left handle) = send (Read (FromPairHandle handle))
 readBlobPairs (Right paths) = traverse (send . Read . uncurry FromPathPair) paths
 
-readProject :: Has Files sig m => Maybe Path.AbsRelDir -> Path.AbsRelFileDir -> Language -> [Path.AbsRelDir] -> m Project
+readProject :: Has Files sig m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProject rootDir dir lang excludeDirs = send (ReadProject rootDir dir lang excludeDirs)
 
-findFiles :: Has Files sig m => Path.AbsRelDir -> [String] -> [Path.AbsRelDir] -> m [Path.AbsRelFile]
+findFiles :: Has Files sig m => FilePath -> [String] -> [FilePath] -> m [FilePath]
 findFiles dir exts paths = send (FindFiles dir exts paths)
 
 -- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.

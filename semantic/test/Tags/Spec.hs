@@ -10,7 +10,6 @@ import Proto.Semantic as P
 import Semantic.Api.Symbols
 import Source.Loc
 import SpecHelpers
-import qualified System.Path as Path
 import qualified System.Path.Fixture as Fixture
 import Tags.Tagging.Precise
 
@@ -92,7 +91,7 @@ spec = do
                          Tag "foo" P.METHOD P.DEFINITION (Range 175 178) (OneIndexedSpan (Span (Pos 18 12) (Pos 18 15))) "def self.foo" (UTF16CodeUnitSpan (Span (Pos 17 11) (Pos 17 14)))
                        ]
 
-parseTestFile :: Foldable t => t P.SyntaxType -> Path.AbsRelFile -> IO [Tag]
+parseTestFile :: Foldable t => t P.SyntaxType -> FilePath -> IO [Tag]
 parseTestFile include path = runTaskOrDie $ readBlob (File.fromPath path) >>= fmap (filter only) . tagsForBlob
   where
     only t = null include || (`elem` include) (tagSyntaxType t)

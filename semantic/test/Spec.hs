@@ -12,7 +12,6 @@ import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
 import qualified Semantic.Stat.Spec
-import qualified System.Path as Path
 import qualified System.Path.Fixture as Fixture
 import Semantic.Config (defaultOptions, optionsLogLevel)
 import Semantic.Task (withOptions, TaskSession(..))
@@ -55,7 +54,7 @@ main :: IO ()
 main = do
   runfiles <- Fixture.create
   let ?runfiles = runfiles
-      ?project = Path.relDir "semantic"
+      ?project = "semantic"
 
   withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter ->
     let ?session = TaskSession config "-" False logger statter

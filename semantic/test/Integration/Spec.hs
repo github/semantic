@@ -9,34 +9,33 @@ import System.FilePath.Glob
 import System.IO.Unsafe
 
 import SpecHelpers
-import qualified System.Path as Path
-import System.Path ((</>))
+import System.FilePath as Path
 
 import Test.Tasty
 import Test.Tasty.Golden
 
-languages :: [Path.RelDir]
-languages = fmap Path.relDir ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
+languages :: [FilePath]
+languages = ["go", "javascript", "json", "python", "ruby", "typescript", "tsx"]
 
 testTree :: (?session :: TaskSession) => TestTree
 testTree = testGroup "Integration (golden tests)" $ fmap testsForLanguage languages
 
-testsForLanguage :: (?session :: TaskSession) => Path.RelDir -> TestTree
+testsForLanguage :: (?session :: TaskSession) => FilePath -> TestTree
 testsForLanguage language = do
-  let dir = Path.relDir "test/fixtures" </> language </> Path.relDir "corpus"
+  let dir = "test/fixtures" </> language </> "corpus"
   let items = unsafePerformIO (examples dir)
-  localOption (mkTimeout 3000000) $ testGroup (Path.toString language) $ fmap testForExample items
+  localOption (mkTimeout 3000000) $ testGroup language $ fmap testForExample items
 {-# NOINLINE testsForLanguage #-}
 
-data Example = ParseExample Path.RelFile Path.RelFile
+data Example = ParseExample FilePath FilePath
              deriving (Eq, Show)
 
 testForExample :: (?session :: TaskSession) => Example -> TestTree
 testForExample (ParseExample file parseOutput) =
     goldenVsStringDiff
-      ("parses " <> Path.toString parseOutput)
+      ("parses " <> parseOutput)
       (\ref new -> ["git", "diff", ref, new])
-      (Path.toString parseOutput)
+      parseOutput
       (parseFilePath ?session file >>= either throw (pure . BL.fromStrict))
 
 
@@ -51,7 +50,7 @@ testForExample (ParseExample file parseOutput) =
 -- |
 -- | example-name.parseA.txt - The expected sexpression parse tree for example-name.A.rb
 -- | example-name.parseB.txt - The expected sexpression parse tree for example-name.B.rb
-examples :: Path.RelDir -> IO [Example]
+examples :: FilePath -> IO [Example]
 examples directory = do
   as <- globFor "*.A.*"
   bs <- globFor "*.B.*"
@@ -71,17 +70,17 @@ examples directory = do
               Just out -> f out name : acc
               Nothing -> acc
 
-    lookupNormalized :: Path.RelFile -> [Path.RelFile] -> Path.RelFile
+    lookupNormalized :: FilePath -> [FilePath] -> FilePath
     lookupNormalized name xs = fromMaybe
-      (error ("cannot find " <> Path.toString name <> " make sure .A, .B and exist."))
+      (error ("cannot find " <> name <> " make sure .A, .B and exist."))
       (lookupNormalized' name xs)
 
-    lookupNormalized' :: Path.RelFile -> [Path.RelFile] -> Maybe Path.RelFile
+    lookupNormalized' :: FilePath -> [FilePath] -> Maybe FilePath
     lookupNormalized' name = find ((== name) . normalizeName)
 
-    globFor :: String -> IO [Path.RelFile]
-    globFor p = fmap Path.relFile <$> globDir1 (compile p) (Path.toString directory)
+    globFor :: String -> IO [FilePath]
+    globFor p = globDir1 (compile p) directory
 
 -- | Given a test name like "foo.A.js", return "foo".
-normalizeName :: Path.RelFile -> Path.RelFile
+normalizeName :: FilePath -> FilePath
 normalizeName = Path.dropExtension . Path.dropExtension

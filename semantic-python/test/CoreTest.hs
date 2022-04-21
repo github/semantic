@@ -35,9 +35,8 @@ import           Syntax.Term
 import           Syntax.Var (closed)
 import           System.Directory
 import           System.Exit
-import           System.Path ((</>))
-import qualified System.Path as Path
-import qualified System.Path.Directory as Path
+import           System.FilePath
+import           System.Directory
 import qualified Text.Trifecta as Trifecta
 import qualified Language.Python.Grammar as TSP
 import qualified AST.Unmarshal as TS
@@ -81,7 +80,7 @@ assertTreeEqual :: Term Core Name -> Term Core Name -> HUnit.Assertion
 assertTreeEqual t item = HUnit.assertEqual ("got (pretty)" <> showCore item) t item
 
 
-checkPythonFile :: HasCallStack => Path.RelFile -> Tasty.TestTree
+checkPythonFile :: HasCallStack => FilePath -> Tasty.TestTree
 checkPythonFile fp = HUnit.testCaseSteps (Path.toString fp) $ \step -> withFrozenCallStack $ do
   -- Extract the directives and the core associated with the provided file
   let fullPath  = Path.relDir "semantic-python/test/fixtures" </> fp

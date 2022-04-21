@@ -55,7 +55,7 @@ The graph should be
 -}
 
 
-runScopeGraph :: ToScopeGraph t => Path.AbsRelFile -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
+runScopeGraph :: ToScopeGraph t => FilePath -> Source.Source -> t Loc -> (ScopeGraph.ScopeGraph Name, Result)
 runScopeGraph p _src item = run . runSketch info $ scopeGraph item
   where
     info = ModuleInfo p "Python" mempty
@@ -66,7 +66,7 @@ sampleGraphThing = do
   declare "goodbye" (Props.Declaration ScopeGraph.Assignment ScopeGraph.Default Nothing (Span (Pos 3 0) (Pos 3 12)))
   pure Complete
 
-graphFile :: Path.AbsRelFile -> IO (ScopeGraph.ScopeGraph Name, Result)
+graphFile :: FilePath -> IO (ScopeGraph.ScopeGraph Name, Result)
 graphFile fp = do
   file <- ByteString.readFile $ Path.toString fp
   tree <- TS.parseByteString @Py.Term @Loc TSP.tree_sitter_python file
@@ -76,14 +76,14 @@ graphFile fp = do
 
 assertSimpleAssignment :: HUnit.Assertion
 assertSimpleAssignment = do
-  let path = Path.absRel "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
+  let path = "semantic-python/test/fixtures/1-04-toplevel-assignment.py"
   (result, Complete) <- graphFile path
   (expecto, Complete) <- runM $ runSketch (ModuleInfo path "Python" mempty) sampleGraphThing
   HUnit.assertEqual "Should work for simple case" expecto result
 
 assertSimpleReference :: HUnit.Assertion
 assertSimpleReference = do
-  let path = Path.absRel "semantic-python/test/fixtures/5-01-simple-reference.py"
+  let path = "semantic-python/test/fixtures/5-01-simple-reference.py"
   (result, Complete) <- graphFile path
   (expecto, Complete) <- runM $ runSketch (ModuleInfo path "Python" mempty) expectedReference
 
@@ -115,7 +115,7 @@ expectedImportHole = do
 
 assertLexicalScope :: HUnit.Assertion
 assertLexicalScope = do
-  let path = Path.absRel "semantic-python/test/fixtures/5-02-simple-function.py"
+  let path = "semantic-python/test/fixtures/5-02-simple-function.py"
   let info = ModuleInfo path "Python" mempty
   (graph, _) <- graphFile path
   case run (runSketch info expectedLexicalScope) of
@@ -132,7 +132,7 @@ expectedLexicalScope = do
 
 assertFunctionArg :: HUnit.Assertion
 assertFunctionArg = do
-  let path = Path.absRel "semantic-python/test/fixtures/5-03-function-argument.py"
+  let path = "semantic-python/test/fixtures/5-03-function-argument.py"
   (graph, _) <- graphFile path
   let info = ModuleInfo path "Python" mempty
   case run (runSketch info expectedFunctionArg) of
@@ -154,7 +154,7 @@ expectedFunctionArg = do
 
 assertImportHole :: HUnit.Assertion
 assertImportHole = do
-  let path = Path.absRel "semantic-python/test/fixtures/cheese/6-01-imports.py"
+  let path = "semantic-python/test/fixtures/cheese/6-01-imports.py"
   (graph, _) <- graphFile path
   let info = ModuleInfo path "Python" mempty
   case run (runSketch info expectedImportHole) of
@@ -163,7 +163,7 @@ assertImportHole = do
 
 assertQualifiedImport :: HUnit.Assertion
 assertQualifiedImport = do
-  let path = Path.absRel "semantic-python/test/fixtures/cheese/6-01-qualified-imports.py"
+  let path = "semantic-python/test/fixtures/cheese/6-01-qualified-imports.py"
   (graph, _) <- graphFile path
   let info = ModuleInfo path "Python" mempty
   case run (runSketch info expectedQualifiedImport) of
@@ -173,8 +173,8 @@ assertQualifiedImport = do
 main :: IO ()
 main = do
   -- make sure we're in the root directory so the paths resolve properly
-  cwd <- Path.getCurrentDirectory
-  when (Path.takeDirName cwd == Just (Path.relDir "semantic-python"))
+  cwd <- getCurrentDirectory
+  when (takeDirectory cwd == Just (Path.relDir "semantic-python"))
     (Path.setCurrentDirectory (cwd </> Path.relDir ".."))
 
   Tasty.defaultMain $

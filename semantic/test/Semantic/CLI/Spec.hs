@@ -6,16 +6,16 @@ import           Analysis.File
 import           Analysis.Reference
 import           Control.Carrier.Parse.Simple
 import           Control.Carrier.Reader
+import           Control.Exception
 import           Data.ByteString.Builder
-import Control.Exception
-import           Source.Language
 import           Semantic.Api hiding (Blob, File)
 import           Semantic.Task
 import           Serializing.Format
+import           Source.Language
+import qualified System.Directory as Path
+import qualified System.FilePath as Path
 import           System.IO.Unsafe
-import qualified System.Path as Path
 import qualified System.Path.Fixture as Fixture
-import qualified System.Path.Directory as Path
 
 import SpecHelpers
 import Test.Tasty
@@ -34,31 +34,31 @@ testTree = testGroup "Semantic.CLI"
 renderDiff :: String -> String -> [String]
 renderDiff ref new = unsafePerformIO $ do
   let check p = do
-        exists <- Path.doesFileExist (Path.absRel p)
+        exists <- Path.doesFileExist p
         unless exists (throwIO (userError ("Can't find path " <> p)))
 
   check ref
   check new
-  useJD <- (Path.hasExtension ".json" (Path.absRel ref) &&) <$> fmap isJust (Path.findExecutable "jd")
+  useJD <- (Path.takeExtension ref == ".json" &&) <$> fmap isJust (Path.findExecutable "jd")
   pure $ if useJD
     then ["jd", "-set", ref, new]
     else ["diff", ref, new]
 {-# NOINLINE renderDiff #-}
 
 
-testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File Language], Path.AbsRelFile) -> TestTree
+testForParseFixture :: (String, [Blob] -> ParseC TaskC Builder, [File Language], FilePath) -> TestTree
 testForParseFixture (format, runParse, files, expected) =
   goldenVsStringDiff
     ("parse fixture renders to " <> format)
     renderDiff
-    (Path.toString expected)
+    expected
     (fmap toLazyByteString . runTaskOrDie $ readBlobs (FilesFromPaths files) >>= runParse)
 
-parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], Path.AbsRelFile)]
+parseFixtures :: [(String, [Blob] -> ParseC TaskC Builder, [File Language], FilePath)]
 parseFixtures =
-  [ ("s-expression", parseTermBuilder TermSExpression, path, Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.parseA.txt")
-  , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.json")
-  , ("protobuf symbols", parseSymbolsBuilder Serializing.Format.Proto, path'', Path.absRel "semantic/test/fixtures/cli/parse-tree.symbols.protobuf.bin")
+  [ ("s-expression", parseTermBuilder TermSExpression, path, "semantic/test/fixtures/ruby/corpus/and-or.parseA.txt")
+  , ("symbols", parseSymbolsBuilder Serializing.Format.JSON, path, "semantic/test/fixtures/cli/parse-tree.symbols.json")
+  , ("protobuf symbols", parseSymbolsBuilder Serializing.Format.Proto, path'', "semantic/test/fixtures/cli/parse-tree.symbols.protobuf.bin")
   ]
-  where path = [File (Reference (Path.absRel "semantic/test/fixtures/ruby/corpus/and-or.A.rb") lowerBound) Ruby]
-        path'' = [File (Reference (Path.absRel "semantic/test/fixtures/ruby/corpus/method-declaration.A.rb") lowerBound) Ruby]
+  where path = [File (Reference "semantic/test/fixtures/ruby/corpus/and-or.A.rb" lowerBound) Ruby]
+        path'' = [File (Reference "semantic/test/fixtures/ruby/corpus/method-declaration.A.rb" lowerBound) Ruby]

@@ -31,7 +31,6 @@ haskell_library(
         "@stackage//:generic-lens",
         "@stackage//:hashable",
         "@stackage//:lens",
-        "@stackage//:pathtype",
         "@stackage//:semilattices",
     ],
 )

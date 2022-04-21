@@ -52,7 +52,6 @@ import           Source.Source as X (Source)
 import           Source.Span as X hiding (HasSpan (..), end, point, start)
 import qualified Source.Span
 import           System.Exit (die)
-import qualified System.Path as Path
 import           Test.Hspec as X (Spec, SpecWith, around, context, describe, it, parallel, pendingWith, runIO, xit)
 import           Test.Hspec.Expectations as X
 
@@ -63,7 +62,7 @@ runBuilder :: Builder -> ByteString
 runBuilder = toStrict . toLazyByteString
 
 -- | Returns an s-expression parse tree for the specified path.
-parseFilePath :: TaskSession -> Path.RelFile -> IO (Either SomeException ByteString)
+parseFilePath :: TaskSession -> FilePath -> IO (Either SomeException ByteString)
 parseFilePath session path = do
   blob <- readBlobFromFile (File.fromPath path)
   res <- runTask session . runParse (configTreeSitterParseTimeout (config session)) $ parseTermBuilder TermSExpression (toList blob)
@@ -73,7 +72,7 @@ runParseWithConfig :: Has (Reader Config) sig m => ParseC m a -> m a
 runParseWithConfig task = asks configTreeSitterParseTimeout >>= \ timeout -> runParse timeout task
 
 -- | Read two files to a BlobPair.
-readFilePathPair :: Path.RelFile -> Path.RelFile -> IO BlobPair
+readFilePathPair :: FilePath -> FilePath -> IO BlobPair
 readFilePathPair p1 p2 = readFilePair (File.fromPath p1) (File.fromPath p2)
 
 -- Run a Task and call `die` if it returns an Exception.

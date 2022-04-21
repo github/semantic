@@ -57,7 +57,7 @@ data Directive = Tree (Term Core Name) -- | @# CHECK-TREE: core@
                  deriving (Eq, Show)
 
 -- | Extract all directives from a file.
-readDirectivesFromFile :: Path.Class.AbsRel ar => Path.File ar -> IO [Directive]
+readDirectivesFromFile :: Path.Class.AbsRel ar => FilePath -> IO [Directive]
 readDirectivesFromFile
   = runResourceT
   . Stream.toList_
