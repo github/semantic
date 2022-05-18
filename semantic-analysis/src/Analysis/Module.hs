@@ -17,7 +17,9 @@ data Module a = Module
   }
 
 instance Show a => Show (Module a) where
-  showsPrec p (Module b i e u) = showParen (p > 10) (showString "Module" . showChar ' ' . showsPrec 11 (b mempty) . showChar ' ' . showsPrec 11 i . showChar ' ' . showsPrec 11 e . showChar ' ' . showsPrec 11 u)
+  showsPrec p (Module b i e u) = showParen (p > 10) (showString "Module" . sp . showsPrec 11 (b mempty) . sp . showsPrec 11 i . sp . showsPrec 11 e . sp . showsPrec 11 u)
+    where
+    sp = showChar ' '
 
 
 newtype ModuleSet a = ModuleSet { getModuleSet :: Map.Map Name (Module a) }
