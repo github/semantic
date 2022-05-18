@@ -61,6 +61,21 @@
   edge @this.node -> @arg.node
 }
 
+(call function: (_) @function arguments: (argument_list (_)* @args)) @this
+{
+  node @this.node
+  attr (@this.node) function = (source-text @function)
+  attr (@this.node) type = "call"
+  for arg in @args {
+    edge @this.node -> arg.node
+  }
+}
+
+(expression_statement (_) @child) @this
+{
+  let @this.node = @child.node
+}
+
 (block (_)* @children) @this
 {
   node @this.node
