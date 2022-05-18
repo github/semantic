@@ -82,6 +82,7 @@
   attr (@this.node) type = "block"
   for child in @children {
     edge @this.node -> child.node
+    attr (@this.node -> child.node) index = (named-child-index child)
   }
 }
 
