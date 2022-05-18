@@ -16,6 +16,10 @@ data Module a = Module
   , unknown :: Set.Set Name
   }
 
+instance Show a => Show (Module a) where
+  showsPrec p (Module b i e u) = showParen (p > 10) (showString "Module" . showChar ' ' . showsPrec 11 (b mempty) . showChar ' ' . showsPrec 11 i . showChar ' ' . showsPrec 11 e . showChar ' ' . showsPrec 11 u)
+
+
 newtype ModuleSet a = ModuleSet { getModuleSet :: Map.Map Name (Module a) }
 
 instance Semigroup (ModuleSet a) where
