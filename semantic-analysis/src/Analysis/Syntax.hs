@@ -163,7 +163,10 @@ findEdgeNamed edges name = foldMap (resolveWith (\ rep attrs -> attrs A..: fromS
 
 -- | Map a list of edges to a list of child nodes.
 children :: [A.Value] -> A.Parser (Graph -> Term)
-children edges = fmap (foldr chain Noop . zip [0..]) . sequenceA <$> traverse resolve edges
+children edges = fmap (foldr chain Noop . zip [0..]) . sequenceA . map snd . sortOn fst <$> traverse (resolveWith child) edges
+  where
+  child :: (Graph -> Term) -> A.Object -> A.Parser (Int, Graph -> Term)
+  child term attrs = (,) <$> attrs A..: fromString "index" <*> pure term
 
 moduleNameComponent :: A.Object -> A.Parser (Int, Text)
 moduleNameComponent attrs = (,) <$> attrs A..: fromString "index" <*> attrs A..: fromString "text"
