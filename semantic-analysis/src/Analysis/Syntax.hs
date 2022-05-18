@@ -57,6 +57,7 @@ data Term
   | Let Name Term Term
   | Import (NonEmpty Text)
   | Function Name [Name] Term
+  | Call Term [Term]
   deriving (Eq, Ord, Show)
 
 
@@ -84,6 +85,10 @@ eval eval = \case
   Import ns -> S.simport ns >> dunit
   Function n ps b -> letrec n (dabs ps (\ as ->
     foldr (\ (p, a) m -> let' p a m) (eval b) (zip ps as)))
+  Call f as -> do
+    f' <- eval f
+    as' <- traverse eval as
+    dapp f' as'
 
 
 -- Macro-expressible syntax
