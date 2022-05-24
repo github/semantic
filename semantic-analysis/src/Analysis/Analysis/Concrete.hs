@@ -172,6 +172,7 @@ instance ( Has (A.Env A.PAddr) sig m
         | otherwise -> hdl (e <$ ctx)
       _             -> fail "expected Bool"
     L (DString s) -> pure (String s <$ ctx)
+    L (_ :>>> t)  -> pure (t <$ ctx)
     L (DDie msg)  -> fail (show (quote msg))
 
     R other       -> DomainC (alg (runDomain . hdl) other ctx)
