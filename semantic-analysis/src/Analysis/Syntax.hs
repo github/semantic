@@ -24,7 +24,7 @@ import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Store
 import           Analysis.File
-import           Analysis.Name (Name, name, nameI)
+import           Analysis.Name (Name, name)
 import           Analysis.Reference as Ref
 import           Control.Applicative (Alternative (..), liftA2, liftA3)
 import           Control.Effect.Labelled
@@ -36,7 +36,7 @@ import qualified Data.Aeson.Internal as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
-import           Data.Foldable (fold)
+import           Data.Foldable (fold, foldl')
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import           Data.List (sortOn)
@@ -169,17 +169,13 @@ findEdgeNamed edges name = foldMap (resolveWith (\ rep attrs -> attrs A..: fromS
 
 -- | Map a list of edges to a list of child nodes.
 children :: [A.Value] -> A.Parser (Graph -> Term)
-children edges = fmap (foldr chain Noop . zip [0..]) . sequenceA . map snd . sortOn fst <$> traverse (resolveWith child) edges
+children edges = fmap (foldl' (:>>) Noop) . sequenceA . map snd . sortOn fst <$> traverse (resolveWith child) edges
   where
   child :: (Graph -> Term) -> A.Object -> A.Parser (Int, Graph -> Term)
   child term attrs = (,) <$> attrs A..: fromString "index" <*> pure term
 
 moduleNameComponent :: A.Object -> A.Parser (Int, Text)
 moduleNameComponent attrs = (,) <$> attrs A..: fromString "index" <*> attrs A..: fromString "text"
-
--- | Chain a statement before any following syntax by let-binding it. Note that this implies call-by-value since any side effects in the statement must be performed before the let's body.
-chain :: (Int, Term) -> Term -> Term
-chain = uncurry (Let . nameI)
 
 resolve :: A.Value -> A.Parser (Graph -> Term)
 resolve = resolveWith (const . pure)
