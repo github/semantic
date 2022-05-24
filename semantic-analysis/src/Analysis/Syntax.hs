@@ -86,8 +86,9 @@ eval eval = \case
     v' <- eval v
     let' n v' (eval b)
   t :>> u   -> do
-    _ <- eval t
-    eval u
+    t' <- eval t
+    u' <- eval u
+    t' >>> u'
   Import ns -> S.simport ns >> dunit
   Function n ps b -> letrec n (dabs ps (\ as ->
     foldr (\ (p, a) m -> let' p a m) (eval b) (zip ps as)))
