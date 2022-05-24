@@ -55,10 +55,13 @@ data Term
   | String Text
   | Throw Term
   | Let Name Term Term
+  | Term :>> Term
   | Import (NonEmpty Text)
   | Function Name [Name] Term
   | Call Term [Term]
   deriving (Eq, Ord, Show)
+
+infixl 1 :>>
 
 
 -- Abstract interpretation
@@ -82,6 +85,9 @@ eval eval = \case
   Let n v b -> do
     v' <- eval v
     let' n v' (eval b)
+  t :>> u   -> do
+    _ <- eval t
+    eval u
   Import ns -> S.simport ns >> dunit
   Function n ps b -> letrec n (dabs ps (\ as ->
     foldr (\ (p, a) m -> let' p a m) (eval b) (zip ps as)))
