@@ -111,7 +111,7 @@ instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m)
       DUnit     -> pure nil
       DBool _   -> pure nil
       DIf c t e -> fmap (mappend c) <$> runExcC (hdl (t <$ ctx) <|> hdl (e <$ ctx))
-      DString s -> pure (var (name s) <$ ctx)
+      DString s -> pure (var (name s) <$ ctx) -- FIXME: include strings as a separate field in exception sets.
       t :>>> u  -> pure ((t <> u) <$ ctx)
       DDie e    -> pure $ e <> fromExceptions [Exception n | n <- Set.toList (freeVariables e)] <$ ctx
       where
