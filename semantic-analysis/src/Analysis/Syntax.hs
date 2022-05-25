@@ -163,6 +163,7 @@ parseTerm attrs edges = \case
   "import"     -> const . Import . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
   "function"   -> liftA3 Function . pure . name <$> attrs A..: fromString "name" <*> pure (pure []) <*> findEdgeNamed edges "body"
   "call"       -> liftA2 Call . const . Var . name <$> attrs A..: fromString "function" <*> (sequenceA <$> traverse resolve edges)
+  "noop"       -> pure (pure Noop)
   t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
 
 findEdgeNamed :: (Foldable t, A.FromJSON a, Eq a) => t A.Value -> a -> A.Parser (Graph -> Term)
