@@ -76,6 +76,12 @@
   let @this.node = @child.node
 }
 
+(pass_statement) @this
+{
+  node @this.node
+  attr (@this.node) type = "noop"
+}
+
 (block (_)* @children) @this
 {
   node @this.node
