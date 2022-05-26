@@ -36,6 +36,7 @@ import qualified Data.Aeson.Internal as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
+import qualified Data.ByteString.Lazy.Char8 as B8
 import           Data.Foldable (fold, foldl')
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
@@ -120,8 +121,9 @@ letrec n m = do
 parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File Term)
 parseFile path = do
   contents <- liftIO (B.readFile path)
-  let start = Pos 0 0
-      end = Pos 0 0
+  let lines = B8.lines contents
+      start = Pos 0 0
+      end = Pos (length lines) 0
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
