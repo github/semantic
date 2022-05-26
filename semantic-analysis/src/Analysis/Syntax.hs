@@ -45,6 +45,7 @@ import           Data.Monoid (First (..))
 import           Data.String (IsString (..))
 import           Data.Text (Text)
 import qualified Data.Vector as V
+import           Source.Span
 import qualified System.Path as Path
 
 data Term
@@ -119,12 +120,14 @@ letrec n m = do
 parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File Term)
 parseFile path = do
   contents <- liftIO (B.readFile path)
+  let start = Pos 0 0
+      end = Pos 0 0
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
     -- FIXME: this should get the path to the source file, not the path to the JSON.
     -- FIXME: this should use the span of the source file, not an empty span.
-    Right (_, Just root) -> pure (File (Ref.fromPath (Path.absRel path)) root)
+    Right (_, Just root) -> pure (File (Reference (Path.absRel path) (Span start end)) root)
 
 newtype Graph = Graph { terms :: IntMap.IntMap Term }
 
