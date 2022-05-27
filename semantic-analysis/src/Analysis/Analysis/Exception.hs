@@ -11,6 +11,7 @@ module Analysis.Analysis.Exception
 ( Exception(..)
 , ExcSet(..)
 , exceptionTracing
+, exceptionTracingIndependent
 , fromExceptions
 , var
 , exc
@@ -76,6 +77,16 @@ exceptionTracing
   -> [File term]
   -> (A.MStore ExcSet, [File (Module ExcSet)])
 exceptionTracing eval = A.runFiles (runFile eval)
+
+exceptionTracingIndependent
+  :: Ord term
+  => ( forall sig m
+     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has A.Statement sig m)
+     => (term -> m ExcSet)
+     -> (term -> m ExcSet) )
+  -> [File term]
+  -> [(A.MStore ExcSet, File (Module ExcSet))]
+exceptionTracingIndependent eval = A.runFilesIndependent (runFile eval)
 
 runFile
   :: ( Has (State (A.MStore ExcSet)) sig m
