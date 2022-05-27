@@ -36,7 +36,6 @@ import qualified Data.Aeson.Internal as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
-import qualified Data.ByteString.Lazy.Char8 as B8
 import           Data.Foldable (fold, foldl')
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
@@ -46,7 +45,7 @@ import           Data.Monoid (First (..))
 import           Data.String (IsString (..))
 import           Data.Text (Text)
 import qualified Data.Vector as V
-import           Source.Span
+import qualified Source.Source as Source
 import qualified System.Path as Path
 
 data Term
@@ -121,15 +120,12 @@ letrec n m = do
 parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File Term)
 parseFile path = do
   contents <- liftIO (B.readFile path)
-  let lines = B8.lines contents
-      start = Pos 0 0
-      end = Pos (length lines) 0
+  let span = Source.totalSpan (Source.fromUTF8 (B.toStrict contents))
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
     -- FIXME: this should get the path to the source file, not the path to the JSON.
-    -- FIXME: this should use the span of the source file, not an empty span.
-    Right (_, Just root) -> pure (File (Reference (Path.absRel path) (Span start end)) root)
+    Right (_, Just root) -> pure (File (Reference (Path.absRel path) span) root)
 
 newtype Graph = Graph { terms :: IntMap.IntMap Term }
 
