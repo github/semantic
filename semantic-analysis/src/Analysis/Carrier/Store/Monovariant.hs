@@ -22,6 +22,7 @@ module Analysis.Carrier.Store.Monovariant
 , module Analysis.Effect.Env
   -- * Running
 , runFiles
+, runFilesIndependent
 ) where
 
 import Analysis.Effect.Env
@@ -99,3 +100,11 @@ runFiles runFile
   = run
   . runStoreState
   . traverse runFile
+
+runFilesIndependent
+  :: (forall sig m . Has (State (MStore  value)) sig m => File term -> m (File result))
+  -> [File term]
+  -> [(MStore value, File result)]
+runFilesIndependent runFile
+  = run
+  . traverse (runStoreState . runFile)
