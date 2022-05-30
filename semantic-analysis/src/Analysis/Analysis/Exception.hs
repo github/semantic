@@ -29,8 +29,10 @@ import           Analysis.File
 import           Analysis.FlowInsensitive (cacheTerm, convergeTerm)
 import           Analysis.Module
 import           Analysis.Name
+import           Analysis.Reference
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
+import           Control.Carrier.Reader
 import           Control.Effect.Labelled
 import           Control.Effect.State
 import qualified Data.Foldable as Foldable
@@ -71,7 +73,7 @@ subst name (ExcSet fvs' es') (ExcSet fvs es) = ExcSet (Set.delete name fvs <> fv
 exceptionTracing
   :: Ord term
   => ( forall sig m
-     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has A.Statement sig m)
+     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m)
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> [File term]
@@ -81,7 +83,7 @@ exceptionTracing eval = A.runFiles (runFile eval)
 exceptionTracingIndependent
   :: Ord term
   => ( forall sig m
-     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has A.Statement sig m)
+     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m)
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> [File term]
@@ -92,15 +94,16 @@ runFile
   :: ( Has (State (A.MStore ExcSet)) sig m
      , Ord term )
   => ( forall sig m
-     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has A.Statement sig m)
+     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m)
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> File term
   -> m (File (Module ExcSet))
-runFile eval = traverse run where
+runFile eval file = traverse run file where
   run
     = A.runStatement result
     . A.runEnv @ExcSet
+    . runReader (fileRef file)
     . convergeTerm (A.runStore @ExcSet . runExcC . fix (cacheTerm . eval))
   result msgs sets = do
     exports <- gets @(A.MStore ExcSet) (fmap Foldable.fold . Map.mapKeys A.getMAddr . A.getMStore)
