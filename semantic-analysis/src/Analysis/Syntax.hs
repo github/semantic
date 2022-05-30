@@ -61,6 +61,7 @@ data Term
   | Import (NonEmpty Text)
   | Function Name [Name] Term
   | Call Term [Term]
+  | Locate Reference Term
   deriving (Eq, Ord, Show)
 
 infixl 1 :>>
@@ -98,6 +99,7 @@ eval eval = \case
     f' <- eval f
     as' <- traverse eval as
     dapp f' as'
+  Locate ref t -> local (const ref) (eval t)
 
 
 -- Macro-expressible syntax
