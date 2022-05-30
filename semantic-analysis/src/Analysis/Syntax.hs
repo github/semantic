@@ -62,7 +62,7 @@ data Term
   | Import (NonEmpty Text)
   | Function Name [Name] Term
   | Call Term [Term]
-  | Locate Reference Term
+  | Locate Span Term
   deriving (Eq, Ord, Show)
 
 infixl 1 :>>
@@ -100,7 +100,9 @@ eval eval = \case
     f' <- eval f
     as' <- traverse eval as
     dapp f' as'
-  Locate ref t -> local (const ref) (eval t)
+  Locate s t -> local (setSpan s) (eval t)
+  where
+  setSpan s r = r{ refSpan = s }
 
 
 -- Macro-expressible syntax
@@ -125,19 +127,18 @@ parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File Term)
 parseFile path = do
   contents <- liftIO (B.readFile path)
   let span = Source.totalSpan (Source.fromUTF8 (B.toStrict contents))
-      path' = Path.absRel path
-  case (A.eitherDecodeWith A.json' (A.iparse (parseGraph path')) contents) of
+  case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
     -- FIXME: this should get the path to the source file, not the path to the JSON.
-    Right (_, Just root) -> pure (File (Reference path' span) root)
+    Right (_, Just root) -> pure (File (Reference (Path.absRel path) span) root)
 
 newtype Graph = Graph { terms :: IntMap.IntMap Term }
 
 -- | Parse a @Value@ into an entire graph of terms, as well as a root node, if any exists.
-parseGraph :: Path.AbsRelFile -> A.Value -> A.Parser (Graph, Maybe Term)
-parseGraph path = A.withArray "nodes" $ \ nodes -> do
-  (untied, First root) <- fold <$> traverse (parseNode path) (V.toList nodes)
+parseGraph :: A.Value -> A.Parser (Graph, Maybe Term)
+parseGraph = A.withArray "nodes" $ \ nodes -> do
+  (untied, First root) <- fold <$> traverse parseNode (V.toList nodes)
   -- @untied@ is an intmap, where the keys are graph node IDs and the values are functions from the final graph to the representations of said graph nodes. Likewise, @root@ is a function of the same variety, wrapped in a @Maybe@.
   --
   -- We define @tied@ as the fixpoint of the former to yield the former as a graph of type @Graph@, and apply the latter to said graph to yield the entry point, if any, from which to evaluate.
@@ -147,17 +148,17 @@ parseGraph path = A.withArray "nodes" $ \ nodes -> do
 -- | Parse a node from a JSON @Value@ into a pair of a partial graph of unfixed terms and optionally an unfixed term representing the root node.
 --
 -- The partial graph is represented as an adjacency map relating node IDs to unfixed terms—terms which may make reference to a completed graph to find edges, and which therefore can't be inspected until the full graph is known.
-parseNode :: Path.AbsRelFile -> A.Value -> A.Parser (IntMap.IntMap (Graph -> Term), First (Graph -> Term))
-parseNode path = A.withObject "node" $ \ o -> do
+parseNode :: A.Value -> A.Parser (IntMap.IntMap (Graph -> Term), First (Graph -> Term))
+parseNode = A.withObject "node" $ \ o -> do
   edges <- o A..: fromString "edges"
   index <- o A..: fromString "id"
   o A..: fromString "attrs" >>= A.withObject "attrs" (\ attrs -> do
     ty <- attrs A..: fromString "type"
-    node <- parseTerm path attrs edges ty
+    node <- parseTerm attrs edges ty
     pure (IntMap.singleton index node, node <$ First (guard (ty == "module"))))
 
-parseTerm :: Path.AbsRelFile -> A.Object -> [A.Value] -> String -> A.Parser (Graph -> Term)
-parseTerm path attrs edges = locate path attrs . \case
+parseTerm :: A.Object -> [A.Value] -> String -> A.Parser (Graph -> Term)
+parseTerm attrs edges = locate attrs . \case
   "string"     -> const . String <$> attrs A..: fromString "text"
   "true"       -> pure (const (Bool True))
   "false"      -> pure (const (Bool False))
@@ -197,8 +198,8 @@ resolveWith' f = A.withObject "edge" (\ edge -> do
   attrs <- edge A..: fromString "attrs"
   f sink attrs)
 
-locate :: Path.AbsRelFile -> A.Object -> A.Parser (Graph -> Term) -> A.Parser (Graph -> Term)
-locate path attrs p = do
+locate :: A.Object -> A.Parser (Graph -> Term) -> A.Parser (Graph -> Term)
+locate attrs p = do
   span <- span
     <$> attrs A..:? fromString "start-line"
     <*> attrs A..:? fromString "start-col"
@@ -207,6 +208,6 @@ locate path attrs p = do
   t <- p
   case span of
     Nothing -> pure t
-    Just s  -> pure (Locate (Reference path s) <$> t)
+    Just s  -> pure (Locate s <$> t)
   where
   span sl sc el ec = Span <$> (Pos <$> sl <*> sc) <*> (Pos <$> el <*> ec)
