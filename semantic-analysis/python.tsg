@@ -59,6 +59,10 @@
   node @this.node
   attr (@this.node) type = "throw"
   edge @this.node -> @arg.node
+  attr (@this.node) start-line = (start-row    @this)
+  attr (@this.node) start-col  = (start-column @this)
+  attr (@this.node) end-line   = (end-row      @this)
+  attr (@this.node) end-col    = (end-column   @this)
 }
 
 (call function: (_) @function arguments: (argument_list (_)* @args)) @this
