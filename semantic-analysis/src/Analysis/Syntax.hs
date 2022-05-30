@@ -157,7 +157,7 @@ parseNode path = A.withObject "node" $ \ o -> do
     pure (IntMap.singleton index node, node <$ First (guard (ty == "module"))))
 
 parseTerm :: Path.AbsRelFile -> A.Object -> [A.Value] -> String -> A.Parser (Graph -> Term)
-parseTerm _ attrs edges = \case
+parseTerm path attrs edges = locate path attrs . \case
   "string"     -> const . String <$> attrs A..: fromString "text"
   "true"       -> pure (const (Bool True))
   "false"      -> pure (const (Bool False))
@@ -196,3 +196,17 @@ resolveWith' f = A.withObject "edge" (\ edge -> do
   sink <- edge A..: fromString "sink"
   attrs <- edge A..: fromString "attrs"
   f sink attrs)
+
+locate :: Path.AbsRelFile -> A.Object -> A.Parser (Graph -> Term) -> A.Parser (Graph -> Term)
+locate path attrs p = do
+  span <- span
+    <$> attrs A..:? fromString "start-row"
+    <*> attrs A..:? fromString "start-column"
+    <*> attrs A..:? fromString "end-row"
+    <*> attrs A..:? fromString "end-column"
+  t <- p
+  case span of
+    Nothing -> pure t
+    Just s  -> pure (Locate (Reference path s) <$> t)
+  where
+  span sl sc el ec = Span <$> (Pos <$> sl <*> sc) <*> (Pos <$> el <*> ec)
