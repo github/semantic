@@ -200,10 +200,10 @@ resolveWith' f = A.withObject "edge" (\ edge -> do
 locate :: Path.AbsRelFile -> A.Object -> A.Parser (Graph -> Term) -> A.Parser (Graph -> Term)
 locate path attrs p = do
   span <- span
-    <$> attrs A..:? fromString "start-row"
-    <*> attrs A..:? fromString "start-column"
-    <*> attrs A..:? fromString "end-row"
-    <*> attrs A..:? fromString "end-column"
+    <$> attrs A..:? fromString "start-line"
+    <*> attrs A..:? fromString "start-col"
+    <*> attrs A..:? fromString "end-line"
+    <*> attrs A..:? fromString "end-col"
   t <- p
   case span of
     Nothing -> pure t
