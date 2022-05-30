@@ -28,6 +28,7 @@ import           Analysis.Name (Name, name)
 import           Analysis.Reference as Ref
 import           Control.Applicative (Alternative (..), liftA2, liftA3)
 import           Control.Effect.Labelled
+import           Control.Effect.Reader
 import           Control.Effect.Throw (Throw, throwError)
 import           Control.Monad (guard)
 import           Control.Monad.IO.Class
@@ -67,11 +68,11 @@ infixl 1 :>>
 
 -- Abstract interpretation
 
-eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m) => Term -> m val
+eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m) => Term -> m val
 eval0 = fix eval
 
 eval
-  :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m)
+  :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m)
   => (Term -> m val)
   -> (Term -> m val)
 eval eval = \case
