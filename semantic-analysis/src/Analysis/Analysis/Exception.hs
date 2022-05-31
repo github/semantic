@@ -4,6 +4,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -12,6 +13,7 @@ module Analysis.Analysis.Exception
 , ExcSet(..)
 , exceptionTracing
 , exceptionTracingIndependent
+, instrumentLines
 , fromExceptions
 , var
 , exc
@@ -38,12 +40,14 @@ import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Reader
 import           Control.Effect.Labelled
 import           Control.Effect.State
+import           Control.Effect.Writer
 import qualified Data.Foldable as Foldable
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
+import           Source.Span
 
 -- | Names of exceptions thrown in the guest language and recorded by this analysis.
 --
@@ -105,6 +109,14 @@ exceptionTracingIndependent
   -> [File term]
   -> [(A.MStore ExcSet, File (Module ExcSet))]
 exceptionTracingIndependent eval = A.runFilesIndependent (runFile eval)
+
+instrumentLines :: (Has (Reader Reference) sig m, Has (Writer LineMap) sig m) => ((term -> m ExcSet) -> term -> m ExcSet) -> ((term -> m ExcSet) -> term -> m ExcSet)
+instrumentLines eval recur term = do
+  Reference _ (Span (Pos startLine _) (Pos endLine _) ) <- ask
+  let lineNumbers = [startLine..endLine]
+  set <- eval recur term
+  tell (lineMapFromList (map (, set) lineNumbers))
+  pure set
 
 runFile
   :: ( Has (State (A.MStore ExcSet)) sig m
