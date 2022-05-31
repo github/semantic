@@ -56,7 +56,7 @@ newtype Exception = Exception { exceptionName :: Name }
   deriving (Eq, Ord, Show)
 
 -- | Sets whose elements are each a variable or an exception.
-data ExcSet = ExcSet { freeVariables :: Set.Set Name, exceptions :: Set.Set Exception }
+data ExcSet = ExcSet { freeVariables :: Set.Set Name, exceptions :: IntMap.IntMap Exception }
   deriving (Eq, Ord, Show)
 
 instance Semigroup ExcSet where
@@ -65,14 +65,14 @@ instance Semigroup ExcSet where
 instance Monoid ExcSet where
   mempty = ExcSet mempty mempty
 
-fromExceptions :: Foldable t => t Exception -> ExcSet
-fromExceptions = ExcSet mempty . Set.fromList . Foldable.toList
+fromExceptions :: Foldable t => t (IntMap.Key, Exception) -> ExcSet
+fromExceptions = ExcSet mempty . IntMap.fromList . Foldable.toList
 
 var :: Name -> ExcSet
 var v = ExcSet (Set.singleton v) mempty
 
-exc :: Exception -> ExcSet
-exc e = ExcSet mempty (Set.singleton e)
+exc :: IntMap.Key -> Exception -> ExcSet
+exc k e = ExcSet mempty (IntMap.singleton k e)
 
 subst  :: Name -> ExcSet -> ExcSet -> ExcSet
 subst name (ExcSet fvs' es') (ExcSet fvs es) = ExcSet (Set.delete name fvs <> fvs') (es <> es')
@@ -145,7 +145,7 @@ runFile eval file = traverse run file where
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
-instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m) where
+instance (Has (Reader Reference) sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m) where
   alg hdl sig ctx = ExcC $ case sig of
     L dom   -> case dom of
       DVar n    -> pure $ var n <$ ctx
@@ -157,7 +157,9 @@ instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m)
       DIf c t e -> fmap (mappend c) <$> runExcC (hdl (t <$ ctx) <|> hdl (e <$ ctx))
       DString s -> pure (var (name (Text.dropAround (== '"') s)) <$ ctx) -- FIXME: include strings as a separate field in exception sets.
       t :>>> u  -> pure (t <> u <$ ctx)
-      DDie e    -> pure $ e{ freeVariables = mempty } <> fromExceptions [Exception n | n <- Set.toList (freeVariables e)] <$ ctx
+      DDie e    -> do
+        Reference _ span <- ask
+        pure $ e{ freeVariables = mempty } <> fromExceptions [(l, Exception n) | n <- Set.toList (freeVariables e), l <- [line (start span)..line (end span)]] <$ ctx
       where
       nil = (mempty :: ExcSet) <$ ctx
 
