@@ -99,7 +99,7 @@ exceptionTracing
      -> (term -> m ExcSet) )
   -> [File term]
   -> (A.MStore ExcSet, [File (LineMap, Module ExcSet)])
-exceptionTracing eval = run . A.runFiles (runWriter @LineMap (\ lm f -> pure ((lm,) <$> f)) . runFile eval)
+exceptionTracing eval = run . A.runFiles (runWriter @LineMap (\ lm f -> pure ((lm,) <$> f)) . runFile (instrumentLines eval))
 
 exceptionTracingIndependent
   :: Ord term
@@ -109,7 +109,7 @@ exceptionTracingIndependent
      -> (term -> m ExcSet) )
   -> [File term]
   -> [(A.MStore ExcSet, File (LineMap, Module ExcSet))]
-exceptionTracingIndependent eval = run . A.runFilesIndependent (runWriter @LineMap (\ lm f -> pure ((lm,) <$> f)) . runFile eval)
+exceptionTracingIndependent eval = run . A.runFilesIndependent (runWriter @LineMap (\ lm f -> pure ((lm,) <$> f)) . runFile (instrumentLines eval))
 
 instrumentLines :: (Has (Reader Reference) sig m, Has (Writer LineMap) sig m) => ((term -> m ExcSet) -> term -> m ExcSet) -> ((term -> m ExcSet) -> term -> m ExcSet)
 instrumentLines eval recur term = do
