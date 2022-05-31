@@ -75,6 +75,9 @@ subst name (ExcSet fvs' es') (ExcSet fvs es) = ExcSet (Set.delete name fvs <> fv
 
 newtype LineMap = LineMap { getLineMap :: IntMap.IntMap ExcSet }
 
+instance Semigroup LineMap where
+  LineMap a <> LineMap b = LineMap (IntMap.unionWith (<>) a b)
+
 
 exceptionTracing
   :: Ord term
