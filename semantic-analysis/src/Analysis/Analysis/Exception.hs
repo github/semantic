@@ -18,6 +18,7 @@ module Analysis.Analysis.Exception
 , subst
   -- * Line maps
 , LineMap(..)
+, lineMapFromList
   -- * Exception tracing analysis
 , ExcC(..)
 ) where
@@ -80,6 +81,9 @@ instance Semigroup LineMap where
 
 instance Monoid LineMap where
   mempty = LineMap IntMap.empty
+
+lineMapFromList :: [(Int, ExcSet)] -> LineMap
+lineMapFromList = LineMap . IntMap.fromList
 
 
 exceptionTracing
