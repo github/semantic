@@ -130,11 +130,13 @@ parseFile path = do
   let sourcePath = replaceExtensions path "py"
   -- FIXME: this is comprised of several terrible assumptions.
   sourceContents <- liftIO (B.readFile sourcePath)
-  let span = Source.totalSpan (Source.fromUTF8 (B.toStrict sourceContents))
+  let span = decrSpan (Source.totalSpan (Source.fromUTF8 (B.toStrict sourceContents)))
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
     Right (_, Just root) -> pure (File (Reference (Path.absRel sourcePath) span) root)
+  where
+  decrSpan (Span (Pos sl sc) (Pos el ec)) = Span (Pos (sl - 1) (sc - 1)) (Pos (el - 1) (ec - 1))
 
 newtype Graph = Graph { terms :: IntMap.IntMap Term }
 
