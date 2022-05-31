@@ -16,6 +16,8 @@ module Analysis.Analysis.Exception
 , var
 , exc
 , subst
+  -- * Line maps
+, LineMap(..)
   -- * Exception tracing analysis
 , ExcC(..)
 ) where
@@ -37,6 +39,7 @@ import           Control.Effect.Labelled
 import           Control.Effect.State
 import qualified Data.Foldable as Foldable
 import           Data.Function (fix)
+import qualified Data.IntMap as IntMap
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
@@ -68,6 +71,9 @@ exc e = ExcSet mempty (Set.singleton e)
 
 subst  :: Name -> ExcSet -> ExcSet -> ExcSet
 subst name (ExcSet fvs' es') (ExcSet fvs es) = ExcSet (Set.delete name fvs <> fvs') (es <> es')
+
+
+newtype LineMap = LineMap { getLineMap :: IntMap.IntMap ExcSet }
 
 
 exceptionTracing
