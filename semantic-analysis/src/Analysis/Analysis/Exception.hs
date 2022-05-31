@@ -78,6 +78,9 @@ newtype LineMap = LineMap { getLineMap :: IntMap.IntMap ExcSet }
 instance Semigroup LineMap where
   LineMap a <> LineMap b = LineMap (IntMap.unionWith (<>) a b)
 
+instance Monoid LineMap where
+  mempty = LineMap IntMap.empty
+
 
 exceptionTracing
   :: Ord term
