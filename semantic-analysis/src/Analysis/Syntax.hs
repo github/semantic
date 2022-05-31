@@ -48,6 +48,7 @@ import           Data.Text (Text)
 import qualified Data.Vector as V
 import qualified Source.Source as Source
 import           Source.Span
+import           System.FilePath
 import qualified System.Path as Path
 
 data Term
@@ -126,12 +127,14 @@ letrec n m = do
 parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File Term)
 parseFile path = do
   contents <- liftIO (B.readFile path)
-  let span = Source.totalSpan (Source.fromUTF8 (B.toStrict contents))
+  let sourcePath = replaceExtensions path "py"
+  -- FIXME: this is comprised of several terrible assumptions.
+  sourceContents <- liftIO (B.readFile sourcePath)
+  let span = Source.totalSpan (Source.fromUTF8 (B.toStrict sourceContents))
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
-    -- FIXME: this should get the path to the source file, not the path to the JSON.
-    Right (_, Just root) -> pure (File (Reference (Path.absRel path) span) root)
+    Right (_, Just root) -> pure (File (Reference (Path.absRel sourcePath) span) root)
 
 newtype Graph = Graph { terms :: IntMap.IntMap Term }
 
