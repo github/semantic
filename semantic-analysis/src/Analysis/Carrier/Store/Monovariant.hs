@@ -93,18 +93,18 @@ instance Has (State (MStore value)) sig m
 -- Running
 
 runFiles
-  :: (forall sig m . Has (State (MStore  value)) sig m => File term -> m (File result))
+  :: Algebra sig m
+  => (forall sig m . Has (State (MStore  value)) sig m => File term -> m (File result))
   -> [File term]
-  -> (MStore value, [File result])
+  -> m (MStore value, [File result])
 runFiles runFile
-  = run
-  . runStoreState
+  = runStoreState
   . traverse runFile
 
 runFilesIndependent
-  :: (forall sig m . Has (State (MStore  value)) sig m => File term -> m (File result))
+  :: Algebra sig m
+  => (forall sig m . Has (State (MStore  value)) sig m => File term -> m (File result))
   -> [File term]
-  -> [(MStore value, File result)]
+  -> m [(MStore value, File result)]
 runFilesIndependent runFile
-  = run
-  . traverse (runStoreState . runFile)
+  = traverse (runStoreState . runFile)
