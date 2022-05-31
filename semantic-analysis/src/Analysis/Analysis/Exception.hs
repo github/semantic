@@ -13,7 +13,6 @@ module Analysis.Analysis.Exception
 , ExcSet(..)
 , exceptionTracing
 , exceptionTracingIndependent
-, instrumentLines
 , fromExceptions
 , var
 , exc
@@ -38,7 +37,6 @@ import           Analysis.Reference
 import           Control.Algebra
 import           Control.Applicative (Alternative (..))
 import           Control.Carrier.Reader
-import           Control.Carrier.Writer.Church
 import           Control.Effect.Labelled
 import           Control.Effect.State
 import qualified Data.Foldable as Foldable
@@ -94,37 +92,28 @@ lineMapFromList = LineMap . IntMap.fromList
 exceptionTracing
   :: Ord term
   => ( forall sig m
-     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m, Has (Writer LineMap) sig m)
+     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m)
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> [File term]
-  -> (A.MStore ExcSet, [File (LineMap, Module ExcSet)])
-exceptionTracing eval = run . A.runFiles (runWriter @LineMap (\ lm f -> pure ((lm,) <$> f)) . runFile (instrumentLines eval))
+  -> (A.MStore ExcSet, [File (Module ExcSet)])
+exceptionTracing eval = run . A.runFiles (runFile eval)
 
 exceptionTracingIndependent
   :: Ord term
   => ( forall sig m
-     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m, Has (Writer LineMap) sig m)
+     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m)
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> [File term]
-  -> [(A.MStore ExcSet, File (LineMap, Module ExcSet))]
-exceptionTracingIndependent eval = run . A.runFilesIndependent (runWriter @LineMap (\ lm f -> pure ((lm,) <$> f)) . runFile (instrumentLines eval))
-
-instrumentLines :: (Has (Reader Reference) sig m, Has (Writer LineMap) sig m) => ((term -> m ExcSet) -> term -> m ExcSet) -> ((term -> m ExcSet) -> term -> m ExcSet)
-instrumentLines eval recur term = do
-  Reference _ (Span (Pos startLine _) (Pos endLine _) ) <- ask
-  let lineNumbers = [startLine..endLine]
-  set <- eval recur term
-  tell (lineMapFromList (map (, set) lineNumbers))
-  pure set
+  -> [(A.MStore ExcSet, File (Module ExcSet))]
+exceptionTracingIndependent eval = run . A.runFilesIndependent (runFile eval)
 
 runFile
   :: ( Has (State (A.MStore ExcSet)) sig m
-     , Has (Writer LineMap) sig m
      , Ord term )
   => ( forall sig m
-     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m, Has (Writer LineMap) sig m)
+     .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m)
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
   -> File term
