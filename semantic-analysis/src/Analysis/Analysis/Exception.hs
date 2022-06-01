@@ -18,6 +18,7 @@ module Analysis.Analysis.Exception
 , var
 , exc
 , subst
+, nullExcSet
   -- * Line maps
 , LineMap(..)
 , lineMapFromList
@@ -76,6 +77,9 @@ exc e = ExcSet mempty (Set.singleton e)
 
 subst  :: Name -> ExcSet -> ExcSet -> ExcSet
 subst name (ExcSet fvs' es') (ExcSet fvs es) = ExcSet (Set.delete name fvs <> fvs') (es <> es')
+
+nullExcSet :: ExcSet -> Bool
+nullExcSet e = null (freeVariables e) && null (exceptions e)
 
 
 newtype LineMap = LineMap { getLineMap :: IntMap.IntMap ExcSet }
