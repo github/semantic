@@ -24,6 +24,7 @@ module Analysis.Analysis.Exception
 , LineMap(..)
 , lineMapFromList
 , nullLineMap
+, printLineMap
   -- * Exception tracing analysis
 , ExcC(..)
 ) where
@@ -45,12 +46,15 @@ import           Control.Carrier.Writer.Church
 import           Control.Effect.Labelled
 import           Control.Effect.State
 import           Control.Monad (unless)
+import           Data.Foldable (for_)
 import qualified Data.Foldable as Foldable
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
+import qualified Data.Text.IO as Text
+import qualified Source.Source as Source
 import           Source.Span
 
 -- | Names of exceptions thrown in the guest language and recorded by this analysis.
@@ -103,6 +107,22 @@ lineMapFromList = LineMap . IntMap.fromList
 nullLineMap :: LineMap -> Bool
 nullLineMap = null . getLineMap
 
+printLineMap :: Source.Source -> LineMap -> IO ()
+printLineMap src (LineMap lines) = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
+  Text.putStr (Source.toText line)
+  case lines IntMap.!? i of
+    Just set | not (nullExcSet set) -> do
+      Text.putStr (Text.pack " — ")
+      Text.putStr (union
+        [ formatFreeVariables (freeVariables set)
+        , formatExceptions    (exceptions    set)
+        ])
+    _                               -> pure ()
+  Text.putStrLn mempty
+  where
+  union = Text.intercalate (Text.pack " ∪ ")
+  formatFreeVariables fvs  = union (map formatName (Set.toList fvs))
+  formatExceptions    excs = Text.pack "{" <> union (map (formatName . exceptionName) (Set.toList excs)) <> Text.pack "}"
 
 exceptionTracing
   :: Ord term
