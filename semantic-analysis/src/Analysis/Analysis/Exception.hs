@@ -42,6 +42,7 @@ import           Control.Carrier.Reader
 import           Control.Carrier.Writer.Church
 import           Control.Effect.Labelled
 import           Control.Effect.State
+import           Control.Monad (unless)
 import qualified Data.Foldable as Foldable
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
@@ -120,7 +121,8 @@ instrumentLines eval recur term = do
   Reference _ (Span (Pos startLine _) (Pos endLine _) ) <- ask
   let lineNumbers = [startLine..endLine]
   set <- eval recur term
-  tell (lineMapFromList (map (, set) lineNumbers))
+  unless (nullExcSet set) $
+    tell (lineMapFromList (map (, set) lineNumbers))
   pure set
 
 runFile
