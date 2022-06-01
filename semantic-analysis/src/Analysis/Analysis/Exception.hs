@@ -22,6 +22,7 @@ module Analysis.Analysis.Exception
   -- * Line maps
 , LineMap(..)
 , lineMapFromList
+, nullLineMap
   -- * Exception tracing analysis
 , ExcC(..)
 ) where
@@ -94,6 +95,9 @@ instance Monoid LineMap where
 
 lineMapFromList :: [(Int, ExcSet)] -> LineMap
 lineMapFromList = LineMap . IntMap.fromList
+
+nullLineMap :: LineMap -> Bool
+nullLineMap = null . getLineMap
 
 
 exceptionTracing
