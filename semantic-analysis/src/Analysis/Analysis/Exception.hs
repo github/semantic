@@ -171,7 +171,7 @@ instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m)
       DIf c t e -> fmap (mappend c) <$> runExcC (hdl (t <$ ctx) <|> hdl (e <$ ctx))
       DString s -> pure (str (Text.dropAround (== '"') s) <$ ctx)
       t :>>> u  -> pure (t <> u <$ ctx)
-      DDie e    -> pure $ e{ freeVariables = mempty } <> fromExceptions [Exception n | n <- Set.toList (freeVariables e)] <$ ctx
+      DDie e    -> pure $ e{ strings = mempty } <> fromExceptions [Exception (name n) | n <- Set.toList (strings e)] <$ ctx
       where
       nil = (mempty :: ExcSet) <$ ctx
 
