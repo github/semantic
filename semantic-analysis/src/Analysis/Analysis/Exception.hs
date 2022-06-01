@@ -124,8 +124,8 @@ instrumentLines :: (Has (Reader Reference) sig m, Has (Writer LineMap) sig m) =>
 instrumentLines eval recur term = do
   Reference _ (Span (Pos startLine _) (Pos endLine _) ) <- ask
   let lineNumbers = [startLine..endLine]
-  set <- eval recur term
-  unless (nullExcSet set) $
+  (written, set) <- listen (eval recur term)
+  unless (nullExcSet set || not (nullLineMap written)) $
     tell (lineMapFromList (map (, set) lineNumbers))
   pure set
 
