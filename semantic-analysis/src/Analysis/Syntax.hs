@@ -239,6 +239,7 @@ analyzeFile
         .  (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m)
         => (term -> m val)
         -> (term -> m val) )
+     -> Source.Source
      -> File term
      -> (store, File (Module val)) )
   -> m (store, File (Module val))
@@ -246,4 +247,4 @@ analyzeFile path analyze = do
   parsed <- runThrow @String (parseFile path)
   case parsed of
     Left err   -> liftIO (throwIO (ErrorCall err))
-    Right file -> pure (analyze eval (fmap snd file))
+    Right file -> pure (analyze eval (fst (fileBody file)) (fmap snd file))
