@@ -4,6 +4,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Analysis.Syntax
 ( Term(..)
@@ -17,6 +18,8 @@ module Analysis.Syntax
 , parseFile
 , parseGraph
 , parseNode
+  -- * Debugging
+, analyzeFile
 ) where
 
 import qualified Analysis.Carrier.Statement.State as S
@@ -24,12 +27,15 @@ import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Store
 import           Analysis.File
+import           Analysis.Module (Module)
 import           Analysis.Name (Name, name)
 import           Analysis.Reference as Ref
 import           Control.Applicative (Alternative (..), liftA2, liftA3)
+import           Control.Carrier.Throw.Either (runThrow)
 import           Control.Effect.Labelled
 import           Control.Effect.Reader
 import           Control.Effect.Throw (Throw, throwError)
+import           Control.Exception
 import           Control.Monad (guard)
 import           Control.Monad.IO.Class
 import qualified Data.Aeson as A
@@ -220,3 +226,24 @@ locate attrs p = do
     Just s  -> pure (Locate s <$> t)
   where
   span sl sc el ec = Span <$> (Pos <$> sl <*> sc) <*> (Pos <$> el <*> ec)
+
+
+-- Debugging
+
+analyzeFile
+  :: (Algebra sig m, MonadIO m)
+  => FilePath
+  -> (  forall term
+     .  Ord term
+     => (  forall sig m
+        .  (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m)
+        => (term -> m val)
+        -> (term -> m val) )
+     -> File term
+     -> (store, File (Module val)) )
+  -> m (store, File (Module val))
+analyzeFile path analyze = do
+  parsed <- runThrow @String (parseFile path)
+  case parsed of
+    Left err   -> liftIO (throwIO (ErrorCall err))
+    Right file -> pure (analyze eval (fmap snd file))
