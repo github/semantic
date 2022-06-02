@@ -240,10 +240,10 @@ analyzeFile
         -> (term -> m val) )
      -> Source.Source
      -> File term
-     -> b )
+     -> m b )
   -> m b
 analyzeFile path analyze = do
   parsed <- runThrow @String (parseFile path)
   case parsed of
     Left err   -> liftIO (throwIO (ErrorCall err))
-    Right file -> pure (analyze eval (fst (fileBody file)) (fmap snd file))
+    Right file -> analyze eval (fst (fileBody file)) (fmap snd file)
