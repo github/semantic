@@ -140,9 +140,9 @@ exceptionTracingIndependent
      .  (Has (Env A.MAddr) sig m, HasLabelled Store (Store A.MAddr ExcSet) sig m, Has (Dom ExcSet) sig m, Has (Reader Reference) sig m, Has A.Statement sig m, Has (Writer LineMap) sig m)
      => (term -> m ExcSet)
      -> (term -> m ExcSet) )
-  -> [File term]
-  -> [(A.MStore ExcSet, File (LineMap, Module ExcSet))]
-exceptionTracingIndependent eval = run . A.runFilesIndependent (runWriter (\ lm f -> pure ((lm,) <$> f)) . runFile (instrumentLines eval))
+  -> File term
+  -> (A.MStore ExcSet, File (LineMap, Module ExcSet))
+exceptionTracingIndependent eval = run . A.runStoreState . runWriter (\ lm f -> pure ((lm,) <$> f)) . runFile (instrumentLines eval)
 
 instrumentLines :: (Has (Reader Reference) sig m, Has (Writer LineMap) sig m) => ((term -> m ExcSet) -> term -> m ExcSet) -> ((term -> m ExcSet) -> term -> m ExcSet)
 instrumentLines eval recur term = do
