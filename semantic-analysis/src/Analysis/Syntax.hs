@@ -124,17 +124,17 @@ letrec n m = do
 
 -- Parsing
 
-parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File Term)
+parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File (Source.Source, Term))
 parseFile path = do
   contents <- liftIO (B.readFile path)
   let sourcePath = replaceExtensions path "py"
   -- FIXME: this is comprised of several terrible assumptions.
-  sourceContents <- liftIO (B.readFile sourcePath)
-  let span = decrSpan (Source.totalSpan (Source.fromUTF8 (B.toStrict sourceContents)))
+  sourceContents <- Source.fromUTF8 . B.toStrict <$> liftIO (B.readFile sourcePath)
+  let span = decrSpan (Source.totalSpan sourceContents)
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
-    Right (_, Just root) -> pure (File (Reference (Path.absRel sourcePath) span) root)
+    Right (_, Just root) -> pure (File (Reference (Path.absRel sourcePath) span) (sourceContents, root))
   where
   decrSpan (Span (Pos sl sc) (Pos el ec)) = Span (Pos (sl - 1) (sc - 1)) (Pos (el - 1) (ec - 1))
 
