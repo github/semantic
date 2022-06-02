@@ -122,7 +122,7 @@ printLineMap src (LineMap lines) = for_ (zip [0..] (Source.lines src)) $ \ (i, l
   where
   union = Text.intercalate (Text.pack " ∪ ")
   formatFreeVariables fvs  = union (map formatName (Set.toList fvs))
-  formatExceptions    excs = Text.pack "{" <> union (map (formatName . exceptionName) (Set.toList excs)) <> Text.pack "}"
+  formatExceptions    excs = Text.pack "{" <> union (map (Text.pack . show . formatName . exceptionName) (Set.toList excs)) <> Text.pack "}"
 
 exceptionTracing
   :: Ord term
