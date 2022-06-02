@@ -109,7 +109,7 @@ nullLineMap = null . getLineMap
 
 printLineMap :: Source.Source -> LineMap -> IO ()
 printLineMap src (LineMap lines) = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
-  Text.putStr (Source.toText line)
+  Text.putStr (Text.dropWhileEnd (== '\n') (Source.toText line))
   case lines IntMap.!? i of
     Just set | not (nullExcSet set) -> do
       Text.putStr (Text.pack " — ")
