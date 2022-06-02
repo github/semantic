@@ -27,7 +27,6 @@ import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Store
 import           Analysis.File
-import           Analysis.Module (Module)
 import           Analysis.Name (Name, name)
 import           Analysis.Reference as Ref
 import           Control.Applicative (Alternative (..), liftA2, liftA3)
@@ -241,8 +240,8 @@ analyzeFile
         -> (term -> m val) )
      -> Source.Source
      -> File term
-     -> (store, File (Module val)) )
-  -> m (store, File (Module val))
+     -> b )
+  -> m b
 analyzeFile path analyze = do
   parsed <- runThrow @String (parseFile path)
   case parsed of
