@@ -113,16 +113,16 @@ printLineMap src (LineMap lines) = for_ (zip [0..] (Source.lines src)) $ \ (i, l
   case lines IntMap.!? i of
     Just set | not (nullExcSet set) -> do
       Text.putStr (Text.pack " — ")
-      Text.putStr (union
+      Text.putStr (Text.pack "{" <> (union
         [ formatFreeVariables (freeVariables set)
         , formatExceptions    (exceptions    set)
-        ])
+        ]) <> Text.pack "}")
     _                               -> pure ()
   Text.putStrLn mempty
   where
-  union = Text.intercalate (Text.pack " ∪ ")
+  union = Text.intercalate (Text.pack ", ")
   formatFreeVariables fvs  = union (map formatName (Set.toList fvs))
-  formatExceptions    excs = Text.pack "{" <> union (map (Text.pack . show . formatName . exceptionName) (Set.toList excs)) <> Text.pack "}"
+  formatExceptions    excs = union (map (Text.pack . show . formatName . exceptionName) (Set.toList excs))
 
 exceptionTracing
   :: Ord term
