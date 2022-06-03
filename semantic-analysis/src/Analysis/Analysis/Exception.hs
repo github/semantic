@@ -50,6 +50,7 @@ import           Data.Foldable (for_)
 import qualified Data.Foldable as Foldable
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
+import qualified Data.IntSet as IntSet
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
@@ -123,8 +124,8 @@ printLineMap src (LineMap lines) = for_ (zip [0..] (Source.lines src)) $ \ (i, l
   formatFreeVariables fvs  = map formatName (Set.toList fvs)
   formatExceptions    excs = map (Text.pack . show . formatName . exceptionName) (Set.toList excs)
 
-refLines :: Reference -> [Int]
-refLines (Reference _ (Span (Pos startLine _) (Pos endLine _))) = [startLine..endLine]
+refLines :: Reference -> IntSet.IntSet
+refLines (Reference _ (Span (Pos startLine _) (Pos endLine _))) = IntSet.fromAscList [startLine..endLine]
 
 exceptionTracing
   :: Ord term
@@ -152,7 +153,7 @@ instrumentLines eval recur term = do
   let lineNumbers = refLines ref
   (written, set) <- listen (eval recur term)
   unless (nullExcSet set || not (nullLineMap written)) $
-    tell (lineMapFromList (map (, set) lineNumbers))
+    tell (lineMapFromList (map (, set) (IntSet.toAscList lineNumbers)))
   pure set
 
 runFile
