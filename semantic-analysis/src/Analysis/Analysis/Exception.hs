@@ -64,8 +64,11 @@ import           Source.Span
 data Exception = Exception { exceptionName :: Name, exceptionLines :: IntSet.IntSet }
   deriving (Eq, Ord, Show)
 
+data FreeVariable = FreeVariable { freeVariableName :: Name, freeVariableLines :: IntSet.IntSet }
+  deriving (Eq, Ord, Show)
+
 -- | Sets whose elements are each a variable or an exception.
-data ExcSet = ExcSet { freeVariables :: Set.Set Name, exceptions :: Set.Set Exception, strings :: Set.Set Text.Text }
+data ExcSet = ExcSet { freeVariables :: Set.Set FreeVariable, exceptions :: Set.Set Exception, strings :: Set.Set Text.Text }
   deriving (Eq, Ord, Show)
 
 instance Semigroup ExcSet where
@@ -77,7 +80,7 @@ instance Monoid ExcSet where
 fromExceptions :: Foldable t => t Exception -> ExcSet
 fromExceptions es = ExcSet mempty (Set.fromList (Foldable.toList es)) mempty
 
-var :: Name -> ExcSet
+var :: FreeVariable -> ExcSet
 var v = ExcSet (Set.singleton v) mempty mempty
 
 exc :: Exception -> ExcSet
@@ -87,7 +90,7 @@ str :: Text.Text -> ExcSet
 str s = ExcSet mempty mempty (Set.singleton s)
 
 subst  :: Name -> ExcSet -> ExcSet -> ExcSet
-subst name (ExcSet fvs' es' ss') (ExcSet fvs es ss) = ExcSet (Set.delete name fvs <> fvs') (es <> es') (ss <> ss')
+subst name (ExcSet fvs' es' ss') (ExcSet fvs es ss) = ExcSet (Set.filter (\ fv -> freeVariableName fv == name) fvs <> fvs') (es <> es') (ss <> ss')
 
 nullExcSet :: ExcSet -> Bool
 nullExcSet e = null (freeVariables e) && null (exceptions e)
@@ -121,7 +124,7 @@ printLineMap src (LineMap lines) = for_ (zip [0..] (Source.lines src)) $ \ (i, l
   Text.putStrLn mempty
   where
   union = Text.intercalate (Text.pack ", ")
-  formatFreeVariables fvs  = map formatName (Set.toList fvs)
+  formatFreeVariables fvs  = map (formatName . freeVariableName) (Set.toList fvs)
   formatExceptions    excs = map (Text.pack . show . formatName . exceptionName) (Set.toList excs)
 
 refLines :: Reference -> IntSet.IntSet
@@ -176,7 +179,7 @@ runFile eval file = traverse run file where
     exports <- gets @(A.MStore ExcSet) (fmap Foldable.fold . Map.mapKeys A.getMAddr . A.getMStore)
     let set = Foldable.fold sets
         imports = Set.fromList (map extractImport msgs)
-    pure (Module (Foldable.foldl' (flip (uncurry subst)) set . Map.toList) imports exports (freeVariables set))
+    pure (Module (Foldable.foldl' (flip (uncurry subst)) set . Map.toList) imports exports (Set.map freeVariableName (freeVariables set)))
   extractImport (A.Import components) = name (Text.intercalate (Text.pack ".") (Foldable.toList components))
 
 newtype ExcC m a = ExcC { runExcC :: m a }
@@ -185,7 +188,9 @@ newtype ExcC m a = ExcC { runExcC :: m a }
 instance (Has (Reader Reference) sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m) where
   alg hdl sig ctx = ExcC $ case sig of
     L dom   -> case dom of
-      DVar n    -> pure $ var n <$ ctx
+      DVar n    -> do
+        lines <- asks refLines
+        pure $ var (FreeVariable n lines) <$ ctx
       DAbs _ b  -> runExcC (hdl (b mempty <$ ctx))
       DApp f a  -> pure $ f <> Foldable.fold a <$ ctx
       DInt _    -> pure nil
