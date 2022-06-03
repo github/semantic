@@ -22,6 +22,7 @@ module Analysis.Analysis.Exception
 , nullExcSet
 , freeVariablesForLine
 , exceptionsForLine
+, printExcSet
   -- * Line maps
 , LineMap(..)
 , lineMapFromList
@@ -102,6 +103,22 @@ freeVariablesForLine l e = Set.filter (\ fv -> IntSet.member l (freeVariableLine
 
 exceptionsForLine :: Int -> ExcSet -> Set.Set Exception
 exceptionsForLine l e = Set.filter (\ ex -> IntSet.member l (exceptionLines ex)) (exceptions e)
+
+printExcSet :: Source.Source -> ExcSet -> IO ()
+printExcSet src e = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
+  Text.putStr (Text.dropWhileEnd (== '\n') (Source.toText line))
+  let es  = exceptionsForLine    i e
+      fvs = freeVariablesForLine i e
+  unless (null es && null fvs) $ do
+    Text.putStr (Text.pack " — ")
+    Text.putStr (Text.pack "{" <> union
+      (  formatFreeVariables fvs
+      <> formatExceptions    es ) <> Text.pack "}")
+  Text.putStrLn mempty
+  where
+  union = Text.intercalate (Text.pack ", ")
+  formatFreeVariables fvs  = map (formatName . freeVariableName) (Set.toList fvs)
+  formatExceptions    excs = map (Text.pack . show . formatName . exceptionName) (Set.toList excs)
 
 
 newtype LineMap = LineMap { getLineMap :: IntMap.IntMap ExcSet }
