@@ -1,5 +1,6 @@
 module Analysis.Module
 ( Module(..)
+, moduleBody
 , ModuleSet(..)
 , link
 ) where
@@ -27,6 +28,9 @@ instance Show a => Show (Module a) where
     comma = showChar ','
     field n b = showString n . sp . showChar '=' . sp . showsPrec 0 b
     sp = showChar ' '
+
+moduleBody :: Module a -> a
+moduleBody m = body m mempty
 
 
 newtype ModuleSet a = ModuleSet { getModuleSet :: Map.Map Name (Module a) }
