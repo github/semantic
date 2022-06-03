@@ -21,6 +21,7 @@ module Analysis.Analysis.Exception
 , subst
 , nullExcSet
 , freeVariablesForLine
+, exceptionsForLine
   -- * Line maps
 , LineMap(..)
 , lineMapFromList
@@ -98,6 +99,9 @@ nullExcSet e = null (freeVariables e) && null (exceptions e)
 
 freeVariablesForLine :: Int -> ExcSet -> Set.Set FreeVariable
 freeVariablesForLine l e = Set.filter (\ fv -> IntSet.member l (freeVariableLines fv)) (freeVariables e)
+
+exceptionsForLine :: Int -> ExcSet -> Set.Set Exception
+exceptionsForLine l e = Set.filter (\ ex -> IntSet.member l (exceptionLines ex)) (exceptions e)
 
 
 newtype LineMap = LineMap { getLineMap :: IntMap.IntMap ExcSet }
