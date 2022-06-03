@@ -50,7 +50,6 @@ import           Data.Foldable (for_)
 import qualified Data.Foldable as Foldable
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
-import qualified Data.IntSet as IntSet
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
@@ -65,29 +64,29 @@ newtype Exception = Exception { exceptionName :: Name }
   deriving (Eq, Ord, Show)
 
 -- | Sets whose elements are each a variable or an exception.
-data ExcSet = ExcSet { freeVariables :: Set.Set Name, exceptions :: Set.Set Exception, strings :: Set.Set Text.Text, lines :: IntSet.IntSet }
+data ExcSet = ExcSet { freeVariables :: Set.Set Name, exceptions :: Set.Set Exception, strings :: Set.Set Text.Text }
   deriving (Eq, Ord, Show)
 
 instance Semigroup ExcSet where
-  ExcSet v1 e1 s1 l1 <> ExcSet v2 e2 s2 l2 = ExcSet (v1 <> v2) (e1 <> e2) (s1 <> s2) (l1 <> l2)
+  ExcSet v1 e1 s1 <> ExcSet v2 e2 s2 = ExcSet (v1 <> v2) (e1 <> e2) (s1 <> s2)
 
 instance Monoid ExcSet where
-  mempty = ExcSet mempty mempty mempty mempty
+  mempty = ExcSet mempty mempty mempty
 
 fromExceptions :: Foldable t => t Exception -> ExcSet
-fromExceptions es = ExcSet mempty (Set.fromList (Foldable.toList es)) mempty mempty
+fromExceptions es = ExcSet mempty (Set.fromList (Foldable.toList es)) mempty
 
 var :: Name -> ExcSet
-var v = ExcSet (Set.singleton v) mempty mempty mempty
+var v = ExcSet (Set.singleton v) mempty mempty
 
 exc :: Exception -> ExcSet
-exc e = ExcSet mempty (Set.singleton e) mempty mempty
+exc e = ExcSet mempty (Set.singleton e) mempty
 
 str :: Text.Text -> ExcSet
-str s = ExcSet mempty mempty (Set.singleton s) mempty
+str s = ExcSet mempty mempty (Set.singleton s)
 
 subst  :: Name -> ExcSet -> ExcSet -> ExcSet
-subst name (ExcSet fvs' es' ss' ls') (ExcSet fvs es ss ls) = ExcSet (Set.delete name fvs <> fvs') (es <> es') (ss <> ss') (ls <> ls')
+subst name (ExcSet fvs' es' ss') (ExcSet fvs es ss) = ExcSet (Set.delete name fvs <> fvs') (es <> es') (ss <> ss')
 
 nullExcSet :: ExcSet -> Bool
 nullExcSet e = null (freeVariables e) && null (exceptions e)
