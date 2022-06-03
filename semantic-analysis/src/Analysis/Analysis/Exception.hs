@@ -61,7 +61,7 @@ import           Source.Span
 -- | Names of exceptions thrown in the guest language and recorded by this analysis.
 --
 -- Not to be confused with exceptions thrown in Haskell itself.
-newtype Exception = Exception { exceptionName :: Name }
+data Exception = Exception { exceptionName :: Name, exceptionLines :: IntSet.IntSet }
   deriving (Eq, Ord, Show)
 
 -- | Sets whose elements are each a variable or an exception.
@@ -182,7 +182,7 @@ runFile eval file = traverse run file where
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
-instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m) where
+instance (Has (Reader Reference) sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m) where
   alg hdl sig ctx = ExcC $ case sig of
     L dom   -> case dom of
       DVar n    -> pure $ var n <$ ctx
@@ -194,7 +194,9 @@ instance (Algebra sig m, Alternative m) => Algebra (Dom ExcSet :+: sig) (ExcC m)
       DIf c t e -> fmap (mappend c) <$> runExcC (hdl (t <$ ctx) <|> hdl (e <$ ctx))
       DString s -> pure (str (Text.dropAround (== '"') s) <$ ctx)
       t :>>> u  -> pure (t <> u <$ ctx)
-      DDie e    -> pure $ e{ strings = mempty } <> fromExceptions [Exception (name n) | n <- Set.toList (strings e)] <$ ctx
+      DDie e    -> do
+        lines <- asks refLines
+        pure $ e{ strings = mempty } <> fromExceptions [Exception (name n) lines | n <- Set.toList (strings e)] <$ ctx
       where
       nil = (mempty :: ExcSet) <$ ctx
 
