@@ -123,6 +123,9 @@ printLineMap src (LineMap lines) = for_ (zip [0..] (Source.lines src)) $ \ (i, l
   formatFreeVariables fvs  = map formatName (Set.toList fvs)
   formatExceptions    excs = map (Text.pack . show . formatName . exceptionName) (Set.toList excs)
 
+refLines :: Reference -> [Int]
+refLines (Reference _ (Span (Pos startLine _) (Pos endLine _))) = [startLine..endLine]
+
 exceptionTracing
   :: Ord term
   => ( forall sig m
@@ -145,8 +148,8 @@ exceptionTracingIndependent eval = run . A.runStoreState . runWriter (\ lm f -> 
 
 instrumentLines :: (Has (Reader Reference) sig m, Has (Writer LineMap) sig m) => ((term -> m ExcSet) -> term -> m ExcSet) -> ((term -> m ExcSet) -> term -> m ExcSet)
 instrumentLines eval recur term = do
-  Reference _ (Span (Pos startLine _) (Pos endLine _) ) <- ask
-  let lineNumbers = [startLine..endLine]
+  ref <- ask
+  let lineNumbers = refLines ref
   (written, set) <- listen (eval recur term)
   unless (nullExcSet set || not (nullLineMap written)) $
     tell (lineMapFromList (map (, set) lineNumbers))
