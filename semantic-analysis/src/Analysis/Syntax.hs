@@ -244,10 +244,8 @@ analyzeFile
      -> m b )
   -> m b
 analyzeFile path analyze = do
-  parsed <- runThrow @String (parseFile path)
-  case parsed of
-    Left err   -> liftIO (throwIO (ErrorCall err))
-    Right file -> analyze eval (fst (fileBody file)) (fmap snd file)
+  file <- parseToTerm path
+  analyze eval (fst (fileBody file)) (fmap snd file)
 
 parseToTerm :: (Algebra sig m, MonadIO m) => FilePath -> m (File (Source.Source, Term))
 parseToTerm path = do
