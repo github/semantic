@@ -130,7 +130,7 @@ letrec n m = do
 
 -- Parsing
 
-parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File (Source.Source, Term))
+parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (Source.Source, File Term)
 parseFile path = do
   contents <- liftIO (B.readFile path)
   let sourcePath = replaceExtensions path "py"
@@ -140,7 +140,7 @@ parseFile path = do
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
-    Right (_, Just root) -> pure (File (Reference (Path.absRel sourcePath) span) (sourceContents, root))
+    Right (_, Just root) -> pure (sourceContents, File (Reference (Path.absRel sourcePath) span) root)
   where
   decrSpan (Span (Pos sl sc) (Pos el ec)) = Span (Pos (sl - 1) (sc - 1)) (Pos (el - 1) (ec - 1))
 
@@ -244,10 +244,10 @@ analyzeFile
      -> m b )
   -> m b
 analyzeFile path analyze = do
-  file <- parseToTerm path
-  analyze eval (fst (fileBody file)) (fmap snd file)
+  (src, file) <- parseToTerm path
+  analyze eval src file
 
-parseToTerm :: (Algebra sig m, MonadIO m) => FilePath -> m (File (Source.Source, Term))
+parseToTerm :: (Algebra sig m, MonadIO m) => FilePath -> m (Source.Source, File Term)
 parseToTerm path = do
   parsed <- runThrow @String (parseFile path)
   either (liftIO . throwIO . ErrorCall) pure parsed
