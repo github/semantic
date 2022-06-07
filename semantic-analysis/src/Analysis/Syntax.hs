@@ -20,6 +20,7 @@ module Analysis.Syntax
 , parseNode
   -- * Debugging
 , analyzeFile
+, parseToTerm
 ) where
 
 import qualified Analysis.Carrier.Statement.State as S
@@ -247,3 +248,8 @@ analyzeFile path analyze = do
   case parsed of
     Left err   -> liftIO (throwIO (ErrorCall err))
     Right file -> analyze eval (fst (fileBody file)) (fmap snd file)
+
+parseToTerm :: (Algebra sig m, MonadIO m) => FilePath -> m (File (Source.Source, Term))
+parseToTerm path = do
+  parsed <- runThrow @String (parseFile path)
+  either (liftIO . throwIO . ErrorCall) pure parsed
