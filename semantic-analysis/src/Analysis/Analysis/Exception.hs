@@ -86,7 +86,14 @@ str :: Text.Text -> ExcSet
 str s = ExcSet mempty mempty (Set.singleton s)
 
 subst  :: Name -> ExcSet -> ExcSet -> ExcSet
-subst name (ExcSet fvs' es' ss') (ExcSet fvs es ss) = ExcSet (Set.filter (\ fv -> freeVariableName fv == name) fvs <> fvs') (es <> es') (ss <> ss')
+-- FIXME: this doesn't handle transitivity at all.
+subst name (ExcSet _ es' _) (ExcSet fvs es ss) = ExcSet fvs'' (es <> es'') ss
+  where
+  (fvs'', es'') = foldMap combine fvs
+  combine fv
+    | freeVariableName fv == name = (mempty, Set.map (\ (Exception n _) -> Exception n (freeVariableLines fv)) es')
+    | otherwise                   = (Set.singleton fv, mempty)
+
 
 nullExcSet :: ExcSet -> Bool
 nullExcSet e = null (freeVariables e) && null (exceptions e)
