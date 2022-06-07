@@ -2,6 +2,7 @@ module Analysis.Module
 ( Module(..)
 , moduleBody
 , ModuleSet(..)
+, fromList
 , link
 ) where
 
@@ -40,6 +41,9 @@ instance Semigroup (ModuleSet a) where
 
 instance Monoid (ModuleSet a) where
   mempty = ModuleSet mempty
+
+fromList :: [(Name, Module a)] -> ModuleSet a
+fromList = ModuleSet . Map.fromList
 
 link :: ModuleSet a -> Module a -> Module a
 link (ModuleSet ms) m = Module body' (imports m Set.\\ Map.keysSet ms) (exports m) unknown' where
