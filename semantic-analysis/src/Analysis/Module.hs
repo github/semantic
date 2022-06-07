@@ -38,6 +38,9 @@ newtype ModuleSet a = ModuleSet { getModuleSet :: Map.Map Name (Module a) }
 instance Semigroup (ModuleSet a) where
   m1 <> m2 = ModuleSet ((link m2 <$> getModuleSet m1) <> (link m1 <$> getModuleSet m2))
 
+instance Monoid (ModuleSet a) where
+  mempty = ModuleSet mempty
+
 link :: ModuleSet a -> Module a -> Module a
 link (ModuleSet ms) m = Module body' (imports m Set.\\ Map.keysSet ms) (exports m) unknown' where
   (unknown', body') = foldl' (uncurry resolveSymbolsInModule) (unknown m, body m) (Map.restrictKeys ms (imports m))
