@@ -6,10 +6,14 @@ module Analysis.Module
 , link
 ) where
 
+import           Analysis.File
 import           Analysis.Name
+import           Analysis.Reference
 import           Data.Foldable (foldl')
 import qualified Data.Map as Map
 import qualified Data.Set as Set
+import qualified Data.Text as Text
+import qualified System.Path as Path
 
 data Module a = Module
   { body    :: Map.Map Name a -> a
@@ -42,8 +46,10 @@ instance Semigroup (ModuleSet a) where
 instance Monoid (ModuleSet a) where
   mempty = ModuleSet mempty
 
-fromList :: [(Name, Module a)] -> ModuleSet a
-fromList = ModuleSet . Map.fromList
+fromList :: [File (Module a)] -> ModuleSet a
+fromList = ModuleSet . Map.fromList . map (\ (File ref mod) -> (refName ref , mod))
+  where
+  refName (Reference path _) = name (Text.pack (Path.toString (Path.takeBaseName path)))
 
 link :: ModuleSet a -> Module a -> Module a
 link (ModuleSet ms) m = Module body' (imports m Set.\\ Map.keysSet ms) (exports m) unknown' where
