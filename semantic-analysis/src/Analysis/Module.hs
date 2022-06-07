@@ -39,6 +39,7 @@ moduleBody m = body m mempty
 
 
 newtype ModuleSet a = ModuleSet { getModuleSet :: Map.Map Name (Module a) }
+  deriving (Show)
 
 instance Semigroup (ModuleSet a) where
   m1 <> m2 = ModuleSet ((link m2 <$> getModuleSet m1) <> (link m1 <$> getModuleSet m2))
