@@ -106,7 +106,7 @@ exceptionsForLine l e = Set.filter (\ ex -> IntSet.member l (exceptionLines ex))
 
 printExcSet :: Source.Source -> ExcSet -> IO ()
 printExcSet src e = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
-  Text.putStr (Text.dropWhileEnd (== '\n') (Source.toText line))
+  Text.putStr (Text.pack "\ESC[37;1m" <> Text.dropWhileEnd (== '\n') (Source.toText line) <> Text.pack "\ESC[0m")
   let es  = exceptionsForLine    i e
       fvs = freeVariablesForLine i e
   unless (null es && null fvs) $ do
