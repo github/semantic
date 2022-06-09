@@ -117,7 +117,7 @@ printExcSet src e = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
   Text.putStrLn mempty
   where
   union = Text.intercalate (Text.pack ", ")
-  formatFreeVariables fvs  = map (formatName . freeVariableName) (Set.toList fvs)
+  formatFreeVariables fvs  = map (\ fv -> Text.pack "?" <> formatName (freeVariableName fv)) (Set.toList fvs)
   formatExceptions    excs = map (Text.pack . show . formatName . exceptionName) (Set.toList excs)
 
 refLines :: Reference -> IntSet.IntSet
