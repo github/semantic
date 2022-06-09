@@ -113,7 +113,7 @@ printExcSet src e = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
     Text.putStr (Text.pack " \ESC[30;1m# ")
     Text.putStr (Text.pack "{" <> union
       (  formatFreeVariables fvs
-      <> formatExceptions    es ) <> Text.pack "}\ESC[0m")
+      <> formatExceptions    es ) <> Text.pack "}" <> reset)
   Text.putStrLn mempty
   where
   keyword k s = Text.intercalate (Text.pack "\ESC[34;1m" <> k <> reset) (Text.splitOn k s)
