@@ -106,7 +106,7 @@ exceptionsForLine l e = Set.filter (\ ex -> IntSet.member l (exceptionLines ex))
 
 printExcSet :: Source.Source -> ExcSet -> IO ()
 printExcSet src e = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
-  Text.putStr (pass (def (import' (raise (Text.dropWhileEnd (== '\n') (Source.toText line))))))
+  Text.putStr (keywords (Text.dropWhileEnd (== '\n') (Source.toText line)))
   let es  = exceptionsForLine    i e
       fvs = freeVariablesForLine i e
   unless (null es && null fvs) $ do
@@ -117,10 +117,7 @@ printExcSet src e = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
   Text.putStrLn mempty
   where
   keyword k s = Text.intercalate (Text.pack "\ESC[34;1m" <> k <> reset) (Text.splitOn k s)
-  raise = keyword (Text.pack "raise")
-  import' = keyword (Text.pack "import")
-  def = keyword (Text.pack "def")
-  pass = keyword (Text.pack "pass")
+  keywords = keyword (Text.pack "raise") . keyword (Text.pack "import") . keyword (Text.pack "def") . keyword (Text.pack "pass")
   union = Text.intercalate (Text.pack ", ")
   formatFreeVariables fvs  = map (\ fv -> Text.pack "?" <> formatName (freeVariableName fv)) (Set.toList fvs)
   formatExceptions    excs = map (Text.pack . show . formatName . exceptionName) (Set.toList excs)
