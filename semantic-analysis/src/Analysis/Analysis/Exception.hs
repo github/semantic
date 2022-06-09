@@ -110,10 +110,10 @@ printExcSet src e = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
   let es  = exceptionsForLine    i e
       fvs = freeVariablesForLine i e
   unless (null es && null fvs) $ do
-    Text.putStr (Text.pack " # ")
+    Text.putStr (Text.pack " \ESC[30;1m# ")
     Text.putStr (Text.pack "{" <> union
       (  formatFreeVariables fvs
-      <> formatExceptions    es ) <> Text.pack "}")
+      <> formatExceptions    es ) <> Text.pack "}\ESC[0m")
   Text.putStrLn mempty
   where
   union = Text.intercalate (Text.pack ", ")
