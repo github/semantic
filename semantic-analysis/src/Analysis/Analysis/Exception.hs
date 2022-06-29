@@ -3,6 +3,7 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
@@ -110,18 +111,18 @@ printExcSet src e = for_ (zip [0..] (Source.lines src)) $ \ (i, line) -> do
   let es  = exceptionsForLine    i e
       fvs = freeVariablesForLine i e
   unless (null es && null fvs) $ do
-    Text.putStr (Text.pack " \ESC[30;1m# ")
-    Text.putStr (Text.pack "{" <> union
+    Text.putStr " \ESC[30;1m# "
+    Text.putStr ("{" <> union
       (  formatFreeVariables fvs
-      <> formatExceptions    es ) <> Text.pack "}" <> reset)
+      <> formatExceptions    es ) <> "}" <> reset)
   Text.putStrLn mempty
   where
-  keyword k s = Text.intercalate (Text.pack "\ESC[34;1m" <> k <> reset) (Text.splitOn k s)
-  keywords = keyword (Text.pack "raise") . keyword (Text.pack "import") . keyword (Text.pack "def") . keyword (Text.pack "pass")
-  union = Text.intercalate (Text.pack ", ")
-  formatFreeVariables fvs  = map (\ fv -> Text.pack "?" <> formatName (freeVariableName fv)) (Set.toList fvs)
+  keyword k s = Text.intercalate ("\ESC[34;1m" <> k <> reset) (Text.splitOn k s)
+  keywords = keyword "raise" . keyword "import" . keyword "def" . keyword "pass"
+  union = Text.intercalate ", "
+  formatFreeVariables fvs  = map (\ fv -> "?" <> formatName (freeVariableName fv)) (Set.toList fvs)
   formatExceptions    excs = map (Text.pack . show . formatName . exceptionName) (Set.toList excs)
-  reset = Text.pack "\ESC[0m"
+  reset = "\ESC[0m"
 
 refLines :: Reference -> IntSet.IntSet
 refLines (Reference _ (Span (Pos startLine _) (Pos endLine _))) = IntSet.fromAscList [startLine..endLine]
@@ -166,7 +167,7 @@ runFile eval file = traverse run file where
     let set = Foldable.fold sets
         imports = Set.fromList (map extractImport msgs)
     pure (Module (Foldable.foldl' (flip (uncurry subst)) set . Map.toList) imports exports (Set.map freeVariableName (freeVariables set)))
-  extractImport (A.Import components) = name (Text.intercalate (Text.pack ".") (Foldable.toList components))
+  extractImport (A.Import components) = name (Text.intercalate "." (Foldable.toList components))
 
 newtype ExcC m a = ExcC { runExcC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
