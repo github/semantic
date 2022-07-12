@@ -4,6 +4,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Analysis.Syntax
 ( Term(..)
@@ -17,6 +18,9 @@ module Analysis.Syntax
 , parseFile
 , parseGraph
 , parseNode
+  -- * Debugging
+, analyzeFile
+, parseToTerm
 ) where
 
 import qualified Analysis.Carrier.Statement.State as S
@@ -24,11 +28,14 @@ import           Analysis.Effect.Domain
 import           Analysis.Effect.Env (Env, bind, lookupEnv)
 import           Analysis.Effect.Store
 import           Analysis.File
-import           Analysis.Name (Name, name, nameI)
+import           Analysis.Name (Name, name)
 import           Analysis.Reference as Ref
-import           Control.Applicative (Alternative (..), liftA3)
+import           Control.Applicative (Alternative (..), liftA2, liftA3)
+import           Control.Carrier.Throw.Either (runThrow)
 import           Control.Effect.Labelled
+import           Control.Effect.Reader
 import           Control.Effect.Throw (Throw, throwError)
+import           Control.Exception
 import           Control.Monad (guard)
 import           Control.Monad.IO.Class
 import qualified Data.Aeson as A
@@ -36,7 +43,7 @@ import qualified Data.Aeson.Internal as A
 import qualified Data.Aeson.Parser as A
 import qualified Data.Aeson.Types as A
 import qualified Data.ByteString.Lazy as B
-import           Data.Foldable (fold)
+import           Data.Foldable (fold, foldl')
 import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import           Data.List (sortOn)
@@ -45,6 +52,9 @@ import           Data.Monoid (First (..))
 import           Data.String (IsString (..))
 import           Data.Text (Text)
 import qualified Data.Vector as V
+import qualified Source.Source as Source
+import           Source.Span
+import           System.FilePath
 import qualified System.Path as Path
 
 data Term
@@ -55,18 +65,23 @@ data Term
   | String Text
   | Throw Term
   | Let Name Term Term
+  | Term :>> Term
   | Import (NonEmpty Text)
   | Function Name [Name] Term
+  | Call Term [Term]
+  | Locate Span Term
   deriving (Eq, Ord, Show)
+
+infixl 1 :>>
 
 
 -- Abstract interpretation
 
-eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m) => Term -> m val
+eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m) => Term -> m val
 eval0 = fix eval
 
 eval
-  :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has S.Statement sig m)
+  :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m)
   => (Term -> m val)
   -> (Term -> m val)
 eval eval = \case
@@ -81,9 +96,20 @@ eval eval = \case
   Let n v b -> do
     v' <- eval v
     let' n v' (eval b)
+  t :>> u   -> do
+    t' <- eval t
+    u' <- eval u
+    t' >>> u'
   Import ns -> S.simport ns >> dunit
   Function n ps b -> letrec n (dabs ps (\ as ->
     foldr (\ (p, a) m -> let' p a m) (eval b) (zip ps as)))
+  Call f as -> do
+    f' <- eval f
+    as' <- traverse eval as
+    dapp f' as'
+  Locate s t -> local (setSpan s) (eval t)
+  where
+  setSpan s r = r{ refSpan = s }
 
 
 -- Macro-expressible syntax
@@ -104,15 +130,19 @@ letrec n m = do
 
 -- Parsing
 
-parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (File Term)
+parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (Source.Source, File Term)
 parseFile path = do
   contents <- liftIO (B.readFile path)
+  let sourcePath = replaceExtensions path "py"
+  -- FIXME: this is comprised of several terrible assumptions.
+  sourceContents <- Source.fromUTF8 . B.toStrict <$> liftIO (B.readFile sourcePath)
+  let span = decrSpan (Source.totalSpan sourceContents)
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
-    -- FIXME: this should get the path to the source file, not the path to the JSON.
-    -- FIXME: this should use the span of the source file, not an empty span.
-    Right (_, Just root) -> pure (File (Ref.fromPath (Path.absRel path)) root)
+    Right (_, Just root) -> pure (sourceContents, File (Reference (Path.absRel sourcePath) span) root)
+  where
+  decrSpan (Span (Pos sl sc) (Pos el ec)) = Span (Pos (sl - 1) (sc - 1)) (Pos (el - 1) (ec - 1))
 
 newtype Graph = Graph { terms :: IntMap.IntMap Term }
 
@@ -139,7 +169,7 @@ parseNode = A.withObject "node" $ \ o -> do
     pure (IntMap.singleton index node, node <$ First (guard (ty == "module"))))
 
 parseTerm :: A.Object -> [A.Value] -> String -> A.Parser (Graph -> Term)
-parseTerm attrs edges = \case
+parseTerm attrs edges = locate attrs . \case
   "string"     -> const . String <$> attrs A..: fromString "text"
   "true"       -> pure (const (Bool True))
   "false"      -> pure (const (Bool False))
@@ -150,6 +180,8 @@ parseTerm attrs edges = \case
   "identifier" -> const . Var . name <$> attrs A..: fromString "text"
   "import"     -> const . Import . fromList . map snd . sortOn fst <$> traverse (resolveWith (const moduleNameComponent)) edges
   "function"   -> liftA3 Function . pure . name <$> attrs A..: fromString "name" <*> pure (pure []) <*> findEdgeNamed edges "body"
+  "call"       -> liftA2 Call . const . Var . name <$> attrs A..: fromString "function" <*> (sequenceA <$> traverse resolve edges)
+  "noop"       -> pure (pure Noop)
   t            -> A.parseFail ("unrecognized type: " <> t <> " attrs: " <> show attrs <> " edges: " <> show edges)
 
 findEdgeNamed :: (Foldable t, A.FromJSON a, Eq a) => t A.Value -> a -> A.Parser (Graph -> Term)
@@ -157,14 +189,17 @@ findEdgeNamed edges name = foldMap (resolveWith (\ rep attrs -> attrs A..: fromS
 
 -- | Map a list of edges to a list of child nodes.
 children :: [A.Value] -> A.Parser (Graph -> Term)
-children edges = fmap (foldr chain Noop . zip [0..]) . sequenceA <$> traverse resolve edges
+children edges = fmap chain . sequenceA . map snd . sortOn fst <$> traverse (resolveWith child) edges
+  where
+  child :: (Graph -> Term) -> A.Object -> A.Parser (Int, Graph -> Term)
+  child term attrs = (,) <$> attrs A..: fromString "index" <*> pure term
+
+  chain :: [Term] -> Term
+  chain []     = Noop
+  chain (t:ts) = foldl' (:>>) t ts
 
 moduleNameComponent :: A.Object -> A.Parser (Int, Text)
 moduleNameComponent attrs = (,) <$> attrs A..: fromString "index" <*> attrs A..: fromString "text"
-
--- | Chain a statement before any following syntax by let-binding it. Note that this implies call-by-value since any side effects in the statement must be performed before the let's body.
-chain :: (Int, Term) -> Term -> Term
-chain = uncurry (Let . nameI)
 
 resolve :: A.Value -> A.Parser (Graph -> Term)
 resolve = resolveWith (const . pure)
@@ -177,3 +212,42 @@ resolveWith' f = A.withObject "edge" (\ edge -> do
   sink <- edge A..: fromString "sink"
   attrs <- edge A..: fromString "attrs"
   f sink attrs)
+
+locate :: A.Object -> A.Parser (Graph -> Term) -> A.Parser (Graph -> Term)
+locate attrs p = do
+  span <- span
+    <$> attrs A..:? fromString "start-line"
+    <*> attrs A..:? fromString "start-col"
+    <*> attrs A..:? fromString "end-line"
+    <*> attrs A..:? fromString "end-col"
+  t <- p
+  case span of
+    Nothing -> pure t
+    Just s  -> pure (Locate s <$> t)
+  where
+  span sl sc el ec = Span <$> (Pos <$> sl <*> sc) <*> (Pos <$> el <*> ec)
+
+
+-- Debugging
+
+analyzeFile
+  :: (Algebra sig m, MonadIO m)
+  => FilePath
+  -> (  forall term
+     .  Ord term
+     => (  forall sig m
+        .  (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m)
+        => (term -> m val)
+        -> (term -> m val) )
+     -> Source.Source
+     -> File term
+     -> m b )
+  -> m b
+analyzeFile path analyze = do
+  (src, file) <- parseToTerm path
+  analyze eval src file
+
+parseToTerm :: (Algebra sig m, MonadIO m) => FilePath -> m (Source.Source, File Term)
+parseToTerm path = do
+  parsed <- runThrow @String (parseFile path)
+  either (liftIO . throwIO . ErrorCall) pure parsed

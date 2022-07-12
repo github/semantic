@@ -21,6 +21,8 @@ module Analysis.Effect.Domain
 , dif
   -- * Strings
 , dstring
+  -- * Statements
+, (>>>)
   -- * Exceptions
 , ddie
   -- * Domain effect
@@ -79,6 +81,15 @@ dstring :: Has (Dom val) sig m => Text -> m val
 dstring = send . DString
 
 
+-- Statements
+
+-- | Combine the results of adjacent statements.
+--
+-- This exists to allow e.g. collecting analyses to see the results of earlier statements when processing later ones, without requiring @val@ to be a 'Semigroup'. For example, concrete and typechecking domains would likely ignore the first parameter and return the second, while a domain counting the number of visited instructions would return the sum of both.
+(>>>) :: Has (Dom val) sig m => val -> val -> m val
+t >>> u = send (t :>>> u)
+
+
 -- Exceptions
 
 ddie :: Has (Dom val) sig m => val -> m val
@@ -96,4 +107,5 @@ data Dom val m k where
   DBool :: Bool -> Dom val m val
   DIf :: val -> m val -> m val -> Dom val m val
   DString :: Text -> Dom val m val
+  (:>>>) :: val -> val -> Dom val m val
   DDie :: val -> Dom val m val

@@ -242,6 +242,8 @@ instance ( Alternative m
       sequenceA_ (zipWith unify a args)
       pure (ret <$ ctx)
 
+    L (_ :>>> t) -> pure (t <$ ctx)
+
     L (DDie msg) -> fail (show msg)
 
     R other -> DomainC (alg (runDomain . hdl) other ctx)

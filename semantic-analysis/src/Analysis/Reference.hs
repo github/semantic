@@ -16,7 +16,6 @@ data Reference = Reference
   , refSpan :: Span
   }
   deriving (Eq, Ord, Show)
--- FIXME: add this to some sort of static context carried in analyses
 
 
 -- Constructors
