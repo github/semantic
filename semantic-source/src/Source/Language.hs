@@ -109,34 +109,34 @@ forPath path =
 
 languageToText :: Language -> T.Text
 languageToText = \case
-  Unknown -> "Unknown"
-  CodeQL -> "CodeQL"
-  Go -> "Go"
-  Haskell -> "Haskell"
-  Java -> "Java"
+  Unknown    -> "Unknown"
+  CodeQL     -> "CodeQL"
+  Go         -> "Go"
+  Haskell    -> "Haskell"
+  Java       -> "Java"
   JavaScript -> "JavaScript"
-  JSON -> "JSON"
-  JSX -> "JSX"
-  Markdown -> "Markdown"
-  PHP -> "PHP"
-  Python -> "Python"
-  Ruby -> "Ruby"
+  JSON       -> "JSON"
+  JSX        -> "JSX"
+  Markdown   -> "Markdown"
+  PHP        -> "PHP"
+  Python     -> "Python"
+  Ruby       -> "Ruby"
   TypeScript -> "TypeScript"
-  TSX -> "TSX"
+  TSX        -> "TSX"
 
 textToLanguage :: T.Text -> Language
 textToLanguage = \case
-  "CodeQL" -> CodeQL
-  "Go" -> Go
-  "Haskell" -> Haskell
-  "Java" -> Java
+  "CodeQL"     -> CodeQL
+  "Go"         -> Go
+  "Haskell"    -> Haskell
+  "Java"       -> Java
   "JavaScript" -> JavaScript
-  "JSON" -> JSON
-  "JSX" -> JSX
-  "Markdown" -> Markdown
-  "PHP" -> PHP
-  "Python" -> Python
-  "Ruby" -> Ruby
+  "JSON"       -> JSON
+  "JSX"        -> JSX
+  "Markdown"   -> Markdown
+  "PHP"        -> PHP
+  "Python"     -> Python
+  "Ruby"       -> Ruby
   "TypeScript" -> TypeScript
-  "TSX" -> TSX
-  _ -> Unknown
+  "TSX"        -> TSX
+  _            -> Unknown
