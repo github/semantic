@@ -136,7 +136,7 @@ library
     , semantic-python ^>= 0
     , semantic-ruby ^>= 0
     , semantic-scope-graph ^>= 0
-    , semantic-source ^>= 0.1.0.1
+    , semantic-source ^>= 0.2
     , semantic-tags ^>= 0
     , semantic-tsx ^>= 0
     , semantic-typescript ^>= 0
@@ -188,7 +188,7 @@ test-suite test
     , semantic-analysis
     , semantic-ast
     , semantic-proto
-    , semantic-source ^>= 0.1.0.1
+    , semantic-source ^>= 0.2
     , semantic-tags
     , semilattices
     , tasty ^>= 1.2.3
