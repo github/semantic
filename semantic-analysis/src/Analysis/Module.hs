@@ -48,7 +48,7 @@ instance Monoid (ModuleSet a) where
   mempty = ModuleSet mempty
 
 fromList :: [File (Module a)] -> ModuleSet a
-fromList = ModuleSet . Map.fromList . map (\ (File ref mod) -> (refName ref , mod))
+fromList = ModuleSet . Map.fromList . map (\ (File ref mod) -> (refName ref, mod))
   where
   refName (Reference path _) = name (Text.pack (Path.toString (Path.takeBaseName path)))
 
