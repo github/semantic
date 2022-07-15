@@ -122,7 +122,6 @@ library
     , network >= 2.8 && < 3.2
     , network-uri ^>= 2.6.1.0
     , optparse-applicative >= 0.14.3 && < 0.16
-    , pathtype ^>= 0.8.1
     , pretty-show ^>= 1.9.5
     , proto-lens >= 0.5 && < 0.8
     , semantic-analysis ^>= 0
@@ -183,7 +182,6 @@ test-suite test
     , hspec >= 2.6 && <3
     , hspec-expectations ^>= 0.8.2
     , network >= 2.8 && < 3.2
-    , pathtype ^>= 0.8.1
     , semantic
     , semantic-analysis
     , semantic-ast
@@ -208,7 +206,6 @@ test-suite parse-examples
     , fused-effects ^>= 1.1
     , Glob
     , lens >= 4.17 && < 5.2
-    , pathtype ^>= 0.8.1
     , process ^>= 1.6.3.0
     , semantic
     , semantic-analysis ^>= 0
@@ -230,7 +227,6 @@ benchmark benchmarks
     , fused-effects ^>= 1.1
     , gauge ^>= 0.2.5
     , Glob
-    , pathtype ^>= 0.8.1
     , semantic
     , semantic-analysis ^>= 0
     , semantic-proto

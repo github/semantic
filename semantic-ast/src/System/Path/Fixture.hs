@@ -13,9 +13,8 @@ where
 
 import Control.Concurrent
 import GHC.Stack
+import System.FilePath
 import System.IO
-import qualified System.Path as Path
-import System.Path ((</>))
 
 #if BAZEL_BUILD
 import qualified Bazel.Runfiles as Bazel
@@ -29,13 +28,13 @@ type HasFixture =
 create :: IO Bazel.Runfiles
 create = Bazel.create
 
-root :: HasFixture => Path.AbsRelDir
+root :: HasFixture => FilePath
 root = Path.absRel (Bazel.rlocation ?runfiles ".")
 
-absRelFile :: (HasFixture) => String -> Path.AbsRelFile
+absRelFile :: (HasFixture) => String -> FilePath
 absRelFile x = Path.toAbsRel (root </> Path.relDir "semantic" </> ?project </> Path.relFile x)
 
-absRelDir :: HasFixture => String -> Path.AbsRelDir
+absRelDir :: HasFixture => String -> FilePath
 absRelDir x = Path.toAbsRel (root </> Path.relDir "semantic" </> ?project </> Path.relDir x)
 
 #else
@@ -46,11 +45,11 @@ type HasFixture = HasCallStack
 create :: IO ()
 create = pure ()
 
-absRelFile :: String -> Path.AbsRelFile
-absRelFile x = Path.absRel "semantic" </> Path.relFile x
+absRelFile :: String -> FilePath
+absRelFile x = "semantic" </> x
 
-absRelDir :: String -> Path.AbsRelDir
-absRelDir x = Path.absRel "semantic" </> Path.relDir x
+absRelDir :: String -> FilePath
+absRelDir x = "semantic" </> x
 
 #endif
 

@@ -12,7 +12,6 @@ import           Analysis.File
 import           Analysis.Reference
 import           Control.Lens
 import qualified Data.Blob as Data
-import           Data.Either
 import           Data.ProtoLens (defMessage)
 import qualified Data.Text as T
 import           Data.Text.Lens
@@ -22,7 +21,6 @@ import qualified Source.Language as Data
 import qualified Source.Range as Source
 import qualified Source.Source as Source (fromText, toText, totalSpan)
 import qualified Source.Span as Source
-import qualified System.Path as Path
 
 -- | An @APIBridge x y@ instance describes an isomorphism between @x@ and @y@.
 -- This is suitable for types such as 'Pos' which are representationally equivalent
@@ -80,7 +78,7 @@ instance APIBridge API.Blob Data.Blob where
       & P.language .~ (bridging # Data.blobLanguage b)
     apiBlobToBlob blob =
       let src = blob ^. content.to Source.fromText
-          pth = fromRight (Path.toAbsRel Path.emptyFile) (blob ^. path._Text.to Path.parse)
+          pth = blob ^. path._Text
       in Data.Blob
       { blobSource = src
       , blobFile = File (Reference pth (Source.totalSpan src)) (blob ^. language.bridging)

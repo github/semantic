@@ -70,7 +70,6 @@ test-suite test
   main-is:          Test.hs
   build-depends:
     , base
-    , pathtype ^>= 0.8.1
     , semantic-ast
     , semantic-rust
     , tasty

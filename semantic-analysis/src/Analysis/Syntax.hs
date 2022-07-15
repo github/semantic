@@ -55,7 +55,6 @@ import qualified Data.Vector as V
 import qualified Source.Source as Source
 import           Source.Span
 import           System.FilePath
-import qualified System.Path as Path
 
 data Term
   = Var Name
@@ -140,7 +139,7 @@ parseFile path = do
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
-    Right (_, Just root) -> pure (sourceContents, File (Reference (Path.absRel sourcePath) span) root)
+    Right (_, Just root) -> pure (sourceContents, File (Reference sourcePath span) root)
   where
   decrSpan (Span (Pos sl sc) (Pos el ec)) = Span (Pos (sl - 1) (sc - 1)) (Pos (el - 1) (ec - 1))
 

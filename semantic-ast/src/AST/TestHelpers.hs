@@ -7,29 +7,28 @@ module AST.TestHelpers
   , testCorpus
   ) where
 
-import           Control.Applicative
-import           Control.Monad
-import           Data.Attoparsec.ByteString.Char8
-import           Data.Attoparsec.ByteString.Char8 as Attoparsec
-import           Data.ByteString (ByteString, readFile)
-import           Data.ByteString.Char8 (pack, unpack)
-import           Data.Either
-import           Data.Functor
-import           Prelude hiding (takeWhile)
-import           System.Exit (exitFailure)
-import           System.Path ((</>))
-import qualified System.Path as Path
-import qualified System.Path.Directory as Path
-import           System.FilePath.Glob
-import           Test.Tasty
-import           Test.Tasty.HUnit
+import Control.Applicative
+import Control.Monad
+import Data.Attoparsec.ByteString.Char8
+import Data.Attoparsec.ByteString.Char8 as Attoparsec
+import Data.ByteString (ByteString, readFile)
+import Data.ByteString.Char8 (pack, unpack)
+import Data.Either
+import Data.Functor
+import Prelude hiding (takeWhile)
+import System.Directory
+import System.Exit (exitFailure)
+import System.FilePath
+import System.FilePath.Glob
+import Test.Tasty
+import Test.Tasty.HUnit
 
-testCorpus :: (ByteString -> IO (Either String (t a))) -> Path.AbsRelFile -> IO TestTree
+testCorpus :: (ByteString -> IO (Either String (t a))) -> FilePath -> IO TestTree
 testCorpus parse path = do
   xs <- parseCorpusFile path
   case xs of
-    Left e -> print ("Failed to parse corpus: " <> show (Path.toString path) <> " " <> "Error: " <> show e) *> exitFailure
-    Right xs -> testGroup (Path.toString path) <$> traverse corpusTestCase xs
+    Left e   -> print ("Failed to parse corpus: " <> show path <> " " <> "Error: " <> show e) *> exitFailure
+    Right xs -> testGroup path <$> traverse corpusTestCase xs
   where
     corpusTestCase (CorpusExample name code) = testCase name . either (errMsg code) pass <$> parse code
     pass = const (pure ())
@@ -38,31 +37,28 @@ testCorpus parse path = do
 -- Depending on whether these tests are invoked via cabal run or cabal test,
 -- we might be in a project subdirectory or not, so let's make sure we're
 -- in project subdirectories as needed.
-findCorpus :: Path.RelDir -> IO Path.RelDir
+findCorpus :: FilePath -> IO FilePath
 findCorpus p = do
-  cwd <- Path.getCurrentDirectory
-  if Path.takeDirName cwd == Just (Path.relDir "haskell-tree-sitter")
+  cwd <- getCurrentDirectory
+  if takeFileName cwd == "haskell-tree-sitter"
      then pure p
-     else pure (Path.relDir ".." </> p)
+     else pure (".." </> p)
 
 -- The path is expected to be relative to the language project.
-readCorpusFiles :: Path.RelDir ->  IO [Path.RelFile]
+readCorpusFiles :: FilePath ->  IO [FilePath]
 readCorpusFiles parent = do
   dir <- findCorpus parent
-  files <- globDir1 (compile "**/*.txt") (Path.toString dir)
-  pure (Path.relPath <$> files)
+  globDir1 (compile "**/*.txt") dir
 
-readCorpusFiles' :: Path.AbsRelDir ->  IO [Path.AbsRelFile]
-readCorpusFiles' dir = do
-  files <- globDir1 (compile "**/*.txt") (Path.toString dir)
-  pure (Path.file <$> files)
+readCorpusFiles' :: FilePath ->  IO [FilePath]
+readCorpusFiles' = globDir1 (compile "**/*.txt")
 
 data CorpusExample = CorpusExample { name :: String, code :: ByteString }
   deriving (Eq, Show)
 
-parseCorpusFile :: Path.AbsRelFile -> IO (Either String [CorpusExample])
+parseCorpusFile :: FilePath -> IO (Either String [CorpusExample])
 parseCorpusFile path = do
-  c <- Data.ByteString.readFile (Path.toString path)
+  c <- Data.ByteString.readFile path
   pure $ parseOnly corpusParser c
 
 corpusParser :: Parser [CorpusExample]
