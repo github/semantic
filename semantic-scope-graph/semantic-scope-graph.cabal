@@ -43,7 +43,6 @@ library
     , generic-lens
     , hashable
     , lens
-    , pathtype
     , semantic-analysis
     , semantic-source    ^>= 0.2
     , semilattices
