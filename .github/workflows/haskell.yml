@@ -66,7 +66,7 @@ jobs:
         cabal v2-run   --project-file=cabal.project.ci semantic-tags:test
         cabal v2-run   --project-file=cabal.project.ci semantic-tsx:test
         cabal v2-run   --project-file=cabal.project.ci semantic-typescript:test
-        cabal v2-run   --project-file=cabal.project.ci semantic-source:test
+        cd semantic-source && cabal v2-run   --project-file=cabal.project.ci semantic-source:test
 
     - name: Write out cache
       run: ./cabal-cache sync-to-archive --threads=2 --archive-uri=dist-cache

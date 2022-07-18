@@ -20,8 +20,6 @@ import qualified Data.Languages as Lingo
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import           GHC.Generics (Generic)
-import qualified System.Path as Path
-import qualified System.Path.PartClass as Path.PartClass
 
 -- | The various languages we support.
 data Language
@@ -96,47 +94,47 @@ knownLanguage = (/= Unknown)
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = fmap T.unpack (maybe mempty Lingo.languageExtensions (Map.lookup (languageToText language) Lingo.languages))
 
-forPath :: Path.PartClass.AbsRel ar => Path.File ar -> Language
+forPath :: FilePath -> Language
 forPath path =
   let spurious lang = lang `elem` [ "Hack" -- .php files
                                   , "GCC Machine Description" -- .md files
                                   , "XML" -- .tsx files
                                   ]
-      allResults = Lingo.languageName <$> Lingo.languagesForPath (Path.toString path)
+      allResults = Lingo.languageName <$> Lingo.languagesForPath path
   in case filter (not . spurious) allResults of
     [result] -> textToLanguage result
     _        -> Unknown
 
 languageToText :: Language -> T.Text
 languageToText = \case
-  Unknown -> "Unknown"
-  CodeQL -> "CodeQL"
-  Go -> "Go"
-  Haskell -> "Haskell"
-  Java -> "Java"
+  Unknown    -> "Unknown"
+  CodeQL     -> "CodeQL"
+  Go         -> "Go"
+  Haskell    -> "Haskell"
+  Java       -> "Java"
   JavaScript -> "JavaScript"
-  JSON -> "JSON"
-  JSX -> "JSX"
-  Markdown -> "Markdown"
-  PHP -> "PHP"
-  Python -> "Python"
-  Ruby -> "Ruby"
+  JSON       -> "JSON"
+  JSX        -> "JSX"
+  Markdown   -> "Markdown"
+  PHP        -> "PHP"
+  Python     -> "Python"
+  Ruby       -> "Ruby"
   TypeScript -> "TypeScript"
-  TSX -> "TSX"
+  TSX        -> "TSX"
 
 textToLanguage :: T.Text -> Language
 textToLanguage = \case
-  "CodeQL" -> CodeQL
-  "Go" -> Go
-  "Haskell" -> Haskell
-  "Java" -> Java
+  "CodeQL"     -> CodeQL
+  "Go"         -> Go
+  "Haskell"    -> Haskell
+  "Java"       -> Java
   "JavaScript" -> JavaScript
-  "JSON" -> JSON
-  "JSX" -> JSX
-  "Markdown" -> Markdown
-  "PHP" -> PHP
-  "Python" -> Python
-  "Ruby" -> Ruby
+  "JSON"       -> JSON
+  "JSX"        -> JSX
+  "Markdown"   -> Markdown
+  "PHP"        -> PHP
+  "Python"     -> Python
+  "Ruby"       -> Ruby
   "TypeScript" -> TypeScript
-  "TSX" -> TSX
-  _ -> Unknown
+  "TSX"        -> TSX
+  _            -> Unknown

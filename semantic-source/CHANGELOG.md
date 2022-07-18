@@ -1,3 +1,9 @@
+# 0.2.0.0
+
+- Finds languages for `FilePath`s.
+- Drops dependency on `pathtype`.
+
+
 # 0.1.0.2
 
 - Support ghc 9.2.
