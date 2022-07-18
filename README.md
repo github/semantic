@@ -94,7 +94,7 @@ Architecturally, `semantic`:
 3. Returns blobs or performs analysis.
 4. Renders output in one of many supported formats.
 
-Throughout its lifestyle, `semantic` has leveraged a number of interesting algorithms and techniques, including:
+Throughout its lifecycle, `semantic` has leveraged a number of interesting algorithms and techniques, including:
 
 - Myers' algorithm (SES) as described in the paper [*An O(ND) Difference Algorithm and Its Variations*][SES]
 - RWS as described in the paper [*RWS-Diff: Flexible and Efficient Change Detection in Hierarchical Data*][RWS].
