@@ -70,6 +70,7 @@ test-suite test
   main-is:          Test.hs
   build-depends:
     , base
+    , filepath
     , semantic-ast
     , semantic-rust
     , tasty

@@ -21,7 +21,7 @@ import qualified Bazel.Runfiles as Bazel
 
 type HasFixture =
   ( ?runfiles :: Bazel.Runfiles,
-    ?project :: Path.RelDir,
+    ?project :: FilePath,
     HasCallStack
   )
 
@@ -29,13 +29,13 @@ create :: IO Bazel.Runfiles
 create = Bazel.create
 
 root :: HasFixture => FilePath
-root = Path.absRel (Bazel.rlocation ?runfiles ".")
+root = Bazel.rlocation ?runfiles "."
 
-absRelFile :: (HasFixture) => String -> FilePath
-absRelFile x = Path.toAbsRel (root </> Path.relDir "semantic" </> ?project </> Path.relFile x)
+absRelFile :: HasFixture => String -> FilePath
+absRelFile x = root </> "semantic" </> ?project </> x
 
 absRelDir :: HasFixture => String -> FilePath
-absRelDir x = Path.toAbsRel (root </> Path.relDir "semantic" </> ?project </> Path.relDir x)
+absRelDir x = root </> "semantic" </> ?project </> x
 
 #else
 
