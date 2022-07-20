@@ -130,9 +130,9 @@ letrec n m = do
 -- Parsing
 
 parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (Source.Source, File Term)
-parseFile path = do
-  contents <- liftIO (B.readFile path)
-  let sourcePath = replaceExtensions path "py"
+parseFile jsonPath = do
+  contents <- liftIO (B.readFile jsonPath)
+  let sourcePath = replaceExtensions jsonPath "py"
   -- FIXME: this is comprised of several terrible assumptions.
   sourceContents <- Source.fromUTF8 . B.toStrict <$> liftIO (B.readFile sourcePath)
   let span = decrSpan (Source.totalSpan sourceContents)
