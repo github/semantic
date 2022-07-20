@@ -247,6 +247,6 @@ analyzeFile path analyze = do
   analyze eval src file
 
 parseToTerm :: (Algebra sig m, MonadIO m) => FilePath -> m (Source.Source, File Term)
-parseToTerm path = do
-  parsed <- runThrow @String (parseFile path)
+parseToTerm jsonPath = do
+  parsed <- runThrow @String (parseFile jsonPath)
   either (liftIO . throwIO . ErrorCall) pure parsed
