@@ -242,8 +242,8 @@ analyzeFile
      -> File term
      -> m b )
   -> m b
-analyzeFile path analyze = do
-  (src, file) <- parseToTerm path
+analyzeFile jsonPath analyze = do
+  (src, file) <- parseToTerm jsonPath
   analyze eval src file
 
 parseToTerm :: (Algebra sig m, MonadIO m) => FilePath -> m (Source.Source, File Term)
