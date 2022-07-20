@@ -132,8 +132,8 @@ letrec n m = do
 parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> FilePath -> m (Source.Source, File Term)
 parseFile srcPath jsonPath = do
   contents <- liftIO (B.readFile jsonPath)
+  -- FIXME: get this from the JSON itself (cf https://github.com/tree-sitter/tree-sitter-graph/issues/69)
   let sourcePath = replaceExtensions jsonPath "py"
-  -- FIXME: this is comprised of several terrible assumptions.
   sourceContents <- Source.fromUTF8 . B.toStrict <$> liftIO (B.readFile srcPath)
   let span = decrSpan (Source.totalSpan sourceContents)
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
