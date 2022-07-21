@@ -12,19 +12,19 @@ import           Analysis.File
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           Source.Language
-import qualified System.Path as Path
+import           System.FilePath (takeFileName)
 
 -- | A 'Project' contains all the information that semantic needs
 -- to execute an analysis, diffing, or graphing pass.
 data Project = Project
-  { projectRootDir     :: Path.AbsRelDir
+  { projectRootDir     :: FilePath
   , projectBlobs       :: [Blob]
   , projectLanguage    :: Language
-  , projectExcludeDirs :: [Path.AbsRelDir]
+  , projectExcludeDirs :: [FilePath]
   } deriving (Eq, Show)
 
 projectName :: Project -> Text
-projectName = T.pack . maybe "" Path.toString . Path.takeDirName . projectRootDir
+projectName = T.pack . takeFileName . projectRootDir
 
 projectExtensions :: Project -> [String]
 projectExtensions = extensionsForLanguage . projectLanguage

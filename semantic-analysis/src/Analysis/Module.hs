@@ -13,7 +13,7 @@ import           Data.Foldable (foldl')
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
-import qualified System.Path as Path
+import           System.FilePath as Path
 
 data Module a = Module
   { body    :: Map.Map Name a -> a
@@ -48,9 +48,9 @@ instance Monoid (ModuleSet a) where
   mempty = ModuleSet mempty
 
 fromList :: [File (Module a)] -> ModuleSet a
-fromList = ModuleSet . Map.fromList . map (\ (File ref mod) -> (refName ref , mod))
+fromList = ModuleSet . Map.fromList . map (\ (File ref mod) -> (refName ref, mod))
   where
-  refName (Reference path _) = name (Text.pack (Path.toString (Path.takeBaseName path)))
+  refName (Reference path _) = name (Text.pack (Path.takeBaseName path))
 
 link :: ModuleSet a -> Module a -> Module a
 link (ModuleSet ms) m = Module body' (imports m Set.\\ Map.keysSet ms) (exports m) unknown' where

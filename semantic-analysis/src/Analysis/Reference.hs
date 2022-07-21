@@ -6,13 +6,11 @@ module Analysis.Reference
 ) where
 
 import Source.Span
-import System.Path as Path
-import System.Path.PartClass as Path.PartClass
 
 -- Reference
 
 data Reference = Reference
-  { refPath :: Path.AbsRelFile
+  { refPath :: FilePath
   , refSpan :: Span
   }
   deriving (Eq, Ord, Show)
@@ -20,5 +18,5 @@ data Reference = Reference
 
 -- Constructors
 
-fromPath :: Path.PartClass.AbsRel ar => Path.File ar -> Reference
-fromPath p = Reference (Path.toAbsRel p) (point (Pos 0 0))
+fromPath :: FilePath -> Reference
+fromPath p = Reference p (point (Pos 0 0))

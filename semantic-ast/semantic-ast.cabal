@@ -73,8 +73,7 @@ library
     , filepath             ^>= 1.4.1
     , fused-effects        ^>= 1.1
     , Glob                 ^>= 0.10.0
-    , pathtype             ^>= 0.8.1
-    , semantic-source      ^>= 0.1.0.1
+    , semantic-source      ^>= 0.2
     , tasty                ^>= 1.2.3
     , tasty-hunit          ^>= 0.10.0.2
     , template-haskell      >= 2.15 && < 2.19

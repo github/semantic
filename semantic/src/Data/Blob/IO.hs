@@ -21,25 +21,16 @@ import           Semantic.IO
 import           Source.Language
 import qualified Source.Source as Source
 import           Source.Span
-import qualified System.Path as Path
 
 -- | Deprecated: this has very weird semantics.
 readProjectFromPaths :: MonadIO m
-                     => Maybe Path.AbsRelDir -- ^ An optional root directory for the project
-                     -> Path.AbsRelFileDir   -- ^ A file or directory to parse. Passing a file path loads all files in that file's parent directory.
+                     => Maybe FilePath -- ^ An optional root directory for the project
+                     -> FilePath       -- ^ A file or directory to parse. Passing a file path loads all files in that file's parent directory.
                      -> Language
-                     -> [Path.AbsRelDir]     -- ^ Directories to exclude.
+                     -> [FilePath]     -- ^ Directories to exclude.
                      -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
-  let rootDir :: Path.AbsRelDir
-      rootDir = case maybeRoot >>= Path.fromAbsRel of
-        -- If we were provided a root directory, use that.
-        Just root -> root
-        Nothing   -> case Path.fileFromFileDir path of
-          -- If we weren't and the path is a file, drop its file name.
-          Just fp -> Path.takeDirectory fp
-          -- Otherwise, load from the path.
-          Nothing -> Path.dirFromFileDir path
+  let rootDir = fromMaybe path maybeRoot
 
   paths <- liftIO $ findFilesInDir rootDir exts excludeDirs
   blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
@@ -51,9 +42,9 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readBlobFromFile :: MonadIO m => File Language -> m (Maybe Blob)
-readBlobFromFile (File (Reference (Path.toString -> "/dev/null") _) _) = pure Nothing
+readBlobFromFile (File (Reference "/dev/null" _) _) = pure Nothing
 readBlobFromFile file@(File (Reference path _) _language) = do
-  raw <- liftIO $ B.readFile (Path.toString path)
+  raw <- liftIO $ B.readFile path
   let newblob = Blob (Source.fromUTF8 raw) file
   pure . Just $ newblob
 
@@ -64,7 +55,7 @@ readBlobFromFile' file = do
   maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
 -- | Read a blob from the provided absolute or relative path , failing if it can't be found.
-readBlobFromPath :: (MonadFail m, MonadIO m) => Path.AbsRelFile -> m Blob
+readBlobFromPath :: (MonadFail m, MonadIO m) => FilePath -> m Blob
 readBlobFromPath = readBlobFromFile' . File.fromPath
 
 readFilePair :: MonadIO m => File Language -> File Language -> m BlobPair

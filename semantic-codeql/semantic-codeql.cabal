@@ -57,7 +57,7 @@ library
     , fused-effects ^>= 1.1
     , semantic-ast
     , semantic-proto ^>= 0
-    , semantic-source ^>= 0.1.0.1
+    , semantic-source ^>= 0.2
     , semantic-tags ^>= 0.0
     , template-haskell >= 2.15 && < 2.19
     , text ^>= 1.2.3
@@ -71,7 +71,6 @@ test-suite test
   main-is:          PreciseTest.hs
   build-depends:
     , base
-    , pathtype ^>= 0.8.1
     , semantic-ast
     , semantic-codeql
     , tasty

@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
@@ -13,14 +13,13 @@ import           Analysis.Reference as Ref
 import           Data.Blob as Blob
 import           Data.Handle
 import           SpecHelpers
-import qualified System.Path as Path
 import qualified System.Path.Fixture as Fixture
 
 spec :: Fixture.HasFixture => Spec
 spec = do
 #if BAZEL_BUILD
   rf <- runIO Fixture.create
-  let ?project = Path.relDir "semantic"
+  let ?project = "semantic"
       ?runfiles = rf
 #endif
   let blobsFromFilePath path = do
@@ -32,14 +31,14 @@ spec = do
     it "returns a blob for extant files" $ do
       let path = Fixture.absRelFile "test/fixtures/cli/diff.json"
       Just blob <- readBlobFromFile (File (Reference path lowerBound) Unknown)
-      blobFilePath blob `shouldBe` Path.toString path
+      blobFilePath blob `shouldBe` path
 
     it "throws for absent files" $ do
-      readBlobFromFile (File (Reference (Path.absRel "/dev/doesnotexist") lowerBound) Unknown) `shouldThrow` anyIOException
+      readBlobFromFile (File (Reference "/dev/doesnotexist" lowerBound) Unknown) `shouldThrow` anyIOException
 
   describe "readBlobPairsFromHandle" $ do
-    let a = Blob.fromSource (Path.relFile "method.rb") Ruby "def foo; end"
-    let b = Blob.fromSource (Path.relFile "method.rb") Ruby "def bar(x); end"
+    let a = Blob.fromSource "method.rb" Ruby "def foo; end"
+    let b = Blob.fromSource "method.rb" Ruby "def bar(x); end"
     it "returns blobs for valid JSON encoded diff input" $ do
       blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
       blobs `shouldBe` [Compare a b]
@@ -64,7 +63,7 @@ spec = do
     it "returns blobs for unsupported language" $ do
       h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/diff-unsupported-language.json")
       blobs <- readBlobPairsFromHandle h
-      let b' = Blob.fromSource (Path.relFile "test.kt") Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
+      let b' = Blob.fromSource "test.kt" Unknown "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
       blobs `shouldBe` [Insert b']
 
     it "detects language based on filepath for empty language" $ do
@@ -87,7 +86,7 @@ spec = do
     it "returns blobs for valid JSON encoded parse input" $ do
       h <- openFileForReading (Fixture.absRelFile "test/fixtures/cli/parse.json")
       blobs <- readBlobsFromHandle h
-      let a = Blob.fromSource (Path.relFile "method.rb") Ruby "def foo; end"
+      let a = Blob.fromSource "method.rb" Ruby "def foo; end"
       blobs `shouldBe` [a]
 
     it "throws on blank input" $ do

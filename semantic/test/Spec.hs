@@ -7,18 +7,17 @@ import qualified Data.Graph.Spec
 import qualified Data.Language.Spec
 import qualified Data.Semigroup.App.Spec
 import qualified Integration.Spec
-import qualified Tags.Spec
-import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
+import           Semantic.Config (defaultOptions, optionsLogLevel)
 import qualified Semantic.IO.Spec
+import qualified Semantic.Spec
 import qualified Semantic.Stat.Spec
-import qualified System.Path as Path
+import           Semantic.Task (TaskSession (..), withOptions)
 import qualified System.Path.Fixture as Fixture
-import Semantic.Config (defaultOptions, optionsLogLevel)
-import Semantic.Task (withOptions, TaskSession(..))
-import Test.Hspec
-import Test.Tasty as Tasty
-import Test.Tasty.Hspec as Tasty
+import qualified Tags.Spec
+import           Test.Hspec
+import           Test.Tasty as Tasty
+import           Test.Tasty.Hspec as Tasty
 
 tests :: (?session :: TaskSession, Fixture.HasFixture) => [TestTree]
 tests =
@@ -55,7 +54,7 @@ main :: IO ()
 main = do
   runfiles <- Fixture.create
   let ?runfiles = runfiles
-      ?project = Path.relDir "semantic"
+      ?project = "semantic"
 
   withOptions defaultOptions { optionsLogLevel = Nothing } $ \ config logger statter ->
     let ?session = TaskSession config "-" False logger statter

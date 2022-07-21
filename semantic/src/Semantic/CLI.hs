@@ -20,8 +20,6 @@ import           Semantic.Version
 import           Serializing.Format
 import qualified Source.Language as Language
 import           System.Exit (die)
-import qualified System.Path as Path
-import qualified System.Path.PartClass as Path.PartClass
 
 import Control.Concurrent (mkWeakThreadId, myThreadId)
 import Proto.Semantic_JSON ()
@@ -112,10 +110,10 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
 filePathReader :: ReadM (File.File Language.Language)
 filePathReader = File.fromPath <$> path
 
-path :: (Path.PartClass.FileDir fd) => ReadM (Path.AbsRel fd)
-path = eitherReader Path.parse
+path :: ReadM FilePath
+path = eitherReader Right
 
-pathOption :: Path.PartClass.FileDir fd => Mod OptionFields (Path.AbsRel fd) -> Parser (Path.AbsRel fd)
+pathOption :: Mod OptionFields FilePath -> Parser FilePath
 pathOption = option path
 
 options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a

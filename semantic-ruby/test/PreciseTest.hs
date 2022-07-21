@@ -1,26 +1,29 @@
-{-# LANGUAGE CPP, DisambiguateRecordFields, OverloadedStrings, TypeApplications, ImplicitParams #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 module Main (main) where
 
-import           TreeSitter.Ruby
 import           AST.TestHelpers
 import           AST.Unmarshal
+import           Control.Concurrent
 import qualified Language.Ruby.AST as Ruby
-import qualified System.Path as Path
-import           Test.Tasty
+import           System.IO
 import qualified System.Path.Fixture as Fixture
-import System.IO
-import Control.Concurrent
+import           Test.Tasty
+import           TreeSitter.Ruby
 
 main :: IO ()
 main = do
 #if BAZEL_BUILD
   rf <- Fixture.create
-  let ?project = Path.relDir "external/tree-sitter-ruby"
+  let ?project = "external/tree-sitter-ruby"
       ?runfiles = rf
   let dirs = Fixture.absRelDir "test/corpus"
 #else
-  dirs <- Path.absRel <$> Ruby.getTestCorpusDir
+  dirs <- Ruby.getTestCorpusDir
 #endif
   readCorpusFiles' dirs
     >>= traverse (testCorpus parse)
