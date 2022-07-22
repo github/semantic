@@ -129,12 +129,12 @@ letrec n m = do
 
 -- Parsing
 
-parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> m (Source.Source, File Term)
-parseFile path = do
-  contents <- liftIO (B.readFile path)
-  let sourcePath = replaceExtensions path "py"
-  -- FIXME: this is comprised of several terrible assumptions.
-  sourceContents <- Source.fromUTF8 . B.toStrict <$> liftIO (B.readFile sourcePath)
+parseFile :: (Has (Throw String) sig m, MonadIO m) => FilePath -> FilePath -> m (Source.Source, File Term)
+parseFile srcPath jsonPath = do
+  contents <- liftIO (B.readFile jsonPath)
+  -- FIXME: get this from the JSON itself (cf https://github.com/tree-sitter/tree-sitter-graph/issues/69)
+  let sourcePath = replaceExtensions jsonPath "py"
+  sourceContents <- Source.fromUTF8 . B.toStrict <$> liftIO (B.readFile srcPath)
   let span = decrSpan (Source.totalSpan sourceContents)
   case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
     Left  (_, err)       -> throwError err
@@ -232,6 +232,7 @@ locate attrs p = do
 analyzeFile
   :: (Algebra sig m, MonadIO m)
   => FilePath
+  -> FilePath
   -> (  forall term
      .  Ord term
      => (  forall sig m
@@ -242,11 +243,11 @@ analyzeFile
      -> File term
      -> m b )
   -> m b
-analyzeFile path analyze = do
-  (src, file) <- parseToTerm path
+analyzeFile srcPath jsonPath analyze = do
+  (src, file) <- parseToTerm srcPath jsonPath
   analyze eval src file
 
-parseToTerm :: (Algebra sig m, MonadIO m) => FilePath -> m (Source.Source, File Term)
-parseToTerm path = do
-  parsed <- runThrow @String (parseFile path)
+parseToTerm :: (Algebra sig m, MonadIO m) => FilePath -> FilePath -> m (Source.Source, File Term)
+parseToTerm srcPath jsonPath = do
+  parsed <- runThrow @String (parseFile srcPath jsonPath)
   either (liftIO . throwIO . ErrorCall) pure parsed
