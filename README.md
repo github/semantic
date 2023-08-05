@@ -98,7 +98,7 @@ Throughout its lifecycle, `semantic` has leveraged a number of interesting algor
 
 - Myers' algorithm (SES) as described in the paper [*An O(ND) Difference Algorithm and Its Variations*][SES]
 - RWS as described in the paper [*RWS-Diff: Flexible and Efficient Change Detection in Hierarchical Data*][RWS].
-- Open unions and [data types à la carte](http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf).
+- Open unions and [data types à la carte](https://www.cambridge.org/core/journals/journal-of-functional-programming/article/data-types-a-la-carte/14416CB20C4637164EA9F77097909409).
 - An implementation of [Abstracting Definitional Interpreters][adi] extended to work with an à la carte representation of syntax terms.
 
 [SES]: http://www.xmailserver.org/diff2.pdf
