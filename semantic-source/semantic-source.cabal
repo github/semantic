@@ -14,7 +14,7 @@ copyright:           (c) 2020 GitHub, Inc.
 category:            Data
 build-type:          Simple
 stability:           alpha
-extra-source-files:
+extra-doc-files:
   CHANGELOG.md
   README.md
 
