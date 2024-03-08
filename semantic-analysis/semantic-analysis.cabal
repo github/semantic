@@ -48,6 +48,7 @@ library
   hs-source-dirs: src
   exposed-modules:
     Analysis.Analysis.Concrete
+    Analysis.Analysis.DeadCode
     Analysis.Analysis.Exception
     Analysis.Analysis.Typecheck
     Analysis.Blob
