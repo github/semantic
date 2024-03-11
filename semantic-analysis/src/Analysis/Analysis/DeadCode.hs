@@ -33,14 +33,6 @@ import Data.Foldable (sequenceA_)
 import Data.Function (fix)
 import qualified Data.Set as Set
 
-{-
-
-- evaluator which first collects set of all subterms
-- at each term evaluation, delete it from the set
-- whatever is left is dead (unvisited)
-
--}
-
 eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m, Has (State (Set.Set Term)) sig m) => Term -> m val
 eval0 term = do
   put (subterms term)
