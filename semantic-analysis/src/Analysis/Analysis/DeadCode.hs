@@ -68,7 +68,7 @@ subterms t = Set.singleton t <> case t of
 deadCodeFlowInsensitive
   :: Ord term
   => (forall sig m
-     .  (Has (A.Dom Unit :+: A.Env A.MAddr :+: Reader Reference) sig m, HasLabelled A.Store (A.Store A.MAddr Unit) sig m, MonadFail m)
+     .  (Has (A.Dom Unit) sig m, Has (A.Env A.MAddr) sig m, Has (Reader Reference) sig m, HasLabelled A.Store (A.Store A.MAddr Unit) sig m, MonadFail m)
      => (term -> m Unit)
      -> (term -> m Unit)
      )
@@ -88,7 +88,7 @@ runFile
      , Ord term
      )
   => (forall sig m
-     .  (Has (A.Dom Unit :+: A.Env A.MAddr :+: Reader Reference) sig m, HasLabelled A.Store (A.Store A.MAddr Unit) sig m, MonadFail m)
+     .  (Has (A.Dom Unit) sig m, Has (A.Env A.MAddr) sig m, Has (Reader Reference) sig m, HasLabelled A.Store (A.Store A.MAddr Unit) sig m, MonadFail m)
      => (term -> m Unit)
      -> (term -> m Unit)
      )
