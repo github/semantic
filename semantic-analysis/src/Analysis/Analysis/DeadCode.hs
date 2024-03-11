@@ -14,6 +14,7 @@ module Analysis.Analysis.DeadCode
 ) where
 
 import Analysis.Carrier.Fail.WithLoc
+import qualified Analysis.Carrier.Statement.State as A
 import qualified Analysis.Carrier.Store.Monovariant as A
 import Analysis.Effect.Domain as A
 import Analysis.Effect.Env
@@ -68,7 +69,7 @@ subterms t = Set.singleton t <> case t of
 deadCodeFlowInsensitive
   :: Ord term
   => (forall sig m
-     .  (Has (A.Dom Unit) sig m, Has (A.Env A.MAddr) sig m, Has (Reader Reference) sig m, HasLabelled A.Store (A.Store A.MAddr Unit) sig m, MonadFail m)
+     .  (Has (A.Dom Unit) sig m, Has (A.Env A.MAddr) sig m, Has (Reader Reference) sig m, Has A.Statement sig m, HasLabelled A.Store (A.Store A.MAddr Unit) sig m, MonadFail m)
      => (term -> m Unit)
      -> (term -> m Unit)
      )
@@ -88,7 +89,7 @@ runFile
      , Ord term
      )
   => (forall sig m
-     .  (Has (A.Dom Unit) sig m, Has (A.Env A.MAddr) sig m, Has (Reader Reference) sig m, HasLabelled A.Store (A.Store A.MAddr Unit) sig m, MonadFail m)
+     .  (Has (A.Dom Unit) sig m, Has (A.Env A.MAddr) sig m, Has (Reader Reference) sig m, Has A.Statement sig m, HasLabelled A.Store (A.Store A.MAddr Unit) sig m, MonadFail m)
      => (term -> m Unit)
      -> (term -> m Unit)
      )
@@ -96,7 +97,8 @@ runFile
   -> m (File (Either (Reference, String) (Set.Set Unit)))
 runFile eval file = traverse run file
   where run
-          = runReader (fileRef file)
+          = A.runStatement (const pure)
+          . runReader (fileRef file)
           . A.runEnv @Unit
           . runFail
           . convergeTerm (A.runStore @Unit . runDomain . fix (cacheTerm . eval))
