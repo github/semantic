@@ -7,7 +7,9 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Analysis.Syntax
-( Term(..)
+( -- * Terms
+  Term(..)
+, subterms
   -- * Abstract interpretation
 , eval0
 , eval
@@ -48,6 +50,7 @@ import qualified Data.IntMap as IntMap
 import           Data.List (sortOn)
 import           Data.List.NonEmpty (NonEmpty, fromList)
 import           Data.Monoid (First (..))
+import qualified Data.Set as Set
 import           Data.String (IsString (..))
 import           Data.Text (Text)
 import qualified Data.Vector as V
@@ -71,6 +74,21 @@ data Term
   deriving (Eq, Ord, Show)
 
 infixl 1 :>>
+
+subterms :: Term -> Set.Set Term
+subterms t = Set.singleton t <> case t of
+  Var _ -> mempty
+  Noop -> mempty
+  Iff c t e -> subterms c <> subterms t <> subterms e
+  Bool _ -> mempty
+  String _ -> mempty
+  Throw t -> subterms t
+  Let _ v b -> subterms v <> subterms b
+  a :>> b -> subterms a <> subterms b
+  Import _ -> mempty
+  Function _ _ b -> subterms b
+  Call f as -> subterms f <> foldMap subterms as
+  Locate _ b -> subterms b
 
 
 -- Abstract interpretation
