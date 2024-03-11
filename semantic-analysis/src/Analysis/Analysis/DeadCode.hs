@@ -69,11 +69,11 @@ runFile eval subterms file = traverse run file
             $ runReader (fileRef file)
             $ A.runEnv @Unit
             $ runFail
-            $ convergeTerm (A.runStore @Unit . runDomain . fix (cacheTerm . eval . evalDead))
+            $ convergeTerm (A.runStore @Unit . runDomain . fix (cacheTerm . evalDead))
             $ term
-        evalDead eval subterm = do
+        evalDead eval' subterm = do
           modify (Set.delete subterm)
-          eval subterm
+          eval eval' subterm
 
 
 data Unit = Unit
