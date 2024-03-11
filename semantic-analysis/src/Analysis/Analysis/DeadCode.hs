@@ -8,21 +8,16 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Analysis.Analysis.DeadCode
-( eval0
-, deadCodeFlowInsensitive
+( deadCodeFlowInsensitive
 ) where
 
 import Analysis.Carrier.Fail.WithLoc
 import qualified Analysis.Carrier.Statement.State as A
 import qualified Analysis.Carrier.Store.Monovariant as A
 import Analysis.Effect.Domain as A
-import Analysis.Effect.Env
-import qualified Analysis.Effect.Statement as S
-import Analysis.Effect.Store
 import Analysis.File
 import Analysis.FlowInsensitive
 import Analysis.Reference
-import Analysis.Syntax hiding (eval0)
 import Control.Applicative (Alternative(..))
 import Control.Carrier.Fresh.Church
 import Control.Carrier.Reader
@@ -32,15 +27,6 @@ import Control.Monad.Trans.Class
 import Data.Foldable (sequenceA_)
 import Data.Function (fix)
 import qualified Data.Set as Set
-
-eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m, Has (State (Set.Set Term)) sig m) => Term -> m val
-eval0 term = do
-  put (subterms term)
-  let evalDead = \ eval' subterm -> do
-        modify (Set.delete subterm)
-        eval' subterm
-  fix (eval . evalDead) term
-
 
 deadCodeFlowInsensitive
   :: Ord term
