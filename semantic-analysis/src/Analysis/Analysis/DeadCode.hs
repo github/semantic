@@ -26,8 +26,8 @@ import Analysis.Syntax hiding (eval0)
 import Control.Applicative (Alternative(..))
 import Control.Carrier.Fresh.Church
 import Control.Carrier.Reader
+import Control.Carrier.State.Church
 import Control.Effect.Labelled
-import Control.Effect.State
 import Control.Monad.Trans.Class
 import Data.Foldable (sequenceA_)
 import Data.Function (fix)
@@ -57,19 +57,23 @@ deadCodeFlowInsensitive
      => (term -> m Unit)
      -> (term -> m Unit)
      )
+  -> (term -> Set.Set term)
   -> [File term]
-  -> ( A.MStore Unit
+  -> ( Set.Set term
+     , A.MStore Unit
      , [File (Either (Reference, String) (Set.Set Unit))]
      )
-deadCodeFlowInsensitive eval
+deadCodeFlowInsensitive eval subterms
   = run
+  . runState (\ dead (store, files) -> pure (dead, store, files)) Set.empty
   . evalFresh 0
   . A.runStoreState
-  . traverse (runFile eval)
+  . traverse (runFile eval subterms)
 
 runFile
   :: ( Has Fresh sig m
      , Has (State (A.MStore Unit)) sig m
+     , Has (State (Set.Set term)) sig m
      , Ord term
      )
   => (forall sig m
@@ -77,15 +81,21 @@ runFile
      => (term -> m Unit)
      -> (term -> m Unit)
      )
+  -> (term -> Set.Set term)
   -> File term
   -> m (File (Either (Reference, String) (Set.Set Unit)))
-runFile eval file = traverse run file
-  where run
-          = A.runStatement (const pure)
-          . runReader (fileRef file)
-          . A.runEnv @Unit
-          . runFail
-          . convergeTerm (A.runStore @Unit . runDomain . fix (cacheTerm . eval))
+runFile eval subterms file = traverse run file
+  where run term = do
+          modify (<> subterms term)
+          A.runStatement (const pure)
+            $ runReader (fileRef file)
+            $ A.runEnv @Unit
+            $ runFail
+            $ convergeTerm (A.runStore @Unit . runDomain . fix (cacheTerm . eval . evalDead))
+            $ term
+        evalDead eval subterm = do
+          modify (Set.delete subterm)
+          eval subterm
 
 
 data Unit = Unit
