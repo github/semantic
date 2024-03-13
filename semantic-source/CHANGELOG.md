@@ -1,3 +1,8 @@
+# 0.2.0.1
+
+- Support ghc 9.4.
+
+
 # 0.2.0.0
 
 - Finds languages for `FilePath`s.

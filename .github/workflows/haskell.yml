@@ -46,6 +46,7 @@ jobs:
       run: |
         cabal v2-update
         cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-tests --write-ghc-environment-files=always -j2
+        cd semantic-source && cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-tests --write-ghc-environment-files=always -j2
 
     - name: Restore from cache
       run: ./cabal-cache sync-from-archive --threads=2 --archive-uri=dist-cache || true

@@ -1,7 +1,7 @@
 cabal-version:       2.4
 
 name:                semantic-source
-version:             0.2.0.0
+version:             0.2.0.1
 synopsis:            Types and functionality for working with source code
 description:         Types and functionality for working with source code (program text).
 homepage:            https://github.com/github/semantic/tree/master/semantic-source#readme
@@ -14,7 +14,7 @@ copyright:           (c) 2020 GitHub, Inc.
 category:            Data
 build-type:          Simple
 stability:           alpha
-extra-source-files:
+extra-doc-files:
   CHANGELOG.md
   README.md
 
@@ -62,7 +62,7 @@ library
     , bytestring      >= 0.10.8.2 && < 0.13
     , deepseq        ^>= 1.4.4.0
     , containers     ^>= 0.6.2
-    , hashable        >= 1.2.7 && < 1.4
+    , hashable        >= 1.2.7 && < 1.5
     , lingo          ^>= 0.5.0.3
     , semilattices   ^>= 0.0.0.3
     , text           ^>= 1.2.3.2
