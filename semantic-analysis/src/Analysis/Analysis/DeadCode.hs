@@ -66,10 +66,10 @@ runFile eval subterms file = traverse run file
   where run term = do
           modify (<> subterms term)
           A.runStatement (const pure)
-            $ runReader (fileRef file)
-            $ A.runEnv @Unit
-            $ runFail
-            $ convergeTerm (A.runStore @Unit . runDomain . fix (cacheTerm . evalDead))
+            . runReader (fileRef file)
+            . A.runEnv @Unit
+            . runFail
+            . convergeTerm (A.runStore @Unit . runDomain . fix (cacheTerm . evalDead))
             $ term
         evalDead eval' subterm = do
           modify (Set.delete subterm)
