@@ -11,21 +11,21 @@ module Analysis.Analysis.DeadCode
 ( deadCodeFlowInsensitive
 ) where
 
-import Analysis.Carrier.Fail.WithLoc
+import           Analysis.Carrier.Fail.WithLoc
 import qualified Analysis.Carrier.Statement.State as A
 import qualified Analysis.Carrier.Store.Monovariant as A
-import Analysis.Effect.Domain as A
-import Analysis.File
-import Analysis.FlowInsensitive
-import Analysis.Reference
-import Control.Applicative (Alternative(..))
-import Control.Carrier.Fresh.Church
-import Control.Carrier.Reader
-import Control.Carrier.State.Church
-import Control.Effect.Labelled
-import Control.Monad.Trans.Class
-import Data.Foldable (sequenceA_)
-import Data.Function (fix)
+import           Analysis.Effect.Domain as A
+import           Analysis.File
+import           Analysis.FlowInsensitive
+import           Analysis.Reference
+import           Control.Applicative (Alternative (..))
+import           Control.Carrier.Fresh.Church
+import           Control.Carrier.Reader
+import           Control.Carrier.State.Church
+import           Control.Effect.Labelled
+import           Control.Monad.Trans.Class
+import           Data.Foldable (sequenceA_)
+import           Data.Function (fix)
 import qualified Data.Set as Set
 
 deadCodeFlowInsensitive
