@@ -23,8 +23,8 @@ import           Control.Carrier.Fresh.Church
 import           Control.Carrier.Reader
 import           Control.Carrier.State.Church
 import           Control.Effect.Labelled
+import           Control.Monad (zipWithM_)
 import           Control.Monad.Trans.Class
-import           Data.Foldable (sequenceA_)
 import           Data.Function (fix)
 import qualified Data.Set as Set
 
@@ -109,7 +109,7 @@ instance ( Alternative m
     L (DAbs n b) -> do
       addrs <- traverse A.alloc n
       let args = Unit <$ n
-      sequenceA_ (zipWith (A..=) addrs args)
+      zipWithM_ (A..=) addrs args
       hdl (b args <$ ctx)
     L (DApp _ _) -> pure (Unit <$ ctx)
 
