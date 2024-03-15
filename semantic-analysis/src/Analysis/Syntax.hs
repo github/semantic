@@ -1,6 +1,4 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE LambdaCase #-}
@@ -91,10 +89,8 @@ instance Ord a => Ord (Vec n a) where
   compare Nil         Nil         = EQ
   compare (Cons a as) (Cons b bs) = a `compare` b <> as `compare` bs
 
-instance Foldable (Vec 'Z) where
-  foldMap _ _ = mempty
-
-instance Foldable (Vec n) => Foldable (Vec ('S n)) where
+instance Foldable (Vec n) where
+  foldMap _ Nil         = mempty
   foldMap f (Cons a as) = f a <> foldMap f as
 
 toList :: Vec n a -> [a]
