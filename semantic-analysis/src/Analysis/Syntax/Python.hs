@@ -10,6 +10,7 @@ module Analysis.Syntax.Python
 , subterms
 , Python(..)
 , noop
+, iff
   -- * Abstract interpretation
 , eval0
 , eval
@@ -82,6 +83,9 @@ infixl 1 :>>>
 
 noop :: T.Term Python v
 noop = Noop' T.:$: T.Nil
+
+iff :: T.Term Python v -> T.Term Python v -> T.Term Python v -> T.Term Python v
+iff c t e = Iff' T.:$: T.Cons c (T.Cons t (T.Cons e T.Nil))
 
 
 -- Abstract interpretation
