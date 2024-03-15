@@ -93,6 +93,7 @@ instance Foldable (Vec n) where
   foldMap _ Nil         = mempty
   foldMap f (Cons a as) = f a <> foldMap f as
 
+
 toList :: Vec n a -> [a]
 toList = \case
   Nil -> []
