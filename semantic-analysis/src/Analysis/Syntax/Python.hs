@@ -1,10 +1,14 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE LambdaCase #-}
 -- | This belongs in @semantic-python@ instead of @semantic-analysis@, but for the sake of expedience…
 module Analysis.Syntax.Python
 ( -- * Syntax
   Term(..)
 , subterms
+, Python(..)
   -- * Abstract interpretation
 , eval0
 , eval
@@ -21,6 +25,7 @@ import           Data.Function (fix)
 import           Data.List.NonEmpty (NonEmpty)
 import qualified Data.Set as Set
 import           Data.Text (Text)
+import           GHC.TypeLits (Natural)
 import           Source.Span (Span)
 
 -- Syntax
@@ -56,6 +61,24 @@ subterms t = Set.singleton t <> case t of
   Function _ _ b -> subterms b
   Call f as      -> subterms f <> foldMap subterms as
   Locate _ b     -> subterms b
+
+
+data Python (arity :: Natural) where
+  Var' :: Name -> Python 0 -- FIXME: move this into @T.Term@.
+  Noop' :: Python 0
+  Iff' :: Python 3
+  Bool' :: Bool -> Python 0
+  String' :: Text -> Python 0
+  Throw' :: Python 1
+  (:>>>) :: Python 2
+  Import' :: NonEmpty Text -> Python 0
+  Function' :: Name -> [Name] -> Python 1
+  Call' :: Python 2 -- ^ Second should be an @ANil'@ or @ACons'@.
+  ANil' :: Python 0
+  ACons' :: Python 2 -- ^ Second should be an @ANil'@ or @ACons'@.
+  Locate' :: Span -> Python 1
+
+infixl 1 :>>>
 
 
 -- Abstract interpretation
