@@ -3,12 +3,14 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE PatternSynonyms #-}
 -- | This belongs in @semantic-python@ instead of @semantic-analysis@, but for the sake of expedience…
 module Analysis.Syntax.Python
 ( -- * Syntax
   Term(..)
 , subterms
 , Python(..)
+, pattern Noop''
 , noop
 , iff
   -- * Abstract interpretation
@@ -80,6 +82,9 @@ data Python (arity :: T.Nat) where
   Locate' :: Span -> Python T.N1
 
 infixl 1 :>>>
+
+pattern Noop'' :: T.Term Python v
+pattern Noop'' <- Noop' T.:$: T.Nil
 
 noop :: T.Term Python v
 noop = Noop' T.:$: T.Nil
