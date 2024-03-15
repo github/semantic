@@ -27,13 +27,16 @@ import Unsafe.Coerce (unsafeCoerce)
 -- Syntax
 
 -- | (Currently) untyped term representations.
-data Term (sig :: Nat -> Type) where
-  (:$:) :: KnownNat n => sig n -> Vec n (Term sig) -> Term sig
+data Term (sig :: Nat -> Type) v where
+  Var  :: v -> Term sig v
+  (:$:) :: KnownNat n => sig n -> Vec n (Term sig v) -> Term sig v
 
-instance (forall n . Eq (sig n)) => Eq (Term sig) where
+instance (forall n . Eq (sig n), Eq v) => Eq (Term sig v) where
+  Var v1   == Var v2   = v1 == v2
   a :$: as == b :$: bs = case sameNat a b of
     Just Refl -> a == b && as == bs
     _         -> False
+  _        == _        = False
 
 
 -- Vectors

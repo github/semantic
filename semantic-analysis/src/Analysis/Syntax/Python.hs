@@ -65,7 +65,6 @@ subterms t = Set.singleton t <> case t of
 
 
 data Python (arity :: T.Nat) where
-  Var' :: Name -> Python T.N0 -- FIXME: move this into @T.Term@.
   Noop' :: Python T.N0
   Iff' :: Python T.N3
   Bool' :: Bool -> Python T.N0
@@ -81,7 +80,7 @@ data Python (arity :: T.Nat) where
 
 infixl 1 :>>>
 
-noop :: T.Term Python
+noop :: T.Term Python v
 noop = Noop' T.:$: T.Nil
 
 
