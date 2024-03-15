@@ -41,6 +41,10 @@ data Vec (n :: Nat) a where
   Nil :: Vec 'Z a
   Cons :: a -> Vec n a -> Vec ('S n) a
 
+instance Eq a => Eq (Vec n a) where
+  Nil       == Nil       = True
+  Cons a as == Cons b bs = a == b && as == bs
+
 toList :: Vec n a -> [a]
 toList = \case
   Nil -> []
