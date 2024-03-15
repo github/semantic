@@ -7,14 +7,8 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Analysis.Syntax
-( -- * Terms
-  Term(..)
-, subterms
-  -- * Abstract interpretation
-, eval0
-, eval
-  -- * Parsing
-, parseFile
+( -- * Parsing
+  parseFile
 , parseGraph
 , parseNode
   -- * Debugging
