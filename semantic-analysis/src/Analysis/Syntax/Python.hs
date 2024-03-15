@@ -9,6 +9,7 @@ module Analysis.Syntax.Python
   Term(..)
 , subterms
 , Python(..)
+, noop
   -- * Abstract interpretation
 , eval0
 , eval
@@ -18,6 +19,7 @@ import           Analysis.Effect.Domain
 import qualified Analysis.Effect.Statement as S
 import           Analysis.Name
 import           Analysis.Reference
+import qualified Analysis.Syntax as T
 import           Analysis.VM
 import           Control.Effect.Labelled
 import           Control.Effect.Reader
@@ -79,6 +81,9 @@ data Python (arity :: Natural) where
   Locate' :: Span -> Python 1
 
 infixl 1 :>>>
+
+noop :: T.Term Python
+noop = Noop' T.:$: T.Nil
 
 
 -- Abstract interpretation
