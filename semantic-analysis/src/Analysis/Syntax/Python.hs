@@ -27,7 +27,6 @@ import           Data.Function (fix)
 import           Data.List.NonEmpty (NonEmpty)
 import qualified Data.Set as Set
 import           Data.Text (Text)
-import           GHC.TypeLits (Natural)
 import           Source.Span (Span)
 
 -- Syntax
@@ -65,20 +64,20 @@ subterms t = Set.singleton t <> case t of
   Locate _ b     -> subterms b
 
 
-data Python (arity :: Natural) where
-  Var' :: Name -> Python 0 -- FIXME: move this into @T.Term@.
-  Noop' :: Python 0
-  Iff' :: Python 3
-  Bool' :: Bool -> Python 0
-  String' :: Text -> Python 0
-  Throw' :: Python 1
-  (:>>>) :: Python 2
-  Import' :: NonEmpty Text -> Python 0
-  Function' :: Name -> [Name] -> Python 1
-  Call' :: Python 2 -- ^ Second should be an @ANil'@ or @ACons'@.
-  ANil' :: Python 0
-  ACons' :: Python 2 -- ^ Second should be an @ANil'@ or @ACons'@.
-  Locate' :: Span -> Python 1
+data Python (arity :: T.Nat) where
+  Var' :: Name -> Python T.N0 -- FIXME: move this into @T.Term@.
+  Noop' :: Python T.N0
+  Iff' :: Python T.N3
+  Bool' :: Bool -> Python T.N0
+  String' :: Text -> Python T.N0
+  Throw' :: Python T.N1
+  (:>>>) :: Python T.N2
+  Import' :: NonEmpty Text -> Python T.N0
+  Function' :: Name -> [Name] -> Python T.N1
+  Call' :: Python T.N2 -- ^ Second should be an @ANil'@ or @ACons'@.
+  ANil' :: Python T.N0
+  ACons' :: Python T.N2 -- ^ Second should be an @ANil'@ or @ACons'@.
+  Locate' :: Span -> Python T.N1
 
 infixl 1 :>>>
 
