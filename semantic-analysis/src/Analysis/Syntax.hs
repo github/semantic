@@ -77,6 +77,10 @@ instance Eq a => Eq (Vec n a) where
   Nil       == Nil       = True
   Cons a as == Cons b bs = a == b && as == bs
 
+instance Ord a => Ord (Vec n a) where
+  compare Nil         Nil         = EQ
+  compare (Cons a as) (Cons b bs) = a `compare` b <> as `compare` bs
+
 toList :: Vec n a -> [a]
 toList = \case
   Nil -> []
