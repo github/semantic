@@ -64,9 +64,9 @@ function flags {
   echo "-Wno-name-shadowing"
   echo "-Wno-safe"
   echo "-Wno-unsafe"
-  [[ "$ghc_version" = 8.8.* ]] || [[ "$ghc_version" = 8.10.* ]] || [[ "$ghc_version" = 9.2.* ]] && echo "-Wno-missing-deriving-strategies" || true
-  [[ "$ghc_version" = 8.10.* ]] || [[ "$ghc_version" = 9.2.* ]] && echo "-Wno-missing-safe-haskell-mode" && echo "-Wno-prepositive-qualified-module" && echo "-Wno-unused-packages" || true
-  [[ "$ghc_version" = 9.2.* ]] && echo "-Wno-missing-kind-signatures" || true
+  [[ "$ghc_version" = 9.4.* ]] || [[ "$ghc_version" = 8.8.* ]] || [[ "$ghc_version" = 8.10.* ]] || [[ "$ghc_version" = 9.2.* ]] && echo "-Wno-missing-deriving-strategies" || true
+  [[ "$ghc_version" = 9.4.* ]] || [[ "$ghc_version" = 8.10.* ]] || [[ "$ghc_version" = 9.2.* ]] && echo "-Wno-missing-safe-haskell-mode" && echo "-Wno-prepositive-qualified-module" && echo "-Wno-unused-packages" || true
+  [[ "$ghc_version" = 9.4.* ]] || [[ "$ghc_version" = 9.2.* ]] && echo "-Wno-missing-kind-signatures" || true
 }
 
 flags > "$output_file"
