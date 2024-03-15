@@ -69,6 +69,7 @@ library
     Analysis.Project
     Analysis.Reference
     Analysis.Syntax
+    Analysis.VM
   build-depends:
     , aeson                        >= 1.4 && < 3
     , base                         >= 4.13 && < 5
