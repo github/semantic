@@ -12,6 +12,7 @@ module Analysis.Syntax.Python
 , Python(..)
 , pattern Noop''
 , pattern Iff''
+, pattern Bool''
   -- * Abstract interpretation
 , eval0
 , eval
@@ -87,6 +88,9 @@ pattern Noop'' <- Noop' T.:$: T.Nil
 
 pattern Iff'' :: T.Term Python v -> T.Term Python v -> T.Term Python v -> T.Term Python v
 pattern Iff'' c t e <- Iff' T.:$: T.Cons c (T.Cons t (T.Cons e T.Nil))
+
+pattern Bool'' :: Bool -> T.Term Python v
+pattern Bool'' b <- Bool' b T.:$: T.Nil
 
 
 -- Abstract interpretation
