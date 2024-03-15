@@ -49,6 +49,7 @@ import           Data.Function (fix)
 import qualified Data.IntMap as IntMap
 import           Data.List (sortOn)
 import           Data.List.NonEmpty (NonEmpty, fromList)
+import           Data.Maybe (listToMaybe)
 import           Data.Monoid (First (..))
 import qualified Data.Set as Set
 import           Data.String (IsString (..))
@@ -117,8 +118,7 @@ eval eval = \case
     u' <- eval u
     t' >>> u'
   Import ns -> S.simport ns >> dunit
-  Function n ps b -> letrec n (dabs ps (\ as ->
-    foldr (\ (p, a) m -> let' p a m) (eval b) (zip ps as)))
+  Function n ps b -> letrec n (dabs ps (foldr (\ (p, a) m -> let' p a m) (eval b) . zip ps))
   Call f as -> do
     f' <- eval f
     as' <- traverse eval as
@@ -153,7 +153,7 @@ parseFile srcPath jsonPath = do
   let sourcePath = replaceExtensions jsonPath "py"
   sourceContents <- Source.fromUTF8 . B.toStrict <$> liftIO (B.readFile srcPath)
   let span = decrSpan (Source.totalSpan sourceContents)
-  case (A.eitherDecodeWith A.json' (A.iparse parseGraph) contents) of
+  case A.eitherDecodeWith A.json' (A.iparse parseGraph) contents of
     Left  (_, err)       -> throwError err
     Right (_, Nothing)   -> throwError "no root node found"
     Right (_, Just root) -> pure (sourceContents, File (Reference sourcePath span) root)
@@ -189,7 +189,7 @@ parseTerm attrs edges = locate attrs . \case
   "string"     -> const . String <$> attrs A..: fromString "text"
   "true"       -> pure (const (Bool True))
   "false"      -> pure (const (Bool False))
-  "throw"      -> fmap Throw <$> resolve (head edges)
+  "throw"      -> fmap Throw <$> maybe empty resolve (listToMaybe edges)
   "if"         -> liftA3 Iff <$> findEdgeNamed edges "condition" <*> findEdgeNamed edges "consequence" <*> findEdgeNamed edges "alternative" <|> pure (const Noop)
   "block"      -> children edges
   "module"     -> children edges
@@ -205,7 +205,7 @@ findEdgeNamed edges name = foldMap (resolveWith (\ rep attrs -> attrs A..: fromS
 
 -- | Map a list of edges to a list of child nodes.
 children :: [A.Value] -> A.Parser (Graph -> Term)
-children edges = fmap chain . sequenceA . map snd . sortOn fst <$> traverse (resolveWith child) edges
+children edges = fmap chain . traverse snd . sortOn fst <$> traverse (resolveWith child) edges
   where
   child :: (Graph -> Term) -> A.Object -> A.Parser (Int, Graph -> Term)
   child term attrs = (,) <$> attrs A..: fromString "index" <*> pure term
