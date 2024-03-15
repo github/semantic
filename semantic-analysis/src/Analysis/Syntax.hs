@@ -38,6 +38,14 @@ instance (forall n . Eq (sig n), Eq v) => Eq (Term sig v) where
     _         -> False
   _        == _        = False
 
+instance (forall n . Ord (sig n), Ord v) => Ord (Term sig v) where
+  compare (Var v1)   (Var v2)   = compare v1 v2
+  compare (Var _)    _          = LT
+  compare (a :$: as) (b :$: bs) = case sameNat a b of
+    Just Refl -> compare a b <> compare as bs
+    _         -> reifyNat a `compare` reifyNat b -- lol
+  compare _          _          = GT
+
 
 -- Vectors
 
