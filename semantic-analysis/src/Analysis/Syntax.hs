@@ -77,18 +77,18 @@ infixl 1 :>>
 
 subterms :: Term -> Set.Set Term
 subterms t = Set.singleton t <> case t of
-  Var _ -> mempty
-  Noop -> mempty
-  Iff c t e -> subterms c <> subterms t <> subterms e
-  Bool _ -> mempty
-  String _ -> mempty
-  Throw t -> subterms t
-  Let _ v b -> subterms v <> subterms b
-  a :>> b -> subterms a <> subterms b
-  Import _ -> mempty
+  Var _          -> mempty
+  Noop           -> mempty
+  Iff c t e      -> subterms c <> subterms t <> subterms e
+  Bool _         -> mempty
+  String _       -> mempty
+  Throw t        -> subterms t
+  Let _ v b      -> subterms v <> subterms b
+  a :>> b        -> subterms a <> subterms b
+  Import _       -> mempty
   Function _ _ b -> subterms b
-  Call f as -> subterms f <> foldMap subterms as
-  Locate _ b -> subterms b
+  Call f as      -> subterms f <> foldMap subterms as
+  Locate _ b     -> subterms b
 
 
 -- Abstract interpretation
