@@ -11,9 +11,7 @@ module Analysis.Syntax.Python
 , subterms
 , Python(..)
 , pattern Noop''
-, noop
 , pattern Iff''
-, iff
   -- * Abstract interpretation
 , eval0
 , eval
@@ -87,14 +85,8 @@ infixl 1 :>>>
 pattern Noop'' :: T.Term Python v
 pattern Noop'' <- Noop' T.:$: T.Nil
 
-noop :: T.Term Python v
-noop = Noop' T.:$: T.Nil
-
 pattern Iff'' :: T.Term Python v -> T.Term Python v -> T.Term Python v -> T.Term Python v
 pattern Iff'' c t e <- Iff' T.:$: T.Cons c (T.Cons t (T.Cons e T.Nil))
-
-iff :: T.Term Python v -> T.Term Python v -> T.Term Python v -> T.Term Python v
-iff c t e = Iff' T.:$: T.Cons c (T.Cons t (T.Cons e T.Nil))
 
 
 -- Abstract interpretation
