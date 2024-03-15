@@ -9,6 +9,7 @@
 module Analysis.Syntax
 ( -- * Syntax
   Term(..)
+, subterms
   -- * Vectors
 , Nat(..)
 , N0
@@ -19,10 +20,11 @@ module Analysis.Syntax
 , toList
 ) where
 
-import Control.Monad (guard)
-import Data.Kind (Type)
-import Data.Typeable
-import Unsafe.Coerce (unsafeCoerce)
+import           Control.Monad (guard)
+import           Data.Kind (Type)
+import qualified Data.Set as Set
+import           Data.Typeable
+import           Unsafe.Coerce (unsafeCoerce)
 
 -- Syntax
 
@@ -45,6 +47,12 @@ instance (forall n . Ord (sig n), Ord v) => Ord (Term sig v) where
     Just Refl -> compare a b <> compare as bs
     _         -> reifyNat a `compare` reifyNat b -- lol
   compare _          _          = GT
+
+
+subterms :: (forall n . Ord (sig n), Ord v) => Term sig v -> Set.Set (Term sig v)
+subterms t = case t of
+  Var _    -> Set.singleton t
+  _ :$: ts -> Set.insert t (foldMap subterms ts)
 
 
 -- Vectors
