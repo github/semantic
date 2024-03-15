@@ -13,9 +13,6 @@ module Analysis.Syntax
   -- * Abstract interpretation
 , eval0
 , eval
-  -- * Macro-expressible syntax
-, let'
-, letrec
   -- * Parsing
 , parseFile
 , parseGraph
@@ -27,11 +24,10 @@ module Analysis.Syntax
 
 import qualified Analysis.Carrier.Statement.State as S
 import           Analysis.Effect.Domain
-import           Analysis.Effect.Env (Env, bind, lookupEnv)
-import           Analysis.Effect.Store
 import           Analysis.File
 import           Analysis.Name (Name, name)
 import           Analysis.Reference as Ref
+import           Analysis.VM
 import           Control.Applicative (Alternative (..), liftA2, liftA3)
 import           Control.Carrier.Throw.Either (runThrow)
 import           Control.Effect.Labelled
@@ -126,22 +122,6 @@ eval eval = \case
   Locate s t -> local (setSpan s) (eval t)
   where
   setSpan s r = r{ refSpan = s }
-
-
--- Macro-expressible syntax
-
-let' :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m) => Name -> val -> m a -> m a
-let' n v m = do
-  addr <- alloc n
-  addr .= v
-  bind n addr m
-
-letrec :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m) => Name -> m val -> m val
-letrec n m = do
-  addr <- alloc n
-  v <- bind n addr m
-  addr .= v
-  pure v
 
 
 -- Parsing
