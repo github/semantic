@@ -14,6 +14,7 @@ module Analysis.Syntax.Python
 , pattern Iff''
 , pattern Bool''
 , pattern String''
+, pattern Throw''
   -- * Abstract interpretation
 , eval0
 , eval
@@ -95,6 +96,9 @@ pattern Bool'' b <- Bool' b T.:$: T.Nil
 
 pattern String'' :: Text -> T.Term Python v
 pattern String'' t <- String' t T.:$: T.Nil
+
+pattern Throw'' :: T.Term Python v -> T.Term Python v
+pattern Throw'' e <- Throw' T.:$: T.Cons e T.Nil
 
 
 -- Abstract interpretation
