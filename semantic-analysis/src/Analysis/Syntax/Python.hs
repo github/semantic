@@ -16,6 +16,7 @@ module Analysis.Syntax.Python
 , pattern Bool''
 , pattern String''
 , pattern Throw''
+, pattern Let''
 , pattern (:>>>>)
 , pattern Import''
 , pattern Function''
@@ -81,6 +82,7 @@ data Python (arity :: T.Nat) where
   Bool' :: Bool -> Python T.N0
   String' :: Text -> Python T.N0
   Throw' :: Python T.N1
+  Let' :: Name -> Python T.N2
   (:>>>) :: Python T.N2
   Import' :: NonEmpty Text -> Python T.N0
   Function' :: Name -> [Name] -> Python T.N1
@@ -105,6 +107,9 @@ pattern String'' t = String' t T.:$: T.Nil
 
 pattern Throw'' :: T.Term Python v -> T.Term Python v
 pattern Throw'' e = Throw' T.:$: T.Cons e T.Nil
+
+pattern Let'' :: Name -> T.Term Python v -> T.Term Python v -> T.Term Python v
+pattern Let'' n v b = Let' n T.:$: T.Cons v (T.Cons b T.Nil)
 
 pattern (:>>>>) :: T.Term Python v -> T.Term Python v -> T.Term Python v
 pattern s :>>>> t = (:>>>) T.:$: T.Cons s (T.Cons t T.Nil)
@@ -139,7 +144,7 @@ pattern ACons'' a as = ACons' T.:$: T.Cons a (T.Cons as T.Nil)
 pattern Locate'' :: Span -> T.Term Python v -> T.Term Python v
 pattern Locate'' s t = Locate' s T.:$: T.Cons t T.Nil
 
-{-# COMPLETE Noop'', Iff'', Bool'', String'', Throw'', (:>>>>), Import'', Function'', Call'', Locate'' #-}
+{-# COMPLETE Noop'', Iff'', Bool'', String'', Throw'', Let'', (:>>>>), Import'', Function'', Call'', Locate'' #-}
 
 
 -- Abstract interpretation
