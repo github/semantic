@@ -19,6 +19,7 @@ module Analysis.Syntax.Python
 , pattern Import''
 , pattern Function''
 , pattern Call''
+, pattern Locate''
   -- * Abstract interpretation
 , eval0
 , eval
@@ -128,6 +129,9 @@ pattern ANil'' = ANil' T.:$: T.Nil
 
 pattern ACons'' :: T.Term Python v -> T.Term Python v -> T.Term Python v
 pattern ACons'' a as = ACons' T.:$: T.Cons a (T.Cons as T.Nil)
+
+pattern Locate'' :: Span -> T.Term Python v -> T.Term Python v
+pattern Locate'' s t = Locate' s T.:$: T.Cons t T.Nil
 
 
 -- Abstract interpretation
