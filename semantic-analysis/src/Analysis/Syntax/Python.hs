@@ -133,6 +133,8 @@ pattern ACons'' a as = ACons' T.:$: T.Cons a (T.Cons as T.Nil)
 pattern Locate'' :: Span -> T.Term Python v -> T.Term Python v
 pattern Locate'' s t = Locate' s T.:$: T.Cons t T.Nil
 
+{-# COMPLETE Noop'', Iff'', Bool'', String'', Throw'', Import'', Function'', Call'', Locate'' #-}
+
 
 -- Abstract interpretation
 
