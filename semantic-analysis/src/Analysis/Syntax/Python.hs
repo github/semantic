@@ -149,35 +149,35 @@ pattern Locate'' s t = Locate' s T.:$: T.Cons t T.Nil
 
 -- Abstract interpretation
 
-eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m) => Term -> m val
+eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m) => T.Term Python Name -> m val
 eval0 = fix eval
 
 eval
   :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m)
-  => (Term -> m val)
-  -> (Term -> m val)
+  => (T.Term Python Name -> m val)
+  -> (T.Term Python Name -> m val)
 eval eval = \case
-  Var n     -> lookupEnv n >>= maybe (dvar n) fetch
-  Noop      -> dunit
-  Iff c t e -> do
+  T.Var n     -> lookupEnv n >>= maybe (dvar n) fetch
+  Noop''      -> dunit
+  Iff'' c t e -> do
     c' <- eval c
     dif c' (eval t) (eval e)
-  Bool b    -> dbool b
-  String s  -> dstring s
-  Throw e   -> eval e >>= ddie
-  Let n v b -> do
+  Bool'' b    -> dbool b
+  String'' s  -> dstring s
+  Throw'' e   -> eval e >>= ddie
+  Let'' n v b -> do
     v' <- eval v
     let' n v' (eval b)
-  t :>> u   -> do
+  t :>>>> u   -> do
     t' <- eval t
     u' <- eval u
     t' >>> u'
-  Import ns -> S.simport ns >> dunit
-  Function n ps b -> letrec n (dabs ps (foldr (\ (p, a) m -> let' p a m) (eval b) . zip ps))
-  Call f as -> do
+  Import'' ns -> S.simport ns >> dunit
+  Function'' n ps b -> letrec n (dabs ps (foldr (\ (p, a) m -> let' p a m) (eval b) . zip ps))
+  Call'' f as -> do
     f' <- eval f
     as' <- traverse eval as
     dapp f' as'
-  Locate s t -> local (setSpan s) (eval t)
+  Locate'' s t -> local (setSpan s) (eval t)
   where
   setSpan s r = r{ refSpan = s }
