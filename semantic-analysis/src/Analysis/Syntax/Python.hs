@@ -122,7 +122,7 @@ eval
   => (T.Term Python Name -> m val)
   -> (T.Term Python Name -> m val)
 eval eval = \case
-  T.Var n     -> lookupEnv n >>= maybe (dvar n) fetch
+  T.Var n   -> lookupEnv n >>= maybe (dvar n) fetch
   Noop      -> dunit
   Iff c t e -> do
     c' <- eval c
