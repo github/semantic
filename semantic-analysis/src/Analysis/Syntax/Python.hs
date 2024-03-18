@@ -16,6 +16,7 @@ module Analysis.Syntax.Python
 , pattern Bool''
 , pattern String''
 , pattern Throw''
+, pattern (:>>>>)
 , pattern Import''
 , pattern Function''
 , pattern Call''
@@ -25,7 +26,7 @@ module Analysis.Syntax.Python
 , eval
 ) where
 
-import           Analysis.Effect.Domain
+import           Analysis.Effect.Domain hiding ((:>>>))
 import qualified Analysis.Effect.Statement as S
 import           Analysis.Name
 import           Analysis.Reference
@@ -105,6 +106,11 @@ pattern String'' t = String' t T.:$: T.Nil
 pattern Throw'' :: T.Term Python v -> T.Term Python v
 pattern Throw'' e = Throw' T.:$: T.Cons e T.Nil
 
+pattern (:>>>>) :: T.Term Python v -> T.Term Python v -> T.Term Python v
+pattern s :>>>> t = (:>>>) T.:$: T.Cons s (T.Cons t T.Nil)
+
+infixl 1 :>>>>
+
 pattern Import'' :: NonEmpty Text -> T.Term Python v
 pattern Import'' i = Import' i T.:$: T.Nil
 
@@ -133,7 +139,7 @@ pattern ACons'' a as = ACons' T.:$: T.Cons a (T.Cons as T.Nil)
 pattern Locate'' :: Span -> T.Term Python v -> T.Term Python v
 pattern Locate'' s t = Locate' s T.:$: T.Cons t T.Nil
 
-{-# COMPLETE Noop'', Iff'', Bool'', String'', Throw'', Import'', Function'', Call'', Locate'' #-}
+{-# COMPLETE Noop'', Iff'', Bool'', String'', Throw'', (:>>>>), Import'', Function'', Call'', Locate'' #-}
 
 
 -- Abstract interpretation
