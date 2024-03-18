@@ -8,8 +8,7 @@
 -- | This belongs in @semantic-python@ instead of @semantic-analysis@, but for the sake of expedience…
 module Analysis.Syntax.Python
 ( -- * Syntax
-  Term(..)
-, subterms
+  T.Term(..)
 , Python(..)
 , pattern Noop''
 , pattern Iff''
@@ -37,44 +36,10 @@ import           Control.Effect.Labelled
 import           Control.Effect.Reader
 import           Data.Function (fix)
 import           Data.List.NonEmpty (NonEmpty)
-import qualified Data.Set as Set
 import           Data.Text (Text)
 import           Source.Span (Span)
 
 -- Syntax
-
-data Term
-  = Var Name
-  | Noop
-  | Iff Term Term Term
-  | Bool Bool
-  | String Text
-  | Throw Term
-  | Let Name Term Term
-  | Term :>> Term
-  | Import (NonEmpty Text)
-  | Function Name [Name] Term
-  | Call Term [Term]
-  | Locate Span Term
-  deriving (Eq, Ord, Show)
-
-infixl 1 :>>
-
-subterms :: Term -> Set.Set Term
-subterms t = Set.singleton t <> case t of
-  Var _          -> mempty
-  Noop           -> mempty
-  Iff c t e      -> subterms c <> subterms t <> subterms e
-  Bool _         -> mempty
-  String _       -> mempty
-  Throw t        -> subterms t
-  Let _ v b      -> subterms v <> subterms b
-  a :>> b        -> subterms a <> subterms b
-  Import _       -> mempty
-  Function _ _ b -> subterms b
-  Call f as      -> subterms f <> foldMap subterms as
-  Locate _ b     -> subterms b
-
 
 data Python (arity :: T.Nat) where
   Noop' :: Python T.N0
