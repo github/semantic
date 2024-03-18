@@ -88,25 +88,25 @@ data Python (arity :: T.Nat) where
 infixl 1 :>>>
 
 pattern Noop'' :: T.Term Python v
-pattern Noop'' <- Noop' T.:$: T.Nil
+pattern Noop'' = Noop' T.:$: T.Nil
 
 pattern Iff'' :: T.Term Python v -> T.Term Python v -> T.Term Python v -> T.Term Python v
-pattern Iff'' c t e <- Iff' T.:$: T.Cons c (T.Cons t (T.Cons e T.Nil))
+pattern Iff'' c t e = Iff' T.:$: T.Cons c (T.Cons t (T.Cons e T.Nil))
 
 pattern Bool'' :: Bool -> T.Term Python v
-pattern Bool'' b <- Bool' b T.:$: T.Nil
+pattern Bool'' b = Bool' b T.:$: T.Nil
 
 pattern String'' :: Text -> T.Term Python v
-pattern String'' t <- String' t T.:$: T.Nil
+pattern String'' t = String' t T.:$: T.Nil
 
 pattern Throw'' :: T.Term Python v -> T.Term Python v
-pattern Throw'' e <- Throw' T.:$: T.Cons e T.Nil
+pattern Throw'' e = Throw' T.:$: T.Cons e T.Nil
 
 pattern Import'' :: NonEmpty Text -> T.Term Python v
-pattern Import'' i <- Import' i T.:$: T.Nil
+pattern Import'' i = Import' i T.:$: T.Nil
 
 pattern Function'' :: Name -> [Name] -> T.Term Python v -> T.Term Python v
-pattern Function'' n as b <- Function' n as T.:$: T.Cons b T.Nil
+pattern Function'' n as b = Function' n as T.:$: T.Cons b T.Nil
 
 
 -- Abstract interpretation
