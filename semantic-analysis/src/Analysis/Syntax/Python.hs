@@ -8,7 +8,7 @@
 -- | This belongs in @semantic-python@ instead of @semantic-analysis@, but for the sake of expedience…
 module Analysis.Syntax.Python
 ( -- * Syntax
-  T.Term(..)
+  Term
 , Python(..)
 , pattern Noop
 , pattern Iff
@@ -40,6 +40,8 @@ import           Data.Text (Text)
 import           Source.Span (Span)
 
 -- Syntax
+
+type Term = T.Term Python Name
 
 data Python (arity :: T.Nat) where
   Noop' :: Python T.N0
@@ -114,13 +116,13 @@ pattern Locate s t = Locate' s T.:$: T.Cons t T.Nil
 
 -- Abstract interpretation
 
-eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m) => T.Term Python Name -> m val
+eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m) => Term -> m val
 eval0 = fix eval
 
 eval
   :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m)
-  => (T.Term Python Name -> m val)
-  -> (T.Term Python Name -> m val)
+  => (Term -> m val)
+  -> (Term -> m val)
 eval eval = \case
   T.Var n   -> lookupEnv n >>= maybe (dvar n) fetch
   Noop      -> dunit
