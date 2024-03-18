@@ -4,6 +4,7 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE ViewPatterns #-}
 -- | This belongs in @semantic-python@ instead of @semantic-analysis@, but for the sake of expedience…
 module Analysis.Syntax.Python
 ( -- * Syntax
@@ -17,6 +18,7 @@ module Analysis.Syntax.Python
 , pattern Throw''
 , pattern Import''
 , pattern Function''
+, pattern Call''
   -- * Abstract interpretation
 , eval0
 , eval
@@ -107,6 +109,25 @@ pattern Import'' i = Import' i T.:$: T.Nil
 
 pattern Function'' :: Name -> [Name] -> T.Term Python v -> T.Term Python v
 pattern Function'' n as b = Function' n as T.:$: T.Cons b T.Nil
+
+pattern Call''
+  :: T.Term Python v
+  -> [T.Term Python v]
+  -> T.Term Python v
+pattern Call'' f as <- Call' T.:$: T.Cons f (T.Cons (fromArgs -> as) T.Nil)
+  where Call'' f as = Call' T.:$: T.Cons f (T.Cons (foldr ACons'' ANil'' as) T.Nil)
+
+fromArgs :: T.Term Python v -> [T.Term Python v]
+fromArgs = \case
+  ANil'' -> []
+  ACons'' a as -> a:fromArgs as
+  _ -> fail "unexpected constructor in spine of argument list"
+
+pattern ANil'' :: T.Term Python v
+pattern ANil'' = ANil' T.:$: T.Nil
+
+pattern ACons'' :: T.Term Python v -> T.Term Python v -> T.Term Python v
+pattern ACons'' a as = ACons' T.:$: T.Cons a (T.Cons as T.Nil)
 
 
 -- Abstract interpretation
