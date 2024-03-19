@@ -7,6 +7,7 @@ module Analysis.Syntax
 , foldTerm
 , paraTerm
 , mendlerTerm
+, mendlerParaTerm
 ) where
 
 import qualified Data.Set as Set
@@ -47,3 +48,9 @@ mendlerTerm var sig = go
   where
   go (Var v)  = var v
   go (Term s) = sig go s
+
+mendlerParaTerm :: (v -> r) -> (forall r' . (r' -> (Term sig v, r)) -> sig r'-> r) -> (Term sig v -> r)
+mendlerParaTerm var sig = go
+  where
+  go (Var v)  = var v
+  go (Term s) = sig ((,) <*> go) s
