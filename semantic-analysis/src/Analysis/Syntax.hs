@@ -31,8 +31,8 @@ instance (Ord (sig (Term sig v)), Ord v) => Ord (Term sig v) where
   compare _          _        = GT
 
 
-subterms :: (Ord (sig (Term sig v)), Ord v, Foldable sig, Functor sig) => Term sig v -> Set.Set (Term sig v)
-subterms = paraTerm (Set.singleton . Var) (foldMap (uncurry Set.insert))
+subterms :: (Ord (sig (Term sig v)), Ord v, Foldable sig) => Term sig v -> Set.Set (Term sig v)
+subterms = mendlerParaTerm (Set.singleton . Var) (\ k -> foldMap (uncurry Set.insert . k))
 
 foldTerm :: Functor sig => (v -> r) -> (sig r -> r) -> (Term sig v -> r)
 foldTerm var sig = mendlerTerm var (\ k -> sig . fmap k)
