@@ -3,6 +3,7 @@ module Analysis.Syntax
 ( -- * Syntax
   Term(..)
 , subterms
+, foldTerm
 ) where
 
 import qualified Data.Set as Set
@@ -30,3 +31,9 @@ subterms :: (forall t . Eq t => Eq (sig t), forall t . Ord t => Ord (sig t), Ord
 subterms t = case t of
   Var _  -> Set.singleton t
   Term s -> Set.insert t (foldMap subterms s)
+
+foldTerm :: Functor sig => (v -> r) -> (sig r -> r) -> (Term sig v -> r)
+foldTerm var sig = go
+  where
+  go (Var v)  = var v
+  go (Term s) = sig (go <$> s)
