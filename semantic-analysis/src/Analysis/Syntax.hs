@@ -34,10 +34,7 @@ subterms :: (forall t . Eq t => Eq (sig t), forall t . Ord t => Ord (sig t), Ord
 subterms = paraTerm (Set.singleton . Var) (foldMap (uncurry Set.insert))
 
 foldTerm :: Functor sig => (v -> r) -> (sig r -> r) -> (Term sig v -> r)
-foldTerm var sig = go
-  where
-  go (Var v)  = var v
-  go (Term s) = sig (go <$> s)
+foldTerm var sig = mendlerTerm var (\ k -> sig . fmap k)
 
 paraTerm :: Functor sig => (v -> r) -> (sig (Term sig v, r) -> r) -> (Term sig v -> r)
 paraTerm var sig = go
