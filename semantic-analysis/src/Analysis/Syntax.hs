@@ -28,10 +28,8 @@ instance (forall t . Eq t => Eq (sig t), forall t. Ord t => Ord (sig t), Ord v) 
   compare _          _        = GT
 
 
-subterms :: (forall t . Eq t => Eq (sig t), forall t . Ord t => Ord (sig t), Ord v, Foldable sig) => Term sig v -> Set.Set (Term sig v)
-subterms t = case t of
-  Var _  -> Set.singleton t
-  Term s -> Set.insert t (foldMap subterms s)
+subterms :: (forall t . Eq t => Eq (sig t), forall t . Ord t => Ord (sig t), Ord v, Foldable sig, Functor sig) => Term sig v -> Set.Set (Term sig v)
+subterms = paraTerm (Set.singleton . Var) (foldMap (uncurry Set.insert))
 
 foldTerm :: Functor sig => (v -> r) -> (sig r -> r) -> (Term sig v -> r)
 foldTerm var sig = go
