@@ -35,6 +35,7 @@ import           Analysis.VM
 import           Control.Effect.Labelled
 import           Control.Effect.Reader
 import           Data.Function (fix)
+import           Data.Functor.Classes (Eq1 (..))
 import           Data.List.NonEmpty (NonEmpty)
 import           Data.Text (Text)
 import           Source.Span (Span)
@@ -112,6 +113,25 @@ pattern Locate :: Span -> T.Term Python v -> T.Term Python v
 pattern Locate s t = Locate' s T.:$: T.Cons t T.Nil
 
 {-# COMPLETE Noop, Iff, Bool, String, Throw, Let, (:>>), Import, Function, Call, Locate #-}
+
+
+instance Eq1 Python where
+  liftEq _ a b = case (a, b) of
+    (Noop', Noop')                       -> True
+    (Iff', Iff')                         -> True
+    (Bool' b1, Bool' b2)                 -> b1 == b2
+    (String' s1, String' s2)             -> s1 == s2
+    (Throw', Throw')                     -> True
+    (Let' n1, Let' n2)                   -> n1 == n2
+    ((:>>>), (:>>>))                     -> True
+    (Import' i1, Import' i2)             -> i1 == i2
+    (Function' n1 as1, Function' n2 as2) -> n1 == n2 && as1 == as2
+    (Call', Call')                       -> True
+    (ANil', ANil')                       -> True
+    (ACons', ACons')                     -> True
+    (Locate' s1, Locate' s2)             -> s1 == s2
+    _                                    -> False
+
 
 
 -- Abstract interpretation
