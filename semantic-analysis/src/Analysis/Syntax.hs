@@ -1,6 +1,5 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
@@ -17,7 +16,6 @@ module Analysis.Syntax
 , N2
 , N3
 , Vec(..)
-, toList
 ) where
 
 import           Control.Monad (guard)
@@ -98,9 +96,3 @@ instance Ord a => Ord (Vec n a) where
 instance Foldable (Vec n) where
   foldMap _ Nil         = mempty
   foldMap f (Cons a as) = f a <> foldMap f as
-
-
-toList :: Vec n a -> [a]
-toList = \case
-  Nil -> []
-  Cons a as -> a : toList as
