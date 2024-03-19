@@ -19,9 +19,9 @@ data Term sig v
   | Term (sig (Term sig v))
 
 instance (forall t . Eq t => Eq (sig t), Eq v) => Eq (Term sig v) where
-  Var v1   == Var v2 = v1 == v2
+  Var v1  == Var v2  = v1 == v2
   Term s1 == Term s2 = s1 == s2
-  _        == _      = False
+  _       == _       = False
 
 instance (forall t . Eq t => Eq (sig t), forall t. Ord t => Ord (sig t), Ord v) => Ord (Term sig v) where
   compare (Var v1)  (Var v2)  = compare v1 v2
