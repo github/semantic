@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE LambdaCase #-}
@@ -11,7 +10,8 @@ module Analysis.Syntax
   Term(..)
 , subterms
   -- * Vectors
-, Nat(..)
+, Z
+, S
 , N0
 , N1
 , N2
@@ -29,7 +29,7 @@ import           Unsafe.Coerce (unsafeCoerce)
 -- Syntax
 
 -- | (Currently) untyped term representations.
-data Term (sig :: Nat -> Type) v where
+data Term (sig :: Type -> Type) v where
   Var  :: v -> Term sig v
   (:$:) :: KnownNat n => sig n -> Vec n (Term sig v) -> Term sig v
 
@@ -57,26 +57,24 @@ subterms t = case t of
 
 -- Vectors
 
-data Nat
-  = Z
-  | S Nat
-  deriving (Eq, Ord, Show)
+data Z
+data S n
 
-type N0 = 'Z
-type N1 = 'S N0
-type N2 = 'S N1
-type N3 = 'S N2
+type N0 = Z
+type N1 = S N0
+type N2 = S N1
+type N3 = S N2
 
 
 -- | Reify 'Nat's back from type-level singletons.
-class KnownNat (n :: Nat) where
-  reifyNat :: proxy n -> Nat
+class KnownNat n where
+  reifyNat :: proxy n -> Int
 
-instance KnownNat 'Z where
-  reifyNat _ = Z
+instance KnownNat Z where
+  reifyNat _ = 0
 
-instance KnownNat n => KnownNat ('S n) where
-  reifyNat _ = S (reifyNat (undefined :: proxy n))
+instance KnownNat n => KnownNat (S n) where
+  reifyNat _ = 1 + reifyNat (undefined :: proxy n)
 
 
 -- | Test the equality of type-level 'Nat's at runtime, generating a type-level equality if equal.
@@ -85,9 +83,9 @@ sameNat a b = unsafeCoerce Refl <$ guard (reifyNat a == reifyNat b)
 
 
 -- FIXME: move this into its own module, or use a dependency, or something.
-data Vec (n :: Nat) a where
-  Nil :: Vec 'Z a
-  Cons :: a -> Vec n a -> Vec ('S n) a
+data Vec n a where
+  Nil :: Vec Z a
+  Cons :: a -> Vec n a -> Vec (S n) a
 
 instance Eq a => Eq (Vec n a) where
   Nil       == Nil       = True

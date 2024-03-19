@@ -43,7 +43,7 @@ import           Source.Span (Span)
 
 type Term = T.Term Python Name
 
-data Python (arity :: T.Nat) where
+data Python arity where
   Noop' :: Python T.N0
   Iff' :: Python T.N3
   Bool' :: Bool -> Python T.N0
