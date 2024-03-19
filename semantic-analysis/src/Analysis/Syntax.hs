@@ -1,10 +1,12 @@
 {-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE RankNTypes #-}
 module Analysis.Syntax
 ( -- * Syntax
   Term(..)
 , subterms
 , foldTerm
 , paraTerm
+, mendlerTerm
 ) where
 
 import qualified Data.Set as Set
@@ -42,3 +44,9 @@ paraTerm var sig = go
   where
   go (Var v)  = var v
   go (Term s) = sig ((,) <*> go <$> s)
+
+mendlerTerm :: (v -> r) -> (forall r' . (r' -> r) -> sig r'-> r) -> (Term sig v -> r)
+mendlerTerm var sig = go
+  where
+  go (Var v)  = var v
+  go (Term s) = sig go s
