@@ -38,10 +38,7 @@ foldTerm :: Functor sig => (v -> r) -> (sig r -> r) -> (Term sig v -> r)
 foldTerm var sig = mendlerTerm var (\ k -> sig . fmap k)
 
 paraTerm :: Functor sig => (v -> r) -> (sig (Term sig v, r) -> r) -> (Term sig v -> r)
-paraTerm var sig = go
-  where
-  go (Var v)  = var v
-  go (Term s) = sig ((,) <*> go <$> s)
+paraTerm var sig = mendlerParaTerm var (\ k -> sig . fmap k)
 
 mendlerTerm :: (v -> r) -> (forall r' . (r' -> r) -> sig r'-> r) -> (Term sig v -> r)
 mendlerTerm var sig = go
