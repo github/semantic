@@ -35,7 +35,7 @@ import           Analysis.VM
 import           Control.Effect.Labelled
 import           Control.Effect.Reader
 import           Data.Function (fix)
-import           Data.Functor.Classes (Eq1 (..))
+import           Data.Functor.Classes (Eq1 (..), Ord1 (..))
 import           Data.List.NonEmpty (NonEmpty)
 import           Data.Text (Text)
 import           Source.Span (Span)
@@ -132,6 +132,34 @@ instance Eq1 Python where
     (Locate' s1, Locate' s2)             -> s1 == s2
     _                                    -> False
 
+instance Ord1 Python where
+  liftCompare _ a b = case (a, b) of
+    (Noop', Noop')                       -> EQ
+    (Noop', _)                           -> LT
+    (Iff', Iff')                         -> EQ
+    (Iff', _)                            -> LT
+    (Bool' b1,  Bool' b2)                -> compare b1 b2
+    (Bool' _,  _)                        -> LT
+    (String' s1, String' s2)             -> compare s1 s2
+    (String' _, _)                       -> LT
+    (Throw', Throw')                     -> EQ
+    (Throw', _)                          -> LT
+    (Let' n1, Let' n2)                   -> compare n1 n2
+    (Let' _, _)                          -> LT
+    ((:>>>), (:>>>))                     -> EQ
+    ((:>>>), _)                          -> LT
+    (Import' i1, Import' i2)             -> compare i1 i2
+    (Import' _, _)                       -> LT
+    (Function' n1 as1, Function' n2 as2) -> compare n1 n2 <> compare as1 as2
+    (Function' _ _, _)                   -> LT
+    (Call', Call')                       -> EQ
+    (Call', _)                           -> LT
+    (ANil', ANil')                       -> EQ
+    (ANil', _)                           -> LT
+    (ACons', ACons')                     -> EQ
+    (ACons', _)                          -> LT
+    (Locate' s1, Locate' s2)             -> compare s1 s2
+    (Locate' _, _)                       -> LT
 
 
 -- Abstract interpretation
