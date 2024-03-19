@@ -4,6 +4,7 @@ module Analysis.Syntax
   Term(..)
 , subterms
 , foldTerm
+, paraTerm
 ) where
 
 import qualified Data.Set as Set
@@ -37,3 +38,9 @@ foldTerm var sig = go
   where
   go (Var v)  = var v
   go (Term s) = sig (go <$> s)
+
+paraTerm :: Functor sig => (v -> r) -> (sig (Term sig v, r) -> r) -> (Term sig v -> r)
+paraTerm var sig = go
+  where
+  go (Var v)  = var v
+  go (Term s) = sig ((,) <*> go <$> s)
