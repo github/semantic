@@ -13,7 +13,8 @@ module Analysis.Syntax.Python
 , parse
 ) where
 
-import           Analysis.Effect.Domain hiding ((:>>>))
+import           Analysis.Effect.Domain hiding ((:>>>), (>>>))
+import qualified Analysis.Effect.Domain as D
 import qualified Analysis.Effect.Statement as S
 import           Analysis.Name
 import           Analysis.Reference
@@ -22,10 +23,9 @@ import           Analysis.VM
 import           Control.Effect.Labelled
 import           Control.Effect.Reader
 import           Data.Function (fix)
-import           Data.List.NonEmpty (NonEmpty)
-import           Data.Text (Text)
+import           Data.List.NonEmpty (NonEmpty (..), nonEmpty)
+import           Data.Text (Text, pack)
 import qualified Language.Python.Common.AST as Py
-import qualified Language.Python.Common.SrcLocation as Py
 import           Language.Python.Version3.Parser
 import           Source.Span (Span)
 import           System.FilePath (takeBaseName)
@@ -76,7 +76,7 @@ eval eval = \case
     t :>> u   -> do
       t' <- eval t
       u' <- eval u
-      t' >>> u'
+      t' D.>>> u'
     Import ns -> S.simport ns >> dunit
     Function n ps b -> letrec n (dabs ps (foldr (\ (p, a) m -> let' p a m) (eval b) . zip ps))
     Call f as -> do
@@ -87,12 +87,27 @@ eval eval = \case
   where
   setSpan s r = r{ refSpan = s }
 
+(>>>) :: T.Term Python v -> T.Term Python v -> T.Term Python v
+l >>> r = T.Term (l :>> r)
+
+noop :: T.Term Python v
+noop = T.Term Noop
+
 
 -- Parsing
 
-parse :: FilePath -> IO (Py.Module Py.SrcSpan)
+parse :: FilePath -> IO (T.Term Python Name)
 parse path = do
   src <- readFile path
   case parseModule src (takeBaseName path) of
-    Left err     -> fail (show err)
-    Right (m, _) -> pure m
+    Left err                -> fail (show err)
+    Right (Py.Module ss, _) -> foldr (>>>) noop <$> traverse statement ss
+  where
+  statement :: Py.Statement annot -> IO (T.Term Python Name)
+  statement = \case
+    Py.Import is _ -> foldr ((>>>) . T.Term . Import) noop <$> traverse importItem is
+    _ -> fail "cannot ingest this Python statement"
+  ident :: Py.Ident annot -> String
+  ident (Py.Ident s _) = s
+  importItem :: Py.ImportItem annot -> IO (NonEmpty Text)
+  importItem Py.ImportItem{ Py.import_item_name = ns } = maybe (fail "") pure (nonEmpty (map (pack . ident) ns)) -- FIXME: "as" names
