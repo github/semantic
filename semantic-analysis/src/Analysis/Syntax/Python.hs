@@ -93,6 +93,9 @@ l >>> r = T.Term (l :>> r)
 noop :: T.Term Python v
 noop = T.Term Noop
 
+iff :: T.Term Python v -> T.Term Python v -> T.Term Python v -> T.Term Python v
+iff c t e = T.Term (Iff c t e)
+
 
 -- Parsing
 
@@ -101,13 +104,20 @@ parse path = do
   src <- readFile path
   case parseModule src (takeBaseName path) of
     Left err                -> fail (show err)
-    Right (Py.Module ss, _) -> foldr (>>>) noop <$> traverse statement ss
+    Right (Py.Module ss, _) -> suite ss
   where
   statement :: Py.Statement annot -> IO (T.Term Python Name)
   statement = \case
     Py.Import is _ -> foldr ((>>>) . T.Term . Import) noop <$> traverse importItem is
+    Py.Conditional cs e _ -> foldr (\ (c, t) e -> iff <$> expr c <*> suite t <*> e) (suite e) cs
     _ -> fail "cannot ingest this Python statement"
+  expr :: Py.Expr annot -> IO (T.Term Python Name)
+  expr = \case
+    Py.Var v _ -> pure (T.Var (name (pack (ident v))))
+    _ -> fail "cannot ingest this Python expression"
   ident :: Py.Ident annot -> String
   ident (Py.Ident s _) = s
   importItem :: Py.ImportItem annot -> IO (NonEmpty Text)
   importItem Py.ImportItem{ Py.import_item_name = ns } = maybe (fail "") pure (nonEmpty (map (pack . ident) ns)) -- FIXME: "as" names
+  suite :: [Py.Statement annot] -> IO (T.Term Python Name)
+  suite ss = foldr (>>>) noop <$> traverse statement ss
