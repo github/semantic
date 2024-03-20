@@ -9,6 +9,8 @@ module Analysis.Syntax.Python
   -- * Abstract interpretation
 , eval0
 , eval
+  -- * Parsing
+, parse
 ) where
 
 import           Analysis.Effect.Domain hiding ((:>>>))
@@ -22,7 +24,11 @@ import           Control.Effect.Reader
 import           Data.Function (fix)
 import           Data.List.NonEmpty (NonEmpty)
 import           Data.Text (Text)
+import qualified Language.Python.Common.AST as Py
+import qualified Language.Python.Common.SrcLocation as Py
+import           Language.Python.Version3.Parser
 import           Source.Span (Span)
+import           System.FilePath (takeBaseName)
 
 -- Syntax
 
@@ -80,3 +86,13 @@ eval eval = \case
     Locate s t -> local (setSpan s) (eval t)
   where
   setSpan s r = r{ refSpan = s }
+
+
+-- Parsing
+
+parse :: FilePath -> IO (Py.Module Py.SrcSpan)
+parse path = do
+  src <- readFile path
+  case parseModule src (takeBaseName path) of
+    Left err     -> fail (show err)
+    Right (m, _) -> pure m
