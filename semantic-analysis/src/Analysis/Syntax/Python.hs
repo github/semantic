@@ -85,7 +85,7 @@ eval eval = \case
     -- FIXME: RaiseV2
     -- FIXME: whatever the second field is
   Statement (Py.StmtExpr e sp) -> setSpan sp (eval (Expr e))
-  Statement (Py.Fun n ps _r ss sp) -> let ps' = mapMaybe (\ p -> case p of { Py.Param n _ _ _ -> Just (ident n) ; _ -> Nothing}) ps in setSpan sp $ letrec (ident n) (dabs ps' (foldr (\ (p, a) m -> let' p a m) (suite ss) . zip ps'))
+  Statement (Py.Fun n ps _r ss sp) -> let ps' = mapMaybe (\case { Py.Param n _ _ _ -> Just (ident n) ; _ -> Nothing}) ps in setSpan sp $ letrec (ident n) (dabs ps' (foldr (\ (p, a) m -> let' p a m) (suite ss) . zip ps'))
   Expr (Py.Var n sp) -> setSpan sp $ let n' = ident n in lookupEnv n' >>= maybe (dvar n') fetch
   Expr (Py.Bool b sp) -> setSpan sp $ dbool b
   Expr (Py.Strings ss sp) -> setSpan sp $ dstring (pack (mconcat ss))
