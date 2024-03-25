@@ -36,6 +36,7 @@ data Term
   | Statement (Py.Statement Py.SrcSpan)
   | Expr (Py.Expr Py.SrcSpan)
   | Argument (Py.Argument Py.SrcSpan)
+  deriving (Eq, Ord, Show)
 
 
 -- Abstract interpretation
