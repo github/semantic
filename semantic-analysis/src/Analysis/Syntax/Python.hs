@@ -4,6 +4,7 @@
 module Analysis.Syntax.Python
 ( -- * Syntax
   Term(..)
+, subterms
   -- * Abstract interpretation
 , eval0
 , eval
@@ -23,6 +24,7 @@ import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.List.NonEmpty (nonEmpty)
 import           Data.Maybe (mapMaybe)
+import qualified Data.Set as Set
 import           Data.Text (pack)
 import qualified Language.Python.Common as Py
 import           Language.Python.Version3.Parser
@@ -36,6 +38,25 @@ data Term
   | Statement (Py.Statement Py.SrcSpan)
   | Expr (Py.Expr Py.SrcSpan)
   deriving (Eq, Ord, Show)
+
+-- | Non-generic production of the recursive set of subterms.
+--
+-- This should be exactly the set of nodes which 'eval' can visit, i.e. it excludes comments, etc.
+subterms :: Term -> Set.Set Term
+subterms t = Set.insert t $ case t of
+  Module (Py.Module ss)                 -> suite ss
+  Statement (Py.Conditional cts e _)    -> foldMap (\ (c, t) -> subterms (Expr c) <> suite t) cts <> suite e
+  Statement (Py.Raise (Py.RaiseV3 e) _) -> maybe Set.empty (subterms . Expr . fst) e
+  -- FIXME: Py.RaiseV2
+  -- FIXME: whatever the second field is
+  Statement (Py.StmtExpr e _)           -> subterms (Expr  e)
+  Statement (Py.Fun _ _ _ ss _)         -> suite ss
+  -- FIXME: include 'subterms' of any default values
+  Expr (Py.Call f as _)                 -> subterms (Expr f) <> foldMap (\case { Py.ArgExpr e _ -> subterms (Expr e) ; _ -> Set.empty }) as
+  -- FIXME: support keyword args &c.
+  _                                     -> Set.empty -- TBD, and terminals
+  where
+  suite = foldMap (subterms . Statement)
 
 
 -- Abstract interpretation
@@ -61,7 +82,8 @@ eval eval = \case
   Statement (Py.Raise (Py.RaiseV3 e) sp) -> setSpan sp $ case e of
     Just (e, _) -> eval (Expr e) >>= ddie -- FIXME: from clause
     Nothing     -> dunit >>= ddie
-  -- FIXME: RaiseV2
+    -- FIXME: RaiseV2
+    -- FIXME: whatever the second field is
   Statement (Py.StmtExpr e sp) -> setSpan sp (eval (Expr e))
   Statement (Py.Fun n ps _r ss sp) -> let ps' = mapMaybe (\ p -> case p of { Py.Param n _ _ _ -> Just (ident n) ; _ -> Nothing}) ps in setSpan sp $ letrec (ident n) (dabs ps' (foldr (\ (p, a) m -> let' p a m) (suite ss) . zip ps'))
   Expr (Py.Var n sp) -> setSpan sp $ let n' = ident n in lookupEnv n' >>= maybe (dvar n') fetch
