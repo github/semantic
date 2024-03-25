@@ -76,7 +76,7 @@ library
     , semantic-source      ^>= 0.2
     , tasty                ^>= 1.2.3
     , tasty-hunit          ^>= 0.10.0.2
-    , template-haskell      >= 2.15 && < 2.19
+    , template-haskell      >= 2.15 && < 2.22
     , text                 ^>= 1.2.3.1
     , tree-sitter          ^>= 0.9.0.0
     , unordered-containers ^>= 0.2.10

@@ -118,7 +118,7 @@ library
     , fused-effects ^>= 1.1
     , hostname ^>= 1.0
     , hscolour ^>= 1.24.4
-    , lens >= 4.17 && < 5.2
+    , lens >= 4.17 && < 5.3
     , network >= 2.8 && < 3.2
     , network-uri ^>= 2.6.1.0
     , optparse-applicative >= 0.14.3 && < 0.16

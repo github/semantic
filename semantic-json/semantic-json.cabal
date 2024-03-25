@@ -56,7 +56,7 @@ library
     , base  >= 4.13 && < 5
     , semantic-ast
     , semantic-tags ^>= 0.0
-    , template-haskell  >= 2.15 && < 2.19
+    , template-haskell  >= 2.15 && < 2.22
     , text ^>= 1.2.3
     , tree-sitter ^>= 0.9
     , tree-sitter-json ^>= 0.7.0.1
