@@ -13,26 +13,25 @@ module Analysis.Syntax.Python
 , parse
 ) where
 
-import           Analysis.Effect.Domain hiding ((:>>>), (>>>))
-import qualified Analysis.Effect.Domain as D
+import           Analysis.Effect.Domain hiding ((:>>>))
 import qualified Analysis.Effect.Statement as S
 import           Analysis.Name
 import           Analysis.Reference
-import qualified Analysis.Syntax as T
 import           Analysis.VM
 import           Control.Effect.Labelled
 import           Control.Effect.Reader
+import           Control.Monad (foldM)
+import           Data.Foldable (for_)
 import           Data.Function (fix)
 import           Data.List.NonEmpty (NonEmpty (..), nonEmpty)
+import           Data.Maybe (mapMaybe)
 import           Data.Text (Text, pack)
-import qualified Language.Python.Common.AST as Py
+import qualified Language.Python.Common as Py
 import           Language.Python.Version3.Parser
-import           Source.Span (Span)
+import           Source.Span (Pos (..), Span (..), point)
 import           System.FilePath (takeBaseName)
 
 -- Syntax
-
-type Term = T.Term Python Name
 
 data Python t
   = Noop
@@ -50,74 +49,71 @@ data Python t
 
 infixl 1 :>>
 
+data Term
+  = Module (Py.Module Py.SrcSpan)
+  | Statement (Py.Statement Py.SrcSpan)
+  | Expr (Py.Expr Py.SrcSpan)
+  | Argument (Py.Argument Py.SrcSpan)
+
 
 -- Abstract interpretation
 
-eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m) => Term -> m val
+eval0 :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m, MonadFail m) => Term -> m val
 eval0 = fix eval
 
 eval
-  :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m)
+  :: (Has (Env addr) sig m, HasLabelled Store (Store addr val) sig m, Has (Dom val) sig m, Has (Reader Reference) sig m, Has S.Statement sig m, MonadFail m)
   => (Term -> m val)
   -> (Term -> m val)
 eval eval = \case
-  T.Var n  -> lookupEnv n >>= maybe (dvar n) fetch
-  T.Term s -> case s of
-    Noop      -> dunit
-    Iff c t e -> do
-      c' <- eval c
-      dif c' (eval t) (eval e)
-    Bool b    -> dbool b
-    String s  -> dstring s
-    Throw e   -> eval e >>= ddie
-    Let n v b -> do
-      v' <- eval v
-      let' n v' (eval b)
-    t :>> u   -> do
-      t' <- eval t
-      u' <- eval u
-      t' D.>>> u'
-    Import ns -> S.simport ns >> dunit
-    Function n ps b -> letrec n (dabs ps (foldr (\ (p, a) m -> let' p a m) (eval b) . zip ps))
-    Call f as -> do
-      f' <- eval f
-      as' <- traverse eval as
-      dapp f' as'
-    Locate s t -> local (setSpan s) (eval t)
+  Module (Py.Module ss) -> suite ss
+  Statement (Py.Import is sp) -> setSpan sp $ do
+    for_ is $ \ Py.ImportItem{ Py.import_item_name = ns } -> case nonEmpty ns of
+      Nothing -> pure ()
+      Just ss -> S.simport (pack . Py.ident_string <$> ss)
+    dunit
+  Statement (Py.Pass sp) -> setSpan sp dunit
+  Statement (Py.Conditional cts e sp) -> setSpan sp $ foldr (\ (c, t) e -> do
+    c' <- eval (Expr c)
+    dif c' (suite t) e) (suite e) cts
+  Statement (Py.Raise (Py.RaiseV3 e) sp) -> setSpan sp $ case e of
+    Just (e, _) -> eval (Expr e) >>= ddie -- FIXME: from clause
+    Nothing     -> dunit >>= ddie
+  -- FIXME: RaiseV2
+  Statement (Py.StmtExpr e sp) -> setSpan sp (eval (Expr e))
+  Statement (Py.Fun n ps _r ss sp) -> let ps' = mapMaybe (\ p -> case p of { Py.Param n _ _ _ -> Just (ident n) ; _ -> Nothing}) ps in setSpan sp $ letrec (ident n) (dabs ps' (foldr (\ (p, a) m -> let' p a m) (suite ss) . zip ps'))
+  Expr (Py.Var n sp) -> setSpan sp $ let n' = ident n in lookupEnv n' >>= maybe (dvar n') fetch
+  Expr (Py.Bool b sp) -> setSpan sp $ dbool b
+  Expr (Py.Strings ss sp) -> setSpan sp $ dstring (pack (mconcat ss))
+  Expr (Py.Call f as sp) -> setSpan sp $ do
+    f' <- eval (Expr f)
+    as' <- traverse (eval . Argument) as
+    dapp f' as'
+  Argument (Py.ArgExpr e sp) -> setSpan sp $ eval (Expr e)
+  -- FIXME: support keyword args &c.
+  _ -> fail "TBD"
   where
-  setSpan s r = r{ refSpan = s }
-
-(>>>) :: T.Term Python v -> T.Term Python v -> T.Term Python v
-l >>> r = T.Term (l :>> r)
-
-noop :: T.Term Python v
-noop = T.Term Noop
-
-iff :: T.Term Python v -> T.Term Python v -> T.Term Python v -> T.Term Python v
-iff c t e = T.Term (Iff c t e)
+  setSpan s = case fromSpan s of
+    Just s -> local (\ r -> r{ refSpan = s })
+    _      -> id
+  fromSpan Py.SpanEmpty                     = Nothing
+  fromSpan (Py.SpanPoint _ l c)             = Just (point (Pos l c))
+  fromSpan (Py.SpanCoLinear _ l c1 c2)      = Just (Span (Pos l c1) (Pos l c2))
+  fromSpan (Py.SpanMultiLine _ l1 l2 c1 c2) = Just (Span (Pos l1 c1) (Pos l2 c2))
+  suite []     = dunit
+  suite (s:ss) = do
+    s' <- eval (Statement s)
+    foldM (\ into each -> do
+      each' <- eval (Statement each)
+      into >>> each') s' ss
+  ident = name . pack . Py.ident_string
 
 
 -- Parsing
 
-parse :: FilePath -> IO (T.Term Python Name)
+parse :: FilePath -> IO Term
 parse path = do
   src <- readFile path
   case parseModule src (takeBaseName path) of
     Left err                -> fail (show err)
-    Right (Py.Module ss, _) -> suite ss
-  where
-  statement :: Py.Statement annot -> IO (T.Term Python Name)
-  statement = \case
-    Py.Import is _ -> foldr ((>>>) . T.Term . Import) noop <$> traverse importItem is
-    Py.Conditional cs e _ -> foldr (\ (c, t) e -> iff <$> expr c <*> suite t <*> e) (suite e) cs
-    _ -> fail "cannot ingest this Python statement"
-  expr :: Py.Expr annot -> IO (T.Term Python Name)
-  expr = \case
-    Py.Var v _ -> pure (T.Var (name (pack (ident v))))
-    _ -> fail "cannot ingest this Python expression"
-  ident :: Py.Ident annot -> String
-  ident (Py.Ident s _) = s
-  importItem :: Py.ImportItem annot -> IO (NonEmpty Text)
-  importItem Py.ImportItem{ Py.import_item_name = ns } = maybe (fail "") pure (nonEmpty (map (pack . ident) ns)) -- FIXME: "as" names
-  suite :: [Py.Statement annot] -> IO (T.Term Python Name)
-  suite ss = foldr (>>>) noop <$> traverse statement ss
+    Right (Py.Module ss, _) -> pure (Module (Py.Module ss))
