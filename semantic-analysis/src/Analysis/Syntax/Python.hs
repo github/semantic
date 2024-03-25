@@ -1,11 +1,9 @@
-{-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
 -- | This belongs in @semantic-python@ instead of @semantic-analysis@, but for the sake of expedience…
 module Analysis.Syntax.Python
 ( -- * Syntax
   Term
-, Python(..)
   -- * Abstract interpretation
 , eval0
 , eval
@@ -23,31 +21,15 @@ import           Control.Effect.Reader
 import           Control.Monad (foldM)
 import           Data.Foldable (for_)
 import           Data.Function (fix)
-import           Data.List.NonEmpty (NonEmpty (..), nonEmpty)
+import           Data.List.NonEmpty (nonEmpty)
 import           Data.Maybe (mapMaybe)
-import           Data.Text (Text, pack)
+import           Data.Text (pack)
 import qualified Language.Python.Common as Py
 import           Language.Python.Version3.Parser
 import           Source.Span (Pos (..), Span (..), point)
 import           System.FilePath (takeBaseName)
 
 -- Syntax
-
-data Python t
-  = Noop
-  | Iff t t t
-  | Bool Bool
-  | String Text
-  | Throw t
-  | Let Name t t
-  | t :>> t
-  | Import (NonEmpty Text)
-  | Function Name [Name] t
-  | Call t [t]
-  | Locate Span t
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
-
-infixl 1 :>>
 
 data Term
   = Module (Py.Module Py.SrcSpan)
