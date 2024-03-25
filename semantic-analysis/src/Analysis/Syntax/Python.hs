@@ -35,7 +35,6 @@ data Term
   = Module (Py.Module Py.SrcSpan)
   | Statement (Py.Statement Py.SrcSpan)
   | Expr (Py.Expr Py.SrcSpan)
-  | Argument (Py.Argument Py.SrcSpan)
   deriving (Eq, Ord, Show)
 
 
@@ -70,10 +69,9 @@ eval eval = \case
   Expr (Py.Strings ss sp) -> setSpan sp $ dstring (pack (mconcat ss))
   Expr (Py.Call f as sp) -> setSpan sp $ do
     f' <- eval (Expr f)
-    as' <- traverse (eval . Argument) as
+    as' <- traverse eval (mapMaybe (\case { Py.ArgExpr e _ -> Just (Expr e) ; _ -> Nothing }) as)
+    -- FIXME: support keyword args &c.
     dapp f' as'
-  Argument (Py.ArgExpr e sp) -> setSpan sp $ eval (Expr e)
-  -- FIXME: support keyword args &c.
   _ -> fail "TBD"
   where
   setSpan s = case fromSpan s of
