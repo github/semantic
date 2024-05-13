@@ -1,9 +1,9 @@
 # How we parse source code into ASTs
 
 #### Table of Contents
-1. [Problem space and possible solutions](#solutions)
-2. [Why we use tree-sitter](#why-tree-sitter)
-3. [Drawbacks of tree-sitter](#drawbacks)
+1. [Problem space and possible solutions](#problem-space-and-possible-solutions)
+2. [Why we use tree-sitter](#why-we-use-tree-sitter)
+3. [Drawbacks of tree-sitter](#drawbacks-of-tree-sitter)
 
 ## Problem space and possible solutions
 
