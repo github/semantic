@@ -51,7 +51,7 @@ data Config
   , configTreeSitterParseTimeout     :: Duration             -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 6000).
   , configTreeSitterUnmarshalTimeout :: Duration             -- ^ Timeout in milliseconds before canceling tree-sitter unmarshalling (default: 4000).
   , configAssignmentTimeout          :: Duration             -- ^ Millisecond timeout for assignment (default: 4000)
-  , configMaxTelemetyQueueSize       :: Int                  -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
+  , configMaxTelemetryQueueSize      :: Int                  -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
   , configIsTerminal                 :: Flag IsTerminal      -- ^ Whether a terminal is attached (set automatically at runtime).
   , configLogPrintSource             :: Flag LogPrintSource  -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , configLogFormatter               :: LogFormatter         -- ^ Log formatter to use (set automatically at runtime).
@@ -98,7 +98,7 @@ defaultConfig options = do
     , configTreeSitterParseTimeout = fromMilliseconds parseTimeout
     , configTreeSitterUnmarshalTimeout = fromMilliseconds unmarshalTimeout
     , configAssignmentTimeout = fromMilliseconds assignTimeout
-    , configMaxTelemetyQueueSize = size
+    , configMaxTelemetryQueueSize = size
     , configIsTerminal = flag IsTerminal isTerminal
     , configLogPrintSource = flag LogPrintSource isTerminal
     , configLogFormatter = if isTerminal then terminalFormatter else logfmtFormatter
@@ -131,16 +131,16 @@ logOptionsFromConfig Config{..} = LogOptions
 
 
 withLoggerFromConfig :: Config -> (LogQueue -> IO c) -> IO c
-withLoggerFromConfig config = withLogger (logOptionsFromConfig config) (configMaxTelemetyQueueSize config)
+withLoggerFromConfig config = withLogger (logOptionsFromConfig config) (configMaxTelemetryQueueSize config)
 
 
 withErrorReporterFromConfig :: Config -> Error.ErrorLogger -> (ErrorQueue -> IO c) -> IO c
 withErrorReporterFromConfig Config{..} errorLogger =
-  withErrorReporter (nullErrorReporter errorLogger) configMaxTelemetyQueueSize
+  withErrorReporter (nullErrorReporter errorLogger) configMaxTelemetryQueueSize
 
 withStatterFromConfig :: Config -> (StatQueue -> IO c) -> IO c
 withStatterFromConfig Config{..} =
-  withStatter configStatsHost configStatsPort configAppName configMaxTelemetyQueueSize
+  withStatter configStatsHost configStatsPort configAppName configMaxTelemetryQueueSize
 
 lookupStatsAddr :: IO (Stat.Host, Stat.Port)
 lookupStatsAddr = do
