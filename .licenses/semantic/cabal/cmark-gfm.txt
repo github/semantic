@@ -97,7 +97,7 @@ SOFTWARE.
 
 buffer.h, buffer.c, chunk.h
 
-are derived from code (C) 2012 Github, Inc.
+are derived from code (C) 2012 GitHub, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
