@@ -10,7 +10,7 @@
 :set -fwrite-interface -fobject-code
 
 -- Disable breaking on error since it hangs on uncaught exceptions when the sandbox is disabled: https://gitlab.haskell.org/ghc/ghc/issues/17743
--- This was already disabled in .ghci, but it turns out that if your user-wide .ghci file sets -fbreak-on-error, it gets overriden, so we override it back again here.
+-- This was already disabled in .ghci, but it turns out that if your user-wide .ghci file sets -fbreak-on-error, it gets overridden, so we override it back again here.
 :set -fno-break-on-error
 
 -- Bonus: silence “add these modules to your .cabal file” warnings for files we :load
