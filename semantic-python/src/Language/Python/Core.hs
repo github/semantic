@@ -115,7 +115,7 @@ instance Compile Py.Attribute
 -- @
 --  (b :<- c) >>>= (a :<- b) >>>= cont
 -- @
--- The tree structure that we get out of tree-sitter is not particulary conducive to expressing
+-- The tree structure that we get out of tree-sitter is not particularly conducive to expressing
 -- this naturally, so we engage in a small desugaring step so that we can turn a list [a, b, c]
 -- into a sequenced Core expression using >>>= and a fold through which information—specifically
 -- the LHS to assign—flows.
