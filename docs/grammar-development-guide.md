@@ -117,7 +117,7 @@ Here are some guidelines to determine what approach to take when removing superf
 
 2. **Add it to the inline array.** If the rule is used more than once and its definition is not simple, make it `inline`. If this does not cause parsing problems, this is the best approach, because it will avoid intermediate node allocations and parsing operations at runtime. One possible side-effect of `inline` is that is sometimes makes the parser much larger in terms of number of states. To evaluate whether this has happened, it’s worth looking at the `STATE_COUNT` in `parser.c` before and after. If the state count goes way up, it may not be worth adding the rule to `inline` since more states mean more one-time memory footprint for the parser. If it goes up a few percent (or goes down), it’s fine to add.
 
-3. **Mark it hidden.** If `inline` causes conflicts or drastically increases the size of the parse table, it's better to mark it as hidden. This is often useful when two nodes can not exist without one another. For example, `class_body_declaration` was a child of `class_body` and occurred together 100% of the time. Similarly, `type_arguments` can not exist independent of its child node, `type_argument`. In both cases, it makes sense to hide the former.
+3. **Mark it hidden.** If `inline` causes conflicts or drastically increases the size of the parse table, it's better to mark it as hidden. This is often useful when two nodes cannot exist without one another. For example, `class_body_declaration` was a child of `class_body` and occurred together 100% of the time. Similarly, `type_arguments` cannot exist independent of its child node, `type_argument`. In both cases, it makes sense to hide the former.
     ```diff
         (generic_type
           (type_identifier)
@@ -138,7 +138,7 @@ Most languages have a long-tail of features that are not frequently utilized in 
 
 ### Handling conflicts
 
-Conflicts may arise due to ambiguities in the grammar. This is when the parser can not decide what the next symbol in an input stream should be because there are multiple ways to parse some strings.
+Conflicts may arise due to ambiguities in the grammar. This is when the parser cannot decide what the next symbol in an input stream should be because there are multiple ways to parse some strings.
 
 - **Refactor by removing duplication.** Take two rules that parse the same string and combine them into a single rule that gets used in two places. Simplifying the number of rules reduces the search space of possible paths the parser can pursue, and resultantly can resolve to a single rule more easily.
 
