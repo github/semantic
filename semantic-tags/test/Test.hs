@@ -82,7 +82,7 @@ testTree = Tasty.testGroup "Tags.Tagging.Precise"
 
     -- NB: This emoji (:man-woman-girl-girl:) cannot be entered into a string literal in haskell for some reason, you'll get:
     --   > lexical error in string/character literal at character '\8205'
-    -- The work around is to enter the unicode directly (7 code points).
+    -- The workaround is to enter the unicode directly (7 code points).
     -- utf-8: 25 bytes to represent
     -- utf-16: 23 bytes to represent
     , testCase "multi code point unicode :man-woman-girl-girl:" $
