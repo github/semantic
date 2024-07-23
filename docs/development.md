@@ -37,7 +37,7 @@ You may want to customize Atom to support your haskelling:
     - [`ide-haskell`](https://atom.io/packages/ide-haskell) also provides errors, warnings, types, etc. using `ghc-mod` and other tools:
       - `stack install ghc-mod hlint happy` — this installs `ghc-mod` and `hlint` executables on your system required for the `haskell-ghc-mod` Atom package below.
       - Install [`haskell-ghc-mod`](https://atom.io/packages/haskell-ghc-mod), and [`ide-haskell-cabal`](https://atom.io/packages/ide-haskell-cabal)
-      - If you don't launch Atom from your shell, set the additional paths for the the `haskell-ghc-mod` package in Atom to include `/Users/$USER/.local/bin/` and `/usr/local/bin`. This is done by going to `Atom -> Preferences -> Packages -> haskell-ghc-mod -> Settings` and editing "Additional Paths":
+      - If you don't launch Atom from your shell, set the additional paths for the `haskell-ghc-mod` package in Atom to include `/Users/$USER/.local/bin/` and `/usr/local/bin`. This is done by going to `Atom -> Preferences -> Packages -> haskell-ghc-mod -> Settings` and editing "Additional Paths":
   ![image](https://user-images.githubusercontent.com/875834/31060015-5ff171b0-a6c0-11e7-9f44-65ff776cd9a2.png)
       - [`autocomplete-haskell`](https://atom.io/packages/autocomplete-haskell): Autocompletion
       - [`ide-haskell-hasktags`](https://atom.io/packages/ide-haskell-hasktags): Symbols
