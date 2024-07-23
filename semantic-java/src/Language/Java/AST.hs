@@ -1791,7 +1791,7 @@ instance Data.Traversable.Traversable ConstructorBody where
 data ConstructorDeclaration a = ConstructorDeclaration
   { ann :: a,
     body :: (AST.Parse.Err (ConstructorBody a)),
-    typeParamaters :: (GHC.Maybe.Maybe (AST.Parse.Err (TypeParameters a))),
+    typeParameters :: (GHC.Maybe.Maybe (AST.Parse.Err (TypeParameters a))),
     name :: (AST.Parse.Err (Identifier a)),
     parameters :: (AST.Parse.Err (FormalParameters a)),
     extraChildren :: ([AST.Parse.Err ((Modifiers GHC.Generics.:+: Throws) a)])
