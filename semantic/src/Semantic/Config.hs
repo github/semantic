@@ -52,7 +52,7 @@ data Config
   , configTreeSitterUnmarshalTimeout :: Duration             -- ^ Timeout in milliseconds before canceling tree-sitter unmarshalling (default: 4000).
   , configAssignmentTimeout          :: Duration             -- ^ Millisecond timeout for assignment (default: 4000)
   , configMaxTelemetyQueueSize       :: Int                  -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
-  , configIsTerminal                 :: Flag IsTerminal      -- ^ Whether a terminal is attached (set automaticaly at runtime).
+  , configIsTerminal                 :: Flag IsTerminal      -- ^ Whether a terminal is attached (set automatically at runtime).
   , configLogPrintSource             :: Flag LogPrintSource  -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , configLogFormatter               :: LogFormatter         -- ^ Log formatter to use (set automatically at runtime).
   , configSHA                        :: String               -- ^ SHA to include in log messages (set automatically).
