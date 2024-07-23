@@ -5,7 +5,7 @@ import Data.Text (Text)
 import qualified Proto.Semantic as P
 import Source.Loc
 
--- | A 0-indxed Span where the column offset units are utf-16 code units (2
+-- | A 0-indexed Span where the column offset units are utf-16 code units (2
 -- bytes), suitable for the LSP (Language Server Protocol) specification.
 newtype UTF16CodeUnitSpan = UTF16CodeUnitSpan { unUTF16CodeUnitSpan :: Span }
   deriving (Eq, Show)
