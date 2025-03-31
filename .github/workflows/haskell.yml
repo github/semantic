@@ -42,8 +42,7 @@ jobs:
 
     - name: Get cabal-cache
       run: |
-        curl -L https://github.com/haskell-works/cabal-cache/releases/download/v1.0.1.8/cabal-cache_x86_64_linux.tar.gz > ./cc.tar.gz
-        tar -xvf ./cc.tar.gz
+        cabal new-install cabal-cache
 
     - name: Configure project
       run: |
@@ -52,7 +51,7 @@ jobs:
         cd semantic-source && cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-tests --write-ghc-environment-files=always -j2
 
     - name: Restore from cache
-      run: ./cabal-cache sync-from-archive --threads=2 --archive-uri=dist-cache || true
+      run: cabal-cache sync-from-archive --threads=2 --archive-uri=dist-cache || true
 
     - name: Build & test
       run: |
@@ -73,4 +72,4 @@ jobs:
         cd semantic-source && cabal v2-run   --project-file=cabal.project.ci semantic-source:test
 
     - name: Write out cache
-      run: ./cabal-cache sync-to-archive --threads=2 --archive-uri=dist-cache
+      run: cabal-cache sync-to-archive --threads=2 --archive-uri=dist-cache
