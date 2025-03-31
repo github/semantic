@@ -8,16 +8,19 @@ on:
       - master
   pull_request: {}
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Bazel
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       id: caching-stage
       name: Cache Bazel artifacts
       with:

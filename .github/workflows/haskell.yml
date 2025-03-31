@@ -8,6 +8,9 @@ on:
       - master
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: ghc ${{ matrix.ghc }}
@@ -17,15 +20,15 @@ jobs:
         ghc: ["8.10", "9.2"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
-    - uses: haskell/actions/setup@v1
+    - uses: haskell-actions/setup@d9b5b3fcf7ca56b8fe585c9b77d3b0ce466affd2 # v2.7.10
       name: Setup Haskell
       with:
         ghc-version: ${{ matrix.ghc }}
 
-    - uses: actions/cache@v1
+    - uses: actions/cache@v4
       id: cache-cabal
       name: Cache Cabal artifacts
       with:
