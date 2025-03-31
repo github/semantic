@@ -28,21 +28,21 @@ jobs:
       with:
         ghc-version: ${{ matrix.ghc }}
 
-    - uses: actions/cache@v4
-      id: cache-cabal
-      name: Cache Cabal artifacts
-      with:
-        path: dist-cache
-        key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-${{ hashFiles('**/*.cabal') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-
-          ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-
-          ${{ runner.os }}-${{ matrix.ghc }}-
-          ${{ runner.os }}-
+    # - uses: actions/cache@v4
+    #   id: cache-cabal
+    #   name: Cache Cabal artifacts
+    #   with:
+    #     path: dist-cache
+    #     key: ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-${{ hashFiles('**/*.cabal') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-cabal-cache-
+    #       ${{ runner.os }}-${{ matrix.ghc }}-${{ matrix.cabal }}-
+    #       ${{ runner.os }}-${{ matrix.ghc }}-
+    #       ${{ runner.os }}-
 
-    - name: Get cabal-cache
-      run: |
-        cabal new-install cabal-cache
+    # - name: Get cabal-cache
+    #   run: |
+    #     cabal new-install cabal-cache
 
     - name: Configure project
       run: |
@@ -50,8 +50,8 @@ jobs:
         cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-tests --write-ghc-environment-files=always -j2
         cd semantic-source && cabal v2-configure --project-file=cabal.project.ci --disable-optimization --enable-tests --write-ghc-environment-files=always -j2
 
-    - name: Restore from cache
-      run: cabal-cache sync-from-archive --threads=2 --archive-uri=dist-cache || true
+    # - name: Restore from cache
+    #   run: cabal-cache sync-from-archive --threads=2 --archive-uri=dist-cache || true
 
     - name: Build & test
       run: |
@@ -71,5 +71,5 @@ jobs:
         cabal v2-run   --project-file=cabal.project.ci semantic-typescript:test
         cd semantic-source && cabal v2-run   --project-file=cabal.project.ci semantic-source:test
 
-    - name: Write out cache
-      run: cabal-cache sync-to-archive --threads=2 --archive-uri=dist-cache
+    # - name: Write out cache
+    #   run: cabal-cache sync-to-archive --threads=2 --archive-uri=dist-cache
